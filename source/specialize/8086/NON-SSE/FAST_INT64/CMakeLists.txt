@@ -50,7 +50,7 @@ FILES
     ${SRC_SPECIALIZE_FAST_INT64}
 )
 
-add_library(softfloat-8086-fi64
+add_library(softfloat-8086-fi64 EXCLUDE_FROM_ALL
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
     ${SRC_OTHERS}

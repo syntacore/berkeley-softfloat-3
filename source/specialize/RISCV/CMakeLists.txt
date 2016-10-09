@@ -76,7 +76,7 @@ FILES
     ${SRC_SPECIALIZE_NON_FAST_INT64}
 )
 
-add_library(softfloat-RISCV-fi64
+add_library(softfloat-RISCV-fi64 EXCLUDE_FROM_ALL
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
     ${SRC_OTHERS}
@@ -89,7 +89,7 @@ add_library(softfloat-RISCV-fi64
     ${SRC_SPECIALIZE_FAST_INT64}
     ${SRC_SPECIALIZE_RISCV}
 )
-add_library(softfloat-RISCV-nfi64
+add_library(softfloat-RISCV-nfi64 EXCLUDE_FROM_ALL
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
     ${SRC_OTHERS}
