@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool extF80_isSignalingNaN( extFloat80_t a )
 {
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
 
     uA.f = a;

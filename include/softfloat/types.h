@@ -57,6 +57,7 @@ typedef struct { uint64_t v[2]; } float128_t;
 | structure must contain a 16-bit field named `signExp' and a 64-bit field
 | named `signif'.
 *----------------------------------------------------------------------------*/
+/** @bug macro value dependent interface */
 #ifdef LITTLEENDIAN
 struct extFloat80M { uint64_t signif; uint16_t signExp; };
 #else

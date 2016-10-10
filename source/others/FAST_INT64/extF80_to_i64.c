@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int_fast64_t
  extF80_to_i64( extFloat80_t a, uint_fast8_t roundingMode, bool exact )
 {
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
     uint_fast16_t uiA64;
     bool sign;

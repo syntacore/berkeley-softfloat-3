@@ -54,6 +54,7 @@ extFloat80_t
     uint_fast64_t roundIncrement, roundMask, roundBits;
     bool isTiny, doIncrement;
     struct uint64_extra sig64Extra;
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     roundingMode = softfloat_roundingMode;

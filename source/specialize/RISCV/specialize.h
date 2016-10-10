@@ -328,7 +328,7 @@ struct uint128
 INLINE
 void
  softfloat_commonNaNToExtF80M(
-     const struct commonNaN *aPtr, struct extFloat80M *zSPtr )
+     const struct commonNaN *aPtr, struct extFloat80M *zSPtr /** @bug use extFloat80_t */)
 {
     (void)aPtr;
     zSPtr->signExp = defaultNaNExtF80UI64;
@@ -337,7 +337,7 @@ void
 #else
 void
  softfloat_commonNaNToExtF80M(
-     const struct commonNaN *aPtr, struct extFloat80M *zSPtr );
+     const struct commonNaN *aPtr, struct extFloat80M *zSPtr /** @bug use extFloat80_t */);
 #endif
 
 /*----------------------------------------------------------------------------
@@ -346,6 +346,7 @@ void
 | at the location pointed to by `zSPtr'.  If either original floating-point
 | value is a signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
+/** @bug use extFloat80_t */
 void
  softfloat_propagateNaNExtF80M(
      const struct extFloat80M *aSPtr,

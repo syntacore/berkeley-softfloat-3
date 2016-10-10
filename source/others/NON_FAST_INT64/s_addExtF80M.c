@@ -43,9 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
  softfloat_addExtF80M(
+/** @bug use extFloat80_t */
      const struct extFloat80M *aSPtr,
-     const struct extFloat80M *bSPtr,
-     struct extFloat80M *zSPtr,
+    /** @bug use extFloat80_t */
+    const struct extFloat80M *bSPtr,
+    /** @bug use extFloat80_t */
+    struct extFloat80M *zSPtr,
      bool negateB
  )
 {
@@ -59,7 +62,8 @@ void
     uint64_t sigZ, sigB;
     void
      (*roundPackRoutinePtr)(
-         bool, int32_t, uint32_t *, uint_fast8_t, struct extFloat80M * );
+         bool, int32_t, uint32_t *, uint_fast8_t, struct extFloat80M * /** @bug use extFloat80_t */
+        );
     int32_t expDiff;
     uint32_t extSigX[3], sigZExtra;
 

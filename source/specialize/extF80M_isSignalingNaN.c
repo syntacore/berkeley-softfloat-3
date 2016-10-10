@@ -46,6 +46,7 @@ bool extF80M_isSignalingNaN( const extFloat80_t *aPtr )
     const struct extFloat80M *aSPtr;
     uint64_t uiA0;
 
+    /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
     if ( (aSPtr->signExp & 0x7FFF) != 0x7FFF ) return false;
     uiA0 = aSPtr->signif;

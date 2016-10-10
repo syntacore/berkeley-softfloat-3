@@ -66,6 +66,7 @@ int_fast64_t extF80M_to_i64_r_minMag( const extFloat80_t *aPtr, bool exact )
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
+    /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
     uiA64 = aSPtr->signExp;
     exp = expExtF80UI64( uiA64 );

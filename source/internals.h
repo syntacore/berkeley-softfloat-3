@@ -47,6 +47,7 @@ union ui32_f32 { uint32_t ui; float32_t f; };
 union ui64_f64 { uint64_t ui; float64_t f; };
 
 #ifdef SOFTFLOAT_FAST_INT64
+/** @bug union of same type */
 union extF80M_extF80 { struct extFloat80M fM; extFloat80_t f; };
 union ui128_f128 { struct uint128 ui; float128_t f; };
 #endif

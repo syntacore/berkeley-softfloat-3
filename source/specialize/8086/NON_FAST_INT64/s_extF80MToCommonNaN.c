@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
 | NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
+/** @bug use extFloat80_t */
 void
  softfloat_extF80MToCommonNaN(
      const struct extFloat80M *aSPtr, struct commonNaN *zPtr )

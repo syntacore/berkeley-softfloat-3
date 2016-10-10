@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
+/** @bug use extFloat80_t */
 void softfloat_invalidExtF80M( struct extFloat80M *zSPtr )
 {
 

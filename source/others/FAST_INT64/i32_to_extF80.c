@@ -46,6 +46,7 @@ extFloat80_t i32_to_extF80( int32_t a )
     uint_fast32_t absA;
     bool sign;
     int_fast8_t shiftDist;
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     uiZ64 = 0;

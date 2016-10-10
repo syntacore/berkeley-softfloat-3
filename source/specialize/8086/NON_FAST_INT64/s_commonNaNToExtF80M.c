@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | floating-point NaN, and stores this NaN at the location pointed to by
 | `zSPtr'.
 *----------------------------------------------------------------------------*/
+/** @bug use extFloat80_t */
 void
  softfloat_commonNaNToExtF80M(
      const struct commonNaN *aPtr, struct extFloat80M *zSPtr )

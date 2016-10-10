@@ -60,6 +60,7 @@ extFloat80_t
     int_fast32_t expZ;
     uint_fast64_t sigExtra;
     struct uint128 sig128, uiZ;
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     /*------------------------------------------------------------------------

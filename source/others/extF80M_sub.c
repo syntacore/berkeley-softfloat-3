@@ -58,7 +58,9 @@ void
             uint_fast16_t, uint_fast64_t, uint_fast16_t, uint_fast64_t, bool );
 #endif
 
+    /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
+    /** @bug cast to same type */
     bSPtr = (const struct extFloat80M *) bPtr;
     uiA64 = aSPtr->signExp;
     uiA0  = aSPtr->signif;
@@ -88,8 +90,11 @@ void
 {
 
     softfloat_addExtF80M(
+        /** @bug cast to same type */
         (const struct extFloat80M *) aPtr,
+        /** @bug cast to same type */
         (const struct extFloat80M *) bPtr,
+        /** @bug cast to same type */
         (struct extFloat80M *) zPtr,
         true
     );

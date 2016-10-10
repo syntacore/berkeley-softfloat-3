@@ -43,6 +43,7 @@ extFloat80_t ui64_to_extF80( uint64_t a )
 {
     uint_fast16_t uiZ64;
     int_fast8_t shiftDist;
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     uiZ64 = 0;

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "softfloat/types.h"
 
+/** @bug use extFloat80_t */
 int
  softfloat_compareNonnormExtF80M(
      const struct extFloat80M *aSPtr, const struct extFloat80M *bSPtr )

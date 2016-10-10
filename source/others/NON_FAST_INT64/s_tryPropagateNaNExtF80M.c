@@ -41,9 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool
  softfloat_tryPropagateNaNExtF80M(
-     const struct extFloat80M *aSPtr,
-     const struct extFloat80M *bSPtr,
-     struct extFloat80M *zSPtr
+    /** @bug use extFloat80_t */
+    const struct extFloat80M *aSPtr,
+    /** @bug use extFloat80_t */
+    const struct extFloat80M *bSPtr,
+    /** @bug use extFloat80_t */
+    struct extFloat80M *zSPtr
  )
 {
     uint_fast16_t ui64;

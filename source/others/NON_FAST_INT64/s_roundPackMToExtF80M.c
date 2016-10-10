@@ -46,7 +46,8 @@ void
      int32_t exp,
      uint32_t *extSigPtr,
      uint_fast8_t roundingPrecision,
-     struct extFloat80M *zSPtr
+    /** @bug use extFloat80_t */
+    struct extFloat80M *zSPtr
  )
 {
     uint_fast8_t roundingMode;

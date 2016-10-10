@@ -53,6 +53,7 @@ extFloat80_t f32_to_extF80( float32_t a )
     uint_fast16_t uiZ64;
     uint_fast64_t uiZ0;
     struct exp16_sig32 normExpSig;
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     /*------------------------------------------------------------------------

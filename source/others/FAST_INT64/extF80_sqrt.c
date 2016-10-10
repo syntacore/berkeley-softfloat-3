@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extFloat80_t extF80_sqrt( extFloat80_t a )
 {
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
     uint_fast16_t uiA64;
     uint_fast64_t uiA0;
@@ -59,6 +60,7 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     uint_fast64_t q, sigZ, x64;
     struct uint128 term;
     uint_fast64_t sigZExtra;
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     /*------------------------------------------------------------------------

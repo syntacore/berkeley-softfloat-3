@@ -67,6 +67,7 @@ int_fast32_t
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
+    /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
     uiA64 = aSPtr->signExp;
     sign = signExtF80UI64( uiA64 );

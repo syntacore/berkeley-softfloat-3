@@ -59,6 +59,7 @@ void i32_to_extF80M( int32_t a, extFloat80_t *zPtr )
     uint32_t absA;
     int_fast8_t shiftDist;
 
+    /** @bug cast to same type */
     zSPtr = (struct extFloat80M *) zPtr;
     uiZ64 = 0;
     sigZ = 0;

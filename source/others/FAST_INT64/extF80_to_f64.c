@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t extF80_to_f64( extFloat80_t a )
 {
+    /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
     uint_fast16_t uiA64;
     uint_fast64_t uiA0;
