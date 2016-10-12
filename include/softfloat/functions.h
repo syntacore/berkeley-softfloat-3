@@ -61,7 +61,7 @@ extern "C" {
 | Software floating-point underflow tininess-detection mode.
 *----------------------------------------------------------------------------*/
 extern THREAD_LOCAL uint_fast8_t softfloat_detectTininess;
-enum {
+enum softfloat_tininess {
     softfloat_tininess_beforeRounding = 0,
     softfloat_tininess_afterRounding  = 1
 };
@@ -70,7 +70,7 @@ enum {
 | Software floating-point rounding mode.
 *----------------------------------------------------------------------------*/
 extern THREAD_LOCAL uint_fast8_t softfloat_roundingMode;
-enum {
+enum softfloat_round_mode {
     softfloat_round_near_even   = 0,
     softfloat_round_minMag      = 1,
     softfloat_round_min         = 2,
@@ -82,12 +82,12 @@ enum {
 | Software floating-point exception flags.
 *----------------------------------------------------------------------------*/
 extern THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags;
-enum {
-    softfloat_flag_inexact   =  1,
-    softfloat_flag_underflow =  2,
-    softfloat_flag_overflow  =  4,
-    softfloat_flag_infinite  =  8,
-    softfloat_flag_invalid   = 16
+enum softfloat_flags {
+    softfloat_flag_inexact   = 1 << 0,
+    softfloat_flag_underflow = 1 << 1,
+    softfloat_flag_overflow  = 1 << 2,
+    softfloat_flag_infinite  = 1 << 3,
+    softfloat_flag_invalid   = 1 << 4
 };
 
 /*----------------------------------------------------------------------------
