@@ -46,12 +46,11 @@ floating-point NaN, and stores this NaN at the location pointed to by
 */
 /** @bug use extFloat80_t */
 void
- softfloat_commonNaNToExtF80M(
-     const struct commonNaN *aPtr, struct extFloat80M *zSPtr )
+softfloat_commonNaNToExtF80M(const struct commonNaN *aPtr, struct extFloat80M *zSPtr)
 {
 
-    zSPtr->signExp = packToExtF80UI64( aPtr->sign, 0x7FFF );
-    zSPtr->signif = UINT64_C( 0xC000000000000000 ) | aPtr->v64>>1;
+    zSPtr->signExp = packToExtF80UI64(aPtr->sign, 0x7FFF);
+    zSPtr->signif = UINT64_C(0xC000000000000000) | aPtr->v64 >> 1;
 
 }
 

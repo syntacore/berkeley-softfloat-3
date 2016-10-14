@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 
+#define SOFTFLOAT_COMMONNANTOEXTF80M
+
+#include "specialize.h"
 #include "softfloat/types.h"
 
-#define softfloat_commonNaNToExtF80M softfloat_commonNaNToExtF80M
-#include "specialize.h"
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into an 80-bit extended
@@ -46,12 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | `zSPtr'.
 *----------------------------------------------------------------------------*/
 void
- softfloat_commonNaNToExtF80M(
-     const struct commonNaN *aPtr, struct extFloat80M *zSPtr )
+softfloat_commonNaNToExtF80M(const struct commonNaN *aPtr, struct extFloat80M *zSPtr )
 {
-
     zSPtr->signExp = defaultNaNExtF80UI64;
     zSPtr->signif  = defaultNaNExtF80UI0;
-
 }
-

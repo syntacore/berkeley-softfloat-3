@@ -315,8 +315,7 @@ floating-point NaN, and stores this NaN at the location pointed to by
 */
 /** @bug use extFloat80_t */
 void
-softfloat_commonNaNToExtF80M(
-    const struct commonNaN *aPtr, struct extFloat80M *zSPtr);
+softfloat_commonNaNToExtF80M(const struct commonNaN *aPtr, struct extFloat80M *zSPtr);
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values

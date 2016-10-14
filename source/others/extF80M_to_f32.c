@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 #include "specialize.h"
+#include <assert.h>
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -101,7 +102,8 @@ float32_t extF80M_to_f32(const extFloat80_t *aPtr)
             exp = -0x1000;
         }
     }
-    return softfloat_roundPackToF32(sign, exp, sig32);
+    assert(INT16_MIN <= exp && exp <= INT16_MAX);
+    return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
     
 
 uiZ:

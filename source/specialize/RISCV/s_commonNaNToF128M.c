@@ -34,27 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_COMMONNANTOF128M
+
+#include "specialize.h"
 
 #include "primitives/types.h"
 
-#define softfloat_commonNaNToF128M softfloat_commonNaNToF128M
-#include "specialize.h"
-
-/*----------------------------------------------------------------------------
-| Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
-| NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
-| `zWPtr' points to an array of four 32-bit elements that concatenate in the
-| platform's normal endian order to form a 128-bit floating-point value.
-*----------------------------------------------------------------------------*/
 void
- softfloat_commonNaNToF128M( const struct commonNaN *aPtr, uint32_t *zWPtr )
+softfloat_commonNaNToF128M(const struct commonNaN *aPtr, uint32_t *zWPtr)
 {
-
-    zWPtr[indexWord( 4, 3 )] = defaultNaNF128UI96;
-    zWPtr[indexWord( 4, 2 )] = defaultNaNF128UI64;
-    zWPtr[indexWord( 4, 1 )] = defaultNaNF128UI32;
-    zWPtr[indexWord( 4, 0 )] = defaultNaNF128UI0;
-
+    (void)aPtr;
+    zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
+    zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
+    zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
+    zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
 }
 
