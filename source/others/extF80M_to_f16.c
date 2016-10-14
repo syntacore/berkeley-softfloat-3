@@ -97,7 +97,7 @@ float16_t extF80M_to_f16( const extFloat80_t *aPtr )
     *------------------------------------------------------------------------*/
     sig16 = softfloat_shortShiftRightJam64( sig, 49 );
     exp -= 0x3FF1;
-    if ( sizeof (int_fast16_t) < sizeof (int32_t) ) {
+    if ( sizeof (int_fast16_t) < sizeof exp ) {
         if ( exp < -0x40 ) exp = -0x40;
     }
     return softfloat_roundPackToF16( sign, exp, sig16 );
