@@ -80,7 +80,7 @@ int_fast64_t
     if ( shiftDist < 0 ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
         return
-            (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+            (exp == INT16_MAX) && (sig & INT64_MAX)
                 ? i64_fromNaN
                 : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
