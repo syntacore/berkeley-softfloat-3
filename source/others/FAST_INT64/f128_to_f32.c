@@ -81,7 +81,7 @@ float32_t f128_to_f32( float128_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     exp -= 0x3F81;
-    if ( sizeof (int_fast16_t) < sizeof (int_fast32_t) ) {
+    if ( sizeof (int_fast16_t) < sizeof exp) {
         if ( exp < -0x1000 ) exp = -0x1000;
     }
     return softfloat_roundPackToF32( sign, exp, frac32 | 0x40000000 );

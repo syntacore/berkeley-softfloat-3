@@ -83,7 +83,7 @@ float16_t extF80_to_f16( extFloat80_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     exp -= 0x3FF1;
-    if ( sizeof (int_fast16_t) < sizeof (int_fast32_t) ) {
+    if ( sizeof (int_fast16_t) < sizeof exp ) {
         if ( exp < -0x40 ) exp = -0x40;
     }
     return softfloat_roundPackToF16( sign, exp, sig16 );
