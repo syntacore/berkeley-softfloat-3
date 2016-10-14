@@ -73,7 +73,7 @@ int_fast64_t f128_to_i64_r_minMag( float128_t a, bool exact )
                 && (sig0 < UINT64_C( 0x0002000000000000 ))
             ) {
                 if ( exact && sig0 ) {
-                    softfloat_exceptionFlags |= softfloat_flag_inexact;
+                    softfloat_raiseFlags(softfloat_flag_inexact);
                 }
                 return -INT64_C( 0x7FFFFFFFFFFFFFFF ) - 1;
             }
@@ -88,14 +88,14 @@ int_fast64_t f128_to_i64_r_minMag( float128_t a, bool exact )
         negShiftDist = -shiftDist;
         absZ = sig64<<negShiftDist | sig0>>(shiftDist & 63);
         if ( exact && (uint64_t) (sig0<<negShiftDist) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
     } else {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         if ( 49 <= shiftDist ) {
             if ( exact && (exp | sig64 | sig0) ) {
-                softfloat_exceptionFlags |= softfloat_flag_inexact;
+                softfloat_raiseFlags(softfloat_flag_inexact);
             }
             return 0;
         }
@@ -104,7 +104,7 @@ int_fast64_t f128_to_i64_r_minMag( float128_t a, bool exact )
         sig64 |= UINT64_C( 0x0001000000000000 );
         absZ = sig64>>shiftDist;
         if ( exact && (sig0 || (absZ<<shiftDist != sig64)) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
     }
     return sign ? -absZ : absZ;

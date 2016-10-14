@@ -72,14 +72,14 @@ uint_fast64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
         negShiftDist = -shiftDist;
         z = sig64<<negShiftDist | sig0>>(shiftDist & 63);
         if ( exact && (uint64_t) (sig0<<negShiftDist) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
     } else {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         if ( 49 <= shiftDist ) {
             if ( exact && (exp | sig64 | sig0) ) {
-                softfloat_exceptionFlags |= softfloat_flag_inexact;
+                softfloat_raiseFlags(softfloat_flag_inexact);
             }
             return 0;
         }
@@ -89,7 +89,7 @@ uint_fast64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
         sig64 |= UINT64_C( 0x0001000000000000 );
         z = sig64>>shiftDist;
         if ( exact && (sig0 || (z<<shiftDist != sig64)) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
     }
     return z;

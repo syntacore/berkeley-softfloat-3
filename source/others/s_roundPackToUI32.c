@@ -67,7 +67,7 @@ uint_fast32_t
     z &= ~(uint_fast32_t) (! (roundBits ^ 0x800) & roundNearEven);
     if ( sign && z ) goto invalid;
     if ( exact && roundBits ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return z;
     /*------------------------------------------------------------------------

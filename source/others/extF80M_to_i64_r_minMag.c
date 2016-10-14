@@ -93,21 +93,21 @@ int_fast64_t extF80M_to_i64_r_minMag( const extFloat80_t *aPtr, bool exact )
         }
         if ( sign ) {
             if ( UINT64_C( 0x8000000000000000 ) < absZ ) goto invalid;
-            u.ui = -absZ;
+            u.ui = -(int64_t)absZ;
             z = u.i;
         } else {
             if ( UINT64_C( 0x8000000000000000 ) <= absZ ) goto invalid;
             z = absZ;
         }
     }
-    if ( raiseInexact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( raiseInexact ) softfloat_raiseFlags(softfloat_flag_inexact);
     return z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return
-        (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ? i64_fromNaN
+        (exp == INT16_MAX) && (sig & INT64_MAX) ? i64_fromNaN
             : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
 }

@@ -74,7 +74,7 @@ uint_fast64_t extF80M_to_ui64_r_minMag( const extFloat80_t *aPtr, bool exact )
     if ( ! sig && (exp != 0x7FFF) ) return 0;
     shiftDist = 0x403E - exp;
     if ( 64 <= shiftDist ) {
-        if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+        if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
         return 0;
     }
     /*------------------------------------------------------------------------
@@ -90,7 +90,7 @@ uint_fast64_t extF80M_to_ui64_r_minMag( const extFloat80_t *aPtr, bool exact )
         if ( shiftDist ) z >>= shiftDist;
         if ( sign && z ) goto invalid;
         if ( exact && shiftDist && (z<<shiftDist != sig) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
     }
     return z;

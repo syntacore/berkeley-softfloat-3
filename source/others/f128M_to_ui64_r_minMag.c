@@ -84,7 +84,7 @@ uint_fast64_t f128M_to_ui64_r_minMag( const float128_t *aPtr, bool exact )
         z = (uint64_t) sig[indexWord( 4, 2 )]<<32 | sig[indexWord( 4, 1 )];
         if ( sign && z ) goto invalid;
         if ( sig[indexWordLo( 4 )] ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
     } else {
         if ( 64 <= shiftDist ) return 0;

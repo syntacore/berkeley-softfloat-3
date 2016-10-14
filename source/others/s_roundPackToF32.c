@@ -79,7 +79,7 @@ float32_t
             goto uiZ;
         }
     }
-    if ( roundBits ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
     sig = (sig + roundIncrement)>>7;
     sig &= ~(uint_fast32_t) (! (roundBits ^ 0x40) & roundNearEven);
     uiZ = packToF32UI( sign, sig ? exp : 0, sig );

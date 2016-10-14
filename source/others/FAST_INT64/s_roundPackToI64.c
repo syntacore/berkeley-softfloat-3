@@ -72,11 +72,11 @@ int_fast64_t
                  (! (sigExtra & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                       & roundNearEven);
     }
-    uZ.ui = sign ? -sig : sig;
+    uZ.ui = sign ? -(int_fast64_t)sig : sig;
     z = uZ.i;
     if ( z && ((z < 0) ^ sign) ) goto invalid;
     if ( exact && sigExtra ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return z;
     /*------------------------------------------------------------------------

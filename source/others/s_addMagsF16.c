@@ -164,7 +164,7 @@ float16_t softfloat_addMagsF16( uint_fast16_t uiA, uint_fast16_t uiB )
             }
         }
     }
-    softfloat_exceptionFlags |= softfloat_flag_inexact;
+    softfloat_raiseFlags(softfloat_flag_inexact);
     goto uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

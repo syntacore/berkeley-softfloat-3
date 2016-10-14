@@ -99,7 +99,7 @@ void
             sigExtra = aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )];
         }
         if ( ! sigExtra && ! (ui96 & 0x7FFFFFFF) ) goto ui96;
-        if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+        if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
         sign = signF128UI96( ui96 );
         switch ( roundingMode ) {
          case softfloat_round_near_even:
@@ -201,7 +201,7 @@ void
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     if ( exact && (softfloat_compare128M( aWPtr, zWPtr ) != 0) ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return;
     /*------------------------------------------------------------------------

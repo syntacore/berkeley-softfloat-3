@@ -91,7 +91,7 @@ extFloat80_t
                 softfloat_raiseFlags( softfloat_flag_underflow );
             }
             if ( roundBits ) {
-                softfloat_exceptionFlags |= softfloat_flag_inexact;
+                softfloat_raiseFlags(softfloat_flag_inexact);
             }
             sig += roundIncrement;
             exp = ((sig & UINT64_C( 0x8000000000000000 )) != 0);
@@ -109,7 +109,7 @@ extFloat80_t
             goto overflow;
         }
     }
-    if ( roundBits ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
     sig = (uint64_t) (sig + roundIncrement);
     if ( sig < roundIncrement ) {
         ++exp;
@@ -145,7 +145,7 @@ extFloat80_t
             if ( isTiny && sigExtra ) {
                 softfloat_raiseFlags( softfloat_flag_underflow );
             }
-            if ( sigExtra ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+            if ( sigExtra ) softfloat_raiseFlags(softfloat_flag_inexact);
             doIncrement = (UINT64_C( 0x8000000000000000 ) <= sigExtra);
             if (
                    ! roundNearEven
@@ -191,7 +191,7 @@ extFloat80_t
             goto packReturn;
         }
     }
-    if ( sigExtra ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( sigExtra ) softfloat_raiseFlags(softfloat_flag_inexact);
     if ( doIncrement ) {
         ++sig;
         if ( ! sig ) {

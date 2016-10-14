@@ -94,7 +94,7 @@ extFloat80_t
         goto uiZ;
     }
     if ( exp <= 0x3FFE ) {
-        if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+        if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
         switch ( roundingMode ) {
          case softfloat_round_near_even:
             if ( ! (sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) break;
@@ -138,7 +138,7 @@ extFloat80_t
         sigZ = UINT64_C( 0x8000000000000000 );
     }
     if ( exact && (sigZ != sigA) ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
  uiZ:
     uZ.s.signExp = uiZ64;

@@ -58,7 +58,7 @@ float16_t f16_roundToInt( float16_t a, uint_fast8_t roundingMode, bool exact )
     *------------------------------------------------------------------------*/
     if ( exp <= 0xE ) {
         if ( ! (uint16_t) (uiA<<1) ) return a;
-        if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+        if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
         uiZ = uiA & packToF16UI( 1, 0, 0 );
         switch ( roundingMode ) {
          case softfloat_round_near_even:
@@ -101,7 +101,7 @@ float16_t f16_roundToInt( float16_t a, uint_fast8_t roundingMode, bool exact )
     }
     uiZ &= ~roundBitsMask;
     if ( exact && (uiZ != uiA) ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
  uiZ:
     uZ.ui = uiZ;

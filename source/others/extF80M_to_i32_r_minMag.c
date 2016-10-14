@@ -98,14 +98,14 @@ int_fast32_t extF80M_to_i32_r_minMag( const extFloat80_t *aPtr, bool exact )
         }
         if ( sign ) {
             if ( 0x80000000 < absZ ) goto invalid;
-            u.ui = -absZ;
+            u.ui = -(int32_t)absZ;
             z = u.i;
         } else {
             if ( 0x80000000 <= absZ ) goto invalid;
             z = absZ;
         }
     }
-    if ( raiseInexact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( raiseInexact ) softfloat_raiseFlags(softfloat_flag_inexact);
     return z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

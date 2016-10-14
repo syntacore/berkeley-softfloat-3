@@ -79,7 +79,7 @@ float16_t
             goto uiZ;
         }
     }
-    if ( roundBits ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
     sig = (sig + roundIncrement)>>4;
     sig &= ~(uint_fast16_t) (! (roundBits ^ 8) & roundNearEven);
     uiZ = packToF16UI( sign, sig ? exp : 0, sig );

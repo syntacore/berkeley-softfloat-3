@@ -72,7 +72,7 @@ uint_fast64_t
     }
     if ( sign && sig ) goto invalid;
     if ( exact && sigExtra ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return sig;
     /*------------------------------------------------------------------------

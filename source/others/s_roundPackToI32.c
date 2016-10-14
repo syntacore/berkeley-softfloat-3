@@ -67,11 +67,11 @@ int_fast32_t
     if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
     sig32 = sig>>12;
     sig32 &= ~(uint_fast32_t) (! (roundBits ^ 0x800) & roundNearEven);
-    uZ.ui = sign ? -sig32 : sig32;
+    uZ.ui = sign ? -(int_fast32_t)sig32 : sig32;
     z = uZ.i;
     if ( z && ((z < 0) ^ sign) ) goto invalid;
     if ( exact && roundBits ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return z;
     /*------------------------------------------------------------------------

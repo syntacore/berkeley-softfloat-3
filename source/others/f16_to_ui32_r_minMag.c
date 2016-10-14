@@ -62,7 +62,7 @@ uint_fast32_t f16_to_ui32_r_minMag( float16_t a, bool exact )
     shiftDist = exp - 0x0F;
     if ( shiftDist < 0 ) {
         if ( exact && (exp | frac) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
         return 0;
     }
@@ -79,7 +79,7 @@ uint_fast32_t f16_to_ui32_r_minMag( float16_t a, bool exact )
     *------------------------------------------------------------------------*/
     alignedSig = (uint_fast32_t) (frac | 0x0400)<<shiftDist;
     if ( exact && (alignedSig & 0x3FF) ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return alignedSig>>10;
 

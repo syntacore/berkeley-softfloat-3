@@ -109,7 +109,7 @@ float128_t
             if ( ! ((uiA64 & UINT64_C( 0x7FFFFFFFFFFFFFFF )) | uiA0) ) {
                 return a;
             }
-            if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+            if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
             uiZ.v64 = uiA64 & packToF128UI64( 1, 0, 0 );
             uiZ.v0  = 0;
             switch ( roundingMode ) {
@@ -150,7 +150,7 @@ float128_t
         uiZ.v64 &= ~roundBitsMask;
     }
     if ( exact && ((uiZ.v64 != uiA64) || (uiZ.v0 != uiA0)) ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
  uiZ:
     uZ.ui = uiZ;

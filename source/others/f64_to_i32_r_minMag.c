@@ -62,7 +62,7 @@ int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     shiftDist = 0x433 - exp;
     if ( 53 <= shiftDist ) {
         if ( exact && (exp | sig) ) {
-            softfloat_exceptionFlags |= softfloat_flag_inexact;
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
         return 0;
     }
@@ -74,7 +74,7 @@ int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
             sign && (exp == 0x41E) && (sig < UINT64_C( 0x0000000000200000 ))
         ) {
             if ( exact && sig ) {
-                softfloat_exceptionFlags |= softfloat_flag_inexact;
+                softfloat_raiseFlags(softfloat_flag_inexact);
             }
             return -0x7FFFFFFF - 1;
         }
@@ -88,7 +88,7 @@ int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     sig |= UINT64_C( 0x0010000000000000 );
     absZ = sig>>shiftDist;
     if ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
-        softfloat_exceptionFlags |= softfloat_flag_inexact;
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return sign ? -absZ : absZ;
 

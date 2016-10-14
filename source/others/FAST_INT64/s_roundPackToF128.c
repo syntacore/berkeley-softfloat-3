@@ -127,7 +127,7 @@ float128_t
             goto uiZ;
         }
     }
-    if ( sigExtra ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( sigExtra ) softfloat_raiseFlags(softfloat_flag_inexact);
     if ( doIncrement ) {
         sig128 = softfloat_add128( sig64, sig0, 0, 1 );
         sig64 = sig128.v64;

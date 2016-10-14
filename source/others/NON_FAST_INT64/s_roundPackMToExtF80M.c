@@ -98,7 +98,7 @@ void
             roundBits = sig & roundMask;
             if ( roundBits ) {
                 if ( isTiny ) softfloat_raiseFlags( softfloat_flag_underflow );
-                softfloat_exceptionFlags |= softfloat_flag_inexact;
+                softfloat_raiseFlags(softfloat_flag_inexact);
             }
             sig += roundIncrement;
             exp = ((sig & UINT64_C( 0x8000000000000000 )) != 0);
@@ -118,7 +118,7 @@ void
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( roundBits ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
     sig += roundIncrement;
     if ( sig < roundIncrement ) {
         ++exp;
@@ -157,7 +157,7 @@ void
             sigExtra = extSigPtr[indexWordLo( 3 )];
             if ( sigExtra ) {
                 if ( isTiny ) softfloat_raiseFlags( softfloat_flag_underflow );
-                softfloat_exceptionFlags |= softfloat_flag_inexact;
+                softfloat_raiseFlags(softfloat_flag_inexact);
             }
             doIncrement = (0x80000000 <= sigExtra);
             if (
@@ -208,7 +208,7 @@ void
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( sigExtra ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( sigExtra ) softfloat_raiseFlags(softfloat_flag_inexact);
     if ( doIncrement ) {
         ++sig;
         if ( ! sig ) {

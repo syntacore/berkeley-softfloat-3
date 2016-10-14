@@ -116,7 +116,7 @@ void
             return;
         }
     }
-    if ( sigExtra ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+    if ( sigExtra ) softfloat_raiseFlags(softfloat_flag_inexact);
     uj = extSigPtr[indexWord( 5, 1 )];
     if ( doIncrement ) {
         ++uj;
