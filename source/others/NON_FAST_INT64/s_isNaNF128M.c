@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,15 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "primitives/functions.h"
 
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
 bool softfloat_isNaNF128M( const uint32_t *aWPtr )
 {
     uint32_t uiA96;
@@ -48,10 +43,6 @@ bool softfloat_isNaNF128M( const uint32_t *aWPtr )
     uiA96 = aWPtr[indexWordHi( 4 )];
     if ( (~uiA96 & 0x7FFF0000) != 0 ) return false;
     return
-        ((uiA96 & 0x0000FFFF) != 0)
-            || ((aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )]
-                     | aWPtr[indexWord( 4, 0 )])
-                    != 0);
-
+        (uiA96 & 0x0000FFFF) != 0 || 
+        (aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )]) != 0;
 }
-

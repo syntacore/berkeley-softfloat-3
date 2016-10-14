@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,48 +32,45 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
 
 void
- softfloat_normRoundPackMToExtF80M(
-     bool sign,
-     int32_t exp,
-     uint32_t *extSigPtr,
-     uint8_t roundingPrecision,
-    /** @bug use extFloat80_t */
-    struct extFloat80M *zSPtr
- )
+softfloat_normRoundPackMToExtF80M(
+    bool sign,
+    int32_t exp,
+    uint32_t *extSigPtr,
+    uint8_t roundingPrecision,
+   /** @bug use extFloat80_t */
+   struct extFloat80M *zSPtr
+)
 {
     int16_t shiftDist;
     uint32_t wordSig;
 
     shiftDist = 0;
-    wordSig = extSigPtr[indexWord( 3, 2 )];
-    if ( ! wordSig ) {
+    wordSig = extSigPtr[indexWord(3, 2)];
+    if (!wordSig) {
         shiftDist = 32;
-        wordSig = extSigPtr[indexWord( 3, 1 )];
-        if ( ! wordSig ) {
+        wordSig = extSigPtr[indexWord(3, 1)];
+        if (!wordSig) {
             shiftDist = 64;
-            wordSig = extSigPtr[indexWord( 3, 0 )];
-            if ( ! wordSig ) {
-                zSPtr->signExp = packToExtF80UI64( sign, 0 );
+            wordSig = extSigPtr[indexWord(3, 0)];
+            if (!wordSig) {
+                zSPtr->signExp = packToExtF80UI64(sign, 0);
                 zSPtr->signif = 0;
                 return;
             }
         }
     }
-    shiftDist += softfloat_countLeadingZeros32( wordSig );
-    if ( shiftDist ) {
+    shiftDist += softfloat_countLeadingZeros32(wordSig);
+    if (shiftDist) {
         exp -= shiftDist;
-        softfloat_shiftLeft96M( extSigPtr, shiftDist, extSigPtr );
+        softfloat_shiftLeft96M(extSigPtr, shiftDist, extSigPtr);
     }
     softfloat_roundPackMToExtF80M(
-        sign, exp, extSigPtr, roundingPrecision, zSPtr );
+        sign, exp, extSigPtr, roundingPrecision, zSPtr);
 
 }
 

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,35 +32,33 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
+*/
 
 #include "internals.h"
 #include "specialize.h"
 
 bool
- softfloat_tryPropagateNaNExtF80M(
-    /** @bug use extFloat80_t */
-    const struct extFloat80M *aSPtr,
-    /** @bug use extFloat80_t */
-    const struct extFloat80M *bSPtr,
-    /** @bug use extFloat80_t */
-    struct extFloat80M *zSPtr
- )
+softfloat_tryPropagateNaNExtF80M(
+   /** @bug use extFloat80_t */
+   const struct extFloat80M *aSPtr,
+   /** @bug use extFloat80_t */
+   const struct extFloat80M *bSPtr,
+   /** @bug use extFloat80_t */
+   struct extFloat80M *zSPtr
+)
 {
     uint16_t ui64;
     uint64_t ui0;
 
     ui64 = aSPtr->signExp;
-    ui0  = aSPtr->signif;
-    if ( isNaNExtF80UI( ui64, ui0 ) ) goto propagateNaN;
+    ui0 = aSPtr->signif;
+    if (isNaNExtF80UI(ui64, ui0)) goto propagateNaN;
     ui64 = bSPtr->signExp;
-    ui0  = bSPtr->signif;
-    if ( isNaNExtF80UI( ui64, ui0 ) ) goto propagateNaN;
+    ui0 = bSPtr->signif;
+    if (isNaNExtF80UI(ui64, ui0)) goto propagateNaN;
     return false;
- propagateNaN:
-    softfloat_propagateNaNExtF80M( aSPtr, bSPtr, zSPtr );
+propagateNaN:
+    softfloat_propagateNaNExtF80M(aSPtr, bSPtr, zSPtr);
     return true;
 
 }

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,49 +32,46 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Interpreting the unsigned integer formed from concatenating `uiA64' and
-| `uiA0' as a 128-bit floating-point value, and likewise interpreting the
-| unsigned integer formed from concatenating `uiB64' and `uiB0' as another
-| 128-bit floating-point value, and assuming at least on of these floating-
-| point values is a NaN, returns the bit pattern of the combined NaN result.
-| If either original floating-point value is a signaling NaN, the invalid
-| exception is raised.
-*----------------------------------------------------------------------------*/
+/**
+Interpreting the unsigned integer formed from concatenating `uiA64' and
+`uiA0' as a 128-bit floating-point value, and likewise interpreting the
+unsigned integer formed from concatenating `uiB64' and `uiB0' as another
+128-bit floating-point value, and assuming at least on of these floating-
+point values is a NaN, returns the bit pattern of the combined NaN result.
+If either original floating-point value is a signaling NaN, the invalid
+exception is raised.
+*/
 struct uint128
- softfloat_propagateNaNF128UI(
-     uint64_t uiA64,
-     uint64_t uiA0,
-     uint64_t uiB64,
-     uint64_t uiB0
- )
+    softfloat_propagateNaNF128UI(
+        uint64_t uiA64,
+        uint64_t uiA0,
+        uint64_t uiB64,
+        uint64_t uiB0
+    )
 {
     bool isSigNaNA;
     struct uint128 uiZ;
 
-    isSigNaNA = softfloat_isSigNaNF128UI( uiA64, uiA0 );
-    if ( isSigNaNA || softfloat_isSigNaNF128UI( uiB64, uiB0 ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) goto returnNonsigA;
+    isSigNaNA = softfloat_isSigNaNF128UI(uiA64, uiA0);
+    if (isSigNaNA || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) goto returnNonsigA;
     }
-    if ( isNaNF128UI( uiA64, uiA0 ) ) {
- returnNonsigA:
+    if (isNaNF128UI(uiA64, uiA0)) {
+returnNonsigA:
         uiZ.v64 = uiA64;
-        uiZ.v0  = uiA0;
+        uiZ.v0 = uiA0;
     } else {
         uiZ.v64 = uiB64;
-        uiZ.v0  = uiB0;
+        uiZ.v0 = uiB0;
     }
-    uiZ.v64 |= UINT64_C( 0x0000800000000000 );
+    uiZ.v64 |= UINT64_C(0x0000800000000000);
     return uiZ;
 
 }

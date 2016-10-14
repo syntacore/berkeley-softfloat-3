@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 uint64_t f64_to_ui64_r_minMag( float64_t a, bool exact )
 {
@@ -51,14 +49,12 @@ uint64_t f64_to_ui64_r_minMag( float64_t a, bool exact )
     bool sign;
     uint64_t z;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     exp = expF64UI( uiA );
     sig = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x433 - exp;
     if ( 53 <= shiftDist ) {
         if ( exact && (exp | sig) ) {
@@ -66,8 +62,7 @@ uint64_t f64_to_ui64_r_minMag( float64_t a, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signF64UI( uiA );
     if ( sign ) goto invalid;
     if ( shiftDist <= 0 ) {
@@ -81,8 +76,7 @@ uint64_t f64_to_ui64_r_minMag( float64_t a, bool exact )
         }
     }
     return z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return

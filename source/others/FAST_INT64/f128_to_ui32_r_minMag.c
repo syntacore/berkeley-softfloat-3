@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 uint32_t f128_to_ui32_r_minMag( float128_t a, bool exact )
 {
@@ -51,15 +49,13 @@ uint32_t f128_to_ui32_r_minMag( float128_t a, bool exact )
     bool sign;
     uint32_t z;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
     exp   = expF128UI64( uiA64 );
     sig64 = fracF128UI64( uiA64 ) | (uiA0 != 0);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x402F - exp;
     if ( 49 <= shiftDist ) {
         if ( exact && (exp | sig64) ) {
@@ -67,8 +63,7 @@ uint32_t f128_to_ui32_r_minMag( float128_t a, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signF128UI64( uiA64 );
     if ( sign || (shiftDist < 17) ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -76,8 +71,7 @@ uint32_t f128_to_ui32_r_minMag( float128_t a, bool exact )
             (exp == 0x7FFF) && sig64 ? ui32_fromNaN
                 : sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sig64 |= UINT64_C( 0x0001000000000000 );
     z = sig64>>shiftDist;
     if ( exact && ((uint64_t) z<<shiftDist != sig64) ) {

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -62,18 +60,15 @@ void f128M_to_extF80M( const float128_t *aPtr, extFloat80_t *zPtr )
     struct commonNaN commonNaN;
     uint32_t sig[4];
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     /** @bug cast to same type */
     zSPtr = (struct extFloat80M *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign = signF128UI96( uiA96 );
     exp  = expF128UI96( uiA96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FFF ) {
         if ( softfloat_isNaNF128M( aWPtr ) ) {
             softfloat_f128MToCommonNaN( aWPtr, &commonNaN );
@@ -84,8 +79,7 @@ void f128M_to_extF80M( const float128_t *aPtr, extFloat80_t *zPtr )
         zSPtr->signif = UINT64_C( 0x8000000000000000 );
         return;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     exp = softfloat_shiftNormSigF128M( aWPtr, 15, sig );
     if ( exp == -128 ) {
         zSPtr->signExp = packToExtF80UI64( sign, 0 );

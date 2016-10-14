@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
@@ -67,8 +65,7 @@ float64_t
     int8_t shiftDist;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
@@ -79,8 +76,7 @@ float64_t
     expC  = expF64UI( uiC );
     sigC  = fracF64UI( uiC );
     signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FF ) {
         if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
@@ -99,8 +95,7 @@ float64_t
         uiZ = uiC;
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
@@ -113,8 +108,7 @@ float64_t
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x3FE;
     sigA = (sigA | UINT64_C( 0x0010000000000000 ))<<10;
     sigB = (sigB | UINT64_C( 0x0010000000000000 ))<<10;
@@ -136,8 +130,7 @@ float64_t
         sigC = normExpSig.sig;
     }
     sigC = (sigC | UINT64_C( 0x0010000000000000 ))<<9;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expZ - expC;
     if ( expDiff < 0 ) {
         expZ = expC;
@@ -150,11 +143,9 @@ float64_t
     } else if ( expDiff ) {
         sig128C = softfloat_shiftRightJam128( sigC, 0, expDiff );
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( signZ == signC ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff <= 0 ) {
             sigZ = (sigC + sig128Z.v64) | (sig128Z.v0 != 0);
         } else {
@@ -168,8 +159,7 @@ float64_t
             sigZ <<= 1;
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff < 0 ) {
             signZ = signC;
             sig128Z = softfloat_sub128( sigC, 0, sig128Z.v64, sig128Z.v0 );
@@ -185,8 +175,7 @@ float64_t
                 softfloat_sub128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( ! sig128Z.v64 ) {
             expZ -= 64;
             sig128Z.v64 = sig128Z.v0;
@@ -206,13 +195,11 @@ float64_t
     }
  roundPack:
     return softfloat_roundPackToF64( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
     goto propagateNaN_ZC;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infProdArg:
     if ( magBits ) {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
@@ -225,8 +212,7 @@ float64_t
  propagateNaN_ZC:
     uiZ = softfloat_propagateNaNF64UI( uiZ, uiC );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zeroProd:
     uiZ = uiC;
     if ( ! (expC | sigC) && (signZ != signC) ) {
@@ -266,8 +252,7 @@ float64_t
     uint32_t sig128C[4];
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
@@ -278,8 +263,7 @@ float64_t
     expC  = expF64UI( uiC );
     sigC  = fracF64UI( uiC );
     signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FF ) {
         if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
@@ -298,8 +282,7 @@ float64_t
         uiZ = uiC;
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
@@ -312,8 +295,7 @@ float64_t
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x3FE;
     sigA = (sigA | UINT64_C( 0x0010000000000000 ))<<10;
     sigB = (sigB | UINT64_C( 0x0010000000000000 ))<<11;
@@ -335,8 +317,7 @@ float64_t
         sigC = normExpSig.sig;
     }
     sigC = (sigC | UINT64_C( 0x0010000000000000 ))<<10;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expZ - expC;
     if ( expDiff < 0 ) {
         expZ = expC;
@@ -364,11 +345,9 @@ float64_t
             softfloat_shiftRightJam128M( sig128C, expDiff, sig128C );
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( signZ == signC ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff <= 0 ) {
             sigZ += sigC;
         } else {
@@ -382,8 +361,7 @@ float64_t
             sigZ = softfloat_shortShiftRightJam64( sigZ, 1 );
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff < 0 ) {
             signZ = signC;
             if ( expDiff < -1 ) {
@@ -432,8 +410,7 @@ float64_t
                 goto sigZ;
             }
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         shiftDist = 0;
         sigZ =
             (uint64_t) sig128Z[indexWord( 4, 3 )]<<32
@@ -457,13 +434,11 @@ float64_t
     if ( sig128Z[indexWord( 4, 1 )] || sig128Z[indexWord( 4, 0 )] ) sigZ |= 1;
  roundPack:
     return softfloat_roundPackToF64( signZ, expZ - 1, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
     goto propagateNaN_ZC;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infProdArg:
     if ( magBits ) {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
@@ -476,8 +451,7 @@ float64_t
  propagateNaN_ZC:
     uiZ = softfloat_propagateNaNF64UI( uiZ, uiC );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zeroProd:
     uiZ = uiC;
     if ( ! (expC | sigC) && (signZ != signC) ) {

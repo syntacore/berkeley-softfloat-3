@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,18 +32,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdint.h>
 
 #include "internals.h"
 #include "specialize.h"
 
-/*----------------------------------------------------------------------------
-| Converts the common NaN pointed to by `aPtr' into an 80-bit extended
-| floating-point NaN, and stores this NaN at the location pointed to by
-| `zSPtr'.
-*----------------------------------------------------------------------------*/
+/**
+Converts the common NaN pointed to by `aPtr' into an 80-bit extended
+floating-point NaN, and stores this NaN at the location pointed to by
+`zSPtr'.
+*/
 /** @bug use extFloat80_t */
 void
  softfloat_commonNaNToExtF80M(

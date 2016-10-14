@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -71,13 +69,11 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
     uint64_t q64;
     uint32_t q, qs[3], uiZ96;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *)aPtr;
     bWPtr = (const uint32_t *)bPtr;
     zWPtr = (uint32_t *)zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi(4)];
     signA = signF128UI96(uiA96);
     expA = expF128UI96(uiA96);
@@ -85,8 +81,7 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
     signB = signF128UI96(uiB96);
     expB = expF128UI96(uiB96);
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
         if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) return;
         if (expA == 0x7FFF) {
@@ -95,8 +90,7 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
         }
         goto zero;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = softfloat_shiftNormSigF128M(aWPtr, 13, y);
     expB = softfloat_shiftNormSigF128M(bWPtr, 13, sigB);
     if (expA == -128) {
@@ -107,8 +101,7 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
         softfloat_raiseFlags(softfloat_flag_infinite);
         goto infinity;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA - expB + 0x3FFE;
     if (softfloat_compare128M(y, sigB) < 0) {
         --expZ;
@@ -132,8 +125,7 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
         }
         qs[ix] = q;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if (((q + 1) & 7) < 2) {
         softfloat_remStep128MBy32(y, 29, sigB, q, y);
         if (y[indexWordHi(4)] & 0x80000000) {
@@ -150,8 +142,7 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
             q |= 1;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q64 = (uint64_t)q << 28;
     y[indexWord(5, 0)] = (uint32_t)q64;
     q64 = ((uint64_t)qs[0] << 25) + (q64 >> 32);
@@ -163,13 +154,11 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
     y[indexWord(5, 4)] = q64 >> 32;
     softfloat_roundPackMToF128M(signZ, expZ, y, zWPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 invalid:
     softfloat_invalidF128M(zWPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 infinity:
     uiZ96 = packToF128UI96(signZ, 0x7FFF, 0);
     goto uiZ96;

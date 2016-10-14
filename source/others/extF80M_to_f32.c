@@ -1,12 +1,13 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,14 +33,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -63,18 +62,18 @@ float32_t extF80M_to_f32(const extFloat80_t *aPtr)
     uint32_t uiZ, sig32;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
     /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
     uiA64 = aSPtr->signExp;
     sign = signExtF80UI64(uiA64);
     exp = expExtF80UI64(uiA64);
     sig = aSPtr->signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
             softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
@@ -84,8 +83,8 @@ float32_t extF80M_to_f32(const extFloat80_t *aPtr)
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
     if (!(sig & UINT64_C(0x8000000000000000))) {
         if (!sig) {
             uiZ = packToF32UI(sign, 0, 0);
@@ -93,16 +92,18 @@ float32_t extF80M_to_f32(const extFloat80_t *aPtr)
         }
         exp += softfloat_normExtF80SigM(&sig);
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
     sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
     exp -= 0x3F81;
     if (sizeof(int16_t) < sizeof exp) {
-        if (exp < -0x1000) exp = -0x1000;
+        if (exp < -0x1000) {
+            exp = -0x1000;
+        }
     }
     return softfloat_roundPackToF32(sign, exp, sig32);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
 uiZ:
     uZ.ui = uiZ;
     return uZ.f;

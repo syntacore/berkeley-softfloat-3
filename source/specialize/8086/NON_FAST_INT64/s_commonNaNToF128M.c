@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,19 +32,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdint.h>
 
 #include "primitives/functions.h"
 #include "specialize.h"
 
-/*----------------------------------------------------------------------------
-| Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
-| NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
-| `zWPtr' points to an array of four 32-bit elements that concatenate in the
-| platform's normal endian order to form a 128-bit floating-point value.
-*----------------------------------------------------------------------------*/
+/**
+Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
+NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
+`zWPtr' points to an array of four 32-bit elements that concatenate in the
+platform's normal endian order to form a 128-bit floating-point value.
+*/
 void
  softfloat_commonNaNToF128M( const struct commonNaN *aPtr, uint32_t *zWPtr )
 {

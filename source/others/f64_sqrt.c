@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float64_t f64_sqrt( float64_t a )
 {
@@ -56,15 +54,13 @@ float64_t f64_sqrt( float64_t a )
     uint64_t sigZ, shiftedSigZ;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FF ) {
         if ( sigA ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
@@ -73,21 +69,19 @@ float64_t f64_sqrt( float64_t a )
         if ( ! signA ) return a;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( signA ) {
         if ( ! (expA | sigA) ) return a;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! sigA ) return a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
+    /*
     | (`sig32Z' is guaranteed to be a lower bound on the square root of
     | `sig32A', which makes `sig32Z' also a lower bound on the square root of
     | `sigA'.)
@@ -107,8 +101,7 @@ float64_t f64_sqrt( float64_t a )
     rem = sigA - (uint64_t) sig32Z * sig32Z;
     q = ((uint32_t) (rem>>2) * (uint64_t) recipSqrt32)>>32;
     sigZ = ((uint64_t) sig32Z<<32 | 1<<5) + ((uint64_t) q<<3);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (sigZ & 0x1FF) < 1<<5 ) {
         sigZ &= ~(uint64_t) 0x3F;
         shiftedSigZ = sigZ>>6;
@@ -120,8 +113,7 @@ float64_t f64_sqrt( float64_t a )
         }
     }
     return softfloat_roundPackToF64( 0, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ = defaultNaNF64UI;

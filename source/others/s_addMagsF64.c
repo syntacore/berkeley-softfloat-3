@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 
 float64_t
@@ -53,18 +51,15 @@ float64_t
     uint64_t sigZ;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = expF64UI( uiA );
     sigA = fracF64UI( uiA );
     expB = expF64UI( uiB );
     sigB = fracF64UI( uiB );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expA - expB;
     if ( ! expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( ! expA ) {
             uiZ = uiA + sigB;
             goto uiZ;
@@ -78,8 +73,7 @@ float64_t
         sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
         sigZ <<= 9;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         sigA <<= 9;
         sigB <<= 9;
         if ( expDiff < 0 ) {
@@ -116,8 +110,7 @@ float64_t
         }
     }
     return softfloat_roundPackToF64( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -63,11 +61,9 @@ float16_t f128M_to_f16( const float128_t *aPtr )
     uint16_t uiZ, frac16;
     union ui16_f16 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign = signF128UI96( uiA96 );
     exp  = expF128UI96( uiA96 );
@@ -76,8 +72,7 @@ float16_t f128M_to_f16( const float128_t *aPtr )
             | ((aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )]
                     | aWPtr[indexWord( 4, 0 )])
                    != 0);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FFF ) {
         if ( frac32 ) {
             softfloat_f128MToCommonNaN( aWPtr, &commonNaN );
@@ -87,22 +82,19 @@ float16_t f128M_to_f16( const float128_t *aPtr )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     frac16 = frac32>>2 | (frac32 & 3);
     if ( ! (exp | frac16) ) {
         uiZ = packToF16UI( sign, 0, 0 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     exp -= 0x3FF1;
     if ( sizeof (int16_t) < sizeof exp) {
         if ( exp < -0x40 ) exp = -0x40;
     }
     return softfloat_roundPackToF16( sign, exp, frac16 | 0x4000 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  uiZ:
     uZ.ui = uiZ;
     return uZ.f;

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extFloat80_t
  softfloat_addMagsExtF80(
@@ -64,14 +62,12 @@ extFloat80_t
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = expExtF80UI64( uiA64 );
     sigA = uiA0;
     expB = expExtF80UI64( uiB64 );
     sigB = uiB0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expA - expB;
     if ( ! expDiff ) {
         if ( expA == 0x7FFF ) {
@@ -93,8 +89,7 @@ extFloat80_t
         expZ = expA;
         goto shiftRight1;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expDiff < 0 ) {
         if ( expB == 0x7FFF ) {
             if ( sigB & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) goto propagateNaN;
@@ -131,8 +126,7 @@ extFloat80_t
  newlyAligned:
     sigZ = sigA + sigB;
     if ( sigZ & UINT64_C( 0x8000000000000000 ) ) goto roundAndPack;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  shiftRight1:
     sig64Extra = softfloat_shortShiftRightJam64Extra( sigZ, sigZExtra, 1 );
     sigZ = sig64Extra.v | UINT64_C( 0x8000000000000000 );
@@ -142,8 +136,7 @@ extFloat80_t
     return
         softfloat_roundPackToExtF80(
             signZ, expZ, sigZ, sigZExtra, extF80_roundingPrecision );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, uiB64, uiB0 );
     uiZ64 = uiZ.v64;

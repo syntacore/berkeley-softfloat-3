@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int32_t f64_to_i32( float64_t a, uint8_t roundingMode, bool exact )
 {
@@ -50,15 +48,13 @@ int32_t f64_to_i32( float64_t a, uint8_t roundingMode, bool exact )
     uint64_t sig;
     int16_t shiftDist;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF64UI( uiA );
     exp  = expF64UI( uiA );
     sig  = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 #if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
     if ( (exp == 0x7FF) && sig ) {
 #if (i32_fromNaN == i32_fromPosOverflow)
@@ -71,8 +67,7 @@ int32_t f64_to_i32( float64_t a, uint8_t roundingMode, bool exact )
 #endif
     }
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
     shiftDist = 0x427 - exp;
     if ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );

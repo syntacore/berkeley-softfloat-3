@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int32_t f16_to_i32_r_minMag( float16_t a, bool exact )
 {
@@ -51,14 +49,12 @@ int32_t f16_to_i32_r_minMag( float16_t a, bool exact )
     bool sign;
     int32_t alignedSig;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     exp  = expF16UI( uiA );
     frac = fracF16UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = exp - 0x0F;
     if ( shiftDist < 0 ) {
         if ( exact && (exp | frac) ) {
@@ -66,8 +62,7 @@ int32_t f16_to_i32_r_minMag( float16_t a, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signF16UI( uiA );
     if ( exp == 0x1F ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -75,8 +70,7 @@ int32_t f16_to_i32_r_minMag( float16_t a, bool exact )
             (exp == 0x1F) && frac ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     alignedSig = (int32_t) (frac | 0x0400)<<shiftDist;
     if ( exact && (alignedSig & 0x3FF) ) {
         softfloat_raiseFlags(softfloat_flag_inexact);

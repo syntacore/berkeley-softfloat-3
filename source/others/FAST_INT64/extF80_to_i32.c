@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int32_t
  extF80_to_i32( extFloat80_t a, uint8_t roundingMode, bool exact )
@@ -52,15 +50,13 @@ int32_t
     uint64_t sig;
     int32_t shiftDist;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     sign = signExtF80UI64( uiA64 );
     exp  = expExtF80UI64( uiA64 );
     sig = uA.s.signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 #if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
     if ( (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
 #if (i32_fromNaN == i32_fromPosOverflow)
@@ -73,8 +69,7 @@ int32_t
 #endif
     }
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x4032 - exp;
     if ( shiftDist <= 0 ) shiftDist = 1;
     sig = softfloat_shiftRightJam64( sig, shiftDist );

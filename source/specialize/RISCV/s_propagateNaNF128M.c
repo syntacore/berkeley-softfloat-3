@@ -1,12 +1,12 @@
-
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdint.h>
 
@@ -40,29 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Assuming at least one of the two 128-bit floating-point values pointed to by
-| `aWPtr' and `bWPtr' is a NaN, stores the combined NaN result at the location
-| pointed to by `zWPtr'.  If either original floating-point value is a
-| signaling NaN, the invalid exception is raised.  Each of `aWPtr', `bWPtr',
-| and `zWPtr' points to an array of four 32-bit elements that concatenate in
-| the platform's normal endian order to form a 128-bit floating-point value.
-*----------------------------------------------------------------------------*/
 void
- softfloat_propagateNaNF128M(
-     const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr )
+softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr)
 {
-
-    if (
-        f128M_isSignalingNaN( (const float128_t *) aWPtr )
-            || (bWPtr && f128M_isSignalingNaN( (const float128_t *) bWPtr ))
-    ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (f128M_isSignalingNaN((const float128_t *)aWPtr) || (bWPtr && f128M_isSignalingNaN((const float128_t *)bWPtr))) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    zWPtr[indexWord( 4, 3 )] = defaultNaNF128UI96;
-    zWPtr[indexWord( 4, 2 )] = defaultNaNF128UI64;
-    zWPtr[indexWord( 4, 1 )] = defaultNaNF128UI32;
-    zWPtr[indexWord( 4, 0 )] = defaultNaNF128UI0;
+    zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
+    zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
+    zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
+    zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
 
 }
 

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,16 +32,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-uint64_t f64_to_ui64( float64_t a, uint8_t roundingMode, bool exact )
+uint64_t f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
 {
     union ui64_f64 uA;
     uint64_t uiA;
@@ -55,49 +53,47 @@ uint64_t f64_to_ui64( float64_t a, uint8_t roundingMode, bool exact )
     uint32_t extSig[3];
 #endif
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    sign = signF64UI( uiA );
-    exp  = expF64UI( uiA );
-    sig  = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
+    sign = signF64UI(uiA);
+    exp = expF64UI(uiA);
+    sig = fracF64UI(uiA);
+
+    if (exp) {
+        sig |= UINT64_C(0x0010000000000000);
+    }
     shiftDist = 0x433 - exp;
 #ifdef SOFTFLOAT_FAST_INT64
-    if ( shiftDist <= 0 ) {
-        if ( shiftDist < -11 ) goto invalid;
-        sigExtra.v = sig<<-shiftDist;
+    if (shiftDist <= 0) {
+        if (shiftDist < -11) goto invalid;
+        sigExtra.v = sig << -shiftDist;
         sigExtra.extra = 0;
     } else {
-        sigExtra = softfloat_shiftRightJam64Extra( sig, 0, shiftDist );
+        sigExtra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
     }
     return
         softfloat_roundPackToUI64(
-            sign, sigExtra.v, sigExtra.extra, roundingMode, exact );
+            sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 #else
-    extSig[indexWord( 3, 0 )] = 0;
-    if ( shiftDist <= 0 ) {
-        if ( shiftDist < -11 ) goto invalid;
+    extSig[indexWord(3, 0)] = 0;
+    if (shiftDist <= 0) {
+        if (shiftDist < -11) goto invalid;
         sig <<= -shiftDist;
-        extSig[indexWord( 3, 2 )] = sig>>32;
-        extSig[indexWord( 3, 1 )] = sig;
+        extSig[indexWord(3, 2)] = sig >> 32;
+        extSig[indexWord(3, 1)] = sig;
     } else {
-        extSig[indexWord( 3, 2 )] = sig>>32;
-        extSig[indexWord( 3, 1 )] = sig;
-        softfloat_shiftRightJam96M( extSig, shiftDist, extSig );
+        extSig[indexWord(3, 2)] = sig >> 32;
+        extSig[indexWord(3, 1)] = (uint32_t)sig;
+        softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
     }
-    return softfloat_roundPackMToUI64( sign, extSig, roundingMode, exact );
+    return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
-    return
-        (exp == 0x7FF) && fracF64UI( uiA ) ? ui64_fromNaN
-            : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
 
-}
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
+    return
+        (exp == 0x7FF) && fracF64UI(uiA) ? ui64_fromNaN
+        : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+
+    }
 

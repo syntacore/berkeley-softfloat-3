@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float128_t f64_to_f128( float64_t a )
 {
@@ -54,15 +52,13 @@ float128_t f64_to_f128( float64_t a )
     struct uint128 frac128;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF64UI( uiA );
     exp  = expF64UI( uiA );
     frac = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FF ) {
         if ( frac ) {
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
@@ -73,8 +69,7 @@ float128_t f64_to_f128( float64_t a )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! exp ) {
         if ( ! frac ) {
             uiZ.v64 = packToF128UI64( sign, 0, 0 );
@@ -85,8 +80,7 @@ float128_t f64_to_f128( float64_t a )
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     frac128 = softfloat_shortShiftLeft128( 0, frac, 60 );
     uiZ.v64 = packToF128UI64( sign, exp + 0x3C00, frac128.v64 );
     uiZ.v0  = frac128.v0;

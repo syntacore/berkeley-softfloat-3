@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 void
  softfloat_addF128M(
@@ -70,14 +68,12 @@ void
     uint8_t carry;
     void (*roundPackRoutinePtr)( bool, int32_t, uint32_t *, uint32_t * );
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi( 4 )];
     expA = expF128UI96( uiA96 );
     uiB96 = bWPtr[indexWordHi( 4 )];
     expB = expF128UI96( uiB96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
         if ( softfloat_tryPropagateNaNF128M( aWPtr, bWPtr, zWPtr ) ) return;
         uiZ96 = uiA96;
@@ -94,8 +90,7 @@ void
         zWPtr[indexWord( 4, 0 )] = 0;
         return;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     signZ = signF128UI96( uiA96 );
     signB = signF128UI96( uiB96 ) ^ negateB;
     negateB = (signZ != signB);
@@ -119,14 +114,12 @@ void
             sig96B |= 0x00010000;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     addCarryMRoutinePtr =
         negateB ? softfloat_addComplCarryM : softfloat_addCarryM;
     expDiff = expA - expB;
     if ( expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         extSigZ[indexWordHi( 5 )] = sig96B;
         extSigZ[indexWord( 5, 3 )] = bWPtr[indexWord( 4, 2 )];
         extSigZ[indexWord( 5, 2 )] = bWPtr[indexWord( 4, 1 )];
@@ -151,8 +144,7 @@ void
             );
         wordSigZ = sig96A + sig96B + carry;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         extSigZ[indexWordLo( 5 )] = 0;
         carry =
             (*addCarryMRoutinePtr)(
@@ -195,8 +187,7 @@ void
         }
     }
     extSigZ[indexWordHi( 5 )] = wordSigZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     roundPackRoutinePtr = softfloat_normRoundPackMToF128M;
     if ( 0x00010000 <= wordSigZ ) {
         if ( 0x00020000 <= wordSigZ ) {

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
@@ -75,8 +73,7 @@ float128_t
     uint64_t sigZExtra, sig256Z0;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     signA = signF128UI64( uiA64 );
     expA  = expF128UI64( uiA64 );
     sigA.v64 = fracF128UI64( uiA64 );
@@ -90,8 +87,7 @@ float128_t
     sigC.v64 = fracF128UI64( uiC64 );
     sigC.v0  = uiC0;
     signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if (
             (sigA.v64 | sigA.v0) || ((expB == 0x7FFF) && (sigB.v64 | sigB.v0))
@@ -116,8 +112,7 @@ float128_t
         uiZ.v0  = uiC0;
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! (sigA.v64 | sigA.v0) ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF128Sig( sigA.v64, sigA.v0 );
@@ -130,8 +125,7 @@ float128_t
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x3FFE;
     sigA.v64 |= UINT64_C( 0x0001000000000000 );
     sigB.v64 |= UINT64_C( 0x0001000000000000 );
@@ -156,8 +150,7 @@ float128_t
     }
     sigC.v64 |= UINT64_C( 0x0001000000000000 );
     sigC = softfloat_shortShiftLeft128( sigC.v64, sigC.v0, 8 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expZ - expC;
     if ( expDiff < 0 ) {
         expZ = expC;
@@ -194,12 +187,10 @@ float128_t
             softfloat_shiftRightJam256M( sig256C, expDiff, sig256C );
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 8;
     if ( signZ == signC ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff <= 0 ) {
             sigZ = softfloat_add128( sigC.v64, sigC.v0, sigZ.v64, sigZ.v0 );
         } else {
@@ -212,8 +203,7 @@ float128_t
             shiftDist = 9;
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff < 0 ) {
             signZ = signC;
             if ( expDiff < -1 ) {
@@ -262,8 +252,7 @@ float128_t
                 goto sigZ;
             }
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         sigZ.v64  = sig256Z[indexWord( 4, 3 )];
         sigZ.v0   = sig256Z[indexWord( 4, 2 )];
         sigZExtra = sig256Z[indexWord( 4, 1 )];
@@ -309,13 +298,11 @@ float128_t
     return
         softfloat_roundPackToF128(
             signZ, expZ - 1, sigZ.v64, sigZ.v0, sigZExtra );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, uiB64, uiB0 );
     goto propagateNaN_ZC;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infProdArg:
     if ( magBits ) {
         uiZ.v64 = packToF128UI64( signZ, 0x7FFF, 0 );
@@ -330,8 +317,7 @@ float128_t
  propagateNaN_ZC:
     uiZ = softfloat_propagateNaNF128UI( uiZ.v64, uiZ.v0, uiC64, uiC0 );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zeroProd:
     uiZ.v64 = uiC64;
     uiZ.v0  = uiC0;

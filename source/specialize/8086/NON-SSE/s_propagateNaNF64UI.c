@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -41,20 +41,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
-| point values, at least one of which is a NaN, returns the bit pattern of
-| the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-| signaling NaN, the invalid exception is raised.
-*----------------------------------------------------------------------------*/
+/**
+Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
+point values, at least one of which is a NaN, returns the bit pattern of
+the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
+signaling NaN, the invalid exception is raised.
+*/
 uint64_t
  softfloat_propagateNaNF64UI( uint64_t uiA, uint64_t uiB )
 {
     bool isSigNaNA, isSigNaNB;
     uint64_t uiNonsigA, uiNonsigB, uiMagA, uiMagB;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     isSigNaNA = softfloat_isSigNaNF64UI( uiA );
     isSigNaNB = softfloat_isSigNaNF64UI( uiB );
     /*------------------------------------------------------------------------
@@ -62,8 +61,7 @@ uint64_t
     *------------------------------------------------------------------------*/
     uiNonsigA = uiA | UINT64_C( 0x0008000000000000 );
     uiNonsigB = uiB | UINT64_C( 0x0008000000000000 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( isSigNaNA | isSigNaNB ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
         if ( isSigNaNA ) {

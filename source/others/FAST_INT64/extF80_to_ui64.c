@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 uint64_t
  extF80_to_ui64( extFloat80_t a, uint8_t roundingMode, bool exact )
@@ -54,15 +52,13 @@ uint64_t
     uint64_t sigExtra;
     struct uint64_extra sig64Extra;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     sign = signExtF80UI64( uiA64 );
     exp  = expExtF80UI64( uiA64 );
     sig = uA.s.signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x403E - exp;
     if ( shiftDist < 0 ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -71,8 +67,7 @@ uint64_t
                 ? ui64_fromNaN
                 : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sigExtra = 0;
     if ( shiftDist ) {
         sig64Extra = softfloat_shiftRightJam64Extra( sig, 0, shiftDist );

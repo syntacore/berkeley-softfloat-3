@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -70,20 +68,17 @@ void
     int32_t expZ;
     uint32_t sigProd[8], *extSigZPtr;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     bWPtr = (const uint32_t *) bPtr;
     zWPtr = (uint32_t *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi( 4 )];
     expA = expF128UI96( uiA96 );
     uiB96 = bWPtr[indexWordHi( 4 )];
     expB = expF128UI96( uiB96 );
     signZ = signF128UI96( uiA96 ) ^ signF128UI96( uiB96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
         if ( softfloat_tryPropagateNaNF128M( aWPtr, bWPtr, zWPtr ) ) return;
         ptr = aWPtr;
@@ -103,8 +98,7 @@ void
         uiZ96 = packToF128UI96( signZ, 0x7FFF, 0 );
         goto uiZ96;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA ) {
         sigA[indexWordHi( 4 )] = fracF128UI96( uiA96 ) | 0x00010000;
         sigA[indexWord( 4, 2 )] = aWPtr[indexWord( 4, 2 )];
@@ -123,8 +117,7 @@ void
         expB = softfloat_shiftNormSigF128M( bWPtr, 0, sigB );
         if ( expB == -128 ) goto zero;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x4000;
     softfloat_mul128MTo256M( sigA, sigB, sigProd );
     if (
@@ -142,8 +135,7 @@ void
     softfloat_shortShiftLeft160M( extSigZPtr, shiftDist, extSigZPtr );
     softfloat_roundPackMToF128M( signZ, expZ, extSigZPtr, zWPtr );
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ96 = packToF128UI96( signZ, 0, 0 );
  uiZ96:

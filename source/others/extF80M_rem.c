@@ -1,12 +1,13 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
 All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,14 +33,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -47,9 +46,7 @@ void
 extF80M_rem(
     const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
 {
-
     *zPtr = extF80_rem(*aPtr, *bPtr);
-
 }
 
 #else
@@ -69,42 +66,47 @@ extF80M_rem(
     uint32_t rem[3], x[3], sig32B, q, recip32, rem2[3], *remPtr, *altRemPtr;
     uint32_t *newRemPtr, wordMeanRem;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
     /** @bug cast to same type */
     bSPtr = (const struct extFloat80M *) bPtr;
     /** @bug cast to same type */
     zSPtr = (struct extFloat80M *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     uiA64 = aSPtr->signExp;
     expA = expExtF80UI64(uiA64);
     expB = expExtF80UI64(bSPtr->signExp);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
-        if (softfloat_tryPropagateNaNExtF80M(aSPtr, bSPtr, zSPtr)) return;
-        if (expA == 0x7FFF) goto invalid;
-        /*--------------------------------------------------------------------
-        | If we get here, then argument b is an infinity and `expB' is 0x7FFF;
-        | Doubling `expB' is an easy way to ensure that `expDiff' later is
-        | less than -1, which will result in returning a canonicalized version
-        | of argument a.
-        *--------------------------------------------------------------------*/
+        if (softfloat_tryPropagateNaNExtF80M(aSPtr, bSPtr, zSPtr)) {
+            return;
+        }
+        if (expA == 0x7FFF) {
+            goto invalid;
+        }
+        /*
+        If we get here, then argument b is an infinity and `expB' is 0x7FFF;
+        Doubling `expB' is an easy way to ensure that `expDiff' later is
+        less than -1, which will result in returning a canonicalized version
+        of argument a.
+        */
         expB += expB;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if (!expB) expB = 1;
+
+    if (!expB) {
+        expB = 1;
+    }
     x64 = bSPtr->signif;
     if (!(x64 & UINT64_C(0x8000000000000000))) {
-        if (!x64) goto invalid;
+        if (!x64) {
+            goto invalid;
+        }
         expB += softfloat_normExtF80SigM(&x64);
     }
     signRem = signExtF80UI64(uiA64);
-    if (!expA) expA = 1;
+    if (!expA) {
+        expA = 1;
+    }
     sigA = aSPtr->signif;
     if (!(sigA & UINT64_C(0x8000000000000000))) {
         if (!sigA) {
@@ -113,10 +115,12 @@ extF80M_rem(
         }
         expA += softfloat_normExtF80SigM(&sigA);
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
+
     expDiff = expA - expB;
-    if (expDiff < -1) goto copyA;
+    if (expDiff < -1) {
+        goto copyA;
+    }
     rem[indexWord(3, 2)] = sigA >> 34;
     rem[indexWord(3, 1)] = sigA >> 2;
     rem[indexWord(3, 0)] = (uint32_t)sigA << 30;
@@ -132,14 +136,18 @@ extF80M_rem(
             q = 0;
         } else {
             q = (softfloat_compare96M(x, rem) <= 0);
-            if (q) softfloat_sub96M(rem, x, rem);
+            if (q) {
+                softfloat_sub96M(rem, x, rem);
+            }
         }
     } else {
         recip32 = softfloat_approxRecip32_1(sig32B);
         expDiff -= 30;
         for (;;) {
             x64 = (uint64_t)rem[indexWordHi(3)] * recip32;
-            if (expDiff < 0) break;
+            if (expDiff < 0) {
+                break;
+            }
             q = (x64 + 0x80000000) >> 32;
             softfloat_remStep96MBy32(rem, 29, x, q, rem);
             if (rem[indexWordHi(3)] & 0x80000000) {
@@ -147,7 +155,7 @@ extF80M_rem(
             }
             expDiff -= 29;
         }
-        /*--------------------------------------------------------------------
+        /*
         | (`expDiff' cannot be less than -29 here.)
         *--------------------------------------------------------------------*/
         q = (uint32_t)(x64 >> 32) >> (~expDiff & 31);
@@ -159,8 +167,7 @@ extF80M_rem(
             goto selectRem;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     remPtr = rem;
     altRemPtr = rem2;
     do {
@@ -173,11 +180,7 @@ extF80M_rem(
 selectRem:
     softfloat_add96M(remPtr, altRemPtr, x);
     wordMeanRem = x[indexWordHi(3)];
-    if (
-        (wordMeanRem & 0x80000000)
-            || (!wordMeanRem && (q & 1) && !x[indexWord(3, 0)]
-        && !x[indexWord(3, 1)])
-    ) {
+    if ((wordMeanRem & 0x80000000) || (!wordMeanRem && (q & 1) && !x[indexWord(3, 0)] && !x[indexWord(3, 1)])) {
         remPtr = altRemPtr;
     }
     if (remPtr[indexWordHi(3)] & 0x80000000) {
@@ -186,13 +189,11 @@ selectRem:
     }
     softfloat_normRoundPackMToExtF80M(signRem, expB + 2, remPtr, 80, zSPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
 invalid:
     softfloat_invalidExtF80M(zSPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
 copyA:
     if (expA < 1) {
         sigA >>= 1 - expA;

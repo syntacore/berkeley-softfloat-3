@@ -1,12 +1,13 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,20 +33,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
-extF80M_div(
-    const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
+extF80M_div(const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
 {
 
     *zPtr = extF80_div(*aPtr, *bPtr);
@@ -164,8 +162,7 @@ infinity:
     uiZ64 = packToExtF80UI64(signZ, 0x7FFF);
     uiZ0 = UINT64_C(0x8000000000000000);
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
 zero:
     uiZ64 = packToExtF80UI64(signZ, 0);
     uiZ0 = 0;

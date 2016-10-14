@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int32_t f64_to_i32_r_minMag( float64_t a, bool exact )
 {
@@ -51,14 +49,12 @@ int32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     bool sign;
     int32_t absZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     exp = expF64UI( uiA );
     sig = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x433 - exp;
     if ( 53 <= shiftDist ) {
         if ( exact && (exp | sig) ) {
@@ -66,8 +62,7 @@ int32_t f64_to_i32_r_minMag( float64_t a, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signF64UI( uiA );
     if ( shiftDist < 22 ) {
         if (
@@ -83,8 +78,7 @@ int32_t f64_to_i32_r_minMag( float64_t a, bool exact )
             (exp == 0x7FF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sig |= UINT64_C( 0x0010000000000000 );
     absZ = sig>>shiftDist;
     if ( exact && ((uint64_t) (uint32_t) absZ<<shiftDist != sig) ) {

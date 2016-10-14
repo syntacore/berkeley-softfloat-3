@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int64_t f32_to_i64_r_minMag( float32_t a, bool exact )
 {
@@ -52,14 +50,12 @@ int64_t f32_to_i64_r_minMag( float32_t a, bool exact )
     uint64_t sig64;
     int64_t absZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     exp = expF32UI( uiA );
     sig = fracF32UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0xBE - exp;
     if ( 64 <= shiftDist ) {
         if ( exact && (exp | sig) ) {
@@ -67,8 +63,7 @@ int64_t f32_to_i64_r_minMag( float32_t a, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signF32UI( uiA );
     if ( shiftDist <= 0 ) {
         if ( uiA == packToF32UI( 1, 0xBE, 0 ) ) {
@@ -79,8 +74,7 @@ int64_t f32_to_i64_r_minMag( float32_t a, bool exact )
             (exp == 0xFF) && sig ? i64_fromNaN
                 : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sig |= 0x00800000;
     sig64 = (uint64_t) sig<<40;
     absZ = sig64>>shiftDist;

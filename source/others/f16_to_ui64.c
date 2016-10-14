@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,16 +32,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-uint64_t f16_to_ui64( float16_t a, uint8_t roundingMode, bool exact )
+uint64_t f16_to_ui64(float16_t a, uint8_t roundingMode, bool exact)
 {
     union ui16_f16 uA;
     uint16_t uiA;
@@ -51,34 +49,32 @@ uint64_t f16_to_ui64( float16_t a, uint8_t roundingMode, bool exact )
     uint32_t sig32;
     int8_t shiftDist;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    sign = signF16UI( uiA );
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp == 0x1F ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    sign = signF16UI(uiA);
+    exp = expF16UI(uiA);
+    frac = fracF16UI(uiA);
+
+    if (exp == 0x1F) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return
             frac ? ui64_fromNaN
-                : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+            : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     sig32 = frac;
-    if ( exp ) {
+    if (exp) {
         sig32 |= 0x0400;
         shiftDist = exp - 0x19;
-        if ( (0 <= shiftDist) && ! sign ) {
-            return sig32<<shiftDist;
+        if ((0 <= shiftDist) && !sign) {
+            return sig32 << shiftDist;
         }
         shiftDist = exp - 0x0D;
-        if ( 0 < shiftDist ) sig32 <<= shiftDist;
+        if (0 < shiftDist) {
+            sig32 <<= shiftDist;
+        }
     }
-    return softfloat_roundPackToUI32( sign, sig32, roundingMode, exact );
+    return softfloat_roundPackToUI32(sign, sig32, roundingMode, exact);
 
 }
 

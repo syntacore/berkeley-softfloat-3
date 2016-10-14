@@ -2,7 +2,7 @@
 @todo split into different SOFTFLOAT_FAST_INT64 cases
 */
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -35,7 +35,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include "softfloat/functions.h"
 
@@ -66,7 +66,7 @@ void i64_to_f128M(int64_t a, float128_t *zPtr)
             uint32_t *const ptr = zWPtr + indexMultiwordHi(4, 3);
             ptr[indexWord(3, 2)] = 0;
             ptr[indexWord(3, 1)] = absA >> 32;
-            ptr[indexWord(3, 0)] = absA;
+            ptr[indexWord(3, 0)] = (uint32_t)absA;
             softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
             ptr[indexWordHi(3)] =
                 packToF128UI96(sign, 0x404E - shiftDist, ptr[indexWordHi(3)]);

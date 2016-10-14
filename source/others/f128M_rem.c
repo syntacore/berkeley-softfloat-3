@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -66,36 +64,30 @@ void
     uint64_t q64;
     uint32_t rem2[5], *altRemPtr, *newRemPtr, wordMeanRem;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     bWPtr = (const uint32_t *) bPtr;
     zWPtr = (uint32_t *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi( 4 )];
     expA = expF128UI96( uiA96 );
     expB = expF128UI96( bWPtr[indexWordHi( 4 )] );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
         if ( softfloat_tryPropagateNaNF128M( aWPtr, bWPtr, zWPtr ) ) return;
         if ( expA == 0x7FFF ) goto invalid;
         goto copyA;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA < expB - 1 ) goto copyA;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expB = softfloat_shiftNormSigF128M( bWPtr, 13, x );
     if ( expB == -128 ) goto invalid;
     remPtr = &rem1[indexMultiwordLo( 5, 4 )];
     expA = softfloat_shiftNormSigF128M( aWPtr, 13, remPtr );
     if ( expA == -128 ) goto copyA;
     signRem = signF128UI96( uiA96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expA - expB;
     if ( expDiff < 1 ) {
         if ( expDiff < -1 ) goto copyA;
@@ -124,7 +116,7 @@ void
             }
             expDiff -= 29;
         }
-        /*--------------------------------------------------------------------
+        /*
         | (`expDiff' cannot be less than -29 here.)
         *--------------------------------------------------------------------*/
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
@@ -135,8 +127,7 @@ void
             goto selectRem;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     altRemPtr = &rem2[indexMultiwordLo( 5, 4 )];
     do {
         ++q;
@@ -163,13 +154,11 @@ void
     remPtr[indexWordHi( 5 )] = 0;
     softfloat_normRoundPackMToF128M( signRem, expB + 18, remPtr, zWPtr );
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_invalidF128M( zWPtr );
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  copyA:
     zWPtr[indexWordHi( 4 )] = uiA96;
     zWPtr[indexWord( 4, 2 )] = aWPtr[indexWord( 4, 2 )];

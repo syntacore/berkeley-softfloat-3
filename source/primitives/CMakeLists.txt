@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(INC_PRIMITIVES
     ${CMAKE_CURRENT_SOURCE_DIR}/functions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/types.h
-)
+PARENT_SCOPE)
 
 set(SRC_PRIMITIVES
     ${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecip32_1.c

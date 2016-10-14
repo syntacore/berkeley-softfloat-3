@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float128_t f128_div( float128_t a, float128_t b )
 {
@@ -67,8 +65,7 @@ float128_t f128_div( float128_t a, float128_t b )
     struct uint128 sigZ, uiZ;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -84,8 +81,7 @@ float128_t f128_div( float128_t a, float128_t b )
     sigB.v64 = fracF128UI64( uiB64 );
     sigB.v0  = uiB0;
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if ( sigA.v64 | sigA.v0 ) goto propagateNaN;
         if ( expB == 0x7FFF ) {
@@ -98,8 +94,7 @@ float128_t f128_div( float128_t a, float128_t b )
         if ( sigB.v64 | sigB.v0 ) goto propagateNaN;
         goto zero;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expB ) {
         if ( ! (sigB.v64 | sigB.v0) ) {
             if ( ! (expA | sigA.v64 | sigA.v0) ) goto invalid;
@@ -116,8 +111,7 @@ float128_t f128_div( float128_t a, float128_t b )
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA - expB + 0x3FFE;
     sigA.v64 |= UINT64_C( 0x0001000000000000 );
     sigB.v64 |= UINT64_C( 0x0001000000000000 );
@@ -142,8 +136,7 @@ float128_t f128_div( float128_t a, float128_t b )
         }
         qs[ix] = q;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ((q + 1) & 7) < 2 ) {
         rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
         term = softfloat_mul128By32( sigB.v64, sigB.v0, q );
@@ -157,8 +150,7 @@ float128_t f128_div( float128_t a, float128_t b )
         }
         if ( rem.v64 | rem.v0 ) q |= 1;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sigZExtra = (uint64_t) ((uint64_t) q<<60);
     term = softfloat_shortShiftLeft128( 0, qs[1], 54 );
     sigZ =
@@ -168,25 +160,21 @@ float128_t f128_div( float128_t a, float128_t b )
         );
     return
         softfloat_roundPackToF128( signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, uiB64, uiB0 );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ.v64 = defaultNaNF128UI64;
     uiZ.v0  = defaultNaNF128UI0;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infinity:
     uiZ.v64 = packToF128UI64( signZ, 0x7FFF, 0 );
     goto uiZ0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ.v64 = packToF128UI64( signZ, 0, 0 );
  uiZ0:

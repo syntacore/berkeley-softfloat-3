@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int64_t f128_to_i64( float128_t a, uint8_t roundingMode, bool exact )
 {
@@ -52,8 +50,7 @@ int64_t f128_to_i64( float128_t a, uint8_t roundingMode, bool exact )
     struct uint128 sig128;
     struct uint64_extra sigExtra;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -61,20 +58,17 @@ int64_t f128_to_i64( float128_t a, uint8_t roundingMode, bool exact )
     exp   = expF128UI64( uiA64 );
     sig64 = fracF128UI64( uiA64 );
     sig0  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x402F - exp;
     if ( shiftDist <= 0 ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( shiftDist < -15 ) {
             softfloat_raiseFlags( softfloat_flag_invalid );
             return
                 (exp == 0x7FFF) && (sig64 | sig0) ? i64_fromNaN
                     : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         sig64 |= UINT64_C( 0x0001000000000000 );
         if ( shiftDist ) {
             sig128 = softfloat_shortShiftLeft128( sig64, sig0, -shiftDist );
@@ -82,8 +76,7 @@ int64_t f128_to_i64( float128_t a, uint8_t roundingMode, bool exact )
             sig0  = sig128.v0;
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( exp ) sig64 |= UINT64_C( 0x0001000000000000 );
         sigExtra = softfloat_shiftRightJam64Extra( sig64, sig0, shiftDist );
         sig64 = sigExtra.v;

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -66,17 +64,14 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     uint64_t sig64Z, x64;
     uint32_t term[5], y[5], rem32;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *)aPtr;
     zWPtr = (uint32_t *)zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA96 = aWPtr[indexWordHi(4)];
     signA = signF128UI96(uiA96);
     rawExpA = expF128UI96(uiA96);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if (rawExpA == 0x7FFF) {
         if (
             fracF128UI96(uiA96)
@@ -89,12 +84,11 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
         if (!signA) goto copyA;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = softfloat_shiftNormSigF128M(aWPtr, 13 - (rawExpA & 1), rem);
     if (expA == -128) goto copyA;
     if (signA) goto invalid;
-    /*------------------------------------------------------------------------
+    /*
     | (`sig32Z' is guaranteed to be a lower bound on the square root of
     | `sig32A', which makes `sig32Z' also a lower bound on the square root of
     | `sigA'.)
@@ -118,8 +112,7 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     rem64 -= (uint64_t)sig32Z * sig32Z;
     rem[indexWord(4, 3)] = rem64 >> 32;
     rem[indexWord(4, 2)] = (uint32_t)rem64;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = ((uint32_t)(rem64 >> 2) * (uint64_t)recipSqrt32) >> 32;
     qs[1] = q;
     sig64Z = ((uint64_t)sig32Z << 32) + ((uint64_t)q << 3);
@@ -130,11 +123,10 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     term[indexWord(4, 0)] = 0;
     softfloat_remStep128MBy32(rem, 29, term, q, y);
     rem64 = (uint64_t)y[indexWord(4, 3)] << 32 | y[indexWord(4, 2)];
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = ((uint32_t)(rem64 >> 2) * (uint64_t)recipSqrt32) >> 32;
     sig64Z <<= 1;
-    /*------------------------------------------------------------------------
+    /*
     | (Repeating this loop is a rare occurrence.)
     *------------------------------------------------------------------------*/
     for (;;) {
@@ -151,8 +143,7 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     }
     qs[0] = q;
     rem64 = (uint64_t)rem32 << 32 | rem[indexWord(6, 4)];
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = (((uint32_t)(rem64 >> 2) * (uint64_t)recipSqrt32) >> 32) + 2;
     x64 = (uint64_t)q << 27;
     y[indexWord(5, 0)] = (uint32_t)x64;
@@ -163,8 +154,7 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     x64 = ((uint64_t)qs[2] << 18) + (x64 >> 32);
     y[indexWord(5, 3)] = (uint32_t)x64;
     y[indexWord(5, 4)] = x64 >> 32;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ((q & 0xF) <= 2) {
         q &= ~3;
         y[indexWordLo(5)] = q << 27;
@@ -197,13 +187,11 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     }
     softfloat_roundPackMToF128M(0, expZ, y, zWPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 invalid:
     softfloat_invalidF128M(zWPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 copyA:
     zWPtr[indexWordHi(4)] = uiA96;
     zWPtr[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];

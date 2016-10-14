@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -41,14 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Assuming at least one of the two 128-bit floating-point values pointed to by
-| `aWPtr' and `bWPtr' is a NaN, stores the combined NaN result at the location
-| pointed to by `zWPtr'.  If either original floating-point value is a
-| signaling NaN, the invalid exception is raised.  Each of `aWPtr', `bWPtr',
-| and `zWPtr' points to an array of four 32-bit elements that concatenate in
-| the platform's normal endian order to form a 128-bit floating-point value.
-*----------------------------------------------------------------------------*/
+/**
+Assuming at least one of the two 128-bit floating-point values pointed to by
+`aWPtr' and `bWPtr' is a NaN, stores the combined NaN result at the location
+pointed to by `zWPtr'.  If either original floating-point value is a
+signaling NaN, the invalid exception is raised.  Each of `aWPtr', `bWPtr',
+and `zWPtr' points to an array of four 32-bit elements that concatenate in
+the platform's normal endian order to form a 128-bit floating-point value.
+*/
 void
  softfloat_propagateNaNF128M(
      const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr )

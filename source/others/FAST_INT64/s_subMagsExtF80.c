@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
@@ -63,14 +61,12 @@ extFloat80_t
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = expExtF80UI64( uiA64 );
     sigA = uiA0;
     expB = expExtF80UI64( uiB64 );
     sigB = uiB0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expA - expB;
     if ( 0 < expDiff ) goto expABigger;
     if ( expDiff < 0 ) goto expBBigger;
@@ -83,8 +79,7 @@ extFloat80_t
         uiZ0  = defaultNaNExtF80UI0;
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA;
     if ( ! expZ ) expZ = 1;
     sigExtra = 0;
@@ -94,8 +89,7 @@ extFloat80_t
         packToExtF80UI64( (softfloat_roundingMode == softfloat_round_min), 0 );
     uiZ0 = 0;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  expBBigger:
     if ( expB == 0x7FFF ) {
         if ( sigB & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) goto propagateNaN;
@@ -117,8 +111,7 @@ extFloat80_t
     signZ = ! signZ;
     sig128 = softfloat_sub128( sigB, 0, sigA, sigExtra );
     goto normRoundPack;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  expABigger:
     if ( expA == 0x7FFF ) {
         if ( sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) goto propagateNaN;
@@ -138,14 +131,12 @@ extFloat80_t
     expZ = expA;
  aBigger:
     sig128 = softfloat_sub128( sigA, 0, sigB, sigExtra );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  normRoundPack:
     return
         softfloat_normRoundPackToExtF80(
             signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, uiB64, uiB0 );
     uiZ64 = uiZ.v64;

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -65,8 +63,7 @@ void f64_to_extF80M( float64_t a, extFloat80_t *zPtr )
     uint64_t uiZ0;
     struct exp16_sig64 normExpSig;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     /** @bug cast to same type */
     zSPtr = (struct extFloat80M *) zPtr;
     uA.f = a;
@@ -74,8 +71,7 @@ void f64_to_extF80M( float64_t a, extFloat80_t *zPtr )
     sign = signF64UI( uiA );
     exp  = expF64UI( uiA );
     frac = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FF ) {
         if ( frac ) {
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
@@ -86,8 +82,7 @@ void f64_to_extF80M( float64_t a, extFloat80_t *zPtr )
         uiZ0  = UINT64_C( 0x8000000000000000 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! exp ) {
         if ( ! frac ) {
             uiZ64 = packToExtF80UI64( sign, 0 );
@@ -98,8 +93,7 @@ void f64_to_extF80M( float64_t a, extFloat80_t *zPtr )
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiZ64 = packToExtF80UI64( sign, exp + 0x3C00 );
     uiZ0  = UINT64_C( 0x8000000000000000 ) | frac<<11;
  uiZ:

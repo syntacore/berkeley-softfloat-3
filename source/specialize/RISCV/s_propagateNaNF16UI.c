@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,19 +32,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdint.h>
 
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
-| point values, at least one of which is a NaN, returns the bit pattern of
-| the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-| signaling NaN, the invalid exception is raised.
-*----------------------------------------------------------------------------*/
+/**
+Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
+point values, at least one of which is a NaN, returns the bit pattern of
+the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
+signaling NaN, the invalid exception is raised.
+*/
 uint16_t
  softfloat_propagateNaNF16UI( uint16_t uiA, uint16_t uiB )
 {

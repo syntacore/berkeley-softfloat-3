@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int32_t f128_to_i32( float128_t a, uint8_t roundingMode, bool exact )
 {
@@ -50,8 +48,7 @@ int32_t f128_to_i32( float128_t a, uint8_t roundingMode, bool exact )
     uint64_t sig64, sig0;
     int32_t shiftDist;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -59,8 +56,7 @@ int32_t f128_to_i32( float128_t a, uint8_t roundingMode, bool exact )
     exp   = expF128UI64( uiA64 );
     sig64 = fracF128UI64( uiA64 );
     sig0  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 #if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
     if ( (exp == 0x7FFF) && (sig64 | sig0) ) {
 #if (i32_fromNaN == i32_fromPosOverflow)
@@ -73,8 +69,7 @@ int32_t f128_to_i32( float128_t a, uint8_t roundingMode, bool exact )
 #endif
     }
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp ) sig64 |= UINT64_C( 0x0001000000000000 );
     sig64 |= (sig0 != 0);
     shiftDist = 0x4023 - exp;

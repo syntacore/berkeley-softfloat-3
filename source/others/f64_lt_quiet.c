@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,16 +32,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-bool f64_lt_quiet( float64_t a, float64_t b )
+bool f64_lt_quiet(float64_t a, float64_t b)
 {
     union ui64_f64 uA;
     uint64_t uiA;
@@ -53,20 +51,16 @@ bool f64_lt_quiet( float64_t a, float64_t b )
     uiA = uA.ui;
     uB.f = b;
     uiB = uB.ui;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
-        if (
-            softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB )
-        ) {
-            softfloat_raiseFlags( softfloat_flag_invalid );
+    if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
+        if (softfloat_isSigNaNF64UI(uiA) || softfloat_isSigNaNF64UI(uiB)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
         }
         return false;
     }
-    signA = signF64UI( uiA );
-    signB = signF64UI( uiB );
+    signA = signF64UI(uiA);
+    signB = signF64UI(uiB);
     return
-        (signA != signB)
-            ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-            : (uiA != uiB) && (signA ^ (uiA < uiB));
-
+        signA != signB ? signA && ((uiA | uiB) & UINT64_C(0x7FFFFFFFFFFFFFFF)) :
+        uiA != uiB && (signA ^ (uiA < uiB));
 }
 

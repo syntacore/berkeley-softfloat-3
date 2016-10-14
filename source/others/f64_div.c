@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,16 +32,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-float64_t f64_div( float64_t a, float64_t b )
+float64_t f64_div(float64_t a, float64_t b)
 {
     union ui64_f64 uA;
     uint64_t uiA;
@@ -63,110 +61,110 @@ float64_t f64_div( float64_t a, float64_t b )
     uint64_t uiZ;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    signA = signF64UI( uiA );
-    expA  = expF64UI( uiA );
-    sigA  = fracF64UI( uiA );
+    signA = signF64UI(uiA);
+    expA = expF64UI(uiA);
+    sigA = fracF64UI(uiA);
     uB.f = b;
     uiB = uB.ui;
-    signB = signF64UI( uiB );
-    expB  = expF64UI( uiB );
-    sigB  = fracF64UI( uiB );
+    signB = signF64UI(uiB);
+    expB = expF64UI(uiB);
+    sigB = fracF64UI(uiB);
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0x7FF ) {
-            if ( sigB ) goto propagateNaN;
+
+    if (expA == 0x7FF) {
+        if (sigA) {
+            goto propagateNaN;
+        }
+        if (expB == 0x7FF) {
+            if (sigB) {
+                goto propagateNaN;
+            }
             goto invalid;
         }
         goto infinity;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
+    if (expB == 0x7FF) {
+        if (sigB) {
+            goto propagateNaN;
+        }
         goto zero;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
-            softfloat_raiseFlags( softfloat_flag_infinite );
+
+    if (!expB) {
+        if (!sigB) {
+            if (!(expA | sigA)) {
+                goto invalid;
+            }
+            softfloat_raiseFlags(softfloat_flag_infinite);
             goto infinity;
         }
-        normExpSig = softfloat_normSubnormalF64Sig( sigB );
+        normExpSig = softfloat_normSubnormalF64Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
-        normExpSig = softfloat_normSubnormalF64Sig( sigA );
+    if (!expA) {
+        if (!sigA) {
+            goto zero;
+        }
+        normExpSig = softfloat_normSubnormalF64Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     expZ = expA - expB + 0x3FE;
-    sigA |= UINT64_C( 0x0010000000000000 );
-    sigB |= UINT64_C( 0x0010000000000000 );
-    if ( sigA < sigB ) {
+    sigA |= UINT64_C(0x0010000000000000);
+    sigB |= UINT64_C(0x0010000000000000);
+    if (sigA < sigB) {
         --expZ;
         sigA <<= 11;
     } else {
         sigA <<= 10;
     }
     sigB <<= 11;
-    recip32 = softfloat_approxRecip32_1( sigB>>32 ) - 2;
-    sig32Z = ((uint32_t) (sigA>>32) * (uint64_t) recip32)>>32;
-    doubleTerm = sig32Z<<1;
+    recip32 = softfloat_approxRecip32_1(sigB >> 32) - 2;
+    sig32Z = ((uint32_t)(sigA >> 32) * (uint64_t)recip32) >> 32;
+    doubleTerm = sig32Z << 1;
     rem =
-        ((sigA - (uint64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
-            - (uint64_t) doubleTerm * ((uint32_t) sigB>>4);
-    q = (((uint32_t) (rem>>32) * (uint64_t) recip32)>>32) + 4;
-    sigZ = ((uint64_t) sig32Z<<32) + ((uint64_t) q<<4);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 4<<4 ) {
+        ((sigA - (uint64_t)doubleTerm * (uint32_t)(sigB >> 32)) << 28)
+        - (uint64_t)doubleTerm * ((uint32_t)sigB >> 4);
+    q = (((uint32_t)(rem >> 32) * (uint64_t)recip32) >> 32) + 4;
+    sigZ = ((uint64_t)sig32Z << 32) + ((uint64_t)q << 4);
+
+    if ((sigZ & 0x1FF) < 4 << 4) {
         q &= ~7;
-        sigZ &= ~(uint64_t) 0x7F;
-        doubleTerm = q<<1;
+        sigZ &= ~(uint64_t)0x7F;
+        doubleTerm = q << 1;
         rem =
-            ((rem - (uint64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
-                - (uint64_t) doubleTerm * ((uint32_t) sigB>>4);
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
-            sigZ -= 1<<7;
+            ((rem - (uint64_t)doubleTerm * (uint32_t)(sigB >> 32)) << 28)
+            - (uint64_t)doubleTerm * ((uint32_t)sigB >> 4);
+        if (rem & UINT64_C(0x8000000000000000)) {
+            sigZ -= 1 << 7;
         } else {
-            if ( rem ) sigZ |= 1;
+            if (rem) {
+                sigZ |= 1;
+            }
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- propagateNaN:
-    uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
+    return softfloat_roundPackToF64(signZ, expZ, sigZ);
+
+propagateNaN:
+    uiZ = softfloat_propagateNaNF64UI(uiA, uiB);
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     uiZ = defaultNaNF64UI;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- infinity:
-    uiZ = packToF64UI( signZ, 0x7FF, 0 );
+
+infinity:
+    uiZ = packToF64UI(signZ, 0x7FF, 0);
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- zero:
-    uiZ = packToF64UI( signZ, 0, 0 );
- uiZ:
+
+zero:
+    uiZ = packToF64UI(signZ, 0, 0);
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
-
 }
-

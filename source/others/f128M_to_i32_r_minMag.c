@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -63,24 +61,21 @@ int32_t f128M_to_i32_r_minMag( const float128_t *aPtr, bool exact )
     uint32_t absZ, uiZ;
     union { uint32_t ui; int32_t i; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign = signF128UI96( uiA96 );
     exp  = expF128UI96( uiA96 );
     sig64 = (uint64_t) fracF128UI96( uiA96 )<<32 | aWPtr[indexWord( 4, 2 )];
     if ( aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )] ) sig64 |= 1;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp < 0x3FFF ) {
         if ( exact && (exp | sig64) ) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( 0x401F <= exp ) goto invalid;
     shiftDist = 0x402F - exp;
     sig64 |= UINT64_C( 0x0001000000000000 );
@@ -92,8 +87,7 @@ int32_t f128M_to_i32_r_minMag( const float128_t *aPtr, bool exact )
     }
     uZ.ui = uiZ;
     return uZ.i;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,23 +32,21 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdint.h>
+*/
 
 #include "primitives/functions.h"
 #include "specialize.h"
 
-/*----------------------------------------------------------------------------
-| Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
-| NaN, and returns the bit pattern of this value as an unsigned integer.
-*----------------------------------------------------------------------------*/
-struct uint128 softfloat_commonNaNToF128UI( const struct commonNaN *aPtr )
+/**
+Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
+NaN, and returns the bit pattern of this value as an unsigned integer.
+*/
+struct uint128 softfloat_commonNaNToF128UI(const struct commonNaN *aPtr)
 {
     struct uint128 uiZ;
 
-    uiZ = softfloat_shortShiftRight128( aPtr->v64, aPtr->v0, 16 );
-    uiZ.v64 |= (uint64_t) aPtr->sign<<63 | UINT64_C( 0x7FFF800000000000 );
+    uiZ = softfloat_shortShiftRight128(aPtr->v64, aPtr->v0, 16);
+    uiZ.v64 |= (uint64_t)aPtr->sign << 63 | UINT64_C(0x7FFF800000000000);
     return uiZ;
 
 }

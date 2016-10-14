@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float128_t f128_rem( float128_t a, float128_t b )
 {
@@ -62,8 +60,7 @@ float128_t f128_rem( float128_t a, float128_t b )
     struct uint128 uiZ;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -77,8 +74,7 @@ float128_t f128_rem( float128_t a, float128_t b )
     expB  = expF128UI64( uiB64 );
     sigB.v64 = fracF128UI64( uiB64 );
     sigB.v0  = uiB0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if (
             (sigA.v64 | sigA.v0) || ((expB == 0x7FFF) && (sigB.v64 | sigB.v0))
@@ -91,8 +87,7 @@ float128_t f128_rem( float128_t a, float128_t b )
         if ( sigB.v64 | sigB.v0 ) goto propagateNaN;
         return a;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expB ) {
         if ( ! (sigB.v64 | sigB.v0) ) goto invalid;
         normExpSig = softfloat_normSubnormalF128Sig( sigB.v64, sigB.v0 );
@@ -105,8 +100,7 @@ float128_t f128_rem( float128_t a, float128_t b )
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sigA.v64 |= UINT64_C( 0x0001000000000000 );
     sigB.v64 |= UINT64_C( 0x0001000000000000 );
     rem = sigA;
@@ -150,8 +144,7 @@ float128_t f128_rem( float128_t a, float128_t b )
             goto selectRem;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     do {
         altRem = rem;
         ++q;
@@ -171,13 +164,11 @@ float128_t f128_rem( float128_t a, float128_t b )
         rem = softfloat_sub128( 0, 0, rem.v64, rem.v0 );
     }
     return softfloat_normRoundPackToF128( signRem, expB - 1, rem.v64, rem.v0 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, uiB64, uiB0 );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ.v64 = defaultNaNF128UI64;

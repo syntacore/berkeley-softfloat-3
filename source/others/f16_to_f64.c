@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float64_t f16_to_f64( float16_t a )
 {
@@ -53,15 +51,13 @@ float64_t f16_to_f64( float16_t a )
     struct exp8_sig16 normExpSig;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF16UI( uiA );
     exp  = expF16UI( uiA );
     frac = fracF16UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x1F ) {
         if ( frac ) {
             softfloat_f16UIToCommonNaN( uiA, &commonNaN );
@@ -71,8 +67,7 @@ float64_t f16_to_f64( float16_t a )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! exp ) {
         if ( ! frac ) {
             uiZ = packToF64UI( sign, 0, 0 );
@@ -82,8 +77,7 @@ float64_t f16_to_f64( float16_t a )
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiZ = packToF64UI( sign, exp + 0x3F0, (uint64_t) frac<<42 );
  uiZ:
     uZ.ui = uiZ;

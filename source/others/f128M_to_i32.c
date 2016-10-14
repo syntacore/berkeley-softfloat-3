@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -63,16 +61,14 @@ int32_t
     uint64_t sig64;
     int32_t shiftDist;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign = signF128UI96( uiA96 );
     exp  = expF128UI96( uiA96 );
     sig64 = (uint64_t) fracF128UI96( uiA96 )<<32 | aWPtr[indexWord( 4, 2 )];
     if ( aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )] ) sig64 |= 1;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 #if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
     if ( (exp == 0x7FFF) && sig64 ) {
 #if (i32_fromNaN == i32_fromPosOverflow)
@@ -85,8 +81,7 @@ int32_t
 #endif
     }
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp ) sig64 |= UINT64_C( 0x0001000000000000 );
     shiftDist = 0x4023 - exp;
     if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,28 +32,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdint.h>
+*/
 
 #include "specialize.h"
+
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Assuming `uiA' has the bit pattern of a 32-bit floating-point NaN, converts
-| this NaN to the common NaN form, and stores the resulting common NaN at the
-| location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
-| exception is raised.
-*----------------------------------------------------------------------------*/
-void softfloat_f32UIToCommonNaN( uint32_t uiA, struct commonNaN *zPtr )
+void softfloat_f32UIToCommonNaN(uint32_t uiA, struct commonNaN *zPtr)
 {
-
-    if ( softfloat_isSigNaNF32UI( uiA ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (softfloat_isSigNaNF32UI(uiA)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    zPtr->sign = uiA>>31;
-    zPtr->v64  = (uint64_t) uiA<<41;
-    zPtr->v0   = 0;
-
+    zPtr->sign = uiA >> 31;
+    zPtr->v64 = (uint64_t)uiA << 41;
+    zPtr->v0 = 0;
 }
-

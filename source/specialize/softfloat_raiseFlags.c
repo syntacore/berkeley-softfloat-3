@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,19 +32,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 
 #include "softfloat/functions.h"
 
 static THREAD_LOCAL uint8_t softfloat_exceptionFlags = 0;
 
-/*----------------------------------------------------------------------------
-| Raises the exceptions specified by `flags'.  Floating-point traps can be
-| defined here if desired.  It is currently not possible for such a trap
-| to substitute a result value.  If traps are not implemented, this routine
-| should be simply `softfloat_exceptionFlags |= flags;'.
-*----------------------------------------------------------------------------*/
+/**
+Raises the exceptions specified by `flags'.  Floating-point traps can be
+defined here if desired.  It is currently not possible for such a trap
+to substitute a result value.  If traps are not implemented, this routine
+should be simply `softfloat_exceptionFlags |= flags;'.
+*/
 void softfloat_raiseFlags( uint8_t flags )
 {
     softfloat_exceptionFlags |= flags;

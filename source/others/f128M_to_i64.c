@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -64,15 +62,13 @@ int64_t
     int32_t shiftDist;
     uint32_t sig[4];
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign  = signF128UI96( uiA96 );
     exp   = expF128UI96( uiA96 );
     sig96 = fracF128UI96( uiA96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x404F - exp;
     if ( shiftDist < 17 ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -84,8 +80,7 @@ int64_t
                 ? i64_fromNaN
                 : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp ) sig96 |= 0x00010000;
     sig[indexWord( 4, 3 )] = sig96;
     sig[indexWord( 4, 2 )] = aWPtr[indexWord( 4, 2 )];

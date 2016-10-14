@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float64_t f64_rem( float64_t a, float64_t b )
 {
@@ -62,8 +60,7 @@ float64_t f64_rem( float64_t a, float64_t b )
     uint64_t uiZ;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     signA = signF64UI( uiA );
@@ -73,8 +70,7 @@ float64_t f64_rem( float64_t a, float64_t b )
     uiB = uB.ui;
     expB = expF64UI( uiB );
     sigB = fracF64UI( uiB );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FF ) {
         if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
         goto invalid;
@@ -83,11 +79,9 @@ float64_t f64_rem( float64_t a, float64_t b )
         if ( sigB ) goto propagateNaN;
         return a;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA < expB - 1 ) return a;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expB ) {
         if ( ! sigB ) goto invalid;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
@@ -100,8 +94,7 @@ float64_t f64_rem( float64_t a, float64_t b )
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     rem = sigA | UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
     expDiff = expA - expB;
@@ -118,13 +111,13 @@ float64_t f64_rem( float64_t a, float64_t b )
         }
     } else {
         recip32 = softfloat_approxRecip32_1( sigB>>21 );
-        /*--------------------------------------------------------------------
+        /*
         | Changing the shift of `rem' here requires also changing the initial
         | subtraction from `expDiff'.
         *--------------------------------------------------------------------*/
         rem <<= 9;
         expDiff -= 30;
-        /*--------------------------------------------------------------------
+        /*
         | The scale of `sigB' affects how many bits are obtained during each
         | cycle of the loop.  Currently this is 29 bits per loop iteration,
         | the maximum possible.
@@ -143,7 +136,7 @@ float64_t f64_rem( float64_t a, float64_t b )
             if ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
             expDiff -= 29;
         }
-        /*--------------------------------------------------------------------
+        /*
         | (`expDiff' cannot be less than -29 here.)
         *--------------------------------------------------------------------*/
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
@@ -153,8 +146,7 @@ float64_t f64_rem( float64_t a, float64_t b )
             goto selectRem;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     do {
         altRem = rem;
         ++q;
@@ -173,8 +165,7 @@ float64_t f64_rem( float64_t a, float64_t b )
         rem = -(int64_t)rem;
     }
     return softfloat_normRoundPackToF64( signRem, expB, rem );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
     goto uiZ;

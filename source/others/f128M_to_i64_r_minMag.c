@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -64,15 +62,13 @@ int64_t f128M_to_i64_r_minMag( const float128_t *aPtr, bool exact )
     uint64_t uiZ;
     union { uint64_t ui; int64_t i; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign  = signF128UI96( uiA96 );
     exp   = expF128UI96( uiA96 );
     sig96 = fracF128UI96( uiA96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x403E - exp;
     if ( shiftDist < 0 ) goto invalid;
     if ( exact ) {
@@ -106,8 +102,7 @@ int64_t f128M_to_i64_r_minMag( const float128_t *aPtr, bool exact )
     if ( sign ) uiZ = -(int64_t)uiZ;
     uZ.ui = uiZ;
     return uZ.i;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return

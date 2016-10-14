@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C header file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #ifndef PRIMITIVES_H_
 #define PRIMITIVES_H_
 
 #include "primitives/types.h"
 #include <stdbool.h>
-#include <stdint.h>
 
 /**
 Shifts `a' right by the number of bits given in `dist', which must be in
@@ -89,7 +88,7 @@ is zero or nonzero.
 INLINE uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
 {
     return
-        (dist < 63) ? a >> dist | ((uint64_t)(a << (-(int32_t)dist & 63)) != 0) : (a != 0);
+        dist >= 63 ? a != 0 : a >> dist | ((uint64_t)(a << (-(int32_t)dist & 63)) != 0);
 }
 #else
 uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist);

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
 {
@@ -67,8 +65,7 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     uiA0  = uA.s.signif;
@@ -82,8 +79,7 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
     expB  = expExtF80UI64( uiB64 );
     sigB  = uiB0;
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if (
                (sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
@@ -99,8 +95,7 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
         magBits = expA | sigA;
         goto infArg;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) expA = 1;
     if ( ! (sigA & UINT64_C( 0x8000000000000000 )) ) {
         if ( ! sigA ) goto zero;
@@ -115,8 +110,7 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x3FFE;
     sig128Z = softfloat_mul64To128( sigA, sigB );
     if ( sig128Z.v64 < UINT64_C( 0x8000000000000000 ) ) {
@@ -128,15 +122,13 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
     return
         softfloat_roundPackToExtF80(
             signZ, expZ, sig128Z.v64, sig128Z.v0, extF80_roundingPrecision );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, uiB64, uiB0 );
     uiZ64 = uiZ.v64;
     uiZ0  = uiZ.v0;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infArg:
     if ( ! magBits ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -147,8 +139,7 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
         uiZ0  = UINT64_C( 0x8000000000000000 );
     }
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ64 = packToExtF80UI64( signZ, 0 );
     uiZ0  = 0;

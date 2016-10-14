@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,27 +32,23 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-bool extF80M_isSignalingNaN( const extFloat80_t *aPtr )
+bool extF80M_isSignalingNaN(const extFloat80_t *aPtr)
 {
-    const struct extFloat80M *aSPtr;
     uint64_t uiA0;
 
     /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    if ( (aSPtr->signExp & 0x7FFF) != 0x7FFF ) return false;
+    const struct extFloat80M *aSPtr = (const struct extFloat80M *) aPtr;
+    if ((aSPtr->signExp & 0x7FFF) != 0x7FFF) {
+        return false;
+    }
     uiA0 = aSPtr->signif;
     return
-        ! (uiA0 & UINT64_C( 0x4000000000000000 ))
-            && (uiA0 & UINT64_C( 0x3FFFFFFFFFFFFFFF));
+        !(uiA0 & UINT64_C(0x4000000000000000)) &&
+        (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
 
 }
 

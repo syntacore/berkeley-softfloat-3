@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float64_t f64_roundToInt( float64_t a, uint8_t roundingMode, bool exact )
 {
@@ -49,13 +47,11 @@ float64_t f64_roundToInt( float64_t a, uint8_t roundingMode, bool exact )
     uint64_t uiZ, lastBitMask, roundBitsMask;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     exp = expF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp <= 0x3FE ) {
         if ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) return a;
         if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
@@ -75,8 +71,7 @@ float64_t f64_roundToInt( float64_t a, uint8_t roundingMode, bool exact )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( 0x433 <= exp ) {
         if ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
@@ -84,8 +79,7 @@ float64_t f64_roundToInt( float64_t a, uint8_t roundingMode, bool exact )
         }
         return a;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiZ = uiA;
     lastBitMask = (uint64_t) 1<<(0x433 - exp);
     roundBitsMask = lastBitMask - 1;

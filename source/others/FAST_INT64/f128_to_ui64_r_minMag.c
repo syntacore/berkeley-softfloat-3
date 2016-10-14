@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 uint64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
 {
@@ -52,8 +50,7 @@ uint64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
     int8_t negShiftDist;
     uint64_t z;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -61,12 +58,10 @@ uint64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
     exp   = expF128UI64( uiA64 );
     sig64 = fracF128UI64( uiA64 );
     sig0  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x402F - exp;
     if ( shiftDist < 0 ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( sign || (shiftDist < -15) ) goto invalid;
         sig64 |= UINT64_C( 0x0001000000000000 );
         negShiftDist = -shiftDist;
@@ -75,16 +70,14 @@ uint64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( 49 <= shiftDist ) {
             if ( exact && (exp | sig64 | sig0) ) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
             return 0;
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( sign ) goto invalid;
         sig64 |= UINT64_C( 0x0001000000000000 );
         z = sig64>>shiftDist;
@@ -93,8 +86,7 @@ uint64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
         }
     }
     return z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return

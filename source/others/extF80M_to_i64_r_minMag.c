@@ -1,12 +1,13 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,27 +33,25 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-int64_t extF80M_to_i64_r_minMag( const extFloat80_t *aPtr, bool exact )
+int64_t extF80M_to_i64_r_minMag(const extFloat80_t *aPtr, bool exact)
 {
 
-    return extF80_to_i64_r_minMag( *aPtr, exact );
+    return extF80_to_i64_r_minMag(*aPtr, exact);
 
 }
 
 #else
 
-int64_t extF80M_to_i64_r_minMag( const extFloat80_t *aPtr, bool exact )
+int64_t extF80M_to_i64_r_minMag(const extFloat80_t *aPtr, bool exact)
 {
     const struct extFloat80M *aSPtr;
     uint16_t uiA64;
@@ -62,53 +61,69 @@ int64_t extF80M_to_i64_r_minMag( const extFloat80_t *aPtr, bool exact )
     bool sign, raiseInexact;
     int64_t z;
     uint64_t absZ;
-    union { uint64_t ui; int64_t i; } u;
+    union
+    {
+        uint64_t ui; int64_t i;
+    } u;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
     uiA64 = aSPtr->signExp;
-    exp = expExtF80UI64( uiA64 );
+    exp = expExtF80UI64(uiA64);
     sig = aSPtr->signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( ! sig && (exp != 0x7FFF) ) return 0;
+    
+    if (!sig && (exp != 0x7FFF)) {
+        return 0;
+    }
     shiftDist = 0x403E - exp;
-    if ( 64 <= shiftDist ) {
+    if (64 <= shiftDist) {
         raiseInexact = exact;
         z = 0;
     } else {
-        sign = signExtF80UI64( uiA64 );
+        sign = signExtF80UI64(uiA64);
         raiseInexact = false;
-        if ( shiftDist < 0 ) {
-            if ( shiftDist <= -63 ) goto invalid;
+        if (shiftDist < 0) {
+            if (shiftDist <= -63) {
+                goto invalid;
+            }
             shiftDist = -shiftDist;
-            absZ = sig<<shiftDist;
-            if ( absZ>>shiftDist != sig ) goto invalid;
+            absZ = sig << shiftDist;
+            if (absZ >> shiftDist != sig) {
+                goto invalid;
+            }
         } else {
             absZ = sig;
-            if ( shiftDist ) absZ >>= shiftDist;
-            if ( exact && shiftDist ) raiseInexact = (absZ<<shiftDist != sig);
+            if (shiftDist) {
+                absZ >>= shiftDist;
+            }
+            if (exact && shiftDist) {
+                raiseInexact = (absZ << shiftDist != sig);
+            }
         }
-        if ( sign ) {
-            if ( UINT64_C( 0x8000000000000000 ) < absZ ) goto invalid;
+        if (sign) {
+            if (UINT64_C(0x8000000000000000) < absZ) {
+                goto invalid;
+            }
             u.ui = -(int64_t)absZ;
             z = u.i;
         } else {
-            if ( UINT64_C( 0x8000000000000000 ) <= absZ ) goto invalid;
+            if (UINT64_C(0x8000000000000000) <= absZ) {
+                goto invalid;
+            }
             z = absZ;
         }
     }
-    if ( raiseInexact ) softfloat_raiseFlags(softfloat_flag_inexact);
+    if (raiseInexact) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
     return z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+    
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     return
         (exp == INT16_MAX) && (sig & INT64_MAX) ? i64_fromNaN
-            : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
 }
 

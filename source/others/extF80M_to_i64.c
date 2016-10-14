@@ -1,12 +1,13 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,14 +33,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -66,16 +65,14 @@ extF80M_to_i64(
     int32_t shiftDist;
     uint32_t extSig[3];
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
     uiA64 = aSPtr->signExp;
     sign = signExtF80UI64(uiA64);
     exp = expExtF80UI64(uiA64);
     sig = aSPtr->signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x403E - exp;
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -84,12 +81,13 @@ extF80M_to_i64(
             ? i64_fromNaN
             : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     extSig[indexWord(3, 2)] = sig >> 32;
     extSig[indexWord(3, 1)] = (uint32_t)sig;
     extSig[indexWord(3, 0)] = 0;
-    if (shiftDist) softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
+    if (shiftDist) {
+        softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
+    }
     return softfloat_roundPackMToI64(sign, extSig, roundingMode, exact);
 
 }

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,13 +32,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include "softfloat/functions.h"
 #include "internals.h"
 #include "specialize.h"
 
-float32_t f32_mul( float32_t a, float32_t b )
+float32_t f32_mul(float32_t a, float32_t b)
 {
     union ui32_f32 uA;
     uint32_t uiA;
@@ -58,76 +58,76 @@ float32_t f32_mul( float32_t a, float32_t b )
     uint32_t uiZ;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    signA = signF32UI( uiA );
-    expA  = expF32UI( uiA );
-    sigA  = fracF32UI( uiA );
+    signA = signF32UI(uiA);
+    expA = expF32UI(uiA);
+    sigA = fracF32UI(uiA);
     uB.f = b;
     uiB = uB.ui;
-    signB = signF32UI( uiB );
-    expB  = expF32UI( uiB );
-    sigB  = fracF32UI( uiB );
+    signB = signF32UI(uiB);
+    expB = expF32UI(uiB);
+    sigB = fracF32UI(uiB);
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
+
+    if (expA == 0xFF) {
+        if (sigA || ((expB == 0xFF) && sigB)) {
+            goto propagateNaN;
+        }
         magBits = expB | sigB;
         goto infArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
+    if (expB == 0xFF) {
+        if (sigB) {
+            goto propagateNaN;
+        }
         magBits = expA | sigA;
         goto infArg;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
-        normExpSig = softfloat_normSubnormalF32Sig( sigA );
+
+    if (!expA) {
+        if (!sigA) {
+            goto zero;
+        }
+        normExpSig = softfloat_normSubnormalF32Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
-        normExpSig = softfloat_normSubnormalF32Sig( sigB );
+    if (!expB) {
+        if (!sigB) {
+            goto zero;
+        }
+        normExpSig = softfloat_normSubnormalF32Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     expZ = expA + expB - 0x7F;
-    sigA = (sigA | 0x00800000)<<7;
-    sigB = (sigB | 0x00800000)<<8;
-    sigZ = (uint32_t)softfloat_shortShiftRightJam64( (uint64_t) sigA * sigB, 32 );
-    if ( sigZ < 0x40000000 ) {
+    sigA = (sigA | 0x00800000) << 7;
+    sigB = (sigB | 0x00800000) << 8;
+    sigZ = (uint32_t)softfloat_shortShiftRightJam64((uint64_t)sigA * sigB, 32);
+    if (sigZ < 0x40000000) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- propagateNaN:
-    uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
+    return softfloat_roundPackToF32(signZ, expZ, sigZ);
+
+propagateNaN:
+    uiZ = softfloat_propagateNaNF32UI(uiA, uiB);
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- infArg:
-    if ( ! magBits ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+
+infArg:
+    if (!magBits) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         uiZ = defaultNaNF32UI;
     } else {
-        uiZ = packToF32UI( signZ, 0xFF, 0 );
+        uiZ = packToF32UI(signZ, 0xFF, 0);
     }
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- zero:
-    uiZ = packToF32UI( signZ, 0, 0 );
- uiZ:
+
+zero:
+    uiZ = packToF32UI(signZ, 0, 0);
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 

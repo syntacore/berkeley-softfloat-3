@@ -1,12 +1,13 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -32,7 +33,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include "softfloat/functions.h"
 
@@ -43,9 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 uint32_t extF80M_to_ui32_r_minMag(const extFloat80_t *aPtr, bool exact)
 {
-
     return extF80_to_ui32_r_minMag(*aPtr, exact);
-
 }
 
 #else
@@ -83,7 +82,9 @@ uint32_t extF80M_to_ui32_r_minMag(const extFloat80_t *aPtr, bool exact)
                     z = shiftedSig;
                 } else {
                     shiftedSig = sig;
-                    if (shiftDist) shiftedSig >>= shiftDist;
+                    if (shiftDist) {
+                        shiftedSig >>= shiftDist;
+                    }
                     if (shiftedSig >> 32) {
                         goto invalid;
                     }

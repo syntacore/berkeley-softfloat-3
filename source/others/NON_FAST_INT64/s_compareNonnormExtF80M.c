@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,11 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "softfloat/types.h"
 
 /** @bug use extFloat80_t */
@@ -50,21 +49,18 @@ int
     uint64_t sigB;
     int32_t expA, expB;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA64 = aSPtr->signExp;
     uiB64 = bSPtr->signExp;
     sigA = aSPtr->signif;
     signB = signExtF80UI64( uiB64 );
     sigB = bSPtr->signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (uiA64 ^ uiB64) & 0x8000 ) {
         if ( ! (sigA | sigB) ) return 0;
         goto resultFromSignB;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = expExtF80UI64( uiA64 );
     expB = expExtF80UI64( uiB64 );
     if ( expA == 0x7FFF ) {
@@ -75,8 +71,7 @@ int
     if ( expB == 0x7FFF ) {
         goto resultFromSignB;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) expA = 1;
     if ( ! (sigA & UINT64_C( 0x8000000000000000 )) ) {
         if ( sigA ) {
@@ -93,8 +88,7 @@ int
             expB = -128;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( signB ) {
         if ( expA < expB ) return 1;
         if ( (expB < expA) || (sigB < sigA) ) return -1;
@@ -103,8 +97,7 @@ int
         if ( (expA < expB) || (sigA < sigB) ) return -1;
     }
     return (sigA != sigB);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  resultFromSignB:
     return signB ? 1 : -1;
 

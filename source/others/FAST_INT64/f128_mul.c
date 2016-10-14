@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float128_t f128_mul( float128_t a, float128_t b )
 {
@@ -64,8 +62,7 @@ float128_t f128_mul( float128_t a, float128_t b )
     struct uint128 uiZ;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -81,8 +78,7 @@ float128_t f128_mul( float128_t a, float128_t b )
     sigB.v64 = fracF128UI64( uiB64 );
     sigB.v0  = uiB0;
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if (
             (sigA.v64 | sigA.v0) || ((expB == 0x7FFF) && (sigB.v64 | sigB.v0))
@@ -97,8 +93,7 @@ float128_t f128_mul( float128_t a, float128_t b )
         magBits = expA | sigA.v64 | sigA.v0;
         goto infArg;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! (sigA.v64 | sigA.v0) ) goto zero;
         normExpSig = softfloat_normSubnormalF128Sig( sigA.v64, sigA.v0 );
@@ -111,8 +106,7 @@ float128_t f128_mul( float128_t a, float128_t b )
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x4000;
     sigA.v64 |= UINT64_C( 0x0001000000000000 );
     sigB = softfloat_shortShiftLeft128( sigB.v64, sigB.v0, 16 );
@@ -133,13 +127,11 @@ float128_t f128_mul( float128_t a, float128_t b )
     }
     return
         softfloat_roundPackToF128( signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, uiB64, uiB0 );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infArg:
     if ( ! magBits ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -149,8 +141,7 @@ float128_t f128_mul( float128_t a, float128_t b )
     }
     uiZ.v64 = packToF128UI64( signZ, 0x7FFF, 0 );
     goto uiZ0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ.v64 = packToF128UI64( signZ, 0, 0 );
  uiZ0:

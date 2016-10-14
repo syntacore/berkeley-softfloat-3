@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include "internals.h"
 
@@ -65,8 +65,7 @@ float32_t
     int8_t shiftDist;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     signA = signF32UI( uiA );
     expA  = expF32UI( uiA );
     sigA  = fracF32UI( uiA );
@@ -77,8 +76,7 @@ float32_t
     expC  = expF32UI( uiC );
     sigC  = fracF32UI( uiC );
     signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0xFF ) {
         if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
@@ -97,8 +95,7 @@ float32_t
         uiZ = uiC;
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
@@ -111,8 +108,7 @@ float32_t
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expProd = expA + expB - 0x7E;
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<7;
@@ -133,12 +129,10 @@ float32_t
         sigC = normExpSig.sig;
     }
     sigC = (sigC | 0x00800000)<<6;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expProd - expC;
     if ( signProd == signC ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expDiff <= 0 ) {
             expZ = expC;
             sigZ = sigC + softfloat_shiftRightJam64( sigProd, 32 - expDiff );
@@ -155,8 +149,7 @@ float32_t
             sigZ <<= 1;
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         sig64C = (uint64_t) sigC<<32;
         if ( expDiff < 0 ) {
             signZ = signC;
@@ -185,13 +178,11 @@ float32_t
     }
  roundPack:
     return softfloat_roundPackToF32( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
     goto propagateNaN_ZC;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infProdArg:
     if ( magBits ) {
         uiZ = packToF32UI( signProd, 0xFF, 0 );
@@ -204,8 +195,7 @@ float32_t
  propagateNaN_ZC:
     uiZ = softfloat_propagateNaNF32UI( uiZ, uiC );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zeroProd:
     uiZ = uiC;
     if ( ! (expC | sigC) && (signProd != signC) ) {

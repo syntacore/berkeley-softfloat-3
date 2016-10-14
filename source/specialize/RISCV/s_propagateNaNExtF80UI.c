@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdint.h>
 
@@ -40,15 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Interpreting the unsigned integer formed from concatenating `uiA64' and
-| `uiA0' as an 80-bit extended floating-point value, and likewise interpreting
-| the unsigned integer formed from concatenating `uiB64' and `uiB0' as another
-| 80-bit extended floating-point value, and assuming at least on of these
-| floating-point values is a NaN, returns the bit pattern of the combined NaN
-| result.  If either original floating-point value is a signaling NaN, the
-| invalid exception is raised.
-*----------------------------------------------------------------------------*/
+/**
+Interpreting the unsigned integer formed from concatenating `uiA64' and
+`uiA0' as an 80-bit extended floating-point value, and likewise interpreting
+the unsigned integer formed from concatenating `uiB64' and `uiB0' as another
+80-bit extended floating-point value, and assuming at least on of these
+floating-point values is a NaN, returns the bit pattern of the combined NaN
+result.  If either original floating-point value is a signaling NaN, the
+invalid exception is raised.
+*/
 struct uint128
  softfloat_propagateNaNExtF80UI(
      uint16_t uiA64,

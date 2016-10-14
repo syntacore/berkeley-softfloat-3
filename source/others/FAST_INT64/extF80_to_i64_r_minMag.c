@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int64_t extF80_to_i64_r_minMag( extFloat80_t a, bool exact )
 {
@@ -52,14 +50,12 @@ int64_t extF80_to_i64_r_minMag( extFloat80_t a, bool exact )
     bool sign;
     int64_t absZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     exp = expExtF80UI64( uiA64 );
     sig = uA.s.signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x403E - exp;
     if ( 64 <= shiftDist ) {
         if ( exact && (exp | sig) ) {
@@ -67,8 +63,7 @@ int64_t extF80_to_i64_r_minMag( extFloat80_t a, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signExtF80UI64( uiA64 );
     if ( shiftDist <= 0 ) {
         if (
@@ -83,8 +78,7 @@ int64_t extF80_to_i64_r_minMag( extFloat80_t a, bool exact )
                 ? i64_fromNaN
                 : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     absZ = sig>>shiftDist;
     if ( exact && (uint64_t) (sig<<(-shiftDist & 63)) ) {
         softfloat_raiseFlags(softfloat_flag_inexact);

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,19 +32,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extern const uint16_t softfloat_approxRecipSqrt_1k0s[];
 extern const uint16_t softfloat_approxRecipSqrt_1k1s[];
 
-float16_t f16_sqrt( float16_t a )
+float16_t f16_sqrt(float16_t a)
 {
     union ui16_f16 uA;
     uint16_t uiA;
@@ -61,74 +59,80 @@ float16_t f16_sqrt( float16_t a )
     uint16_t negRem;
     union ui16_f16 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    signA = signF16UI( uiA );
-    expA  = expF16UI( uiA );
-    sigA  = fracF16UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( expA == 0x1F ) {
-        if ( sigA ) {
-            uiZ = softfloat_propagateNaNF16UI( uiA, 0 );
+    signA = signF16UI(uiA);
+    expA = expF16UI(uiA);
+    sigA = fracF16UI(uiA);
+
+    if (expA == 0x1F) {
+        if (sigA) {
+            uiZ = softfloat_propagateNaNF16UI(uiA, 0);
             goto uiZ;
         }
-        if ( ! signA ) return a;
+        if (!signA) {
+            return a;
+        }
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
+
+    if (signA) {
+        if (!(expA | sigA)) {
+            return a;
+        }
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
-        normExpSig = softfloat_normSubnormalF16Sig( sigA );
+
+    if (!expA) {
+        if (!sigA) {
+            return a;
+        }
+        normExpSig = softfloat_normSubnormalF16Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    expZ = ((expA - 0xF)>>1) + 0xE;
+
+    expZ = ((expA - 0xF) >> 1) + 0xE;
     expA &= 1;
     sigA |= 0x0400;
-    index = (sigA>>6 & 0xE) + expA;
+    index = (sigA >> 6 & 0xE) + expA;
     r0 = softfloat_approxRecipSqrt_1k0s[index]
-             - (((uint32_t) softfloat_approxRecipSqrt_1k1s[index]
-                     * (sigA & 0x7F))
-                    >>11);
-    ESqrR0 = ((uint32_t) r0 * r0)>>1;
-    if ( expA ) ESqrR0 >>= 1;
-    sigma0 = ~(uint16_t) ((ESqrR0 * sigA)>>16);
-    recipSqrt16 = r0 + (((uint32_t) r0 * sigma0)>>25);
-    if ( ! (recipSqrt16 & 0x8000) ) recipSqrt16 = 0x8000;
-    sigZ = ((uint32_t) (sigA<<5) * recipSqrt16)>>16;
-    if ( expA ) sigZ >>= 1;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+        - (((uint32_t)softfloat_approxRecipSqrt_1k1s[index]
+           * (sigA & 0x7F))
+               >> 11);
+    ESqrR0 = ((uint32_t)r0 * r0) >> 1;
+    if (expA) {
+        ESqrR0 >>= 1;
+    }
+    sigma0 = ~(uint16_t)((ESqrR0 * sigA) >> 16);
+    recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
+    if (!(recipSqrt16 & 0x8000)) {
+        recipSqrt16 = 0x8000;
+    }
+    sigZ = ((uint32_t)(sigA << 5) * recipSqrt16) >> 16;
+    if (expA) {
+        sigZ >>= 1;
+    }
+
     ++sigZ;
-    if ( ! (sigZ & 7) ) {
-        shiftedSigZ = sigZ>>1;
+    if (!(sigZ & 7)) {
+        shiftedSigZ = sigZ >> 1;
         negRem = shiftedSigZ * shiftedSigZ;
         sigZ &= ~1;
-        if ( negRem & 0x8000 ) {
+        if (negRem & 0x8000) {
             sigZ |= 1;
         } else {
-            if ( negRem ) --sigZ;
+            if (negRem) {
+                --sigZ;
+            }
         }
     }
-    return softfloat_roundPackToF16( 0, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+    return softfloat_roundPackToF16(0, expZ, sigZ);
+
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     uiZ = defaultNaNF16UI;
- uiZ:
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 

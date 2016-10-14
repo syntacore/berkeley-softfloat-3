@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extFloat80_t
  extF80_roundToInt( extFloat80_t a, uint8_t roundingMode, bool exact )
@@ -57,15 +55,13 @@ extFloat80_t
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     signUI64 = uiA64 & packToExtF80UI64( 1, 0 );
     exp = expExtF80UI64( uiA64 );
     sigA = uA.s.signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! (sigA & UINT64_C( 0x8000000000000000 )) && (exp != 0x7FFF) ) {
         if ( ! sigA ) {
             uiZ64 = signUI64;
@@ -76,8 +72,7 @@ extFloat80_t
         exp += normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( 0x403E <= exp ) {
         if ( exp == 0x7FFF ) {
             if ( sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
@@ -116,8 +111,7 @@ extFloat80_t
         sigZ  = UINT64_C( 0x8000000000000000 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiZ64 = signUI64 | exp;
     lastBitMask = (uint64_t) 1<<(0x403E - exp);
     roundBitsMask = lastBitMask - 1;

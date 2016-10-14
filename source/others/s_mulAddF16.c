@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include "internals.h"
 
@@ -124,12 +124,10 @@ softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
         sigC = normExpSig.sig;
     }
     sigC = (sigC | 0x0400) << 3;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expProd - expC;
     if (signProd == signC) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if (expDiff <= 0) {
             expZ = expC;
             sigZ = sigC + softfloat_shiftRightJam32(sigProd, 16 - expDiff);
@@ -146,8 +144,7 @@ softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
             sigZ <<= 1;
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         sig32C = (uint32_t)sigC << 16;
         if (expDiff < 0) {
             signZ = signC;
@@ -182,8 +179,7 @@ roundPack:
 propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF16UI(uiA, uiB);
     goto propagateNaN_ZC;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
 infProdArg:
     if (magBits) {
         uiZ = packToF16UI(signProd, 0x1F, 0);

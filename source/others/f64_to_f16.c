@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float16_t f64_to_f16( float64_t a )
 {
@@ -52,15 +50,13 @@ float16_t f64_to_f16( float64_t a )
     uint16_t uiZ, frac16;
     union ui16_f16 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF64UI( uiA );
     exp  = expF64UI( uiA );
     frac = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FF ) {
         if ( frac ) {
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
@@ -70,15 +66,13 @@ float16_t f64_to_f16( float64_t a )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     frac16 = (uint16_t)softfloat_shortShiftRightJam64( frac, 38 );
     if ( ! (exp | frac16) ) {
         uiZ = packToF16UI( sign, 0, 0 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     return softfloat_roundPackToF16( sign, exp - 0x3F1, frac16 | 0x4000 );
  uiZ:
     uZ.ui = uiZ;

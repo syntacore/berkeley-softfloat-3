@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float32_t f16_to_f32( float16_t a )
 {
@@ -53,15 +51,13 @@ float32_t f16_to_f32( float16_t a )
     struct exp8_sig16 normExpSig;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF16UI( uiA );
     exp  = expF16UI( uiA );
     frac = fracF16UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x1F ) {
         if ( frac ) {
             softfloat_f16UIToCommonNaN( uiA, &commonNaN );
@@ -71,8 +67,7 @@ float32_t f16_to_f32( float16_t a )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! exp ) {
         if ( ! frac ) {
             uiZ = packToF32UI( sign, 0, 0 );
@@ -82,8 +77,7 @@ float32_t f16_to_f32( float16_t a )
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiZ = packToF32UI( sign, exp + 0x70, (uint32_t) frac<<13 );
  uiZ:
     uZ.ui = uiZ;

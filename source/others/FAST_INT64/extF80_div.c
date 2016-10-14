@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
 {
@@ -74,8 +72,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     uiA0  = uA.s.signif;
@@ -89,8 +86,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
     expB  = expExtF80UI64( uiB64 );
     sigB  = uiB0;
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if ( sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) goto propagateNaN;
         if ( expB == 0x7FFF ) {
@@ -103,8 +99,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
         if ( sigB & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) goto propagateNaN;
         goto zero;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expB ) expB = 1;
     if ( ! (sigB & UINT64_C( 0x8000000000000000 )) ) {
         if ( ! sigB ) {
@@ -123,8 +118,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA - expB + 0x3FFF;
     if ( sigA < sigB ) {
         --expZ;
@@ -149,8 +143,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
         }
         sigZ = (sigZ<<29) + q;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ((q + 1) & 0x3FFFFF) < 2 ) {
         rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
         term = softfloat_mul64ByShifted32To128( sigB, q );
@@ -165,35 +158,30 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
         }
         if ( rem.v64 | rem.v0 ) q |= 1;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sigZ = (sigZ<<6) + (q>>23);
     sigZExtra = (uint64_t) ((uint64_t) q<<41);
     return
         softfloat_roundPackToExtF80(
             signZ, expZ, sigZ, sigZExtra, extF80_roundingPrecision );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, uiB64, uiB0 );
     uiZ64 = uiZ.v64;
     uiZ0  = uiZ.v0;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ64 = defaultNaNExtF80UI64;
     uiZ0  = defaultNaNExtF80UI0;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infinity:
     uiZ64 = packToExtF80UI64( signZ, 0x7FFF );
     uiZ0  = UINT64_C( 0x8000000000000000 );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ64 = packToExtF80UI64( signZ, 0 );
     uiZ0  = 0;

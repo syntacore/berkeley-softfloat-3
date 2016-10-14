@@ -1,10 +1,9 @@
-
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
+@copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -20,7 +19,8 @@ modification, are permitted provided that the following conditions are met:
  3. Neither the name of the University nor the names of its contributors may
     be used to endorse or promote products derived from this software without
     specific prior written permission.
-
+*/
+/*
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 void
  softfloat_mulAddF128M(
@@ -79,8 +77,6 @@ void
     uint8_t carry;
     void (*roundPackRoutinePtr)( bool, int32_t, uint32_t *, uint32_t * );
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uiA96 = aWPtr[indexWordHi( 4 )];
     expA = expF128UI96( uiA96 );
     uiB96 = bWPtr[indexWordHi( 4 )];
@@ -91,8 +87,7 @@ void
     signProd =
         signF128UI96( uiA96 ) ^ signF128UI96( uiB96 )
             ^ (op == softfloat_mulAdd_subProd);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     prodIsInfinite = false;
     if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
         if ( softfloat_tryPropagateNaNF128M( aWPtr, bWPtr, zWPtr ) ) {
@@ -128,8 +123,7 @@ void
         uiZ96 = packToF128UI96( signProd, 0x7FFF, 0 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     if ( expA ) {
         sigA[indexWordHi( 4 )] = fracF128UI96( uiA96 ) | 0x00010000;
         sigA[indexWord( 4, 2 )] = aWPtr[indexWord( 4, 2 )];
@@ -148,12 +142,10 @@ void
         expB = softfloat_shiftNormSigF128M( bWPtr, 0, sigX );
         if ( expB == -128 ) goto zeroProd;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     expProd = expA + expB - 0x3FF0;
     softfloat_mul128MTo256M( sigA, sigX, sigProd );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     wordSig = fracF128UI96( uiC96 );
     if ( expC ) {
         --expC;
@@ -163,21 +155,15 @@ void
     sigX[indexWord( 5, 3 )] = cWPtr[indexWord( 4, 2 )];
     sigX[indexWord( 5, 2 )] = cWPtr[indexWord( 4, 1 )];
     sigX[indexWord( 5, 1 )] = cWPtr[indexWord( 4, 0 )];
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     doSub = (signProd != signC);
     addCarryMRoutinePtr =
         doSub ? softfloat_addComplCarryM : softfloat_addCarryM;
     expDiff = expProd - expC;
     if ( expDiff <= 0 ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
         signZ = signC;
         expZ = expC;
-        if (
-            sigProd[indexWord( 8, 2 )]
-                || (sigProd[indexWord( 8, 1 )] | sigProd[indexWord( 8, 0 )])
-        ) {
+        if (sigProd[indexWord( 8, 2 )] || (sigProd[indexWord( 8, 1 )] | sigProd[indexWord( 8, 0 )])) {
             sigProd[indexWord( 8, 3 )] |= 1;
         }
         extSigPtr = &sigProd[indexMultiwordHi( 8, 5 )];
@@ -213,15 +199,11 @@ void
         }
         goto extSigReady_noCancellation;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
         signZ = signProd;
         expZ = expProd;
         sigX[indexWordLo( 5 )] = 0;
         expDiff -= 128;
         if ( 0 <= expDiff ) {
-            /*----------------------------------------------------------------
-            *----------------------------------------------------------------*/
             if ( expDiff ) softfloat_shiftRightJam160M( sigX, expDiff, sigX );
             wordSig = sigX[indexWordLo( 5 )];
             carry = 0;
@@ -240,8 +222,6 @@ void
             sigProd[indexWord( 8, 2 )] |= wordSig;
             ptr = &sigProd[indexWord( 8, 4 )];
         } else {
-            /*----------------------------------------------------------------
-            *----------------------------------------------------------------*/
             shiftDist = expDiff & 31;
             if ( shiftDist ) {
                 softfloat_shortShiftRight160M( sigX, shiftDist, sigX );
@@ -253,16 +233,12 @@ void
             carry =
                 (*addCarryMRoutinePtr)( 5, extSigPtr, sigX, doSub, extSigPtr );
             if ( expDiff == -4 ) {
-                /*------------------------------------------------------------
-                *------------------------------------------------------------*/
                 wordSig = sigProd[indexWordHi( 8 )];
                 if ( wordSig & 0x80000000 ) {
                     signZ = ! signZ;
                     softfloat_negX256M( sigProd );
                     wordSig = sigProd[indexWordHi( 8 )];
                 }
-                /*------------------------------------------------------------
-                *------------------------------------------------------------*/
                 if ( wordSig ) goto expProdBigger_noWordShift;
                 wordSig = sigProd[indexWord( 8, 6 )];
                 if ( 0x00040000 <= wordSig ) goto expProdBigger_noWordShift;
@@ -278,8 +254,7 @@ void
                         goto checkCancellation;
                     }
                 }
-                /*------------------------------------------------------------
-                *------------------------------------------------------------*/
+
                 ptr = extSigPtr + indexWordLo( 5 );
                 do {
                     ptr -= wordIncr;
@@ -293,8 +268,7 @@ void
             }
             ptr = extSigPtr + indexWordHi( 5 ) + wordIncr;
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( carry != doSub ) {
             if ( doSub ) {
                 do {
@@ -310,8 +284,7 @@ void
                 } while ( ! wordSig );
             }
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
      expProdBigger_noWordShift:
         if (
             sigProd[indexWord( 8, 2 )]
@@ -335,15 +308,13 @@ void
  doRoundPack:
     (*roundPackRoutinePtr)( signZ, expZ, extSigPtr, zWPtr );
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_invalidF128M( zWPtr );
  propagateNaN_ZC:
     softfloat_propagateNaNF128M( zWPtr, cWPtr, zWPtr );
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zeroProd:
     if (
         ! (uint32_t) (uiC96<<1) && (signProd != signC)
@@ -358,8 +329,7 @@ void
     zWPtr[indexWord( 4, 1 )] = cWPtr[indexWord( 4, 1 )];
     zWPtr[indexWord( 4, 0 )] = cWPtr[indexWord( 4, 0 )];
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  checkCancellation:
     if (
         wordSig

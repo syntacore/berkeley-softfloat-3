@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float64_t f64_mul( float64_t a, float64_t b )
 {
@@ -65,8 +63,7 @@ float64_t f64_mul( float64_t a, float64_t b )
     uint64_t sigZ, uiZ;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     signA = signF64UI( uiA );
@@ -78,8 +75,7 @@ float64_t f64_mul( float64_t a, float64_t b )
     expB  = expF64UI( uiB );
     sigB  = fracF64UI( uiB );
     signZ = signA ^ signB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FF ) {
         if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
         magBits = expB | sigB;
@@ -90,8 +86,7 @@ float64_t f64_mul( float64_t a, float64_t b )
         magBits = expA | sigA;
         goto infArg;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
@@ -104,8 +99,7 @@ float64_t f64_mul( float64_t a, float64_t b )
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expZ = expA + expB - 0x3FF;
     sigA = (sigA | UINT64_C( 0x0010000000000000 ))<<10;
     sigB = (sigB | UINT64_C( 0x0010000000000000 ))<<11;
@@ -123,13 +117,11 @@ float64_t f64_mul( float64_t a, float64_t b )
         sigZ <<= 1;
     }
     return softfloat_roundPackToF64( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  infArg:
     if ( ! magBits ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -138,8 +130,7 @@ float64_t f64_mul( float64_t a, float64_t b )
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
     }
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:

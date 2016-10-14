@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -65,18 +63,15 @@ void f32_to_f128M( float32_t a, float128_t *zPtr )
     struct exp16_sig32 normExpSig;
     uint64_t frac64;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     zWPtr = (uint32_t *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF32UI( uiA );
     exp  = expF32UI( uiA );
     frac = fracF32UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiZ64 = 0;
     if ( exp == 0xFF ) {
         if ( frac ) {
@@ -87,8 +82,7 @@ void f32_to_f128M( float32_t a, float128_t *zPtr )
         uiZ96 = packToF128UI96( sign, 0x7FFF, 0 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! exp ) {
         if ( ! frac ) {
             uiZ96 = packToF128UI96( sign, 0, 0 );
@@ -98,8 +92,7 @@ void f32_to_f128M( float32_t a, float128_t *zPtr )
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     frac64 = (uint64_t) frac<<25;
     uiZ96 = packToF128UI96( sign, exp + 0x3F80, frac64>>32 );
     uiZ64 = frac64;

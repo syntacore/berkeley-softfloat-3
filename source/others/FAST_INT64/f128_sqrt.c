@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float128_t f128_sqrt( float128_t a )
 {
@@ -60,8 +58,7 @@ float128_t f128_sqrt( float128_t a )
     struct uint128 sigZ;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -69,8 +66,7 @@ float128_t f128_sqrt( float128_t a )
     expA  = expF128UI64( uiA64 );
     sigA.v64 = fracF128UI64( uiA64 );
     sigA.v0  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if ( sigA.v64 | sigA.v0 ) {
             uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, 0, 0 );
@@ -79,14 +75,12 @@ float128_t f128_sqrt( float128_t a )
         if ( ! signA ) return a;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( signA ) {
         if ( ! (expA | sigA.v64 | sigA.v0) ) return a;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) {
         if ( ! (sigA.v64 | sigA.v0) ) return a;
         normExpSig = softfloat_normSubnormalF128Sig( sigA.v64, sigA.v0 );
@@ -112,8 +106,7 @@ float128_t f128_sqrt( float128_t a )
     }
     qs[2] = sig32Z;
     rem.v64 -= (uint64_t) sig32Z * sig32Z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = ((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32;
     qs[1] = q;
     x64 = (uint64_t) sig32Z<<32;
@@ -122,8 +115,7 @@ float128_t f128_sqrt( float128_t a )
     rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
     term = softfloat_mul64ByShifted32To128( x64, q );
     rem = softfloat_sub128( rem.v64, rem.v0, term.v64, term.v0 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = ((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32;
     y = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
     sig64Z <<= 1;
@@ -139,8 +131,7 @@ float128_t f128_sqrt( float128_t a )
         --q;
     }
     qs[0] = q;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = (((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32) + 2;
     sigZExtra = (uint64_t) ((uint64_t) q<<59);
     term = softfloat_shortShiftLeft128( 0, qs[1], 53 );
@@ -149,8 +140,7 @@ float128_t f128_sqrt( float128_t a )
             (uint64_t) qs[2]<<18, ((uint64_t) qs[0]<<24) + (q>>5),
             term.v64, term.v0
         );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (q & 0xF) <= 2 ) {
         q &= ~3;
         sigZExtra = (uint64_t) ((uint64_t) q<<59);
@@ -180,8 +170,7 @@ float128_t f128_sqrt( float128_t a )
         }
     }
     return softfloat_roundPackToF128( 0, expZ, sigZ.v64, sigZ.v0, sigZExtra );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ.v64 = defaultNaNF128UI64;

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -80,16 +78,13 @@ void
     uint8_t carry;
     uint32_t extrasMask;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     zWPtr = (uint32_t *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     ui96 = aWPtr[indexWordHi( 4 )];
     exp = expF128UI96( ui96 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp < 0x3FFF ) {
         zWPtr[indexWord( 4, 2 )] = 0;
         zWPtr[indexWord( 4, 1 )] = 0;
@@ -120,8 +115,7 @@ void
         ui96 = packToF128UI96( sign, 0x3FFF, 0 );
         goto ui96;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( 0x406F <= exp ) {
         if (
             (exp == 0x7FFF)
@@ -137,8 +131,7 @@ void
         zWPtr[indexWord( 4, 0 )] = aWPtr[indexWord( 4, 0 )];
         goto ui96;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     bitPos = 0x406F - exp;
     roundNear =
            (roundingMode == softfloat_round_near_maxMag)
@@ -198,14 +191,12 @@ void
         zWPtr[index] = wordZ;
         carry &= ! wordZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exact && (softfloat_compare128M( aWPtr, zWPtr ) != 0) ) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  ui96:
     zWPtr[indexWordHi( 4 )] = ui96;
 

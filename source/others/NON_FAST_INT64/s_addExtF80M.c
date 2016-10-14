@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 void
  softfloat_addExtF80M(
@@ -67,14 +65,12 @@ void
     int32_t expDiff;
     uint32_t extSigX[3], sigZExtra;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uiA64 = aSPtr->signExp;
     expA = expExtF80UI64( uiA64 );
     uiB64 = bSPtr->signExp;
     expB = expExtF80UI64( uiB64 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
         if ( softfloat_tryPropagateNaNExtF80M( aSPtr, bSPtr, zSPtr ) ) return;
         uiZ64 = uiA64;
@@ -89,8 +85,7 @@ void
         zSPtr->signif = (uint64_t)INT64_MIN;
         return;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     signZ = signExtF80UI64( uiA64 );
     signB = signExtF80UI64( uiB64 ) ^ negateB;
     negateB = (signZ != signB);
@@ -108,13 +103,11 @@ void
     }
     sigZ = aSPtr->signif;
     sigB = bSPtr->signif;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     roundPackRoutinePtr = softfloat_roundPackMToExtF80M;
     expDiff = expA - expB;
     if ( expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         extSigX[indexWord( 3, 2 )] = sigB>>32;
         extSigX[indexWord( 3, 1 )] = sigB;
         extSigX[indexWord( 3, 0 )] = 0;
@@ -145,8 +138,7 @@ void
             goto completeNormAfterAdd;
         }
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         sigZExtra = 0;
         if ( negateB ) {
             if ( sigZ < sigB ) {
@@ -180,8 +172,7 @@ void
  sigZ:
     extSigX[indexWord( 3, 2 )] = sigZ>>32;
     extSigX[indexWord( 3, 1 )] = sigZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     (*roundPackRoutinePtr)(
         signZ, expA, extSigX, extF80_roundingPrecision, zSPtr );
 

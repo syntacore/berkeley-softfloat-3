@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
@@ -57,18 +55,15 @@ float16_t softfloat_subMagsF16( uint16_t uiA, uint16_t uiB )
     int8_t roundingMode;
     union ui16_f16 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = expF16UI( uiA );
     sigA = fracF16UI( uiA );
     expB = expF16UI( uiB );
     sigB = fracF16UI( uiB );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expA - expB;
     if ( ! expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( expA == 0x1F ) {
             if ( sigA | sigB ) goto propagateNaN;
             softfloat_raiseFlags( softfloat_flag_invalid );
@@ -97,12 +92,10 @@ float16_t softfloat_subMagsF16( uint16_t uiA, uint16_t uiB )
         sigZ = sigDiff<<shiftDist;
         goto pack;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         signZ = signF16UI( uiA );
         if ( expDiff < 0 ) {
-            /*----------------------------------------------------------------
-            *----------------------------------------------------------------*/
+            
             signZ = ! signZ;
             if ( expB == 0x1F ) {
                 if ( sigB ) goto propagateNaN;
@@ -119,8 +112,7 @@ float16_t softfloat_subMagsF16( uint16_t uiA, uint16_t uiB )
             sigY = sigA + (expA ? 0x0400 : sigA);
             expDiff = -expDiff;
         } else {
-            /*----------------------------------------------------------------
-            *----------------------------------------------------------------*/
+            
             uiZ = uiA;
             if ( expA == 0x1F ) {
                 if ( sigA ) goto propagateNaN;
@@ -149,13 +141,11 @@ float16_t softfloat_subMagsF16( uint16_t uiA, uint16_t uiB )
         }
         return softfloat_roundPackToF16( signZ, expZ, sigZ );
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF16UI( uiA, uiB );
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  subEpsilon:
     roundingMode = softfloat_roundingMode;
     if ( roundingMode != softfloat_round_near_even ) {
@@ -170,8 +160,7 @@ float16_t softfloat_subMagsF16( uint16_t uiA, uint16_t uiB )
     }
     softfloat_raiseFlags(softfloat_flag_inexact);
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  pack:
     uiZ = packToF16UI( signZ, expZ, sigZ );
  uiZ:

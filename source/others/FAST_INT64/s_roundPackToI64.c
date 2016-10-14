@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
@@ -54,8 +52,7 @@ int64_t
     union { uint64_t ui; int64_t i; } uZ;
     int64_t z;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     roundNearEven = (roundingMode == softfloat_round_near_even);
     doIncrement = (UINT64_C( 0x8000000000000000 ) <= sigExtra);
     if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
@@ -79,8 +76,7 @@ int64_t
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
     return z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return sign ? i64_fromNegOverflow : i64_fromPosOverflow;

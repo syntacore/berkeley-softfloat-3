@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extFloat80_t f128_to_extF80( float128_t a )
 {
@@ -57,8 +55,7 @@ extFloat80_t f128_to_extF80( float128_t a )
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
@@ -66,8 +63,7 @@ extFloat80_t f128_to_extF80( float128_t a )
     exp    = expF128UI64( uiA64 );
     frac64 = fracF128UI64( uiA64 );
     frac0  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FFF ) {
         if ( frac64 | frac0 ) {
             softfloat_f128UIToCommonNaN( uiA64, uiA0, &commonNaN );
@@ -80,8 +76,7 @@ extFloat80_t f128_to_extF80( float128_t a )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! exp ) {
         if ( ! (frac64 | frac0) ) {
             uiZ64 = packToExtF80UI64( sign, 0 );
@@ -93,14 +88,12 @@ extFloat80_t f128_to_extF80( float128_t a )
         frac64 = normExpSig.sig.v64;
         frac0  = normExpSig.sig.v0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sig128 =
         softfloat_shortShiftLeft128(
             frac64 | UINT64_C( 0x0001000000000000 ), frac0, 15 );
     return softfloat_roundPackToExtF80( sign, exp, sig128.v64, sig128.v0, 80 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  uiZ:
     uZ.s.signExp = uiZ64;
     uZ.s.signif  = uiZ0;

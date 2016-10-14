@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 int64_t f64_to_i64( float64_t a, uint8_t roundingMode, bool exact )
 {
@@ -55,15 +53,13 @@ int64_t f64_to_i64( float64_t a, uint8_t roundingMode, bool exact )
     uint32_t extSig[3];
 #endif
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA = uA.ui;
     sign = signF64UI( uiA );
     exp  = expF64UI( uiA );
     sig  = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
     shiftDist = 0x433 - exp;
 #ifdef SOFTFLOAT_FAST_INT64
@@ -91,8 +87,7 @@ int64_t f64_to_i64( float64_t a, uint8_t roundingMode, bool exact )
     }
     return softfloat_roundPackMToI64( sign, extSig, roundingMode, exact );
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     return

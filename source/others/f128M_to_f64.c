@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -64,15 +62,13 @@ float64_t f128M_to_f64( const float128_t *aPtr )
     uint32_t frac32;
     union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     uiA96 = aWPtr[indexWordHi( 4 )];
     sign = signF128UI96( uiA96 );
     exp  = expF128UI96( uiA96 );
     frac64 = (uint64_t) fracF128UI96( uiA96 )<<32 | aWPtr[indexWord( 4, 2 )];
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( exp == 0x7FFF ) {
         if ( frac64 || aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )] ) {
             softfloat_f128MToCommonNaN( aWPtr, &commonNaN );
@@ -82,8 +78,7 @@ float64_t f128M_to_f64( const float128_t *aPtr )
         }
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     frac32 = aWPtr[indexWord( 4, 1 )];
     frac64 = frac64<<14 | frac32>>18;
     if ( (frac32 & 0x0003FFFF) || aWPtr[indexWord( 4, 0 )] ) frac64 |= 1;
@@ -91,8 +86,7 @@ float64_t f128M_to_f64( const float128_t *aPtr )
         uiZ = packToF64UI( sign, 0, 0 );
         goto uiZ;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     exp -= 0x3C01;
     if ( sizeof (int16_t) < sizeof exp) {
         if ( exp < -0x1000 ) exp = -0x1000;
@@ -100,8 +94,7 @@ float64_t f128M_to_f64( const float128_t *aPtr )
     return
         softfloat_roundPackToF64(
             sign, exp, frac64 | UINT64_C( 0x4000000000000000 ) );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  uiZ:
     uZ.ui = uiZ;
     return uZ.f;

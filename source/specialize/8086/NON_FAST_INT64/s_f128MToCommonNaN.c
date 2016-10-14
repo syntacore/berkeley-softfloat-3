@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 #include <stdint.h>
 
@@ -40,14 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-/*----------------------------------------------------------------------------
-| Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,
-| converts this NaN to the common NaN form, and stores the resulting common
-| NaN at the location pointed to by `zPtr'.  If the NaN is a signaling NaN,
-| the invalid exception is raised.  Argument `aWPtr' points to an array of
-| four 32-bit elements that concatenate in the platform's normal endian order
-| to form a 128-bit floating-point value.
-*----------------------------------------------------------------------------*/
+/**
+Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,
+converts this NaN to the common NaN form, and stores the resulting common
+NaN at the location pointed to by `zPtr'.  If the NaN is a signaling NaN,
+the invalid exception is raised.  Argument `aWPtr' points to an array of
+four 32-bit elements that concatenate in the platform's normal endian order
+to form a 128-bit floating-point value.
+*/
 void
  softfloat_f128MToCommonNaN( const uint32_t *aWPtr, struct commonNaN *zPtr )
 {

@@ -1,10 +1,10 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+@copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -20,7 +20,8 @@ modification, are permitted provided that the following conditions are met:
  3. Neither the name of the University nor the names of its contributors may
     be used to endorse or promote products derived from this software without
     specific prior written permission.
-
+*/
+/*
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
@@ -32,20 +33,16 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdint.h>
+*/
 
 #include "specialize.h"
 
-/*----------------------------------------------------------------------------
-| Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
-| NaN, and returns the bit pattern of this value as an unsigned integer.
-*----------------------------------------------------------------------------*/
-uint32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
+/**
+Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
+NaN, and returns the bit pattern of this value as an unsigned integer.
+*/
+uint32_t softfloat_commonNaNToF32UI(const struct commonNaN *aPtr)
 {
-
-    return (uint32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
-
+    return (uint32_t)aPtr->sign << 31 | 0x7FC00000 | aPtr->v64 >> 41;
 }
 

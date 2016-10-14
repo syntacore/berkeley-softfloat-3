@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float128_t
  f128_roundToInt( float128_t a, uint8_t roundingMode, bool exact )
@@ -52,17 +50,14 @@ float128_t
     bool roundNearEven;
     union ui128_f128 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0  = uA.ui.v0;
     exp = expF128UI64( uiA64 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( 0x402F <= exp ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( 0x406F <= exp ) {
             if ( (exp == 0x7FFF) && (fracF128UI64( uiA64 ) | uiA0) ) {
                 uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, 0, 0 );
@@ -70,8 +65,7 @@ float128_t
             }
             return a;
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         lastBitMask = (uint64_t) 2<<(0x406E - exp);
         roundBitsMask = lastBitMask - 1;
         uiZ.v64 = uiA64;
@@ -103,8 +97,7 @@ float128_t
         }
         uiZ.v0 &= ~roundBitsMask;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( exp < 0x3FFF ) {
             if ( ! ((uiA64 & UINT64_C( 0x7FFFFFFFFFFFFFFF )) | uiA0) ) {
                 return a;
@@ -127,8 +120,7 @@ float128_t
             }
             goto uiZ;
         }
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         uiZ.v64 = uiA64;
         uiZ.v0  = 0;
         lastBitMask = (uint64_t) 1<<(0x402F - exp);

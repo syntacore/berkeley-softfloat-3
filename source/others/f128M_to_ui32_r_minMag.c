@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -62,15 +60,13 @@ uint32_t f128M_to_ui32_r_minMag( const float128_t *aPtr, bool exact )
     bool sign;
     uint32_t z;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     aWPtr = (const uint32_t *) aPtr;
     uiA96 = aWPtr[indexWordHi( 4 )];
     exp = expF128UI96( uiA96 );
     sig64 = (uint64_t) fracF128UI96( uiA96 )<<32 | aWPtr[indexWord( 4, 2 )];
     if ( aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )] ) sig64 |= 1;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     shiftDist = 0x402F - exp;
     if ( 49 <= shiftDist ) {
         if ( exact && (exp | sig64) ) {
@@ -78,8 +74,7 @@ uint32_t f128M_to_ui32_r_minMag( const float128_t *aPtr, bool exact )
         }
         return 0;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sign = signF128UI96( uiA96 );
     if ( sign || (shiftDist < 17) ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
@@ -87,8 +82,7 @@ uint32_t f128M_to_ui32_r_minMag( const float128_t *aPtr, bool exact )
             (exp == 0x7FFF) && sig64 ? ui32_fromNaN
                 : sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     sig64 |= UINT64_C( 0x0001000000000000 );
     z = sig64>>shiftDist;
     if ( exact && ((uint64_t) z<<shiftDist != sig64) ) {

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 
 float32_t softfloat_addMagsF32( uint32_t uiA, uint32_t uiB )
@@ -53,18 +51,15 @@ float32_t softfloat_addMagsF32( uint32_t uiA, uint32_t uiB )
     uint32_t sigZ;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expA = expF32UI( uiA );
     sigA = fracF32UI( uiA );
     expB = expF32UI( uiB );
     sigB = fracF32UI( uiB );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     expDiff = expA - expB;
     if ( ! expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         if ( ! expA ) {
             uiZ = uiA + sigB;
             goto uiZ;
@@ -83,8 +78,7 @@ float32_t softfloat_addMagsF32( uint32_t uiA, uint32_t uiB )
         }
         sigZ <<= 6;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
+        
         signZ = signF32UI( uiA );
         sigA <<= 6;
         sigB <<= 6;
@@ -114,8 +108,7 @@ float32_t softfloat_addMagsF32( uint32_t uiA, uint32_t uiB )
         }
     }
     return softfloat_roundPackToF32( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:

@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,12 +32,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
-
-#include <stdbool.h>
-#include <stdint.h>
+*/
 
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
@@ -56,18 +54,13 @@ float32_t softfloat_subMagsF32( uint32_t uiA, uint32_t uiB )
     uint32_t sigX, sigY;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     expA = expF32UI( uiA );
     sigA = fracF32UI( uiA );
     expB = expF32UI( uiB );
     sigB = fracF32UI( uiB );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+
     expDiff = expA - expB;
     if ( ! expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
         if ( expA == 0xFF ) {
             if ( sigA | sigB ) goto propagateNaN;
             softfloat_raiseFlags( softfloat_flag_invalid );
@@ -96,14 +89,10 @@ float32_t softfloat_subMagsF32( uint32_t uiA, uint32_t uiB )
         uiZ = packToF32UI( signZ, expZ, sigDiff<<shiftDist );
         goto uiZ;
     } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 7;
         sigB <<= 7;
         if ( expDiff < 0 ) {
-            /*----------------------------------------------------------------
-            *----------------------------------------------------------------*/
             signZ = ! signZ;
             if ( expB == 0xFF ) {
                 if ( sigB ) goto propagateNaN;
@@ -115,8 +104,6 @@ float32_t softfloat_subMagsF32( uint32_t uiA, uint32_t uiB )
             sigY = sigA + (expA ? 0x40000000 : sigA);
             expDiff = -expDiff;
         } else {
-            /*----------------------------------------------------------------
-            *----------------------------------------------------------------*/
             if ( expA == 0xFF ) {
                 if ( sigA ) goto propagateNaN;
                 uiZ = uiA;
@@ -131,13 +118,11 @@ float32_t softfloat_subMagsF32( uint32_t uiA, uint32_t uiB )
                 signZ, expZ, sigX - softfloat_shiftRightJam32( sigY, expDiff )
             );
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- propagateNaN:
+
+propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 
 }
-

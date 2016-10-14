@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,14 +32,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 extFloat80_t extF80_sqrt( extFloat80_t a )
 {
@@ -63,16 +61,14 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     uA.f = a;
     uiA64 = uA.s.signExp;
     uiA0  = uA.s.signif;
     signA = signExtF80UI64( uiA64 );
     expA  = expExtF80UI64( uiA64 );
     sigA  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( expA == 0x7FFF ) {
         if ( sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
             uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, 0, 0 );
@@ -83,14 +79,12 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
         if ( ! signA ) return a;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( signA ) {
         if ( ! sigA ) goto zero;
         goto invalid;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( ! expA ) expA = 1;
     if ( ! (sigA & UINT64_C( 0x8000000000000000 )) ) {
         if ( ! sigA ) goto zero;
@@ -115,22 +109,19 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
         rem = softfloat_shortShiftLeft128( 0, sigA, 62 );
     }
     rem.v64 -= (uint64_t) sig32Z * sig32Z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = ((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32;
     sigZ = ((uint64_t) sig32Z<<32) + (q<<3);
     x64 = ((uint64_t) sig32Z<<32) + sigZ;
     term = softfloat_mul64ByShifted32To128( x64, q );
     rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
     rem = softfloat_sub128( rem.v64, rem.v0, term.v64, term.v0 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     q = (((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32) + 2;
     x64 = sigZ;
     sigZ = (sigZ<<1) + (q>>25);
     sigZExtra = (uint64_t) (q<<39);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
     if ( (q & 0xFFFFFF) <= 2 ) {
         q &= ~(uint64_t) 0xFFFF;
         sigZExtra = (uint64_t) (q<<39);
@@ -149,15 +140,13 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     return
         softfloat_roundPackToExtF80(
             0, expZ, sigZ, sigZExtra, extF80_roundingPrecision );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  invalid:
     softfloat_raiseFlags( softfloat_flag_invalid );
     uiZ64 = defaultNaNExtF80UI64;
     uiZ0  = defaultNaNExtF80UI0;
     goto uiZ;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    
  zero:
     uiZ64 = packToExtF80UI64( signA, 0 );
     uiZ0  = 0;
