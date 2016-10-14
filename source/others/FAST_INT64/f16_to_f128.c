@@ -44,10 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t f16_to_f128( float16_t a )
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     bool sign;
-    int_fast8_t exp;
-    uint_fast16_t frac;
+    int8_t exp;
+    uint16_t frac;
     struct commonNaN commonNaN;
     struct uint128 uiZ;
     struct exp8_sig16 normExpSig;
@@ -86,7 +86,7 @@ float128_t f16_to_f128( float16_t a )
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    uiZ.v64 = packToF128UI64( sign, exp + 0x3FF0, (uint_fast64_t) frac<<38 );
+    uiZ.v64 = packToF128UI64( sign, exp + 0x3FF0, (uint64_t) frac<<38 );
     uiZ.v0  = 0;
  uiZ:
     uZ.ui = uiZ;

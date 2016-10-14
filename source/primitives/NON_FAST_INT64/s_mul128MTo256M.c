@@ -47,7 +47,7 @@ void
     uint32_t *lastZPtr, wordB;
     uint64_t dwordProd;
     uint32_t wordZ;
-    uint_fast8_t carry;
+    uint8_t carry;
 
     bPtr += indexWordLo( 4 );
     lastZPtr = zPtr + indexMultiwordHi( 8, 5 );

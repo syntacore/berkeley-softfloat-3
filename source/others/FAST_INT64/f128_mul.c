@@ -44,21 +44,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t f128_mul( float128_t a, float128_t b )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool signA;
-    int_fast32_t expA;
+    int32_t expA;
     struct uint128 sigA;
     union ui128_f128 uB;
-    uint_fast64_t uiB64, uiB0;
+    uint64_t uiB64, uiB0;
     bool signB;
-    int_fast32_t expB;
+    int32_t expB;
     struct uint128 sigB;
     bool signZ;
-    uint_fast64_t magBits;
+    uint64_t magBits;
     struct exp32_sig128 normExpSig;
-    int_fast32_t expZ;
+    int32_t expZ;
     uint64_t sig256Z[4];
-    uint_fast64_t sigZExtra;
+    uint64_t sigZExtra;
     struct uint128 sigZ;
     struct uint128_extra sig128Extra;
     struct uint128 uiZ;

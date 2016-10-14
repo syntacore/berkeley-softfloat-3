@@ -49,7 +49,7 @@ bool
     struct extFloat80M *zSPtr
  )
 {
-    uint_fast16_t ui64;
+    uint16_t ui64;
     uint64_t ui0;
 
     ui64 = aSPtr->signExp;

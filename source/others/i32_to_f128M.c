@@ -1,4 +1,7 @@
+/** @file
 
+@todo split into different implementation files
+*/
 /*============================================================================
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -34,48 +37,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-void i32_to_f128M( int32_t a, float128_t *zPtr )
+void i32_to_f128M(int32_t a, float128_t *zPtr)
 {
-
-    *zPtr = i32_to_f128( a );
-
+    *zPtr = i32_to_f128(a);
 }
 
 #else
 
-void i32_to_f128M( int32_t a, float128_t *zPtr )
+void i32_to_f128M(int32_t a, float128_t *zPtr)
 {
-    uint32_t *zWPtr;
-    uint32_t uiZ96, uiZ64;
-    bool sign;
-    uint32_t absA;
-    int_fast8_t shiftDist;
-    uint64_t normAbsA;
-
-    zWPtr = (uint32_t *) zPtr;
-    uiZ96 = 0;
-    uiZ64 = 0;
-    if ( a ) {
-        sign = (a < 0);
-        absA = sign ? -(uint32_t) a : (uint32_t) a;
-        shiftDist = softfloat_countLeadingZeros32( absA ) + 17;
-        normAbsA = (uint64_t) absA<<shiftDist;
-        uiZ96 = packToF128UI96( sign, 0x402E - shiftDist, normAbsA>>32 );
+    uint32_t *zWPtr = (uint32_t *)zPtr;
+    uint32_t uiZ96 = 0;
+    uint32_t uiZ64 = 0;
+    if (a) {
+        bool const sign = a < 0;
+        uint32_t const absA = sign ? -a : a;
+        int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 17;
+        uint64_t const normAbsA = (uint64_t)absA << shiftDist;
+        uiZ96 = packToF128UI96(sign, 0x402E - shiftDist, normAbsA >> 32);
         uiZ64 = normAbsA;
     }
-    zWPtr[indexWord( 4, 3 )] = uiZ96;
-    zWPtr[indexWord( 4, 2 )] = uiZ64;
-    zWPtr[indexWord( 4, 1 )] = 0;
-    zWPtr[indexWord( 4, 0 )] = 0;
-
+    zWPtr[indexWord(4, 3)] = uiZ96;
+    zWPtr[indexWord(4, 2)] = uiZ64;
+    zWPtr[indexWord(4, 1)] = 0;
+    zWPtr[indexWord(4, 0)] = 0;
 }
-
 #endif
-

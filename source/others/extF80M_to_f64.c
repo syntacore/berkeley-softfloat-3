@@ -55,7 +55,7 @@ float64_t extF80M_to_f64( const extFloat80_t *aPtr )
 float64_t extF80M_to_f64( const extFloat80_t *aPtr )
 {
     const struct extFloat80M *aSPtr;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     bool sign;
     int32_t exp;
     uint64_t sig;
@@ -97,7 +97,7 @@ float64_t extF80M_to_f64( const extFloat80_t *aPtr )
     *------------------------------------------------------------------------*/
     sig = softfloat_shortShiftRightJam64( sig, 1 );
     exp -= 0x3C01;
-    if ( sizeof (int_fast16_t) < sizeof exp) {
+    if ( sizeof (int16_t) < sizeof exp) {
         if ( exp < -0x1000 ) exp = -0x1000;
     }
     return softfloat_roundPackToF64( sign, exp, sig );

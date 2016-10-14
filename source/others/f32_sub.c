@@ -43,11 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t f32_sub( float32_t a, float32_t b )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     union ui32_f32 uB;
-    uint_fast32_t uiB;
+    uint32_t uiB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 1)
-    float32_t (*magsFuncPtr)( uint_fast32_t, uint_fast32_t );
+    float32_t (*magsFuncPtr)( uint32_t, uint32_t );
 #endif
 
     uA.f = a;

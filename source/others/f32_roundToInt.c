@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool exact )
+float32_t f32_roundToInt( float32_t a, uint8_t roundingMode, bool exact )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
-    int_fast16_t exp;
-    uint_fast32_t uiZ, lastBitMask, roundBitsMask;
+    uint32_t uiA;
+    int16_t exp;
+    uint32_t uiZ, lastBitMask, roundBitsMask;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------
@@ -87,7 +87,7 @@ float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
-    lastBitMask = (uint_fast32_t) 1<<(0x96 - exp);
+    lastBitMask = (uint32_t) 1<<(0x96 - exp);
     roundBitsMask = lastBitMask - 1;
     if ( roundingMode == softfloat_round_near_maxMag ) {
         uiZ += lastBitMask>>1;

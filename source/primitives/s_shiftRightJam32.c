@@ -34,18 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_SHIFTRIGHTJAM32
 
+#include "primitives/functions.h"
 
-#ifndef softfloat_shiftRightJam32
-
-uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
+uint32_t softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
 {
-
     return
-        (dist < 31) ? a>>dist | ((uint32_t) (a<<(-dist & 31)) != 0) : (a != 0);
-
+        dist >= 31 ? a != 0 : a >> dist | ((uint32_t)(a << (-(int16_t)dist & 31)) != 0);
 }
-
-#endif
-

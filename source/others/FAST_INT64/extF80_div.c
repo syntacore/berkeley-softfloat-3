@@ -45,32 +45,32 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool signA;
-    int_fast32_t expA;
-    uint_fast64_t sigA;
+    int32_t expA;
+    uint64_t sigA;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uB;
-    uint_fast16_t uiB64;
-    uint_fast64_t uiB0;
+    uint16_t uiB64;
+    uint64_t uiB0;
     bool signB;
-    int_fast32_t expB;
-    uint_fast64_t sigB;
+    int32_t expB;
+    uint64_t sigB;
     bool signZ;
     struct exp32_sig64 normExpSig;
-    int_fast32_t expZ;
+    int32_t expZ;
     struct uint128 rem;
-    uint_fast32_t recip32;
-    uint_fast64_t sigZ;
+    uint32_t recip32;
+    uint64_t sigZ;
     int ix;
-    uint_fast64_t q64;
-    uint_fast32_t q;
+    uint64_t q64;
+    uint32_t q;
     struct uint128 term;
-    uint_fast64_t sigZExtra;
+    uint64_t sigZExtra;
     struct uint128 uiZ;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
@@ -136,7 +136,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
     sigZ = 0;
     ix = 2;
     for (;;) {
-        q64 = (uint_fast64_t) (uint32_t) (rem.v64>>2) * recip32;
+        q64 = (uint64_t) (uint32_t) (rem.v64>>2) * recip32;
         q = (q64 + 0x80000000)>>32;
         --ix;
         if ( ix < 0 ) break;
@@ -168,7 +168,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sigZ = (sigZ<<6) + (q>>23);
-    sigZExtra = (uint64_t) ((uint_fast64_t) q<<41);
+    sigZExtra = (uint64_t) ((uint64_t) q<<41);
     return
         softfloat_roundPackToExtF80(
             signZ, expZ, sigZ, sigZExtra, extF80_roundingPrecision );

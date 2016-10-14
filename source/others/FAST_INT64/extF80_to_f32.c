@@ -34,64 +34,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-float32_t extF80_to_f32( extFloat80_t a )
+#include <assert.h>
+
+float32_t extF80_to_f32(extFloat80_t a)
 {
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    union
+    {
+        struct extFloat80M s; extFloat80_t f;
+    } uA;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool sign;
-    int_fast32_t exp;
-    uint_fast64_t sig;
-    struct commonNaN commonNaN;
-    uint_fast32_t uiZ, sig32;
+    int32_t exp;
+    uint64_t sig;
+    uint32_t uiZ;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA64 = uA.s.signExp;
-    uiA0  = uA.s.signif;
-    sign = signExtF80UI64( uiA64 );
-    exp  = expExtF80UI64( uiA64 );
-    sig  = uiA0;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp == 0x7FFF ) {
-        if ( sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
-            softfloat_extF80UIToCommonNaN( uiA64, uiA0, &commonNaN );
-            uiZ = softfloat_commonNaNToF32UI( &commonNaN );
+    uiA0 = uA.s.signif;
+    sign = signExtF80UI64(uiA64);
+    exp = expExtF80UI64(uiA64);
+    sig = uiA0;
+    if (exp == INT16_MAX) {
+        if (sig & INT64_MAX) {
+            struct commonNaN commonNaN;
+            softfloat_extF80UIToCommonNaN(uiA64, uiA0, &commonNaN);
+            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
         } else {
-            uiZ = packToF32UI( sign, 0xFF, 0 );
+            uiZ = packToF32UI(sign, 0xFF, 0);
         }
-        goto uiZ;
+    } else {
+        uint32_t const sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
+        if (exp | sig32) {
+            exp -= 0x3F81;
+            if (sizeof(int16_t) < sizeof exp) {
+                if (exp < -0x1000) {
+                    exp = -0x1000;
+                }
+            }
+            assert(INT16_MIN <= exp && exp <= INT16_MAX);
+            return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
+        } else {
+            uiZ = packToF32UI(sign, 0, 0);
+        }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    sig32 = softfloat_shortShiftRightJam64( sig, 33 );
-    if ( ! (exp | sig32) ) {
-        uiZ = packToF32UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    exp -= 0x3F81;
-    if ( sizeof (int_fast16_t) < sizeof exp ) {
-        if ( exp < -0x1000 ) exp = -0x1000;
-    }
-    return softfloat_roundPackToF32( sign, exp, sig32 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- uiZ:
     uZ.ui = uiZ;
     return uZ.f;
-
 }
 

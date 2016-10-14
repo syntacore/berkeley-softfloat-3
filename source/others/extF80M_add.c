@@ -34,10 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -46,16 +45,16 @@ void
      const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr )
 {
     const struct extFloat80M *aSPtr, *bSPtr;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool signA;
-    uint_fast16_t uiB64;
-    uint_fast64_t uiB0;
+    uint16_t uiB64;
+    uint64_t uiB0;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     extFloat80_t
         (*magsFuncPtr)(
-            uint_fast16_t, uint_fast64_t, uint_fast16_t, uint_fast64_t, bool );
+            uint16_t, uint64_t, uint16_t, uint64_t, bool );
 #endif
 
     /** @bug cast to same type */

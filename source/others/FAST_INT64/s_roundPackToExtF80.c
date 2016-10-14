@@ -43,15 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
  softfloat_roundPackToExtF80(
      bool sign,
-     int_fast32_t exp,
-     uint_fast64_t sig,
-     uint_fast64_t sigExtra,
-     uint_fast8_t roundingPrecision
+     int32_t exp,
+     uint64_t sig,
+     uint64_t sigExtra,
+     uint8_t roundingPrecision
  )
 {
-    uint_fast8_t roundingMode;
+    uint8_t roundingMode;
     bool roundNearEven;
-    uint_fast64_t roundIncrement, roundMask, roundBits;
+    uint64_t roundIncrement, roundMask, roundBits;
     bool isTiny, doIncrement;
     struct uint64_extra sig64Extra;
     /** @bug union of same type */
@@ -160,7 +160,7 @@ extFloat80_t
             if ( doIncrement ) {
                 ++sig;
                 sig &=
-                    ~(uint_fast64_t)
+                    ~(uint64_t)
                          (! (sigExtra & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                               & roundNearEven);
                 exp = ((sig & UINT64_C( 0x8000000000000000 )) != 0);
@@ -199,7 +199,7 @@ extFloat80_t
             sig = UINT64_C( 0x8000000000000000 );
         } else {
             sig &=
-                ~(uint_fast64_t)
+                ~(uint64_t)
                      (! (sigExtra & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                           & roundNearEven);
         }

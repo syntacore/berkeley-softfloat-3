@@ -34,17 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
-
-
-#ifndef softfloat_countLeadingZeros64
-
-#define softfloat_countLeadingZeros64 softfloat_countLeadingZeros64
 #include "primitives/functions.h"
 
-uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
+uint8_t softfloat_countLeadingZeros64( uint64_t a )
 {
-    uint_fast8_t count;
+    uint8_t count;
     uint32_t a32;
 
     count = 0;
@@ -68,6 +62,3 @@ uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
     return count;
 
 }
-
-#endif
-

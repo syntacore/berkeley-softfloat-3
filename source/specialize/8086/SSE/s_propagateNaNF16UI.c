@@ -34,11 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "internals.h"
 #include "specialize.h"
+#include "internals.h"
 #include "softfloat/functions.h"
 
 /*----------------------------------------------------------------------------
@@ -47,17 +44,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast16_t
- softfloat_propagateNaNF16UI( uint_fast16_t uiA, uint_fast16_t uiB )
+uint16_t
+softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
 {
     bool isSigNaNA;
 
-    isSigNaNA = softfloat_isSigNaNF16UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF16UI( uiB ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) return uiA | 0x0200;
+    isSigNaNA = softfloat_isSigNaNF16UI(uiA);
+    if (isSigNaNA || softfloat_isSigNaNF16UI(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) {
+            return uiA | 0x0200;
+        }
     }
-    return (isNaNF16UI( uiA ) ? uiA : uiB) | 0x0200;
-
+    return (isNaNF16UI(uiA) ? uiA : uiB) | 0x0200;
 }
-

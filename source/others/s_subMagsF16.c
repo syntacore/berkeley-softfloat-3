@@ -41,20 +41,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-float16_t softfloat_subMagsF16( uint_fast16_t uiA, uint_fast16_t uiB )
+float16_t softfloat_subMagsF16( uint16_t uiA, uint16_t uiB )
 {
-    int_fast8_t expA;
-    uint_fast16_t sigA;
-    int_fast8_t expB;
-    uint_fast16_t sigB;
-    int_fast8_t expDiff;
-    uint_fast16_t uiZ;
-    int_fast16_t sigDiff;
+    int8_t expA;
+    uint16_t sigA;
+    int8_t expB;
+    uint16_t sigB;
+    int8_t expDiff;
+    uint16_t uiZ;
+    int16_t sigDiff;
     bool signZ;
-    int_fast8_t shiftDist, expZ;
-    uint_fast16_t sigZ, sigX, sigY;
-    uint_fast32_t sig32Z;
-    int_fast8_t roundingMode;
+    int8_t shiftDist, expZ;
+    uint16_t sigZ, sigX, sigY;
+    uint32_t sig32Z;
+    int8_t roundingMode;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------
@@ -134,7 +134,7 @@ float16_t softfloat_subMagsF16( uint_fast16_t uiA, uint_fast16_t uiB )
             sigX = sigA | 0x0400;
             sigY = sigB + (expB ? 0x0400 : sigB);
         }
-        sig32Z = ((uint_fast32_t) sigX<<expDiff) - sigY;
+        sig32Z = ((uint32_t) sigX<<expDiff) - sigY;
         shiftDist = softfloat_countLeadingZeros32( sig32Z ) - 1;
         sig32Z <<= shiftDist;
         expZ -= shiftDist;

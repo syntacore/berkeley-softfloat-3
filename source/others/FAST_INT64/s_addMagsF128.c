@@ -42,21 +42,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float128_t
  softfloat_addMagsF128(
-     uint_fast64_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast64_t uiB64,
-     uint_fast64_t uiB0,
+     uint64_t uiA64,
+     uint64_t uiA0,
+     uint64_t uiB64,
+     uint64_t uiB0,
      bool signZ
  )
 {
-    int_fast32_t expA;
+    int32_t expA;
     struct uint128 sigA;
-    int_fast32_t expB;
+    int32_t expB;
     struct uint128 sigB;
-    int_fast32_t expDiff;
+    int32_t expDiff;
     struct uint128 uiZ, sigZ;
-    int_fast32_t expZ;
-    uint_fast64_t sigZExtra;
+    int32_t expZ;
+    uint64_t sigZExtra;
     struct uint128_extra sig128Extra;
     union ui128_f128 uZ;
 

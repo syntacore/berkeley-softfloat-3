@@ -44,19 +44,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t f128_rem( float128_t a, float128_t b )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool signA;
-    int_fast32_t expA;
+    int32_t expA;
     struct uint128 sigA;
     union ui128_f128 uB;
-    uint_fast64_t uiB64, uiB0;
-    int_fast32_t expB;
+    uint64_t uiB64, uiB0;
+    int32_t expB;
     struct uint128 sigB;
     struct exp32_sig128 normExpSig;
     struct uint128 rem;
-    int_fast32_t expDiff;
-    uint_fast32_t q, recip32;
-    uint_fast64_t q64;
+    int32_t expDiff;
+    uint32_t q, recip32;
+    uint64_t q64;
     struct uint128 term, altRem, meanRem;
     bool signRem;
     struct uint128 uiZ;
@@ -127,7 +127,7 @@ float128_t f128_rem( float128_t a, float128_t b )
         recip32 = softfloat_approxRecip32_1( sigB.v64>>17 );
         expDiff -= 30;
         for (;;) {
-            q64 = (uint_fast64_t) (uint32_t) (rem.v64>>19) * recip32;
+            q64 = (uint64_t) (uint32_t) (rem.v64>>19) * recip32;
             if ( expDiff < 0 ) break;
             q = (q64 + 0x80000000)>>32;
             rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );

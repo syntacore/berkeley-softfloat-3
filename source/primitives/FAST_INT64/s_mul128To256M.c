@@ -34,12 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
-
-
-#ifndef softfloat_mul128To256M
-
-#define softfloat_mul128To256M softfloat_mul128To256M
 #include "primitives/functions.h"
 
 void
@@ -47,7 +41,7 @@ void
      uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0, uint64_t *zPtr )
 {
     struct uint128 p0, p64, p128;
-    uint_fast64_t z64, z128, z192;
+    uint64_t z64, z128, z192;
 
     p0 = softfloat_mul64To128( a0, b0 );
     zPtr[indexWord( 4, 0 )] = p0.v0;
@@ -66,6 +60,3 @@ void
     zPtr[indexWord( 4, 3 )] = z192 + (z128 < p64.v64);
 
 }
-
-#endif
-

@@ -44,22 +44,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t f64_rem( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast64_t sigA;
+    int16_t expA;
+    uint64_t sigA;
     union ui64_f64 uB;
-    uint_fast64_t uiB;
-    int_fast16_t expB;
-    uint_fast64_t sigB;
+    uint64_t uiB;
+    int16_t expB;
+    uint64_t sigB;
     struct exp16_sig64 normExpSig;
     uint64_t rem;
-    int_fast16_t expDiff;
+    int16_t expDiff;
     uint32_t q, recip32;
-    uint_fast64_t q64;
+    uint64_t q64;
     uint64_t altRem, meanRem;
     bool signRem;
-    uint_fast64_t uiZ;
+    uint64_t uiZ;
     union ui64_f64 uZ;
 
     /*------------------------------------------------------------------------
@@ -131,13 +131,13 @@ float64_t f64_rem( float64_t a, float64_t b )
         *--------------------------------------------------------------------*/
         sigB <<= 9;
         for (;;) {
-            q64 = (uint32_t) (rem>>32) * (uint_fast64_t) recip32;
+            q64 = (uint32_t) (rem>>32) * (uint64_t) recip32;
             if ( expDiff < 0 ) break;
             q = (q64 + 0x80000000)>>32;
 #ifdef SOFTFLOAT_FAST_INT64
             rem <<= 29;
 #else
-            rem = (uint_fast64_t) (uint32_t) (rem>>3)<<32;
+            rem = (uint64_t) (uint32_t) (rem>>3)<<32;
 #endif
             rem -= q * (uint64_t) sigB;
             if ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
@@ -170,7 +170,7 @@ float64_t f64_rem( float64_t a, float64_t b )
     signRem = signA;
     if ( rem & UINT64_C( 0x8000000000000000 ) ) {
         signRem = ! signRem;
-        rem = -rem;
+        rem = -(int64_t)rem;
     }
     return softfloat_normRoundPackToF64( signRem, expB, rem );
     /*------------------------------------------------------------------------

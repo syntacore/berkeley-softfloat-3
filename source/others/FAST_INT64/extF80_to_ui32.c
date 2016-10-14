@@ -41,16 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-uint_fast32_t
- extF80_to_ui32( extFloat80_t a, uint_fast8_t roundingMode, bool exact )
+uint32_t
+ extF80_to_ui32( extFloat80_t a, uint8_t roundingMode, bool exact )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     bool sign;
-    int_fast32_t exp;
-    uint_fast64_t sig;
-    int_fast32_t shiftDist;
+    int32_t exp;
+    uint64_t sig;
+    int32_t shiftDist;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

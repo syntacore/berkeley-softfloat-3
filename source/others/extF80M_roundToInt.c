@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
  extF80M_roundToInt(
      const extFloat80_t *aPtr,
-     uint_fast8_t roundingMode,
+     uint8_t roundingMode,
      bool exact,
      extFloat80_t *zPtr
  )
@@ -61,17 +61,17 @@ void
 void
  extF80M_roundToInt(
      const extFloat80_t *aPtr,
-     uint_fast8_t roundingMode,
+     uint8_t roundingMode,
      bool exact,
      extFloat80_t *zPtr
  )
 {
     const struct extFloat80M *aSPtr;
     struct extFloat80M *zSPtr;
-    uint_fast16_t uiA64, signUI64;
+    uint16_t uiA64, signUI64;
     int32_t exp;
     uint64_t sigA;
-    uint_fast16_t uiZ64;
+    uint16_t uiZ64;
     uint64_t sigZ, lastBitMask, roundBitsMask;
 
     /*------------------------------------------------------------------------

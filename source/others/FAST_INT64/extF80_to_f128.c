@@ -45,10 +45,10 @@ float128_t extF80_to_f128( extFloat80_t a )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
-    uint_fast16_t exp;
-    uint_fast64_t frac;
+    uint16_t uiA64;
+    uint64_t uiA0;
+    uint16_t exp;
+    uint64_t frac;
     struct commonNaN commonNaN;
     struct uint128 uiZ;
     bool sign;

@@ -44,26 +44,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t f32_div( float32_t a, float32_t b )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast32_t sigA;
+    int16_t expA;
+    uint32_t sigA;
     union ui32_f32 uB;
-    uint_fast32_t uiB;
+    uint32_t uiB;
     bool signB;
-    int_fast16_t expB;
-    uint_fast32_t sigB;
+    int16_t expB;
+    uint32_t sigB;
     bool signZ;
     struct exp16_sig32 normExpSig;
-    int_fast16_t expZ;
+    int16_t expZ;
 #ifdef SOFTFLOAT_FAST_DIV64TO32
-    uint_fast64_t sig64A;
-    uint_fast32_t sigZ;
+    uint64_t sig64A;
+    uint32_t sigZ;
 #else
-    uint_fast32_t sigZ;
-    uint_fast64_t rem;
+    uint32_t sigZ;
+    uint64_t rem;
 #endif
-    uint_fast32_t uiZ;
+    uint32_t uiZ;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------
@@ -119,12 +119,12 @@ float32_t f32_div( float32_t a, float32_t b )
 #ifdef SOFTFLOAT_FAST_DIV64TO32
     if ( sigA < sigB ) {
         --expZ;
-        sig64A = (uint_fast64_t) sigA<<31;
+        sig64A = (uint64_t) sigA<<31;
     } else {
-        sig64A = (uint_fast64_t) sigA<<30;
+        sig64A = (uint64_t) sigA<<30;
     }
     sigZ = sig64A / sigB;
-    if ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
+    if ( ! (sigZ & 0x3F) ) sigZ |= ((uint64_t) sigB * sigZ != sig64A);
 #else
     if ( sigA < sigB ) {
         --expZ;
@@ -133,16 +133,16 @@ float32_t f32_div( float32_t a, float32_t b )
         sigA <<= 7;
     }
     sigB <<= 8;
-    sigZ = ((uint_fast64_t) sigA * softfloat_approxRecip32_1( sigB ))>>32;
+    sigZ = ((uint64_t) sigA * softfloat_approxRecip32_1( sigB ))>>32;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sigZ += 2;
     if ( (sigZ & 0x3F) < 2 ) {
         sigZ &= ~3;
 #ifdef SOFTFLOAT_FAST_INT64
-        rem = ((uint_fast64_t) sigA<<31) - (uint_fast64_t) sigZ * sigB;
+        rem = ((uint64_t) sigA<<31) - (uint64_t) sigZ * sigB;
 #else
-        rem = ((uint_fast64_t) sigA<<32) - (uint_fast64_t) (sigZ<<1) * sigB;
+        rem = ((uint64_t) sigA<<32) - (uint64_t) (sigZ<<1) * sigB;
 #endif
         if ( rem & UINT64_C( 0x8000000000000000 ) ) {
             sigZ -= 4;

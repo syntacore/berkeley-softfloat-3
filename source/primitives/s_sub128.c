@@ -34,22 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#ifndef SOFTFLOAT_FAST_INT64
+#define SOFTFLOAT_FAST_INT64
+#endif
 
-#include "primitives/types.h"
+#define SOFTFLOAT_SUB128
 
-#ifndef softfloat_sub128
+#include "primitives/functions.h"
 
 struct uint128
  softfloat_sub128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
     struct uint128 z;
-
     z.v0 = a0 - b0;
     z.v64 = a64 - b64 - (a0 < b0);
     return z;
 
 }
-
-#endif
-

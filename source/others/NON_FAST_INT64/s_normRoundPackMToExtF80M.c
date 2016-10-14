@@ -44,12 +44,12 @@ void
      bool sign,
      int32_t exp,
      uint32_t *extSigPtr,
-     uint_fast8_t roundingPrecision,
+     uint8_t roundingPrecision,
     /** @bug use extFloat80_t */
     struct extFloat80M *zSPtr
  )
 {
-    int_fast16_t shiftDist;
+    int16_t shiftDist;
     uint32_t wordSig;
 
     shiftDist = 0;

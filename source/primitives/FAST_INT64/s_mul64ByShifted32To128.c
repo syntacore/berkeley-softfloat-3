@@ -34,23 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_MUL64BYSHIFTED32TO128
 
-#include "primitives/types.h"
-
-#ifndef softfloat_mul64ByShifted32To128
+#include "primitives/functions.h"
 
 struct uint128 softfloat_mul64ByShifted32To128( uint64_t a, uint32_t b )
 {
-    uint_fast64_t mid;
+    uint64_t mid;
     struct uint128 z;
 
-    mid = (uint_fast64_t) (uint32_t) a * b;
+    mid = (uint64_t) (uint32_t) a * b;
     z.v0 = mid<<32;
-    z.v64 = (uint_fast64_t) (uint32_t) (a>>32) * b + (mid>>32);
+    z.v64 = (uint64_t) (uint32_t) (a>>32) * b + (mid>>32);
     return z;
 
 }
-
-#endif
-

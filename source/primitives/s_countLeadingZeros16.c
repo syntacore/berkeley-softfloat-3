@@ -34,17 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_COUNTLEADINGZEROS16
 
-
-#ifndef softfloat_countLeadingZeros16
-
-#define softfloat_countLeadingZeros16 softfloat_countLeadingZeros16
 #include "primitives/functions.h"
 
-uint_fast8_t softfloat_countLeadingZeros16( uint16_t a )
+uint8_t softfloat_countLeadingZeros16( uint16_t a )
 {
-    uint_fast8_t count;
+    uint8_t count;
 
     count = 8;
     if ( 0x100 <= a ) {
@@ -55,6 +51,3 @@ uint_fast8_t softfloat_countLeadingZeros16( uint16_t a )
     return count;
 
 }
-
-#endif
-

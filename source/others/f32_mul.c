@@ -34,30 +34,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
+#include "softfloat/functions.h"
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
 float32_t f32_mul( float32_t a, float32_t b )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast32_t sigA;
+    int16_t expA;
+    uint32_t sigA;
     union ui32_f32 uB;
-    uint_fast32_t uiB;
+    uint32_t uiB;
     bool signB;
-    int_fast16_t expB;
-    uint_fast32_t sigB;
+    int16_t expB;
+    uint32_t sigB;
     bool signZ;
-    uint_fast32_t magBits;
+    uint32_t magBits;
     struct exp16_sig32 normExpSig;
-    int_fast16_t expZ;
-    uint_fast32_t sigZ, uiZ;
+    int16_t expZ;
+    uint32_t sigZ;
+    uint32_t uiZ;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------
@@ -104,7 +102,7 @@ float32_t f32_mul( float32_t a, float32_t b )
     expZ = expA + expB - 0x7F;
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<8;
-    sigZ = softfloat_shortShiftRightJam64( (uint_fast64_t) sigA * sigB, 32 );
+    sigZ = (uint32_t)softfloat_shortShiftRightJam64( (uint64_t) sigA * sigB, 32 );
     if ( sigZ < 0x40000000 ) {
         --expZ;
         sigZ <<= 1;

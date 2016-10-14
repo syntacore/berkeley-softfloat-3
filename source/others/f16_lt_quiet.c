@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool f16_lt_quiet( float16_t a, float16_t b )
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     union ui16_f16 uB;
-    uint_fast16_t uiB;
+    uint16_t uiB;
     bool signA, signB;
 
     uA.f = a;

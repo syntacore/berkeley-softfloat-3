@@ -34,21 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_SHIFTRIGHTJAM64EXTRA
 
-#include "primitives/types.h"
-
-#ifndef softfloat_shiftRightJam64Extra
+#include "primitives/functions.h"
 
 struct uint64_extra
- softfloat_shiftRightJam64Extra(
-     uint64_t a, uint64_t extra, uint_fast32_t dist )
+ softfloat_shiftRightJam64Extra(uint64_t a, uint64_t extra, uint32_t dist )
 {
     struct uint64_extra z;
 
     if ( dist < 64 ) {
         z.v = a>>dist;
-        z.extra = a<<(-dist & 63);
+        z.extra = a<<(-(int32_t)dist & 63);
     } else {
         z.v = 0;
         z.extra = (dist == 64) ? a : (a != 0);
@@ -57,6 +54,4 @@ struct uint64_extra
     return z;
 
 }
-
-#endif
 

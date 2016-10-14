@@ -34,38 +34,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "internals.h"
 #include "softfloat/functions.h"
 
-float16_t i32_to_f16( int32_t a )
-{
-    bool sign;
-    uint_fast32_t absA;
-    int_fast8_t shiftDist;
-    union ui16_f16 u;
-    uint_fast16_t sig;
+#include "internals.h"
 
-    sign = (a < 0);
-    absA = sign ? -(uint_fast32_t) a : (uint_fast32_t) a;
-    shiftDist = softfloat_countLeadingZeros32( absA ) - 21;
-    if ( 0 <= shiftDist ) {
-        u.ui =
-            a ? packToF16UI(
-                    sign, 0x18 - shiftDist, (uint_fast16_t) absA<<shiftDist )
-                : 0;
+float16_t i32_to_f16(int32_t a)
+{
+    bool const sign = a < 0;
+    /** @bug INT32_MIN */
+    uint32_t absA = sign ? -a : a;
+    int8_t shiftDist = softfloat_countLeadingZeros32(absA) - 21;
+    if (0 <= shiftDist) {
+        union ui16_f16 u;
+        u.ui = a ? packToF16UI(sign, 0x18 - shiftDist, (uint16_t)absA << shiftDist) : 0;
         return u.f;
     } else {
+        uint16_t sig;
         shiftDist += 4;
         sig =
-            (shiftDist < 0)
-                ? absA>>(-shiftDist)
-                      | ((uint32_t) (absA<<(shiftDist & 31)) != 0)
-                : (uint_fast16_t) absA<<shiftDist;
-        return softfloat_roundPackToF16( sign, 0x1C - shiftDist, sig );
+            shiftDist < 0 ? absA >> (-shiftDist) | 
+            ((uint32_t)(absA << (shiftDist & 31)) != 0) :
+            (uint16_t)absA << shiftDist;
+        return softfloat_roundPackToF16(sign, 0x1C - shiftDist, sig);
     }
-
 }
-

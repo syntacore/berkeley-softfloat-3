@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 
 struct exp32_sig128
- softfloat_normSubnormalF128Sig( uint_fast64_t sig64, uint_fast64_t sig0 )
+ softfloat_normSubnormalF128Sig( uint64_t sig64, uint64_t sig0 )
 {
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     struct exp32_sig128 z;
 
     if ( ! sig64 ) {

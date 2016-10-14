@@ -43,19 +43,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-float32_t extF80M_to_f32( const extFloat80_t *aPtr )
+float32_t extF80M_to_f32(const extFloat80_t *aPtr)
 {
 
-    return extF80_to_f32( *aPtr );
+    return extF80_to_f32(*aPtr);
 
 }
 
 #else
 
-float32_t extF80M_to_f32( const extFloat80_t *aPtr )
+float32_t extF80M_to_f32(const extFloat80_t *aPtr)
 {
     const struct extFloat80M *aSPtr;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     bool sign;
     int32_t exp;
     uint64_t sig;
@@ -70,40 +70,40 @@ float32_t extF80M_to_f32( const extFloat80_t *aPtr )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiA64 = aSPtr->signExp;
-    sign = signExtF80UI64( uiA64 );
-    exp  = expExtF80UI64( uiA64 );
+    sign = signExtF80UI64(uiA64);
+    exp = expExtF80UI64(uiA64);
     sig = aSPtr->signif;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0x7FFF ) {
-        if ( sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
-            softfloat_extF80MToCommonNaN( aSPtr, &commonNaN );
-            uiZ = softfloat_commonNaNToF32UI( &commonNaN );
+    if (exp == 0x7FFF) {
+        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
+            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
         } else {
-            uiZ = packToF32UI( sign, 0xFF, 0 );
+            uiZ = packToF32UI(sign, 0xFF, 0);
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! (sig & UINT64_C( 0x8000000000000000 )) ) {
-        if ( ! sig ) {
-            uiZ = packToF32UI( sign, 0, 0 );
+    if (!(sig & UINT64_C(0x8000000000000000))) {
+        if (!sig) {
+            uiZ = packToF32UI(sign, 0, 0);
             goto uiZ;
         }
-        exp += softfloat_normExtF80SigM( &sig );
+        exp += softfloat_normExtF80SigM(&sig);
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    sig32 = softfloat_shortShiftRightJam64( sig, 33 );
+    sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
     exp -= 0x3F81;
-    if ( sizeof (int_fast16_t) < sizeof exp) {
-        if ( exp < -0x1000 ) exp = -0x1000;
+    if (sizeof(int16_t) < sizeof exp) {
+        if (exp < -0x1000) exp = -0x1000;
     }
-    return softfloat_roundPackToF32( sign, exp, sig32 );
+    return softfloat_roundPackToF32(sign, exp, sig32);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- uiZ:
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 

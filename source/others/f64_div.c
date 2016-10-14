@@ -44,23 +44,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t f64_div( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast64_t sigA;
+    int16_t expA;
+    uint64_t sigA;
     union ui64_f64 uB;
-    uint_fast64_t uiB;
+    uint64_t uiB;
     bool signB;
-    int_fast16_t expB;
-    uint_fast64_t sigB;
+    int16_t expB;
+    uint64_t sigB;
     bool signZ;
     struct exp16_sig64 normExpSig;
-    int_fast16_t expZ;
+    int16_t expZ;
     uint32_t recip32, sig32Z, doubleTerm;
-    uint_fast64_t rem;
+    uint64_t rem;
     uint32_t q;
-    uint_fast64_t sigZ;
-    uint_fast64_t uiZ;
+    uint64_t sigZ;
+    uint64_t uiZ;
     union ui64_f64 uZ;
 
     /*------------------------------------------------------------------------
@@ -121,22 +121,22 @@ float64_t f64_div( float64_t a, float64_t b )
     }
     sigB <<= 11;
     recip32 = softfloat_approxRecip32_1( sigB>>32 ) - 2;
-    sig32Z = ((uint32_t) (sigA>>32) * (uint_fast64_t) recip32)>>32;
+    sig32Z = ((uint32_t) (sigA>>32) * (uint64_t) recip32)>>32;
     doubleTerm = sig32Z<<1;
     rem =
-        ((sigA - (uint_fast64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
-            - (uint_fast64_t) doubleTerm * ((uint32_t) sigB>>4);
-    q = (((uint32_t) (rem>>32) * (uint_fast64_t) recip32)>>32) + 4;
-    sigZ = ((uint_fast64_t) sig32Z<<32) + ((uint_fast64_t) q<<4);
+        ((sigA - (uint64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
+            - (uint64_t) doubleTerm * ((uint32_t) sigB>>4);
+    q = (((uint32_t) (rem>>32) * (uint64_t) recip32)>>32) + 4;
+    sigZ = ((uint64_t) sig32Z<<32) + ((uint64_t) q<<4);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     if ( (sigZ & 0x1FF) < 4<<4 ) {
         q &= ~7;
-        sigZ &= ~(uint_fast64_t) 0x7F;
+        sigZ &= ~(uint64_t) 0x7F;
         doubleTerm = q<<1;
         rem =
-            ((rem - (uint_fast64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
-                - (uint_fast64_t) doubleTerm * ((uint32_t) sigB>>4);
+            ((rem - (uint64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
+                - (uint64_t) doubleTerm * ((uint32_t) sigB>>4);
         if ( rem & UINT64_C( 0x8000000000000000 ) ) {
             sigZ -= 1<<7;
         } else {

@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-uint_fast64_t
+uint64_t
  softfloat_roundPackToUI64(
      bool sign,
-     uint_fast64_t sig,
-     uint_fast64_t sigExtra,
-     uint_fast8_t roundingMode,
+     uint64_t sig,
+     uint64_t sigExtra,
+     uint8_t roundingMode,
      bool exact
  )
 {
@@ -66,7 +66,7 @@ uint_fast64_t
         ++sig;
         if ( ! sig ) goto invalid;
         sig &=
-            ~(uint_fast64_t)
+            ~(uint64_t)
                  (! (sigExtra & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                       & roundNearEven);
     }

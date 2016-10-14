@@ -58,11 +58,11 @@ void
     bool isSigNaNA;
     const struct extFloat80M *sPtr;
     bool isSigNaNB;
-    uint_fast16_t uiB64;
+    uint16_t uiB64;
     uint64_t uiB0;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     uint64_t uiA0;
-    uint_fast16_t uiMagA64, uiMagB64;
+    uint16_t uiMagA64, uiMagB64;
 
     isSigNaNA = extF80M_isSignalingNaN( (const extFloat80_t *) aSPtr );
     sPtr = aSPtr;

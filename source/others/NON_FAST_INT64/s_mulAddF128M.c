@@ -47,7 +47,7 @@ void
      const uint32_t *bWPtr,
      const uint32_t *cWPtr,
      uint32_t *zWPtr,
-     uint_fast8_t op
+     uint8_t op
  )
 {
     uint32_t uiA96;
@@ -59,24 +59,24 @@ void
     int32_t expC;
     bool signProd, prodIsInfinite;
     uint32_t *ptr, uiZ96, sigA[4];
-    uint_fast8_t shiftDist;
+    uint8_t shiftDist;
     uint32_t sigX[5];
     int32_t expProd;
     uint32_t sigProd[8], wordSig;
     bool doSub;
-    uint_fast8_t
+    uint8_t
      (*addCarryMRoutinePtr)(
-         uint_fast8_t,
+         uint8_t,
          const uint32_t *,
          const uint32_t *,
-         uint_fast8_t,
+         uint8_t,
          uint32_t *
      );
     int32_t expDiff;
     bool signZ;
     int32_t expZ;
     uint32_t *extSigPtr;
-    uint_fast8_t carry;
+    uint8_t carry;
     void (*roundPackRoutinePtr)( bool, int32_t, uint32_t *, uint32_t * );
 
     /*------------------------------------------------------------------------
@@ -187,7 +187,7 @@ void
         carry = 0;
         if ( doSub ) {
             wordSig = extSigPtr[indexWordLo( 5 )];
-            extSigPtr[indexWordLo( 5 )] = -wordSig;
+            extSigPtr[indexWordLo( 5 )] = -(int32_t)wordSig;
             carry = ! wordSig;
         }
         (*addCarryMRoutinePtr)(
@@ -227,7 +227,7 @@ void
             carry = 0;
             if ( doSub ) {
                 carry = ! wordSig;
-                wordSig = -wordSig;
+                wordSig = -(int32_t)wordSig;
             }
             carry =
                 (*addCarryMRoutinePtr)(

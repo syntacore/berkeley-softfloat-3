@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 void
  softfloat_f128UIToCommonNaN(
-     uint_fast64_t uiA64, uint_fast64_t uiA0, struct commonNaN *zPtr )
+     uint64_t uiA64, uint64_t uiA0, struct commonNaN *zPtr )
 {
     struct uint128 NaNSig;
 

@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool f128_eq( float128_t a, float128_t b )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     union ui128_f128 uB;
-    uint_fast64_t uiB64, uiB0;
+    uint64_t uiB64, uiB0;
 
     uA.f = a;
     uiA64 = uA.ui.v64;

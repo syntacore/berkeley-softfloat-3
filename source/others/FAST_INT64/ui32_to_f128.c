@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float128_t ui32_to_f128( uint32_t a )
 {
-    uint_fast64_t uiZ64;
-    int_fast8_t shiftDist;
+    uint64_t uiZ64;
+    int8_t shiftDist;
     union ui128_f128 uZ;
 
     uiZ64 = 0;
@@ -50,7 +50,7 @@ float128_t ui32_to_f128( uint32_t a )
         shiftDist = softfloat_countLeadingZeros32( a ) + 17;
         uiZ64 =
             packToF128UI64(
-                0, 0x402E - shiftDist, (uint_fast64_t) a<<shiftDist );
+                0, 0x402E - shiftDist, (uint64_t) a<<shiftDist );
     }
     uZ.ui.v64 = uiZ64;
     uZ.ui.v0  = 0;

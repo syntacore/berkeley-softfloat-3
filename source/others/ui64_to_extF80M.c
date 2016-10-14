@@ -53,9 +53,9 @@ void ui64_to_extF80M( uint64_t a, extFloat80_t *zPtr )
 void ui64_to_extF80M( uint64_t a, extFloat80_t *zPtr )
 {
     struct extFloat80M *zSPtr;
-    uint_fast16_t uiZ64;
+    uint16_t uiZ64;
     uint64_t sigZ;
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
 
     /** @bug cast to same type */
     zSPtr = (struct extFloat80M *) zPtr;

@@ -42,13 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 float128_t
- f128_roundToInt( float128_t a, uint_fast8_t roundingMode, bool exact )
+ f128_roundToInt( float128_t a, uint8_t roundingMode, bool exact )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
-    int_fast32_t exp;
+    uint64_t uiA64, uiA0;
+    int32_t exp;
     struct uint128 uiZ;
-    uint_fast64_t lastBitMask, roundBitsMask;
+    uint64_t lastBitMask, roundBitsMask;
     bool roundNearEven;
     union ui128_f128 uZ;
 
@@ -72,7 +72,7 @@ float128_t
         }
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        lastBitMask = (uint_fast64_t) 2<<(0x406E - exp);
+        lastBitMask = (uint64_t) 2<<(0x406E - exp);
         roundBitsMask = lastBitMask - 1;
         uiZ.v64 = uiA64;
         uiZ.v0  = uiA0;
@@ -131,7 +131,7 @@ float128_t
         *--------------------------------------------------------------------*/
         uiZ.v64 = uiA64;
         uiZ.v0  = 0;
-        lastBitMask = (uint_fast64_t) 1<<(0x402F - exp);
+        lastBitMask = (uint64_t) 1<<(0x402F - exp);
         roundBitsMask = lastBitMask - 1;
         if ( roundingMode == softfloat_round_near_maxMag ) {
             uiZ.v64 += lastBitMask>>1;

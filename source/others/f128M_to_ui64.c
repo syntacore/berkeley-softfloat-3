@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-uint_fast64_t
- f128M_to_ui64( const float128_t *aPtr, uint_fast8_t roundingMode, bool exact )
+uint64_t
+ f128M_to_ui64( const float128_t *aPtr, uint8_t roundingMode, bool exact )
 {
 
     return f128_to_ui64( *aPtr, roundingMode, exact );
@@ -53,8 +53,8 @@ uint_fast64_t
 
 #else
 
-uint_fast64_t
- f128M_to_ui64( const float128_t *aPtr, uint_fast8_t roundingMode, bool exact )
+uint64_t
+ f128M_to_ui64( const float128_t *aPtr, uint8_t roundingMode, bool exact )
 {
     const uint32_t *aWPtr;
     uint32_t uiA96;

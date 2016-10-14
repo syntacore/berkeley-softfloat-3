@@ -1,10 +1,9 @@
-
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
+@Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,54 +33,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "internals.h"
-#include "specialize.h"
 #include "softfloat/functions.h"
 
-int32_t f16_to_i32( float16_t a, uint8_t roundingMode, bool exact )
+#include "internals.h"
+
+void i32_to_extF80M(int32_t a, extFloat80_t *zPtr)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool sign;
-    int8_t exp;
-    uint16_t frac;
-    int32_t sig32;
-    int8_t shiftDist;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF16UI( uiA );
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp == 0x1F ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return
-            frac ? i32_fromNaN
-                : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    extFloat80_t *zSPtr = zPtr;
+    uint16_t uiZ64 = 0;
+    uint64_t sigZ = 0;
+    if (a) {
+        bool const sign = a < 0;
+        uint32_t absA = sign ? -a : a;
+        int8_t const shiftDist = softfloat_countLeadingZeros32(absA);
+        uiZ64 = packToExtF80UI64(sign, 0x401E - shiftDist);
+        sigZ = (uint64_t)(absA << shiftDist) << 32;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    sig32 = frac;
-    if ( exp ) {
-        sig32 |= 0x0400;
-        shiftDist = exp - 0x19;
-        if ( 0 <= shiftDist ) {
-            sig32 <<= shiftDist;
-            return sign ? -sig32 : sig32;
-        }
-        shiftDist = exp - 0x0D;
-        if ( 0 < shiftDist ) sig32 <<= shiftDist;
-    }
-    return
-        softfloat_roundPackToI32(
-            sign, (uint32_t) sig32, roundingMode, exact );
-
+    zSPtr->signExp = uiZ64;
+    zSPtr->signif = sigZ;
 }
-

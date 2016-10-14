@@ -42,14 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
  softfloat_subM(
-     uint_fast8_t size_words,
+     uint8_t size_words,
      const uint32_t *aPtr,
      const uint32_t *bPtr,
      uint32_t *zPtr
  )
 {
     unsigned int index, lastIndex;
-    uint_fast8_t borrow;
+    uint8_t borrow;
     uint32_t wordA, wordB;
 
     index = indexWordLo( size_words );

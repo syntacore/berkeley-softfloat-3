@@ -45,26 +45,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t
  softfloat_mulAddF64(
-     uint_fast64_t uiA, uint_fast64_t uiB, uint_fast64_t uiC, uint_fast8_t op )
+     uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op )
 {
     bool signA;
-    int_fast16_t expA;
-    uint_fast64_t sigA;
+    int16_t expA;
+    uint64_t sigA;
     bool signB;
-    int_fast16_t expB;
-    uint_fast64_t sigB;
+    int16_t expB;
+    uint64_t sigB;
     bool signC;
-    int_fast16_t expC;
-    uint_fast64_t sigC;
+    int16_t expC;
+    uint64_t sigC;
     bool signZ;
-    uint_fast64_t magBits, uiZ;
+    uint64_t magBits, uiZ;
     struct exp16_sig64 normExpSig;
-    int_fast16_t expZ;
+    int16_t expZ;
     struct uint128 sig128Z;
-    uint_fast64_t sigZ;
-    int_fast16_t expDiff;
+    uint64_t sigZ;
+    int16_t expDiff;
     struct uint128 sig128C;
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     union ui64_f64 uZ;
 
     /*------------------------------------------------------------------------
@@ -245,24 +245,24 @@ float64_t
 
 float64_t
  softfloat_mulAddF64(
-     uint_fast64_t uiA, uint_fast64_t uiB, uint_fast64_t uiC, uint_fast8_t op )
+     uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op )
 {
     bool signA;
-    int_fast16_t expA;
+    int16_t expA;
     uint64_t sigA;
     bool signB;
-    int_fast16_t expB;
+    int16_t expB;
     uint64_t sigB;
     bool signC;
-    int_fast16_t expC;
+    int16_t expC;
     uint64_t sigC;
     bool signZ;
     uint64_t magBits, uiZ;
     struct exp16_sig64 normExpSig;
-    int_fast16_t expZ;
+    int16_t expZ;
     uint32_t sig128Z[4];
     uint64_t sigZ;
-    int_fast16_t shiftDist, expDiff;
+    int16_t shiftDist, expDiff;
     uint32_t sig128C[4];
     union ui64_f64 uZ;
 

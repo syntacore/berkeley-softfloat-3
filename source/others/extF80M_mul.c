@@ -60,12 +60,12 @@ void
 {
     const struct extFloat80M *aSPtr, *bSPtr;
     struct extFloat80M *zSPtr;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     int32_t expA;
-    uint_fast16_t uiB64;
+    uint16_t uiB64;
     int32_t expB;
     bool signZ;
-    uint_fast16_t uiZ64;
+    uint16_t uiZ64;
     uint64_t uiZ0, sigA, sigB;
     int32_t expZ;
     uint32_t sigProd[4], *extSigZPtr;

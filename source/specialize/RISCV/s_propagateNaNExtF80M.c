@@ -54,8 +54,8 @@ void
      struct extFloat80M *zSPtr
  )
 {
-    uint_fast16_t ui64;
-    uint_fast64_t ui0;
+    uint16_t ui64;
+    uint64_t ui0;
 
     ui64 = aSPtr->signExp;
     ui0  = aSPtr->signif;

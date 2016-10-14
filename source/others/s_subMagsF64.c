@@ -42,18 +42,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 float64_t
- softfloat_subMagsF64( uint_fast64_t uiA, uint_fast64_t uiB, bool signZ )
+ softfloat_subMagsF64( uint64_t uiA, uint64_t uiB, bool signZ )
 {
-    int_fast16_t expA;
-    uint_fast64_t sigA;
-    int_fast16_t expB;
-    uint_fast64_t sigB;
-    int_fast16_t expDiff;
-    uint_fast64_t uiZ;
-    int_fast64_t sigDiff;
-    int_fast8_t shiftDist;
-    int_fast16_t expZ;
-    uint_fast64_t sigZ;
+    int16_t expA;
+    uint64_t sigA;
+    int16_t expB;
+    uint64_t sigB;
+    int16_t expDiff;
+    uint64_t uiZ;
+    int64_t sigDiff;
+    int8_t shiftDist;
+    int16_t expZ;
+    uint64_t sigZ;
     union ui64_f64 uZ;
 
     /*------------------------------------------------------------------------

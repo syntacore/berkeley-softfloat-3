@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t ui32_to_f64( uint32_t a )
 {
-    uint_fast64_t uiZ;
-    int_fast8_t shiftDist;
+    uint64_t uiZ;
+    int8_t shiftDist;
     union ui64_f64 uZ;
 
     if ( ! a ) {
@@ -50,7 +50,7 @@ float64_t ui32_to_f64( uint32_t a )
     } else {
         shiftDist = softfloat_countLeadingZeros32( a ) + 21;
         uiZ =
-            packToF64UI( 0, 0x432 - shiftDist, (uint_fast64_t) a<<shiftDist );
+            packToF64UI( 0, 0x432 - shiftDist, (uint64_t) a<<shiftDist );
     }
     uZ.ui = uiZ;
     return uZ.f;

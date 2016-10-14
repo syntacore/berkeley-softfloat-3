@@ -52,14 +52,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 struct uint128
  softfloat_propagateNaNF128UI(
-     uint_fast64_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast64_t uiB64,
-     uint_fast64_t uiB0
+     uint64_t uiA64,
+     uint64_t uiA0,
+     uint64_t uiB64,
+     uint64_t uiB0
  )
 {
     bool isSigNaNA, isSigNaNB;
-    uint_fast64_t uiNonsigA64, uiNonsigB64, uiMagA64, uiMagB64;
+    uint64_t uiNonsigA64, uiNonsigB64, uiMagA64, uiMagB64;
     struct uint128 uiZ;
 
     /*------------------------------------------------------------------------

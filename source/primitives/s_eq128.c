@@ -34,11 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
-
-#ifndef softfloat_eq128
+#define SOFTFLOAT_EQ128
+#include "primitives/functions.h"
 
 bool softfloat_eq128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
@@ -46,6 +43,4 @@ bool softfloat_eq128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
     return (a64 == b64) && (a0 == b0);
 
 }
-
-#endif
 

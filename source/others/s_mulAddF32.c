@@ -34,37 +34,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "internals.h"
+
 #include "specialize.h"
 #include "softfloat/functions.h"
 
 float32_t
  softfloat_mulAddF32(
-     uint_fast32_t uiA, uint_fast32_t uiB, uint_fast32_t uiC, uint_fast8_t op )
+     uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op )
 {
     bool signA;
-    int_fast16_t expA;
-    uint_fast32_t sigA;
+    int16_t expA;
+    uint32_t sigA;
     bool signB;
-    int_fast16_t expB;
-    uint_fast32_t sigB;
+    int16_t expB;
+    uint32_t sigB;
     bool signC;
-    int_fast16_t expC;
-    uint_fast32_t sigC;
+    int16_t expC;
+    uint32_t sigC;
     bool signProd;
-    uint_fast32_t magBits, uiZ;
+    uint32_t magBits, uiZ;
     struct exp16_sig32 normExpSig;
-    int_fast16_t expProd;
-    uint_fast64_t sigProd;
+    int16_t expProd;
+    uint64_t sigProd;
     bool signZ;
-    int_fast16_t expZ;
-    uint_fast32_t sigZ;
-    int_fast16_t expDiff;
-    uint_fast64_t sig64Z, sig64C;
-    int_fast8_t shiftDist;
+    int16_t expZ;
+    uint32_t sigZ;
+    int16_t expDiff;
+    uint64_t sig64Z, sig64C;
+    int8_t shiftDist;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------
@@ -118,7 +116,7 @@ float32_t
     expProd = expA + expB - 0x7E;
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<7;
-    sigProd = (uint_fast64_t) sigA * sigB;
+    sigProd = (uint64_t) sigA * sigB;
     if ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
         --expProd;
         sigProd <<= 1;
@@ -149,7 +147,7 @@ float32_t
             sig64Z =
                 sigProd
                     + softfloat_shiftRightJam64(
-                          (uint_fast64_t) sigC<<32, expDiff );
+                          (uint64_t) sigC<<32, expDiff );
             sigZ = softfloat_shortShiftRightJam64( sig64Z, 32 );
         }
         if ( sigZ < 0x40000000 ) {
@@ -159,7 +157,7 @@ float32_t
     } else {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        sig64C = (uint_fast64_t) sigC<<32;
+        sig64C = (uint64_t) sigC<<32;
         if ( expDiff < 0 ) {
             signZ = signC;
             expZ = expC;
@@ -170,7 +168,7 @@ float32_t
             if ( ! sig64Z ) goto completeCancellation;
             if ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
-                sig64Z = -sig64Z;
+                sig64Z = -(int64_t)sig64Z;
             }
         } else {
             expZ = expProd;
@@ -182,7 +180,7 @@ float32_t
         if ( shiftDist < 0 ) {
             sigZ = softfloat_shortShiftRightJam64( sig64Z, -shiftDist );
         } else {
-            sigZ = (uint_fast32_t) sig64Z<<shiftDist;
+            sigZ = (uint32_t) sig64Z<<shiftDist;
         }
     }
  roundPack:

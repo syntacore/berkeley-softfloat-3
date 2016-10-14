@@ -1,4 +1,6 @@
-
+/** @file
+@todo split into different SOFTFLOAT_FAST_INT64 cases
+*/
 /*============================================================================
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -34,10 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -53,11 +54,11 @@ void i64_to_extF80M( int64_t a, extFloat80_t *zPtr )
 void i64_to_extF80M( int64_t a, extFloat80_t *zPtr )
 {
     struct extFloat80M *zSPtr;
-    uint_fast16_t uiZ64;
+    uint16_t uiZ64;
     uint64_t sigZ;
     bool sign;
     uint64_t absA;
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
 
     /** @bug cast to same type */
     zSPtr = (struct extFloat80M *) zPtr;
@@ -65,7 +66,7 @@ void i64_to_extF80M( int64_t a, extFloat80_t *zPtr )
     sigZ = 0;
     if ( a ) {
         sign = (a < 0);
-        absA = sign ? -(uint64_t) a : (uint64_t) a;
+        absA = sign ? -a : a;
         shiftDist = softfloat_countLeadingZeros64( absA );
         uiZ64 = packToExtF80UI64( sign, 0x403E - shiftDist );
         sigZ = absA<<shiftDist;

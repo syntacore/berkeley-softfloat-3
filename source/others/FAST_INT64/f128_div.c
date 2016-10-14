@@ -44,26 +44,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t f128_div( float128_t a, float128_t b )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool signA;
-    int_fast32_t expA;
+    int32_t expA;
     struct uint128 sigA;
     union ui128_f128 uB;
-    uint_fast64_t uiB64, uiB0;
+    uint64_t uiB64, uiB0;
     bool signB;
-    int_fast32_t expB;
+    int32_t expB;
     struct uint128 sigB;
     bool signZ;
     struct exp32_sig128 normExpSig;
-    int_fast32_t expZ;
+    int32_t expZ;
     struct uint128 rem;
-    uint_fast32_t recip32;
+    uint32_t recip32;
     int ix;
-    uint_fast64_t q64;
-    uint_fast32_t q;
+    uint64_t q64;
+    uint32_t q;
     struct uint128 term;
-    uint_fast32_t qs[3];
-    uint_fast64_t sigZExtra;
+    uint32_t qs[3];
+    uint64_t sigZExtra;
     struct uint128 sigZ, uiZ;
     union ui128_f128 uZ;
 
@@ -129,7 +129,7 @@ float128_t f128_div( float128_t a, float128_t b )
     recip32 = softfloat_approxRecip32_1( sigB.v64>>17 );
     ix = 3;
     for (;;) {
-        q64 = (uint_fast64_t) (uint32_t) (rem.v64>>19) * recip32;
+        q64 = (uint64_t) (uint32_t) (rem.v64>>19) * recip32;
         q = (q64 + 0x80000000)>>32;
         --ix;
         if ( ix < 0 ) break;
@@ -159,11 +159,11 @@ float128_t f128_div( float128_t a, float128_t b )
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    sigZExtra = (uint64_t) ((uint_fast64_t) q<<60);
+    sigZExtra = (uint64_t) ((uint64_t) q<<60);
     term = softfloat_shortShiftLeft128( 0, qs[1], 54 );
     sigZ =
         softfloat_add128(
-            (uint_fast64_t) qs[2]<<19, ((uint_fast64_t) qs[0]<<25) + (q>>4),
+            (uint64_t) qs[2]<<19, ((uint64_t) qs[0]<<25) + (q>>4),
             term.v64, term.v0
         );
     return

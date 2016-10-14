@@ -45,25 +45,25 @@ extFloat80_t extF80_mul( extFloat80_t a, extFloat80_t b )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool signA;
-    int_fast32_t expA;
-    uint_fast64_t sigA;
+    int32_t expA;
+    uint64_t sigA;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uB;
-    uint_fast16_t uiB64;
-    uint_fast64_t uiB0;
+    uint16_t uiB64;
+    uint64_t uiB0;
     bool signB;
-    int_fast32_t expB;
-    uint_fast64_t sigB;
+    int32_t expB;
+    uint64_t sigB;
     bool signZ;
-    uint_fast64_t magBits;
+    uint64_t magBits;
     struct exp32_sig64 normExpSig;
-    int_fast32_t expZ;
+    int32_t expZ;
     struct uint128 sig128Z, uiZ;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 

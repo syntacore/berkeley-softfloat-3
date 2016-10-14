@@ -42,11 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     union ui32_f32 uB;
-    uint_fast32_t uiB;
+    uint32_t uiB;
     union ui32_f32 uC;
-    uint_fast32_t uiC;
+    uint32_t uiC;
 
     uA.f = a;
     uiA = uA.ui;

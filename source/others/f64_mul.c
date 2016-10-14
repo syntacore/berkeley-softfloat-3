@@ -44,25 +44,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t f64_mul( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast64_t sigA;
+    int16_t expA;
+    uint64_t sigA;
     union ui64_f64 uB;
-    uint_fast64_t uiB;
+    uint64_t uiB;
     bool signB;
-    int_fast16_t expB;
-    uint_fast64_t sigB;
+    int16_t expB;
+    uint64_t sigB;
     bool signZ;
-    uint_fast64_t magBits;
+    uint64_t magBits;
     struct exp16_sig64 normExpSig;
-    int_fast16_t expZ;
+    int16_t expZ;
 #ifdef SOFTFLOAT_FAST_INT64
     struct uint128 sig128Z;
 #else
     uint32_t sig128Z[4];
 #endif
-    uint_fast64_t sigZ, uiZ;
+    uint64_t sigZ, uiZ;
     union ui64_f64 uZ;
 
     /*------------------------------------------------------------------------

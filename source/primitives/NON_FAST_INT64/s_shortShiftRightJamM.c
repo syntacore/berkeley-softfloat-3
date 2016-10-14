@@ -42,13 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
  softfloat_shortShiftRightJamM(
-     uint_fast8_t size_words,
+     uint8_t size_words,
      const uint32_t *aPtr,
-     uint_fast8_t dist,
+     uint8_t dist,
      uint32_t *zPtr
  )
 {
-    uint_fast8_t uNegDist;
+    uint8_t uNegDist;
     unsigned int index, lastIndex;
     uint32_t partWordZ, wordA;
 

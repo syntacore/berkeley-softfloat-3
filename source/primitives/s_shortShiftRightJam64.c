@@ -34,17 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_SHORTSHIFTRIGHTJAM64
 
+#include "primitives/functions.h"
 
-#ifndef softfloat_shortShiftRightJam64
-
-uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
+uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint8_t dist )
 {
 
-    return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0);
+    return a>>dist | ((a & (((uint64_t) 1<<dist) - 1)) != 0);
 
 }
-
-#endif
 

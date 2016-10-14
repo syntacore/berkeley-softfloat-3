@@ -34,20 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
-
-#include "primitives/types.h"
-
-#ifndef softfloat_shiftRightJam128Extra
+#include "primitives/functions.h"
 
 struct uint128_extra
  softfloat_shiftRightJam128Extra(
-     uint64_t a64, uint64_t a0, uint64_t extra, uint_fast32_t dist )
+     uint64_t a64, uint64_t a0, uint64_t extra, uint32_t dist )
 {
-    uint_fast8_t u8NegDist;
     struct uint128_extra z;
 
-    u8NegDist = -dist;
+    uint8_t u8NegDist = -(int32_t)dist;
     if ( dist < 64 ) {
         z.v.v64 = a64>>dist;
         z.v.v0 = a64<<(u8NegDist & 63) | a0>>dist;
@@ -72,6 +67,3 @@ struct uint128_extra
     return z;
 
 }
-
-#endif
-

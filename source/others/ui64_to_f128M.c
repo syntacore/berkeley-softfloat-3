@@ -53,7 +53,7 @@ void ui64_to_f128M( uint64_t a, float128_t *zPtr )
 void ui64_to_f128M( uint64_t a, float128_t *zPtr )
 {
     uint32_t *zWPtr, uiZ96, uiZ64;
-    uint_fast8_t shiftDist;
+    uint8_t shiftDist;
     uint32_t *ptr;
 
     zWPtr = (uint32_t *) zPtr;

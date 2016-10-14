@@ -34,15 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_SHORTSHIFTLEFT64TO96M
 
-#include "primitives/types.h"
-
-#ifndef softfloat_shortShiftLeft64To96M
+#include "primitives/functions.h"
 
 void
  softfloat_shortShiftLeft64To96M(
-     uint64_t a, uint_fast8_t dist, uint32_t *zPtr )
+     uint64_t a, uint8_t dist, uint32_t *zPtr )
 {
 
     zPtr[indexWord( 3, 0 )] = (uint32_t) a<<dist;
@@ -51,6 +49,3 @@ void
     zPtr[indexWord( 3, 1 )] = a;
 
 }
-
-#endif
-

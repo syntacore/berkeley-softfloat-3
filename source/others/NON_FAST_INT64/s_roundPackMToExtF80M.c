@@ -45,12 +45,12 @@ void
      bool sign,
      int32_t exp,
      uint32_t *extSigPtr,
-     uint_fast8_t roundingPrecision,
+     uint8_t roundingPrecision,
     /** @bug use extFloat80_t */
     struct extFloat80M *zSPtr
  )
 {
-    uint_fast8_t roundingMode;
+    uint8_t roundingMode;
     bool roundNearEven;
     uint64_t sig, roundIncrement, roundMask, roundBits;
     bool isTiny;

@@ -42,13 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
  softfloat_normRoundPackToExtF80(
      bool sign,
-     int_fast32_t exp,
-     uint_fast64_t sig,
-     uint_fast64_t sigExtra,
-     uint_fast8_t roundingPrecision
+     int32_t exp,
+     uint64_t sig,
+     uint64_t sigExtra,
+     uint8_t roundingPrecision
  )
 {
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     struct uint128 sig128;
 
     if ( ! sig ) {

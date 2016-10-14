@@ -45,21 +45,21 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool signA;
-    int_fast32_t expA;
-    uint_fast64_t sigA;
+    int32_t expA;
+    uint64_t sigA;
     struct uint128 uiZ;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
     struct exp32_sig64 normExpSig;
-    int_fast32_t expZ;
-    uint_fast32_t sig32A, recipSqrt32, sig32Z;
+    int32_t expZ;
+    uint32_t sig32A, recipSqrt32, sig32Z;
     struct uint128 rem;
-    uint_fast64_t q, sigZ, x64;
+    uint64_t q, sigZ, x64;
     struct uint128 term;
-    uint_fast64_t sigZExtra;
+    uint64_t sigZExtra;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
@@ -107,35 +107,35 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     expA &= 1;
     sig32A = sigA>>32;
     recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
-    sig32Z = ((uint_fast64_t) sig32A * recipSqrt32)>>32;
+    sig32Z = ((uint64_t) sig32A * recipSqrt32)>>32;
     if ( expA ) {
         sig32Z >>= 1;
         rem = softfloat_shortShiftLeft128( 0, sigA, 61 );
     } else {
         rem = softfloat_shortShiftLeft128( 0, sigA, 62 );
     }
-    rem.v64 -= (uint_fast64_t) sig32Z * sig32Z;
+    rem.v64 -= (uint64_t) sig32Z * sig32Z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    q = ((uint32_t) (rem.v64>>2) * (uint_fast64_t) recipSqrt32)>>32;
-    sigZ = ((uint_fast64_t) sig32Z<<32) + (q<<3);
-    x64 = ((uint_fast64_t) sig32Z<<32) + sigZ;
+    q = ((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32;
+    sigZ = ((uint64_t) sig32Z<<32) + (q<<3);
+    x64 = ((uint64_t) sig32Z<<32) + sigZ;
     term = softfloat_mul64ByShifted32To128( x64, q );
     rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
     rem = softfloat_sub128( rem.v64, rem.v0, term.v64, term.v0 );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    q = (((uint32_t) (rem.v64>>2) * (uint_fast64_t) recipSqrt32)>>32) + 2;
+    q = (((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32) + 2;
     x64 = sigZ;
     sigZ = (sigZ<<1) + (q>>25);
     sigZExtra = (uint64_t) (q<<39);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     if ( (q & 0xFFFFFF) <= 2 ) {
-        q &= ~(uint_fast64_t) 0xFFFF;
+        q &= ~(uint64_t) 0xFFFF;
         sigZExtra = (uint64_t) (q<<39);
         term = softfloat_mul64ByShifted32To128( x64 + (q>>27), q );
-        x64 = (uint32_t) (q<<5) * (uint_fast64_t) (uint32_t) q;
+        x64 = (uint32_t) (q<<5) * (uint64_t) (uint32_t) q;
         term = softfloat_add128( term.v64, term.v0, 0, x64 );
         rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 28 );
         rem = softfloat_sub128( rem.v64, rem.v0, term.v64, term.v0 );

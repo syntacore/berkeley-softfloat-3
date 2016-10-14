@@ -43,15 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t f128_add( float128_t a, float128_t b )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool signA;
     union ui128_f128 uB;
-    uint_fast64_t uiB64, uiB0;
+    uint64_t uiB64, uiB0;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     float128_t
         (*magsFuncPtr)(
-            uint_fast64_t, uint_fast64_t, uint_fast64_t, uint_fast64_t, bool );
+            uint64_t, uint64_t, uint64_t, uint64_t, bool );
 #endif
 
     uA.f = a;

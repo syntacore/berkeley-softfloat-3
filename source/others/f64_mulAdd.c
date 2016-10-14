@@ -42,11 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     union ui64_f64 uB;
-    uint_fast64_t uiB;
+    uint64_t uiB;
     union ui64_f64 uC;
-    uint_fast64_t uiC;
+    uint64_t uiC;
 
     uA.f = a;
     uiA = uA.ui;

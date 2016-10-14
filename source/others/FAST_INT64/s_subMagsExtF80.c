@@ -43,22 +43,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extFloat80_t
  softfloat_subMagsExtF80(
-     uint_fast16_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast16_t uiB64,
-     uint_fast64_t uiB0,
+     uint16_t uiA64,
+     uint64_t uiA0,
+     uint16_t uiB64,
+     uint64_t uiB0,
      bool signZ
  )
 {
-    int_fast32_t expA;
-    uint_fast64_t sigA;
-    int_fast32_t expB;
-    uint_fast64_t sigB;
-    int_fast32_t expDiff;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
-    int_fast32_t expZ;
-    uint_fast64_t sigExtra;
+    int32_t expA;
+    uint64_t sigA;
+    int32_t expB;
+    uint64_t sigB;
+    int32_t expDiff;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
+    int32_t expZ;
+    uint64_t sigExtra;
     struct uint128 sig128, uiZ;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;

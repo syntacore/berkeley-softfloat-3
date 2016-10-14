@@ -44,16 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
  softfloat_shiftRightM(
-     uint_fast8_t size_words,
+     uint8_t size_words,
      const uint32_t *aPtr,
      uint32_t dist,
      uint32_t *zPtr
  )
 {
     uint32_t wordDist;
-    uint_fast8_t innerDist;
+    uint8_t innerDist;
     uint32_t *destPtr;
-    uint_fast8_t i;
+    uint8_t i;
 
     wordDist = dist>>5;
     if ( wordDist < size_words ) {

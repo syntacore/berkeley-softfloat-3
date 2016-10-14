@@ -44,7 +44,7 @@ int
  softfloat_compareNonnormExtF80M(
      const struct extFloat80M *aSPtr, const struct extFloat80M *bSPtr )
 {
-    uint_fast16_t uiA64, uiB64;
+    uint16_t uiA64, uiB64;
     uint64_t sigA;
     bool signB;
     uint64_t sigB;

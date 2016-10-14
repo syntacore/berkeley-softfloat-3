@@ -47,38 +47,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast16_t
- softfloat_propagateNaNF16UI( uint_fast16_t uiA, uint_fast16_t uiB )
+uint16_t
+softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
 {
-    bool isSigNaNA, isSigNaNB;
-    uint_fast16_t uiNonsigA, uiNonsigB, uiMagA, uiMagB;
+    bool const isSigNaNA = softfloat_isSigNaNF16UI(uiA);
+    bool const isSigNaNB = softfloat_isSigNaNF16UI(uiB);
+    /* Make NaNs non-signaling.*/
+    uint16_t const uiNonsigA = uiA | 0x0200;
+    uint16_t const uiNonsigB = uiB | 0x0200;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    isSigNaNA = softfloat_isSigNaNF16UI( uiA );
-    isSigNaNB = softfloat_isSigNaNF16UI( uiB );
-    /*------------------------------------------------------------------------
-    | Make NaNs non-signaling.
-    *------------------------------------------------------------------------*/
-    uiNonsigA = uiA | 0x0200;
-    uiNonsigB = uiB | 0x0200;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( isSigNaNA | isSigNaNB ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) {
-            if ( isSigNaNB ) goto returnLargerMag;
-            return isNaNF16UI( uiB ) ? uiNonsigB : uiNonsigA;
+    if (isSigNaNA | isSigNaNB) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) {
+            if (!isSigNaNB) {
+                return isNaNF16UI(uiB) ? uiNonsigB : uiNonsigA;
+            }
         } else {
-            return isNaNF16UI( uiA ) ? uiNonsigA : uiNonsigB;
+            return isNaNF16UI(uiA) ? uiNonsigA : uiNonsigB;
         }
     }
- returnLargerMag:
-    uiMagA = uiNonsigA & 0x7FFF;
-    uiMagB = uiNonsigB & 0x7FFF;
-    if ( uiMagA < uiMagB ) return uiNonsigB;
-    if ( uiMagB < uiMagA ) return uiNonsigA;
-    return (uiNonsigA < uiNonsigB) ? uiNonsigA : uiNonsigB;
-
+    {
+        uint16_t const uiMagA = uiNonsigA & 0x7FFF;
+        uint16_t const uiMagB = uiNonsigB & 0x7FFF;
+        return
+            uiMagA < uiMagB ? uiNonsigB :
+            uiMagB < uiMagA ? uiNonsigA :
+            uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
+    }
 }
-

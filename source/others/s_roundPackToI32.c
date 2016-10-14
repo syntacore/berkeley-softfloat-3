@@ -41,15 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-int_fast32_t
+int32_t
  softfloat_roundPackToI32(
-     bool sign, uint_fast64_t sig, uint_fast8_t roundingMode, bool exact )
+     bool sign, uint64_t sig, uint8_t roundingMode, bool exact )
 {
     bool roundNearEven;
-    uint_fast16_t roundIncrement, roundBits;
-    uint_fast32_t sig32;
+    uint16_t roundIncrement, roundBits;
+    uint32_t sig32;
     union { uint32_t ui; int32_t i; } uZ;
-    int_fast32_t z;
+    int32_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
@@ -66,8 +66,8 @@ int_fast32_t
     sig += roundIncrement;
     if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
     sig32 = sig>>12;
-    sig32 &= ~(uint_fast32_t) (! (roundBits ^ 0x800) & roundNearEven);
-    uZ.ui = sign ? -(int_fast32_t)sig32 : sig32;
+    sig32 &= ~(uint32_t) (! (roundBits ^ 0x800) & roundNearEven);
+    uZ.ui = sign ? -(int32_t)sig32 : sig32;
     z = uZ.i;
     if ( z && ((z < 0) ^ sign) ) goto invalid;
     if ( exact && roundBits ) {

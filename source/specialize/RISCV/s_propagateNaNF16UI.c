@@ -45,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast16_t
- softfloat_propagateNaNF16UI( uint_fast16_t uiA, uint_fast16_t uiB )
+uint16_t
+ softfloat_propagateNaNF16UI( uint16_t uiA, uint16_t uiB )
 {
 
     if ( softfloat_isSigNaNF16UI( uiA ) || softfloat_isSigNaNF16UI( uiB ) ) {

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-static THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags = 0;
+static THREAD_LOCAL uint8_t softfloat_exceptionFlags = 0;
 
 /*----------------------------------------------------------------------------
 | Raises the exceptions specified by `flags'.  Floating-point traps can be
@@ -45,7 +45,7 @@ static THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags = 0;
 | to substitute a result value.  If traps are not implemented, this routine
 | should be simply `softfloat_exceptionFlags |= flags;'.
 *----------------------------------------------------------------------------*/
-void softfloat_raiseFlags( uint_fast8_t flags )
+void softfloat_raiseFlags( uint8_t flags )
 {
     softfloat_exceptionFlags |= flags;
 }
@@ -56,7 +56,7 @@ softfloat_clearFlags(void)
     softfloat_exceptionFlags = 0;
 }
 
-uint_fast8_t softfloat_getFlags(void)
+uint8_t softfloat_getFlags(void)
 {
     return softfloat_exceptionFlags;
 }

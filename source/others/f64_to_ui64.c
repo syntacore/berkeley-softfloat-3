@@ -41,14 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-uint_fast64_t f64_to_ui64( float64_t a, uint_fast8_t roundingMode, bool exact )
+uint64_t f64_to_ui64( float64_t a, uint8_t roundingMode, bool exact )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     bool sign;
-    int_fast16_t exp;
-    uint_fast64_t sig;
-    int_fast16_t shiftDist;
+    int16_t exp;
+    uint64_t sig;
+    int16_t shiftDist;
 #ifdef SOFTFLOAT_FAST_INT64
     struct uint64_extra sigExtra;
 #else

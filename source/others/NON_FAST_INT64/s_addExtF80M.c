@@ -62,7 +62,7 @@ void
     uint64_t sigZ, sigB;
     void
      (*roundPackRoutinePtr)(
-         bool, int32_t, uint32_t *, uint_fast8_t, struct extFloat80M * /** @bug use extFloat80_t */
+         bool, int32_t, uint32_t *, uint8_t, struct extFloat80M * /** @bug use extFloat80_t */
         );
     int32_t expDiff;
     uint32_t extSigX[3], sigZExtra;
@@ -86,7 +86,7 @@ void
             }
         }
         zSPtr->signExp = uiZ64;
-        zSPtr->signif = UINT64_C( 0x8000000000000000 );
+        zSPtr->signif = (uint64_t)INT64_MIN;
         return;
     }
     /*------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void
             sigZExtra = extSigX[indexWordLo( 3 )];
             if ( sigZExtra ) {
                 --sigZ;
-                sigZExtra = -sigZExtra;
+                sigZExtra = -(int32_t)sigZExtra;
             }
             if ( ! (sigZ & UINT64_C( 0x8000000000000000 )) ) {
                 if ( sigZ & UINT64_C( 0x4000000000000000 ) ) {

@@ -41,9 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-int_fast64_t
+int64_t
  softfloat_roundPackMToI64(
-     bool sign, uint32_t *extSigPtr, uint_fast8_t roundingMode, bool exact )
+     bool sign, uint32_t *extSigPtr, uint8_t roundingMode, bool exact )
 {
     bool roundNearEven;
     uint32_t sigExtra;

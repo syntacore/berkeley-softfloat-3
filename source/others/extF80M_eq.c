@@ -55,9 +55,9 @@ bool extF80M_eq( const extFloat80_t *aPtr, const extFloat80_t *bPtr )
 bool extF80M_eq( const extFloat80_t *aPtr, const extFloat80_t *bPtr )
 {
     const struct extFloat80M *aSPtr, *bSPtr;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     uint64_t uiA0;
-    uint_fast16_t uiB64;
+    uint16_t uiB64;
     uint64_t uiB0;
 
     /*------------------------------------------------------------------------

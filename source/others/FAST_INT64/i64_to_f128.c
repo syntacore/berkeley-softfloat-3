@@ -34,39 +34,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
-
-#include "internals.h"
 #include "softfloat/functions.h"
 
-float128_t i64_to_f128( int64_t a )
+#include "internals.h"
+
+float128_t i64_to_f128(int64_t a)
 {
-    uint_fast64_t uiZ64, uiZ0;
-    bool sign;
-    uint_fast64_t absA;
-    int_fast8_t shiftDist;
-    struct uint128 zSig;
+    uint64_t uiZ64, uiZ0;
     union ui128_f128 uZ;
 
-    if ( ! a ) {
+    if (!a) {
         uiZ64 = 0;
-        uiZ0  = 0;
+        uiZ0 = 0;
     } else {
-        sign = (a < 0);
-        absA = sign ? -(uint_fast64_t) a : (uint_fast64_t) a;
-        shiftDist = softfloat_countLeadingZeros64( absA ) + 49;
-        if ( 64 <= shiftDist ) {
-            zSig.v64 = absA<<(shiftDist - 64);
-            zSig.v0  = 0;
+        bool const sign = (a < 0);
+        /** @bug for INT64_MIN */
+        uint64_t absA = sign ? -a : a;
+        int8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 49;
+        struct uint128 zSig;
+        if (64 <= shiftDist) {
+            zSig.v64 = absA << (shiftDist - 64);
+            zSig.v0 = 0;
         } else {
-            zSig = softfloat_shortShiftLeft128( 0, absA, shiftDist );
+            zSig = softfloat_shortShiftLeft128(0, absA, shiftDist);
         }
-        uiZ64 = packToF128UI64( sign, 0x406E - shiftDist, zSig.v64 );
-        uiZ0  = zSig.v0;
+        uiZ64 = packToF128UI64(sign, 0x406E - shiftDist, zSig.v64);
+        uiZ0 = zSig.v0;
     }
     uZ.ui.v64 = uiZ64;
-    uZ.ui.v0  = uiZ0;
+    uZ.ui.v0 = uiZ0;
     return uZ.f;
-
 }
 

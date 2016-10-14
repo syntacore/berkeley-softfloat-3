@@ -34,26 +34,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
-#include "softfloat/functions.h"
 
 extFloat80_t i64_to_extF80( int64_t a )
 {
-    uint_fast16_t uiZ64;
-    uint_fast64_t absA;
-    bool sign;
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
-    uiZ64 = 0;
-    absA = 0;
+    uint16_t uiZ64 = 0;
+    uint64_t absA = 0;
     if ( a ) {
-        sign = (a < 0);
-        absA = sign ? -(uint_fast64_t) a : (uint_fast64_t) a;
+        bool const sign = (a < 0);
+        /** @bug for INT64_MIN */
+        absA = sign ? -a : a;
         shiftDist = softfloat_countLeadingZeros64( absA );
         uiZ64 = packToExtF80UI64( sign, 0x403E - shiftDist );
         absA <<= shiftDist;
@@ -61,6 +57,4 @@ extFloat80_t i64_to_extF80( int64_t a )
     uZ.s.signExp = uiZ64;
     uZ.s.signif  = absA;
     return uZ.f;
-
 }
-

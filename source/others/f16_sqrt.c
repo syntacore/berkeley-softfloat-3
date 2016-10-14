@@ -47,17 +47,17 @@ extern const uint16_t softfloat_approxRecipSqrt_1k1s[];
 float16_t f16_sqrt( float16_t a )
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     bool signA;
-    int_fast8_t expA;
-    uint_fast16_t sigA, uiZ;
+    int8_t expA;
+    uint16_t sigA, uiZ;
     struct exp8_sig16 normExpSig;
-    int_fast8_t expZ;
+    int8_t expZ;
     int index;
-    uint_fast16_t r0;
-    uint_fast32_t ESqrR0;
+    uint16_t r0;
+    uint32_t ESqrR0;
     uint16_t sigma0;
-    uint_fast16_t recipSqrt16, sigZ, shiftedSigZ;
+    uint16_t recipSqrt16, sigZ, shiftedSigZ;
     uint16_t negRem;
     union ui16_f16 uZ;
 
@@ -99,15 +99,15 @@ float16_t f16_sqrt( float16_t a )
     sigA |= 0x0400;
     index = (sigA>>6 & 0xE) + expA;
     r0 = softfloat_approxRecipSqrt_1k0s[index]
-             - (((uint_fast32_t) softfloat_approxRecipSqrt_1k1s[index]
+             - (((uint32_t) softfloat_approxRecipSqrt_1k1s[index]
                      * (sigA & 0x7F))
                     >>11);
-    ESqrR0 = ((uint_fast32_t) r0 * r0)>>1;
+    ESqrR0 = ((uint32_t) r0 * r0)>>1;
     if ( expA ) ESqrR0 >>= 1;
-    sigma0 = ~(uint_fast16_t) ((ESqrR0 * sigA)>>16);
-    recipSqrt16 = r0 + (((uint_fast32_t) r0 * sigma0)>>25);
+    sigma0 = ~(uint16_t) ((ESqrR0 * sigA)>>16);
+    recipSqrt16 = r0 + (((uint32_t) r0 * sigma0)>>25);
     if ( ! (recipSqrt16 & 0x8000) ) recipSqrt16 = 0x8000;
-    sigZ = ((uint_fast32_t) (sigA<<5) * recipSqrt16)>>16;
+    sigZ = ((uint32_t) (sigA<<5) * recipSqrt16)>>16;
     if ( expA ) sigZ >>= 1;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

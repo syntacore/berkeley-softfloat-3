@@ -44,20 +44,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t f32_rem( float32_t a, float32_t b )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast32_t sigA;
+    int16_t expA;
+    uint32_t sigA;
     union ui32_f32 uB;
-    uint_fast32_t uiB;
-    int_fast16_t expB;
-    uint_fast32_t sigB;
+    uint32_t uiB;
+    int16_t expB;
+    uint32_t sigB;
     struct exp16_sig32 normExpSig;
     uint32_t rem;
-    int_fast16_t expDiff;
+    int16_t expDiff;
     uint32_t q, recip32, altRem, meanRem;
     bool signRem;
-    uint_fast32_t uiZ;
+    uint32_t uiZ;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------
@@ -126,9 +126,9 @@ float32_t f32_rem( float32_t a, float32_t b )
         *--------------------------------------------------------------------*/
         sigB <<= 6;
         for (;;) {
-            q = (rem * (uint_fast64_t) recip32)>>32;
+            q = (rem * (uint64_t) recip32)>>32;
             if ( expDiff < 0 ) break;
-            rem = -(q * (uint32_t) sigB);
+            rem = -(int32_t)(q * sigB);
             expDiff -= 29;
         }
         /*--------------------------------------------------------------------
@@ -149,7 +149,7 @@ float32_t f32_rem( float32_t a, float32_t b )
     signRem = signA;
     if ( 0x80000000 <= rem ) {
         signRem = ! signRem;
-        rem = -rem;
+        rem = -(int32_t)rem;
     }
     return softfloat_normRoundPackToF32( signRem, expB, rem );
     /*------------------------------------------------------------------------

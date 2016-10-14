@@ -58,16 +58,16 @@ void
     const uint32_t *tempPtr;
     uint32_t sig96A, sig96B;
     int32_t expDiff;
-    uint_fast8_t
+    uint8_t
      (*addCarryMRoutinePtr)(
-         uint_fast8_t,
+         uint8_t,
          const uint32_t *,
          const uint32_t *,
-         uint_fast8_t,
+         uint8_t,
          uint32_t *
      );
     uint32_t extSigZ[5], wordSigZ;
-    uint_fast8_t carry;
+    uint8_t carry;
     void (*roundPackRoutinePtr)( bool, int32_t, uint32_t *, uint32_t * );
 
     /*------------------------------------------------------------------------
@@ -138,7 +138,7 @@ void
         if ( negateB ) {
             sig96B = ~sig96B;
             wordSigZ = extSigZ[indexWordLo( 5 )];
-            extSigZ[indexWordLo( 5 )] = -wordSigZ;
+            extSigZ[indexWordLo( 5 )] = -(int32_t)wordSigZ;
             carry = ! wordSigZ;
         }
         carry =

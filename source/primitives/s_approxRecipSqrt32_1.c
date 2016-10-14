@@ -34,40 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#include "primitives/functions.h"
 
-
-#ifndef softfloat_approxRecipSqrt32_1
-
-extern const uint16_t softfloat_approxRecipSqrt_1k0s[];
-extern const uint16_t softfloat_approxRecipSqrt_1k1s[];
-
-uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a )
+uint32_t softfloat_approxRecipSqrt32_1(unsigned oddExpA, uint32_t a)
 {
-    int index;
-    uint16_t eps, r0;
-    uint_fast32_t ESqrR0;
-    uint32_t sigma0;
-    uint_fast32_t r;
-    uint32_t sqrSigma0;
-
-    index = (a>>27 & 0xE) + oddExpA;
-    eps = (uint16_t) (a>>12);
-    r0 = softfloat_approxRecipSqrt_1k0s[index]
-             - ((softfloat_approxRecipSqrt_1k1s[index] * (uint_fast32_t) eps)
-                    >>20);
-    ESqrR0 = (uint_fast32_t) r0 * r0;
-    if ( ! oddExpA ) ESqrR0 <<= 1;
-    sigma0 = ~(uint_fast32_t) (((uint32_t) ESqrR0 * (uint_fast64_t) a)>>23);
-    r = ((uint_fast32_t) r0<<16) + ((r0 * (uint_fast64_t) sigma0)>>25);
-    sqrSigma0 = ((uint_fast64_t) sigma0 * sigma0)>>32;
-    r += ((uint32_t) ((r>>1) + (r>>3) - ((uint_fast32_t) r0<<14))
-              * (uint_fast64_t) sqrSigma0)
-             >>48;
-    if ( ! (r & 0x80000000) ) r = 0x80000000;
-    return r;
-
+    int const index = (a >> 27 & 0xE) + oddExpA;
+    uint16_t const eps = a >> 12;
+    uint16_t const r0 =
+        softfloat_approxRecipSqrt_1k0s[index] -
+        ((softfloat_approxRecipSqrt_1k1s[index] * (uint32_t)eps) >> 20);
+    uint32_t ESqrR0 = ((uint32_t)r0 * r0) << (!oddExpA ? 1 : 0);
+    uint32_t const sigma0 = ~(uint32_t)(((uint32_t)ESqrR0 * (uint64_t)a) >> 23);
+    uint32_t r =
+        ((uint32_t)r0 << 16) +
+        ((r0 * (uint64_t)sigma0) >> 25);
+    uint32_t const sqrSigma0 = ((uint64_t)sigma0 * sigma0) >> 32;
+    r += ((uint32_t)((r >> 1) + (r >> 3) - ((uint32_t)r0 << 14)) * (uint64_t)sqrSigma0) >> 48;
+    return !(r & 0x80000000) ? 0x80000000 : r;
 }
-
-#endif
-

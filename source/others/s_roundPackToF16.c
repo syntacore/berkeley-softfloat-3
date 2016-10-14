@@ -34,58 +34,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "internals.h"
+
 #include "softfloat/functions.h"
 
 float16_t
- softfloat_roundPackToF16( bool sign, int_fast16_t exp, uint_fast16_t sig )
+softfloat_roundPackToF16(bool sign, int16_t exp, uint16_t sig)
 {
-    uint_fast8_t roundingMode;
-    bool roundNearEven;
-    uint_fast8_t roundIncrement, roundBits;
-    bool isTiny;
-    uint_fast16_t uiZ;
+    uint8_t roundBits;
+    uint16_t uiZ;
     union ui16_f16 uZ;
 
-    roundingMode = softfloat_roundingMode;
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    roundIncrement = 0x8;
-    if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
+    uint8_t const roundingMode = softfloat_roundingMode;
+    bool const roundNearEven = roundingMode == softfloat_round_near_even;
+    uint8_t roundIncrement = 0x8;
+    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
         roundIncrement =
-            (roundingMode
-                 == (sign ? softfloat_round_min : softfloat_round_max))
-                ? 0xF
-                : 0;
+            roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0xF : 0;
     }
     roundBits = sig & 0xF;
-    if ( 0x1D <= (unsigned int) exp ) {
-        if ( exp < 0 ) {
-            isTiny =
-                (softfloat_detectTininess == softfloat_tininess_beforeRounding)
-                    || (exp < -1) || (sig + roundIncrement < 0x8000);
-            sig = softfloat_shiftRightJam32( sig, -exp );
+    if (0x1D <= (unsigned int)exp) {
+        if (exp < 0) {
+            bool const isTiny =
+                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
+                exp < -1 ||
+                sig + roundIncrement < 0x8000;
+            sig = softfloat_shiftRightJam32(sig, -exp);
             exp = 0;
             roundBits = sig & 0xF;
-            if ( isTiny && roundBits ) {
-                softfloat_raiseFlags( softfloat_flag_underflow );
+            if (isTiny && roundBits) {
+                softfloat_raiseFlags(softfloat_flag_underflow);
             }
-        } else if ( (0x1D < exp) || (0x8000 <= sig + roundIncrement) ) {
+        } else if ((0x1D < exp) || (0x8000 <= sig + roundIncrement)) {
             softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact );
-            uiZ = packToF16UI( sign, 0x1F, 0 ) - ! roundIncrement;
+                softfloat_flag_overflow | softfloat_flag_inexact);
+            uiZ = packToF16UI(sign, 0x1F, 0) - !roundIncrement;
             goto uiZ;
         }
     }
-    if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
-    sig = (sig + roundIncrement)>>4;
-    sig &= ~(uint_fast16_t) (! (roundBits ^ 8) & roundNearEven);
-    uiZ = packToF16UI( sign, sig ? exp : 0, sig );
- uiZ:
+    if (roundBits) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+    sig = (sig + roundIncrement) >> 4;
+    sig &= ~(uint16_t)(!(roundBits ^ 8) & roundNearEven);
+    uiZ = packToF16UI(sign, sig ? exp : 0, sig);
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
-
 }
-

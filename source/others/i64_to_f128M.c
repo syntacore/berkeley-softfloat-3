@@ -1,3 +1,6 @@
+/** @file
+@todo split into different SOFTFLOAT_FAST_INT64 cases
+*/
 
 /*============================================================================
 
@@ -34,59 +37,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
-#include "softfloat/functions.h"
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-void i64_to_f128M( int64_t a, float128_t *zPtr )
+void i64_to_f128M(int64_t a, float128_t *zPtr)
 {
-
-    *zPtr = i64_to_f128( a );
-
+    *zPtr = i64_to_f128(a);
 }
 
 #else
 
-void i64_to_f128M( int64_t a, float128_t *zPtr )
+void i64_to_f128M(int64_t a, float128_t *zPtr)
 {
-    uint32_t *zWPtr;
-    uint32_t uiZ96, uiZ64;
-    bool sign;
-    uint64_t absA;
-    uint_fast8_t shiftDist;
-    uint32_t *ptr;
-
-    zWPtr = (uint32_t *) zPtr;
-    uiZ96 = 0;
-    uiZ64 = 0;
-    zWPtr[indexWord( 4, 1 )] = 0;
-    zWPtr[indexWord( 4, 0 )] = 0;
-    if ( a ) {
-        sign = (a < 0);
-        absA = sign ? -(uint64_t) a : (uint64_t) a;
-        shiftDist = softfloat_countLeadingZeros64( absA ) + 17;
-        if ( shiftDist < 32 ) {
-            ptr = zWPtr + indexMultiwordHi( 4, 3 );
-            ptr[indexWord( 3, 2 )] = 0;
-            ptr[indexWord( 3, 1 )] = absA>>32;
-            ptr[indexWord( 3, 0 )] = absA;
-            softfloat_shortShiftLeft96M( ptr, shiftDist, ptr );
-            ptr[indexWordHi( 3 )] =
-                packToF128UI96(
-                    sign, 0x404E - shiftDist, ptr[indexWordHi( 3 )] );
+    uint32_t *zWPtr = (uint32_t *)zPtr;
+    uint32_t uiZ96 = 0;
+    uint32_t uiZ64 = 0;
+    zWPtr[indexWord(4, 1)] = 0;
+    zWPtr[indexWord(4, 0)] = 0;
+    if (a) {
+        bool const sign = (a < 0);
+        /** @bug INT64_MIN */
+        uint64_t absA = sign ? -a : a;
+        uint8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 17;
+        if (shiftDist < 32) {
+            uint32_t *const ptr = zWPtr + indexMultiwordHi(4, 3);
+            ptr[indexWord(3, 2)] = 0;
+            ptr[indexWord(3, 1)] = absA >> 32;
+            ptr[indexWord(3, 0)] = absA;
+            softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
+            ptr[indexWordHi(3)] =
+                packToF128UI96(sign, 0x404E - shiftDist, ptr[indexWordHi(3)]);
             return;
+        } else {
+            absA <<= shiftDist - 32;
+            uiZ96 = packToF128UI96(sign, 0x404E - shiftDist, absA >> 32);
+            uiZ64 = absA;
         }
-        absA <<= shiftDist - 32;
-        uiZ96 = packToF128UI96( sign, 0x404E - shiftDist, absA>>32 );
-        uiZ64 = absA;
     }
-    zWPtr[indexWord( 4, 3 )] = uiZ96;
-    zWPtr[indexWord( 4, 2 )] = uiZ64;
-
+    zWPtr[indexWord(4, 3)] = uiZ96;
+    zWPtr[indexWord(4, 2)] = uiZ64;
 }
 
 #endif
-

@@ -44,12 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t f128_to_f16( float128_t a )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool sign;
-    int_fast32_t exp;
-    uint_fast64_t frac64;
+    int32_t exp;
+    uint64_t frac64;
     struct commonNaN commonNaN;
-    uint_fast16_t uiZ, frac16;
+    uint16_t uiZ, frac16;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------
@@ -73,7 +73,7 @@ float16_t f128_to_f16( float128_t a )
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    frac16 = softfloat_shortShiftRightJam64( frac64, 34 );
+    frac16 = (uint16_t)softfloat_shortShiftRightJam64( frac64, 34 );
     if ( ! (exp | frac16) ) {
         uiZ = packToF16UI( sign, 0, 0 );
         goto uiZ;
@@ -81,7 +81,7 @@ float16_t f128_to_f16( float128_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     exp -= 0x3FF1;
-    if ( sizeof (int_fast16_t) < sizeof exp) {
+    if ( sizeof (int16_t) < sizeof exp) {
         if ( exp < -0x40 ) exp = -0x40;
     }
     return softfloat_roundPackToF16( sign, exp, frac16 | 0x4000 );

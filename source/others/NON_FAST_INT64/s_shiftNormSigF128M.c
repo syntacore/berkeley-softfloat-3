@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int
  softfloat_shiftNormSigF128M(
-     const uint32_t *wPtr, uint_fast8_t shiftDist, uint32_t *sigPtr )
+     const uint32_t *wPtr, uint8_t shiftDist, uint32_t *sigPtr )
 {
     uint32_t wordSig;
     int32_t exp;

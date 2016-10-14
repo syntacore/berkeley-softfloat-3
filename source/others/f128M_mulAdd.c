@@ -50,9 +50,9 @@ void
  )
 {
     const uint64_t *aWPtr, *bWPtr, *cWPtr;
-    uint_fast64_t uiA64, uiA0;
-    uint_fast64_t uiB64, uiB0;
-    uint_fast64_t uiC64, uiC0;
+    uint64_t uiA64, uiA0;
+    uint64_t uiB64, uiB0;
+    uint64_t uiC64, uiC0;
 
     aWPtr = (const uint64_t *) aPtr;
     bWPtr = (const uint64_t *) bPtr;

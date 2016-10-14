@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool f64_eq( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     union ui64_f64 uB;
-    uint_fast64_t uiB;
+    uint64_t uiB;
 
     uA.f = a;
     uiA = uA.ui;

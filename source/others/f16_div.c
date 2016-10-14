@@ -47,27 +47,27 @@ extern const uint16_t softfloat_approxRecip_1k1s[];
 float16_t f16_div( float16_t a, float16_t b )
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     bool signA;
-    int_fast8_t expA;
-    uint_fast16_t sigA;
+    int8_t expA;
+    uint16_t sigA;
     union ui16_f16 uB;
-    uint_fast16_t uiB;
+    uint16_t uiB;
     bool signB;
-    int_fast8_t expB;
-    uint_fast16_t sigB;
+    int8_t expB;
+    uint16_t sigB;
     bool signZ;
     struct exp8_sig16 normExpSig;
-    int_fast8_t expZ;
+    int8_t expZ;
 #ifdef SOFTFLOAT_FAST_DIV32TO16
-    uint_fast32_t sig32A;
-    uint_fast16_t sigZ;
+    uint32_t sig32A;
+    uint16_t sigZ;
 #else
     int index;
     uint16_t r0;
-    uint_fast16_t sigZ, rem;
+    uint16_t sigZ, rem;
 #endif
-    uint_fast16_t uiZ;
+    uint16_t uiZ;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------
@@ -123,12 +123,12 @@ float16_t f16_div( float16_t a, float16_t b )
 #ifdef SOFTFLOAT_FAST_DIV32TO16
     if ( sigA < sigB ) {
         --expZ;
-        sig32A = (uint_fast32_t) sigA<<15;
+        sig32A = (uint32_t) sigA<<15;
     } else {
-        sig32A = (uint_fast32_t) sigA<<14;
+        sig32A = (uint32_t) sigA<<14;
     }
     sigZ = sig32A / sigB;
-    if ( ! (sigZ & 7) ) sigZ |= ((uint_fast32_t) sigB * sigZ != sig32A);
+    if ( ! (sigZ & 7) ) sigZ |= ((uint32_t) sigB * sigZ != sig32A);
 #else
     if ( sigA < sigB ) {
         --expZ;
@@ -138,12 +138,12 @@ float16_t f16_div( float16_t a, float16_t b )
     }
     index = sigB>>6 & 0xF;
     r0 = softfloat_approxRecip_1k0s[index]
-             - (((uint_fast32_t) softfloat_approxRecip_1k1s[index]
+             - (((uint32_t) softfloat_approxRecip_1k1s[index]
                      * (sigB & 0x3F))
                     >>10);
-    sigZ = ((uint_fast32_t) sigA * r0)>>16;
+    sigZ = ((uint32_t) sigA * r0)>>16;
     rem = (sigA<<10) - sigZ * sigB;
-    sigZ += (rem * (uint_fast32_t) r0)>>26;
+    sigZ += (rem * (uint32_t) r0)>>26;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     ++sigZ;

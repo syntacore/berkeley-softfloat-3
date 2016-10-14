@@ -44,18 +44,18 @@ extFloat80_t extF80_add( extFloat80_t a, extFloat80_t b )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool signA;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uB;
-    uint_fast16_t uiB64;
-    uint_fast64_t uiB0;
+    uint16_t uiB64;
+    uint64_t uiB0;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     extFloat80_t
         (*magsFuncPtr)(
-            uint_fast16_t, uint_fast64_t, uint_fast16_t, uint_fast64_t, bool );
+            uint16_t, uint64_t, uint16_t, uint64_t, bool );
 #endif
 
     uA.f = a;

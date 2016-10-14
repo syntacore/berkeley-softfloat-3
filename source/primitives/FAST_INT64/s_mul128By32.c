@@ -34,25 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_MUL128BY32
 
-#include "primitives/types.h"
-
-#ifndef softfloat_mul128By32
+#include "primitives/functions.h"
 
 struct uint128 softfloat_mul128By32( uint64_t a64, uint64_t a0, uint32_t b )
 {
     struct uint128 z;
-    uint_fast64_t mid;
-    uint_fast32_t carry;
+    uint64_t mid;
+    uint32_t carry;
 
     z.v0 = a0 * b;
-    mid = (uint_fast64_t) (uint32_t) (a0>>32) * b;
-    carry = (uint32_t) ((uint_fast32_t) (z.v0>>32) - (uint_fast32_t) mid);
-    z.v64 = a64 * b + (uint_fast32_t) ((mid + carry)>>32);
+    mid = (uint64_t) (uint32_t) (a0>>32) * b;
+    carry = (uint32_t) ((uint32_t) (z.v0>>32) - (uint32_t) mid);
+    z.v64 = a64 * b + (uint32_t) ((mid + carry)>>32);
     return z;
 
 }
-
-#endif
-

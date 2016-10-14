@@ -41,19 +41,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
+float32_t softfloat_subMagsF32( uint32_t uiA, uint32_t uiB )
 {
-    int_fast16_t expA;
-    uint_fast32_t sigA;
-    int_fast16_t expB;
-    uint_fast32_t sigB;
-    int_fast16_t expDiff;
-    uint_fast32_t uiZ;
-    int_fast32_t sigDiff;
+    int16_t expA;
+    uint32_t sigA;
+    int16_t expB;
+    uint32_t sigB;
+    int16_t expDiff;
+    uint32_t uiZ;
+    int32_t sigDiff;
     bool signZ;
-    int_fast8_t shiftDist;
-    int_fast16_t expZ;
-    uint_fast32_t sigX, sigY;
+    int8_t shiftDist;
+    int16_t expZ;
+    uint32_t sigX, sigY;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------

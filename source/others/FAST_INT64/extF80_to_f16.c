@@ -45,13 +45,13 @@ float16_t extF80_to_f16( extFloat80_t a )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool sign;
-    int_fast32_t exp;
-    uint_fast64_t sig;
+    int32_t exp;
+    uint64_t sig;
     struct commonNaN commonNaN;
-    uint_fast16_t uiZ, sig16;
+    uint16_t uiZ, sig16;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------
@@ -75,7 +75,7 @@ float16_t extF80_to_f16( extFloat80_t a )
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    sig16 = softfloat_shortShiftRightJam64( sig, 49 );
+    sig16 = (uint16_t)softfloat_shortShiftRightJam64( sig, 49 );
     if ( ! (exp | sig16) ) {
         uiZ = packToF16UI( sign, 0, 0 );
         goto uiZ;
@@ -83,7 +83,7 @@ float16_t extF80_to_f16( extFloat80_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     exp -= 0x3FF1;
-    if ( sizeof (int_fast16_t) < sizeof exp ) {
+    if ( sizeof (int16_t) < sizeof exp ) {
         if ( exp < -0x40 ) exp = -0x40;
     }
     return softfloat_roundPackToF16( sign, exp, sig16 );

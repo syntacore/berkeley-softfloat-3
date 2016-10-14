@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int softfloat_normExtF80SigM( uint64_t *sigPtr )
 {
     uint64_t sig;
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
 
     sig = *sigPtr;
     shiftDist = softfloat_countLeadingZeros64( sig );

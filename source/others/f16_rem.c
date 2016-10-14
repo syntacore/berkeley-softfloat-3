@@ -34,66 +34,64 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-float16_t f16_rem( float16_t a, float16_t b )
+float16_t f16_rem(float16_t a, float16_t b)
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     bool signA;
-    int_fast8_t expA;
-    uint_fast16_t sigA;
+    int8_t expA;
+    uint16_t sigA;
     union ui16_f16 uB;
-    uint_fast16_t uiB;
-    int_fast8_t expB;
-    uint_fast16_t sigB;
+    uint16_t uiB;
+    int8_t expB;
+    uint16_t sigB;
     struct exp8_sig16 normExpSig;
     uint16_t rem;
-    int_fast8_t expDiff;
-    uint_fast16_t q;
+    int8_t expDiff;
+    uint16_t q;
     uint32_t recip32, q32;
     uint16_t altRem, meanRem;
     bool signRem;
-    uint_fast16_t uiZ;
+    uint16_t uiZ;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    signA = signF16UI( uiA );
-    expA  = expF16UI( uiA );
-    sigA  = fracF16UI( uiA );
+    signA = signF16UI(uiA);
+    expA = expF16UI(uiA);
+    sigA = fracF16UI(uiA);
     uB.f = b;
     uiB = uB.ui;
-    expB = expF16UI( uiB );
-    sigB = fracF16UI( uiB );
+    expB = expF16UI(uiB);
+    sigB = fracF16UI(uiB);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x1F ) {
-        if ( sigA || ((expB == 0x1F) && sigB) ) goto propagateNaN;
+    if (expA == 0x1F) {
+        if (sigA || ((expB == 0x1F) && sigB)) goto propagateNaN;
         goto invalid;
     }
-    if ( expB == 0x1F ) {
-        if ( sigB ) goto propagateNaN;
+    if (expB == 0x1F) {
+        if (sigB) goto propagateNaN;
         return a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
-        normExpSig = softfloat_normSubnormalF16Sig( sigB );
+    if (!expB) {
+        if (!sigB) goto invalid;
+        normExpSig = softfloat_normSubnormalF16Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
-        normExpSig = softfloat_normSubnormalF16Sig( sigA );
+    if (!expA) {
+        if (!sigA) return a;
+        normExpSig = softfloat_normSubnormalF16Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -102,19 +100,19 @@ float16_t f16_rem( float16_t a, float16_t b )
     rem = sigA | 0x0400;
     sigB |= 0x0400;
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    if (expDiff < 1) {
+        if (expDiff < -1) return a;
         sigB <<= 3;
-        if ( expDiff ) {
+        if (expDiff) {
             rem <<= 2;
             q = 0;
         } else {
             rem <<= 3;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            if (q) rem -= sigB;
         }
     } else {
-        recip32 = softfloat_approxRecip32_1( (uint_fast32_t) sigB<<21 );
+        recip32 = softfloat_approxRecip32_1((uint32_t)sigB << 21);
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
         | subtraction from `expDiff'.
@@ -128,9 +126,9 @@ float16_t f16_rem( float16_t a, float16_t b )
         *--------------------------------------------------------------------*/
         sigB <<= 3;
         for (;;) {
-            q32 = (rem * (uint_fast64_t) recip32)>>16;
-            if ( expDiff < 0 ) break;
-            rem = -((uint_fast16_t) q32 * sigB);
+            q32 = (rem * (uint64_t)recip32) >> 16;
+            if (expDiff < 0) break;
+            rem = -(int16_t)((uint16_t)q32 * sigB);
             expDiff -= 29;
         }
         /*--------------------------------------------------------------------
@@ -138,7 +136,7 @@ float16_t f16_rem( float16_t a, float16_t b )
         *--------------------------------------------------------------------*/
         q32 >>= ~expDiff & 31;
         q = q32;
-        rem = (rem<<(expDiff + 30)) - q * sigB;
+        rem = (rem << (expDiff + 30)) - q * sigB;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
@@ -146,26 +144,24 @@ float16_t f16_rem( float16_t a, float16_t b )
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & 0x8000) );
+    } while (!(rem & 0x8000));
     meanRem = rem + altRem;
-    if ( (meanRem & 0x8000) || (! meanRem && (q & 1)) ) rem = altRem;
+    if ((meanRem & 0x8000) || (!meanRem && (q & 1))) rem = altRem;
     signRem = signA;
-    if ( 0x8000 <= rem ) {
-        signRem = ! signRem;
+    if (0x8000 <= rem) {
+        signRem = !signRem;
         rem = -rem;
     }
-    return softfloat_normRoundPackToF16( signRem, expB, rem );
+    return softfloat_normRoundPackToF16(signRem, expB, rem);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- propagateNaN:
-    uiZ = softfloat_propagateNaNF16UI( uiA, uiB );
+propagateNaN:
+    uiZ = softfloat_propagateNaNF16UI(uiA, uiB);
     goto uiZ;
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     uiZ = defaultNaNF16UI;
- uiZ:
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
-
 }
-

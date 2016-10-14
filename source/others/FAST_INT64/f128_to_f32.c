@@ -34,60 +34,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "internals.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-float32_t f128_to_f32( float128_t a )
+#include <assert.h>
+
+float32_t f128_to_f32(float128_t a)
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool sign;
-    int_fast32_t exp;
-    uint_fast64_t frac64;
-    struct commonNaN commonNaN;
-    uint_fast32_t uiZ, frac32;
+    int32_t exp;
+    uint64_t frac64;
+    uint32_t uiZ;
     union ui32_f32 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
-    sign  = signF128UI64( uiA64 );
-    exp   = expF128UI64( uiA64 );
-    frac64 = fracF128UI64( uiA64 ) | (uiA0 != 0);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp == 0x7FFF ) {
-        if ( frac64 ) {
-            softfloat_f128UIToCommonNaN( uiA64, uiA0, &commonNaN );
-            uiZ = softfloat_commonNaNToF32UI( &commonNaN );
+    uiA0 = uA.ui.v0;
+    sign = signF128UI64(uiA64);
+    exp = expF128UI64(uiA64);
+    frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
+    if (exp != INT16_MAX) {
+        uint32_t const frac32 = softfloat_shortShiftRightJam64(frac64, 18);
+        if (exp | frac32) {
+            exp -= 0x3F81;
+            if (sizeof(int16_t) < sizeof exp) {
+                if (exp < -0x1000) {exp = -0x1000;}
+            }
+            assert(INT16_MIN <= exp && exp <= INT16_MAX);
+            return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
         } else {
-            uiZ = packToF32UI( sign, 0xFF, 0 );
+            uiZ = packToF32UI(sign, 0, 0);
         }
-        goto uiZ;
+    } else {
+        if (frac64) {
+            struct commonNaN commonNaN;
+            softfloat_f128UIToCommonNaN(uiA64, uiA0, &commonNaN);
+            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
+        } else {
+            uiZ = packToF32UI(sign, 0xFF, 0);
+        }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    frac32 = softfloat_shortShiftRightJam64( frac64, 18 );
-    if ( ! (exp | frac32) ) {
-        uiZ = packToF32UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    exp -= 0x3F81;
-    if ( sizeof (int_fast16_t) < sizeof exp) {
-        if ( exp < -0x1000 ) exp = -0x1000;
-    }
-    return softfloat_roundPackToF32( sign, exp, frac32 | 0x40000000 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 

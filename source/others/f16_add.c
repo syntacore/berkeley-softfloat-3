@@ -43,11 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t f16_add( float16_t a, float16_t b )
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     union ui16_f16 uB;
-    uint_fast16_t uiB;
+    uint16_t uiB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 1)
-    float16_t (*magsFuncPtr)( uint_fast16_t, uint_fast16_t );
+    float16_t (*magsFuncPtr)( uint16_t, uint16_t );
 #endif
 
     uA.f = a;

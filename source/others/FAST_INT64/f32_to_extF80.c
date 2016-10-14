@@ -44,14 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t f32_to_extF80( float32_t a )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     bool sign;
-    int_fast16_t exp;
-    uint_fast32_t frac;
+    int16_t exp;
+    uint32_t frac;
     struct commonNaN commonNaN;
     struct uint128 uiZ;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
     struct exp16_sig32 normExpSig;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
@@ -92,7 +92,7 @@ extFloat80_t f32_to_extF80( float32_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ64 = packToExtF80UI64( sign, exp + 0x3F80 );
-    uiZ0  = (uint_fast64_t) (frac | 0x00800000)<<40;
+    uiZ0  = (uint64_t) (frac | 0x00800000)<<40;
  uiZ:
     uZ.s.signExp = uiZ64;
     uZ.s.signif  = uiZ0;

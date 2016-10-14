@@ -40,10 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef softfloat_negXM
 
-void softfloat_negXM( uint_fast8_t size_words, uint32_t *zPtr )
+void softfloat_negXM( uint8_t size_words, uint32_t *zPtr )
 {
     unsigned int index, lastIndex;
-    uint_fast8_t carry;
+    uint8_t carry;
     uint32_t word;
 
     index = indexWordLo( size_words );

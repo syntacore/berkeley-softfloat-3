@@ -58,7 +58,7 @@ void f64_to_f128M( float64_t a, float128_t *zPtr )
     union ui64_f64 uA;
     uint64_t uiA;
     bool sign;
-    int_fast16_t exp;
+    int16_t exp;
     uint64_t frac;
     struct commonNaN commonNaN;
     uint32_t uiZ96;

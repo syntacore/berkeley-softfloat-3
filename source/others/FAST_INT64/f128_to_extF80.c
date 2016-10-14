@@ -44,14 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t f128_to_extF80( float128_t a )
 {
     union ui128_f128 uA;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool sign;
-    int_fast32_t exp;
-    uint_fast64_t frac64, frac0;
+    int32_t exp;
+    uint64_t frac64, frac0;
     struct commonNaN commonNaN;
     struct uint128 uiZ;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
     struct exp32_sig128 normExpSig;
     struct uint128 sig128;
     /** @bug union of same type */

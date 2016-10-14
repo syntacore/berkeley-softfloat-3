@@ -65,7 +65,7 @@ void
     bool signZ;
     const uint32_t *ptr;
     uint32_t uiZ96, sigA[4];
-    uint_fast8_t shiftDist;
+    uint8_t shiftDist;
     uint32_t sigB[4];
     int32_t expZ;
     uint32_t sigProd[8], *extSigZPtr;

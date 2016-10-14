@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
  f128M_roundToInt(
      const float128_t *aPtr,
-     uint_fast8_t roundingMode,
+     uint8_t roundingMode,
      bool exact,
      float128_t *zPtr
  )
@@ -61,7 +61,7 @@ void
 void
  f128M_roundToInt(
      const float128_t *aPtr,
-     uint_fast8_t roundingMode,
+     uint8_t roundingMode,
      bool exact,
      float128_t *zPtr
  )
@@ -72,12 +72,12 @@ void
     int32_t exp;
     uint32_t sigExtra;
     bool sign;
-    uint_fast8_t bitPos;
+    uint8_t bitPos;
     bool roundNear;
     unsigned int index, lastIndex;
     bool extra;
     uint32_t wordA, bit, wordZ;
-    uint_fast8_t carry;
+    uint8_t carry;
     uint32_t extrasMask;
 
     /*------------------------------------------------------------------------

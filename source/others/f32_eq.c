@@ -44,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool f32_eq( float32_t a, float32_t b )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     union ui32_f32 uB;
-    uint_fast32_t uiB;
+    uint32_t uiB;
 
     uA.f = a;
     uiA = uA.ui;

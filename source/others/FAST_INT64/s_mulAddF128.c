@@ -43,36 +43,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float128_t
  softfloat_mulAddF128(
-     uint_fast64_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast64_t uiB64,
-     uint_fast64_t uiB0,
-     uint_fast64_t uiC64,
-     uint_fast64_t uiC0,
-     uint_fast8_t op
+     uint64_t uiA64,
+     uint64_t uiA0,
+     uint64_t uiB64,
+     uint64_t uiB0,
+     uint64_t uiC64,
+     uint64_t uiC0,
+     uint8_t op
  )
 {
     bool signA;
-    int_fast32_t expA;
+    int32_t expA;
     struct uint128 sigA;
     bool signB;
-    int_fast32_t expB;
+    int32_t expB;
     struct uint128 sigB;
     bool signC;
-    int_fast32_t expC;
+    int32_t expC;
     struct uint128 sigC;
     bool signZ;
-    uint_fast64_t magBits;
+    uint64_t magBits;
     struct uint128 uiZ;
     struct exp32_sig128 normExpSig;
-    int_fast32_t expZ;
+    int32_t expZ;
     uint64_t sig256Z[4];
     struct uint128 sigZ;
-    int_fast32_t shiftDist, expDiff;
+    int32_t shiftDist, expDiff;
     struct uint128 x128;
     uint64_t sig256C[4];
     static uint64_t zero256[4] = INIT_UINTM4( 0, 0, 0, 0 );
-    uint_fast64_t sigZExtra, sig256Z0;
+    uint64_t sigZExtra, sig256Z0;
     union ui128_f128 uZ;
 
     /*------------------------------------------------------------------------

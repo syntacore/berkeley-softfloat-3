@@ -47,11 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast32_t
- softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32_t uiB )
+uint32_t
+ softfloat_propagateNaNF32UI( uint32_t uiA, uint32_t uiB )
 {
     bool isSigNaNA, isSigNaNB;
-    uint_fast32_t uiNonsigA, uiNonsigB, uiMagA, uiMagB;
+    uint32_t uiNonsigA, uiNonsigB, uiMagA, uiMagB;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

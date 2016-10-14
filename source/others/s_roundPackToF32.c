@@ -41,13 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 float32_t
- softfloat_roundPackToF32( bool sign, int_fast16_t exp, uint_fast32_t sig )
+ softfloat_roundPackToF32( bool sign, int16_t exp, uint32_t sig )
 {
-    uint_fast8_t roundingMode;
+    uint8_t roundingMode;
     bool roundNearEven;
-    uint_fast8_t roundIncrement, roundBits;
+    uint8_t roundIncrement, roundBits;
     bool isTiny;
-    uint_fast32_t uiZ;
+    uint32_t uiZ;
     union ui32_f32 uZ;
 
     roundingMode = softfloat_roundingMode;
@@ -81,7 +81,7 @@ float32_t
     }
     if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
     sig = (sig + roundIncrement)>>7;
-    sig &= ~(uint_fast32_t) (! (roundBits ^ 0x40) & roundNearEven);
+    sig &= ~(uint32_t) (! (roundBits ^ 0x40) & roundNearEven);
     uiZ = packToF32UI( sign, sig ? exp : 0, sig );
  uiZ:
     uZ.ui = uiZ;

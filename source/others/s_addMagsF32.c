@@ -40,17 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
+float32_t softfloat_addMagsF32( uint32_t uiA, uint32_t uiB )
 {
-    int_fast16_t expA;
-    uint_fast32_t sigA;
-    int_fast16_t expB;
-    uint_fast32_t sigB;
-    int_fast16_t expDiff;
-    uint_fast32_t uiZ;
+    int16_t expA;
+    uint32_t sigA;
+    int16_t expB;
+    uint32_t sigB;
+    int16_t expDiff;
+    uint32_t uiZ;
     bool signZ;
-    int_fast16_t expZ;
-    uint_fast32_t sigZ;
+    int16_t expZ;
+    uint32_t sigZ;
     union ui32_f32 uZ;
 
     /*------------------------------------------------------------------------

@@ -34,22 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
+#define SOFTFLOAT_SHORTSHIFTLEFT128
 
-#include "primitives/types.h"
-
-#ifndef softfloat_shortShiftLeft128
+#include "primitives/functions.h"
 
 struct uint128
- softfloat_shortShiftLeft128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
+    softfloat_shortShiftLeft128(uint64_t a64, uint64_t a0, uint8_t dist)
 {
     struct uint128 z;
-
-    z.v64 = a64<<dist | a0>>(-dist & 63);
-    z.v0 = a0<<dist;
+    z.v64 = a64 << dist | a0 >> (-(int8_t)dist & 63);
+    z.v0 = a0 << dist;
     return z;
 
 }
-
-#endif
 

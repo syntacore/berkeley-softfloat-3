@@ -44,13 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t f32_sqrt( float32_t a )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast32_t sigA, uiZ;
+    int16_t expA;
+    uint32_t sigA, uiZ;
     struct exp16_sig32 normExpSig;
-    int_fast16_t expZ;
-    uint_fast32_t sigZ, shiftedSigZ;
+    int16_t expZ;
+    uint32_t sigZ, shiftedSigZ;
     uint32_t negRem;
     union ui32_f32 uZ;
 
@@ -91,7 +91,7 @@ float32_t f32_sqrt( float32_t a )
     expA &= 1;
     sigA = (sigA | 0x00800000)<<8;
     sigZ =
-        ((uint_fast64_t) sigA * softfloat_approxRecipSqrt32_1( expA, sigA ))
+        ((uint64_t) sigA * softfloat_approxRecipSqrt32_1( expA, sigA ))
             >>32;
     if ( expA ) sigZ >>= 1;
     /*------------------------------------------------------------------------

@@ -45,27 +45,27 @@ extFloat80_t extF80_rem( extFloat80_t a, extFloat80_t b )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    uint_fast64_t uiA0;
+    uint16_t uiA64;
+    uint64_t uiA0;
     bool signA;
-    int_fast32_t expA;
-    uint_fast64_t sigA;
+    int32_t expA;
+    uint64_t sigA;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uB;
-    uint_fast16_t uiB64;
-    uint_fast64_t uiB0;
-    int_fast32_t expB;
-    uint_fast64_t sigB;
+    uint16_t uiB64;
+    uint64_t uiB0;
+    int32_t expB;
+    uint64_t sigB;
     struct exp32_sig64 normExpSig;
-    int_fast32_t expDiff;
+    int32_t expDiff;
     struct uint128 rem, shiftedSigB;
-    uint_fast32_t q, recip32;
-    uint_fast64_t q64;
+    uint32_t q, recip32;
+    uint64_t q64;
     struct uint128 term, altRem, meanRem;
     bool signRem;
     struct uint128 uiZ;
-    uint_fast16_t uiZ64;
-    uint_fast64_t uiZ0;
+    uint16_t uiZ64;
+    uint64_t uiZ0;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
@@ -144,7 +144,7 @@ extFloat80_t extF80_rem( extFloat80_t a, extFloat80_t b )
         recip32 = softfloat_approxRecip32_1( sigB>>32 );
         expDiff -= 30;
         for (;;) {
-            q64 = (uint_fast64_t) (uint32_t) (rem.v64>>2) * recip32;
+            q64 = (uint64_t) (uint32_t) (rem.v64>>2) * recip32;
             if ( expDiff < 0 ) break;
             q = (q64 + 0x80000000)>>32;
             rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );

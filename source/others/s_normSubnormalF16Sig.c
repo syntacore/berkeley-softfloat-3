@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-struct exp8_sig16 softfloat_normSubnormalF16Sig( uint_fast16_t sig )
+struct exp8_sig16 softfloat_normSubnormalF16Sig( uint16_t sig )
 {
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     struct exp8_sig16 z;
 
     shiftDist = softfloat_countLeadingZeros16( sig ) - 5;

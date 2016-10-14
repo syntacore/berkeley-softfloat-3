@@ -44,152 +44,134 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
- extF80M_div(
-     const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr )
+extF80M_div(
+    const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
 {
 
-    *zPtr = extF80_div( *aPtr, *bPtr );
+    *zPtr = extF80_div(*aPtr, *bPtr);
 
 }
 
 #else
 
 void
- extF80M_div(
-     const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr )
+extF80M_div(
+    const extFloat80_t *aSPtr, const extFloat80_t *bSPtr, extFloat80_t *zSPtr)
 {
-    const struct extFloat80M *aSPtr, *bSPtr;
-    struct extFloat80M *zSPtr;
-    uint_fast16_t uiA64;
-    int32_t expA;
-    uint_fast16_t uiB64;
-    int32_t expB;
-    bool signZ;
     uint64_t sigA, x64;
     int32_t expZ;
     int shiftDist;
     uint32_t y[3], recip32, sigB[3];
     int ix;
     uint32_t q, qs[2];
-    uint_fast16_t uiZ64;
+    uint16_t uiZ64;
     uint64_t uiZ0;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    /** @bug cast to same type */
-    bSPtr = (const struct extFloat80M *) bPtr;
-    /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    uiA64 = aSPtr->signExp;
-    expA = expExtF80UI64( uiA64 );
-    uiB64 = bSPtr->signExp;
-    expB = expExtF80UI64( uiB64 );
-    signZ = signExtF80UI64( uiA64 ) ^ signExtF80UI64( uiB64 );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
-        if ( softfloat_tryPropagateNaNExtF80M( aSPtr, bSPtr, zSPtr ) ) return;
-        if ( expA == 0x7FFF ) {
-            if ( expB == 0x7FFF ) goto invalid;
+    uint16_t const uiA64 = aSPtr->signExp;
+    int32_t expA = expExtF80UI64(uiA64);
+    uint16_t const uiB64 = bSPtr->signExp;
+    int32_t expB = expExtF80UI64(uiB64);
+    bool const signZ = signExtF80UI64(uiA64) ^ signExtF80UI64(uiB64);
+    if (expA == INT16_MAX || expB == INT16_MAX) {
+        if (softfloat_tryPropagateNaNExtF80M(aSPtr, bSPtr, zSPtr)) {
+            return;
+        } else if (expA != INT16_MAX) {
+            goto zero;
+        } else if (expB == INT16_MAX) {
+            softfloat_invalidExtF80M(zSPtr);
+            return;
+        } else {
             goto infinity;
         }
-        goto zero;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     sigA = aSPtr->signif;
     x64 = bSPtr->signif;
-    if ( ! expB ) expB = 1;
-    if ( ! (x64 & UINT64_C( 0x8000000000000000 )) ) {
-        if ( ! x64 ) {
-            if ( ! sigA ) goto invalid;
-            softfloat_raiseFlags( softfloat_flag_infinite );
-            goto infinity;
+    if (!expB) {
+        expB = 1;
+    }
+    if (!(x64 & UINT64_C(0x8000000000000000))) {
+        if (!x64) {
+            if (!sigA) {
+                softfloat_invalidExtF80M(zSPtr);
+                return;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_infinite);
+                goto infinity;
+            }
         }
-        expB += softfloat_normExtF80SigM( &x64 );
+        expB += softfloat_normExtF80SigM(&x64);
     }
-    if ( ! expA ) expA = 1;
-    if ( ! (sigA & UINT64_C( 0x8000000000000000 )) ) {
-        if ( ! sigA ) goto zero;
-        expA += softfloat_normExtF80SigM( &sigA );
+    if (!expA) {
+        expA = 1;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+    if (!(sigA & UINT64_C(0x8000000000000000))) {
+        if (!sigA) {
+            goto zero;
+        }
+        expA += softfloat_normExtF80SigM(&sigA);
+    }
+
     expZ = expA - expB + 0x3FFF;
     shiftDist = 29;
-    if ( sigA < x64 ) {
+    if (sigA < x64) {
         --expZ;
         shiftDist = 30;
     }
-    softfloat_shortShiftLeft64To96M( sigA, shiftDist, y );
-    recip32 = softfloat_approxRecip32_1( x64>>32 );
-    sigB[indexWord( 3, 0 )] = (uint32_t) x64<<30;
+    softfloat_shortShiftLeft64To96M(sigA, shiftDist, y);
+    recip32 = softfloat_approxRecip32_1(x64 >> 32);
+    sigB[indexWord(3, 0)] = (uint32_t)x64 << 30;
     x64 >>= 2;
-    sigB[indexWord( 3, 2 )] = x64>>32;
-    sigB[indexWord( 3, 1 )] = x64;
+    sigB[indexWord(3, 2)] = x64 >> 32;
+    sigB[indexWord(3, 1)] = (uint32_t)x64;
     ix = 2;
     for (;;) {
-        x64 = (uint64_t) y[indexWordHi( 3 )] * recip32;
-        q = (x64 + 0x80000000)>>32;
+        x64 = (uint64_t)y[indexWordHi(3)] * recip32;
+        q = (x64 + 0x80000000) >> 32;
         --ix;
-        if ( ix < 0 ) break;
-        softfloat_remStep96MBy32( y, 29, sigB, q, y );
-        if ( y[indexWordHi( 3 )] & 0x80000000 ) {
+        if (ix < 0) {
+            break;
+        }
+        softfloat_remStep96MBy32(y, 29, sigB, q, y);
+        if (y[indexWordHi(3)] & 0x80000000) {
             --q;
-            softfloat_add96M( y, sigB, y );
+            softfloat_add96M(y, sigB, y);
         }
         qs[ix] = q;
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( ((q + 1) & 0x3FFFFF) < 2 ) {
-        softfloat_remStep96MBy32( y, 29, sigB, q, y );
-        if ( y[indexWordHi( 3 )] & 0x80000000 ) {
+
+    if (((q + 1) & 0x3FFFFF) < 2) {
+        softfloat_remStep96MBy32(y, 29, sigB, q, y);
+        if (y[indexWordHi(3)] & 0x80000000) {
             --q;
-            softfloat_add96M( y, sigB, y );
-        } else if ( softfloat_compare96M( sigB, y ) <= 0 ) {
+            softfloat_add96M(y, sigB, y);
+        } else if (softfloat_compare96M(sigB, y) <= 0) {
             ++q;
-            softfloat_sub96M( y, sigB, y );
+            softfloat_sub96M(y, sigB, y);
         }
-        if (
-            y[indexWordLo( 3 )] || y[indexWord( 3, 1 )] || y[indexWord( 3, 2 )]
-        ) {
+        if (y[indexWordLo(3)] || y[indexWord(3, 1)] || y[indexWord(3, 2)]) {
             q |= 1;
         }
     }
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    x64 = (uint64_t) q<<9;
-    y[indexWord( 3, 0 )] = x64;
-    x64 = ((uint64_t) qs[0]<<6) + (x64>>32);
-    y[indexWord( 3, 1 )] = x64;
-    y[indexWord( 3, 2 )] = (qs[1]<<3) + (x64>>32);
-    softfloat_roundPackMToExtF80M(
-        signZ, expZ, y, extF80_roundingPrecision, zSPtr );
+    x64 = (uint64_t)q << 9;
+    y[indexWord(3, 0)] = (uint32_t)x64;
+    x64 = ((uint64_t)qs[0] << 6) + (x64 >> 32);
+    y[indexWord(3, 1)] = (uint32_t)x64;
+    y[indexWord(3, 2)] = (qs[1] << 3) + (x64 >> 32);
+    softfloat_roundPackMToExtF80M(signZ, expZ, y, extF80_roundingPrecision, zSPtr);
     return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- invalid:
-    softfloat_invalidExtF80M( zSPtr );
-    return;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
- infinity:
-    uiZ64 = packToExtF80UI64( signZ, 0x7FFF );
-    uiZ0  = UINT64_C( 0x8000000000000000 );
+
+infinity:
+    uiZ64 = packToExtF80UI64(signZ, 0x7FFF);
+    uiZ0 = UINT64_C(0x8000000000000000);
     goto uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- zero:
-    uiZ64 = packToExtF80UI64( signZ, 0 );
-    uiZ0  = 0;
- uiZ:
+zero:
+    uiZ64 = packToExtF80UI64(signZ, 0);
+    uiZ0 = 0;
+uiZ:
     zSPtr->signExp = uiZ64;
-    zSPtr->signif  = uiZ0;
+    zSPtr->signif = uiZ0;
 
 }
 

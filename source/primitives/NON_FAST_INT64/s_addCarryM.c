@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef softfloat_addCarryM
 
-uint_fast8_t
+uint8_t
  softfloat_addCarryM(
-     uint_fast8_t size_words,
+     uint8_t size_words,
      const uint32_t *aPtr,
      const uint32_t *bPtr,
-     uint_fast8_t carry,
+     uint8_t carry,
      uint32_t *zPtr
  )
 {

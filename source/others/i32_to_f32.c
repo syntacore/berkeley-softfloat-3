@@ -34,25 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "internals.h"
 #include "softfloat/functions.h"
 
-float32_t i32_to_f32( int32_t a )
+#include "internals.h"
+
+float32_t i32_to_f32(int32_t a)
 {
-    bool sign;
-    union ui32_f32 uZ;
-    uint_fast32_t absA;
-
-    sign = (a < 0);
-    if ( ! (a & 0x7FFFFFFF) ) {
-        uZ.ui = sign ? packToF32UI( 1, 0x9E, 0 ) : 0;
+    bool const sign = a < 0;
+    if (!(a & 0x7FFFFFFF)) {
+        /** @todo ui32_as_f32() */
+        union ui32_f32 uZ;
+        uZ.ui = sign ? packToF32UI(1, 0x9E, 0) : 0;
         return uZ.f;
+    } else {
+        uint32_t absA = sign ? -a : a;
+        return softfloat_normRoundPackToF32(sign, 0x9C, absA);
     }
-    absA = sign ? -(uint_fast32_t) a : (uint_fast32_t) a;
-    return softfloat_normRoundPackToF32( sign, 0x9C, absA );
-
 }
 

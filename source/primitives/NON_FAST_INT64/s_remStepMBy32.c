@@ -42,9 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
  softfloat_remStepMBy32(
-     uint_fast8_t size_words,
+     uint8_t size_words,
      const uint32_t *remPtr,
-     uint_fast8_t dist,
+     uint8_t dist,
      const uint32_t *bPtr,
      uint32_t q,
      uint32_t *zPtr
@@ -53,7 +53,7 @@ void
     unsigned int index, lastIndex;
     uint64_t dwordProd;
     uint32_t wordRem, wordShiftedRem, wordProd;
-    uint_fast8_t uNegDist, borrow;
+    uint8_t uNegDist, borrow;
 
     index = indexWordLo( size_words );
     lastIndex = indexWordHi( size_words );

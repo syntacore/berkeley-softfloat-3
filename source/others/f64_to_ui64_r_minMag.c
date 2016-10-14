@@ -41,15 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-uint_fast64_t f64_to_ui64_r_minMag( float64_t a, bool exact )
+uint64_t f64_to_ui64_r_minMag( float64_t a, bool exact )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
-    int_fast16_t exp;
-    uint_fast64_t sig;
-    int_fast16_t shiftDist;
+    uint64_t uiA;
+    int16_t exp;
+    uint64_t sig;
+    int16_t shiftDist;
     bool sign;
-    uint_fast64_t z;
+    uint64_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

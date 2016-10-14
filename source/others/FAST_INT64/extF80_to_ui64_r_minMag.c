@@ -41,16 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-uint_fast64_t extF80_to_ui64_r_minMag( extFloat80_t a, bool exact )
+uint64_t extF80_to_ui64_r_minMag( extFloat80_t a, bool exact )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64;
-    int_fast32_t exp;
-    uint_fast64_t sig;
-    int_fast32_t shiftDist;
+    uint16_t uiA64;
+    int32_t exp;
+    uint64_t sig;
+    int32_t shiftDist;
     bool sign;
-    uint_fast64_t z;
+    uint64_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/

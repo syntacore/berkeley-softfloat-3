@@ -58,10 +58,10 @@ void f32_to_extF80M( float32_t a, extFloat80_t *zPtr )
     union ui32_f32 uA;
     uint32_t uiA;
     bool sign;
-    int_fast16_t exp;
+    int16_t exp;
     uint32_t frac;
     struct commonNaN commonNaN;
-    uint_fast16_t uiZ64;
+    uint16_t uiZ64;
     uint32_t uiZ32;
     struct exp16_sig32 normExpSig;
 

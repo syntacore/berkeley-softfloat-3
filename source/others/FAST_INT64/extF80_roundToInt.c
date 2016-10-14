@@ -42,18 +42,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 extFloat80_t
- extF80_roundToInt( extFloat80_t a, uint_fast8_t roundingMode, bool exact )
+ extF80_roundToInt( extFloat80_t a, uint8_t roundingMode, bool exact )
 {
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint_fast16_t uiA64, signUI64;
-    int_fast32_t exp;
-    uint_fast64_t sigA;
-    uint_fast16_t uiZ64;
-    uint_fast64_t sigZ;
+    uint16_t uiA64, signUI64;
+    int32_t exp;
+    uint64_t sigA;
+    uint16_t uiZ64;
+    uint64_t sigZ;
     struct exp32_sig64 normExpSig;
     struct uint128 uiZ;
-    uint_fast64_t lastBitMask, roundBitsMask;
+    uint64_t lastBitMask, roundBitsMask;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
@@ -119,7 +119,7 @@ extFloat80_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ64 = signUI64 | exp;
-    lastBitMask = (uint_fast64_t) 1<<(0x403E - exp);
+    lastBitMask = (uint64_t) 1<<(0x403E - exp);
     roundBitsMask = lastBitMask - 1;
     sigZ = sigA;
     if ( roundingMode == softfloat_round_near_maxMag ) {

@@ -99,7 +99,7 @@ struct commonNaN { char _unused; };
 | Converts the common NaN pointed to by `aPtr' into a 16-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-#define softfloat_commonNaNToF16UI( aPtr ) ((uint_fast16_t) defaultNaNF16UI)
+#define softfloat_commonNaNToF16UI( aPtr ) ((uint16_t) defaultNaNF16UI)
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
@@ -107,8 +107,8 @@ struct commonNaN { char _unused; };
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast16_t
- softfloat_propagateNaNF16UI( uint_fast16_t uiA, uint_fast16_t uiB );
+uint16_t
+ softfloat_propagateNaNF16UI( uint16_t uiA, uint16_t uiB );
 
 /*----------------------------------------------------------------------------
 | The bit pattern for a default generated 32-bit floating-point NaN.
@@ -134,7 +134,7 @@ uint_fast16_t
 | Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-#define softfloat_commonNaNToF32UI( aPtr ) ((uint_fast32_t) defaultNaNF32UI)
+#define softfloat_commonNaNToF32UI( aPtr ) ((uint32_t) defaultNaNF32UI)
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
@@ -142,8 +142,8 @@ uint_fast16_t
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast32_t
- softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32_t uiB );
+uint32_t
+ softfloat_propagateNaNF32UI( uint32_t uiA, uint32_t uiB );
 
 /*----------------------------------------------------------------------------
 | The bit pattern for a default generated 64-bit floating-point NaN.
@@ -169,7 +169,7 @@ uint_fast32_t
 | Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-#define softfloat_commonNaNToF64UI( aPtr ) ((uint_fast64_t) defaultNaNF64UI)
+#define softfloat_commonNaNToF64UI( aPtr ) ((uint64_t) defaultNaNF64UI)
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
@@ -177,8 +177,8 @@ uint_fast32_t
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-uint_fast64_t
- softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64_t uiB );
+uint64_t
+ softfloat_propagateNaNF64UI( uint64_t uiA, uint64_t uiB );
 
 /*----------------------------------------------------------------------------
 | The bit pattern for a default generated 80-bit extended floating-point NaN.
@@ -240,10 +240,10 @@ struct uint128 softfloat_commonNaNToExtF80UI( const struct commonNaN *aPtr );
 *----------------------------------------------------------------------------*/
 struct uint128
  softfloat_propagateNaNExtF80UI(
-     uint_fast16_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast16_t uiB64,
-     uint_fast64_t uiB0
+     uint16_t uiA64,
+     uint64_t uiA0,
+     uint16_t uiB64,
+     uint64_t uiB0
  );
 
 /*----------------------------------------------------------------------------
@@ -298,10 +298,10 @@ struct uint128 softfloat_commonNaNToF128UI( const struct commonNaN * );
 *----------------------------------------------------------------------------*/
 struct uint128
  softfloat_propagateNaNF128UI(
-     uint_fast64_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast64_t uiB64,
-     uint_fast64_t uiB0
+     uint64_t uiA64,
+     uint64_t uiA0,
+     uint64_t uiB64,
+     uint64_t uiB0
  );
 
 #else

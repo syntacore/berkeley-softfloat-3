@@ -41,22 +41,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float16_t ui64_to_f16( uint64_t a )
 {
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     union ui16_f16 u;
-    uint_fast16_t sig;
+    uint16_t sig;
 
     shiftDist = softfloat_countLeadingZeros64( a ) - 53;
     if ( 0 <= shiftDist ) {
         u.ui =
             a ? packToF16UI(
-                    0, 0x18 - shiftDist, (uint_fast16_t) a<<shiftDist )
+                    0, 0x18 - shiftDist, (uint16_t) a<<shiftDist )
                 : 0;
         return u.f;
     } else {
         shiftDist += 4;
         sig =
             (shiftDist < 0) ? softfloat_shortShiftRightJam64( a, -shiftDist )
-                : (uint_fast16_t) a<<shiftDist;
+                : (uint16_t) a<<shiftDist;
         return softfloat_roundPackToF16( 0, 0x1C - shiftDist, sig );
     }
 

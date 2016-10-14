@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float128_t
  softfloat_normRoundPackToF128(
-     bool sign, int_fast32_t exp, uint_fast64_t sig64, uint_fast64_t sig0 )
+     bool sign, int32_t exp, uint64_t sig64, uint64_t sig0 )
 {
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     struct uint128 sig128;
     union ui128_f128 uZ;
-    uint_fast64_t sigExtra;
+    uint64_t sigExtra;
     struct uint128_extra sig128Extra;
 
     if ( ! sig64 ) {

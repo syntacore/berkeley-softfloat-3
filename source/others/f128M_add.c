@@ -46,14 +46,14 @@ void
  f128M_add( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
 {
     const uint64_t *aWPtr, *bWPtr;
-    uint_fast64_t uiA64, uiA0;
+    uint64_t uiA64, uiA0;
     bool signA;
-    uint_fast64_t uiB64, uiB0;
+    uint64_t uiB64, uiB0;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     float128_t
         (*magsFuncPtr)(
-            uint_fast64_t, uint_fast64_t, uint_fast64_t, uint_fast64_t, bool );
+            uint64_t, uint64_t, uint64_t, uint64_t, bool );
 #endif
 
     aWPtr = (const uint64_t *) aPtr;

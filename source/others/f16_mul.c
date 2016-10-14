@@ -44,21 +44,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t f16_mul( float16_t a, float16_t b )
 {
     union ui16_f16 uA;
-    uint_fast16_t uiA;
+    uint16_t uiA;
     bool signA;
-    int_fast8_t expA;
-    uint_fast16_t sigA;
+    int8_t expA;
+    uint16_t sigA;
     union ui16_f16 uB;
-    uint_fast16_t uiB;
+    uint16_t uiB;
     bool signB;
-    int_fast8_t expB;
-    uint_fast16_t sigB;
+    int8_t expB;
+    uint16_t sigB;
     bool signZ;
-    uint_fast16_t magBits;
+    uint16_t magBits;
     struct exp8_sig16 normExpSig;
-    int_fast8_t expZ;
-    uint_fast32_t sig32Z;
-    uint_fast16_t sigZ, uiZ;
+    int8_t expZ;
+    uint32_t sig32Z;
+    uint16_t sigZ, uiZ;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------
@@ -105,7 +105,7 @@ float16_t f16_mul( float16_t a, float16_t b )
     expZ = expA + expB - 0xF;
     sigA = (sigA | 0x0400)<<4;
     sigB = (sigB | 0x0400)<<5;
-    sig32Z = (uint_fast32_t) sigA * sigB;
+    sig32Z = (uint32_t) sigA * sigB;
     sigZ = sig32Z>>16;
     if ( sig32Z & 0xFFFF ) sigZ |= 1;
     if ( sigZ < 0x4000 ) {

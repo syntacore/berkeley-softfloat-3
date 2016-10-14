@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 
 float64_t
- softfloat_normRoundPackToF64( bool sign, int_fast16_t exp, uint_fast64_t sig )
+ softfloat_normRoundPackToF64( bool sign, int16_t exp, uint64_t sig )
 {
-    int_fast8_t shiftDist;
+    int8_t shiftDist;
     union ui64_f64 uZ;
 
     shiftDist = softfloat_countLeadingZeros64( sig ) - 1;

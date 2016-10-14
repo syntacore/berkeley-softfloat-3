@@ -43,20 +43,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-void extF80M_sqrt( const extFloat80_t *aPtr, extFloat80_t *zPtr )
+void extF80M_sqrt(const extFloat80_t *aPtr, extFloat80_t *zPtr)
 {
 
-    *zPtr = extF80_sqrt( *aPtr );
+    *zPtr = extF80_sqrt(*aPtr);
 
 }
 
 #else
 
-void extF80M_sqrt( const extFloat80_t *aPtr, extFloat80_t *zPtr )
+void extF80M_sqrt(const extFloat80_t *aPtr, extFloat80_t *zPtr)
 {
     const struct extFloat80M *aSPtr;
     struct extFloat80M *zSPtr;
-    uint_fast16_t uiA64, signUI64;
+    uint16_t uiA64, signUI64;
     int32_t expA;
     uint64_t rem64;
     int32_t expZ;
@@ -73,104 +73,104 @@ void extF80M_sqrt( const extFloat80_t *aPtr, extFloat80_t *zPtr )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiA64 = aSPtr->signExp;
-    signUI64 = uiA64 & packToExtF80UI64( 1, 0 );
-    expA = expExtF80UI64( uiA64 );
+    signUI64 = uiA64 & packToExtF80UI64(1, 0);
+    expA = expExtF80UI64(uiA64);
     rem64 = aSPtr->signif;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FFF ) {
-        if ( rem64 & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
-            softfloat_propagateNaNExtF80M( aSPtr, 0, zSPtr );
+    if (expA == 0x7FFF) {
+        if (rem64 & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            softfloat_propagateNaNExtF80M(aSPtr, 0, zSPtr);
             return;
         }
-        if ( signUI64 ) goto invalid;
-        rem64 = UINT64_C( 0x8000000000000000 );
+        if (signUI64) goto invalid;
+        rem64 = UINT64_C(0x8000000000000000);
         goto copyA;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) expA = 1;
-    if ( ! (rem64 & UINT64_C( 0x8000000000000000 )) ) {
-        if ( ! rem64 ) {
+    if (!expA) expA = 1;
+    if (!(rem64 & UINT64_C(0x8000000000000000))) {
+        if (!rem64) {
             uiA64 = signUI64;
             goto copyA;
         }
-        expA += softfloat_normExtF80SigM( &rem64 );
+        expA += softfloat_normExtF80SigM(&rem64);
     }
-    if ( signUI64 ) goto invalid;
+    if (signUI64) goto invalid;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    expZ = ((expA - 0x3FFF)>>1) + 0x3FFF;
+    expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
     expA &= 1;
     softfloat_shortShiftLeft64To96M(
-        rem64, 30 - expA, &rem[indexMultiwordHi( 4, 3 )] );
-    sig32A = rem64>>32;
-    recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
-    sig32Z = ((uint64_t) sig32A * recipSqrt32)>>32;
-    if ( expA ) sig32Z >>= 1;
+        rem64, 30 - expA, &rem[indexMultiwordHi(4, 3)]);
+    sig32A = rem64 >> 32;
+    recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
+    sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;
+    if (expA) sig32Z >>= 1;
     rem64 =
-        ((uint64_t) rem[indexWord( 4, 3 )]<<32 | rem[indexWord( 4, 2 )])
-            - (uint64_t) sig32Z * sig32Z;
-    rem[indexWord( 4, 3 )] = rem64>>32;
-    rem[indexWord( 4, 2 )] = rem64;
+        ((uint64_t)rem[indexWord(4, 3)] << 32 | rem[indexWord(4, 2)])
+        - (uint64_t)sig32Z * sig32Z;
+    rem[indexWord(4, 3)] = rem64 >> 32;
+    rem[indexWord(4, 2)] = (uint32_t)rem64;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    q = ((uint32_t) (rem64>>2) * (uint64_t) recipSqrt32)>>32;
-    sig64Z = ((uint64_t) sig32Z<<32) + ((uint64_t) q<<3);
-    x64 = ((uint64_t) sig32Z<<32) + sig64Z;
-    term[indexWord( 3, 2 )] = 0;
-    term[indexWord( 3, 1 )] = x64>>32;
-    term[indexWord( 3, 0 )] = x64;
+    q = ((uint32_t)(rem64 >> 2) * (uint64_t)recipSqrt32) >> 32;
+    sig64Z = ((uint64_t)sig32Z << 32) + ((uint64_t)q << 3);
+    x64 = ((uint64_t)sig32Z << 32) + sig64Z;
+    term[indexWord(3, 2)] = 0;
+    term[indexWord(3, 1)] = x64 >> 32;
+    term[indexWord(3, 0)] = (uint32_t)x64;
     softfloat_remStep96MBy32(
-        &rem[indexMultiwordHi( 4, 3 )],
+        &rem[indexMultiwordHi(4, 3)],
         29,
         term,
         q,
-        &rem[indexMultiwordHi( 4, 3 )]
+        &rem[indexMultiwordHi(4, 3)]
     );
-    rem64 = (uint64_t) rem[indexWord( 4, 3 )]<<32 | rem[indexWord( 4, 2 )];
+    rem64 = (uint64_t)rem[indexWord(4, 3)] << 32 | rem[indexWord(4, 2)];
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    q = (((uint32_t) (rem64>>2) * (uint64_t) recipSqrt32)>>32) + 2;
-    x64 = (uint64_t) q<<7;
-    extSigZ[indexWord( 3, 0 )] = x64;
-    x64 = (sig64Z<<1) + (x64>>32);
-    extSigZ[indexWord( 3, 2 )] = x64>>32;
-    extSigZ[indexWord( 3, 1 )] = x64;
+    q = (((uint32_t)(rem64 >> 2) * (uint64_t)recipSqrt32) >> 32) + 2;
+    x64 = (uint64_t)q << 7;
+    extSigZ[indexWord(3, 0)] = (uint32_t)x64;
+    x64 = (sig64Z << 1) + (x64 >> 32);
+    extSigZ[indexWord(3, 2)] = x64 >> 32;
+    extSigZ[indexWord(3, 1)] = (uint32_t)x64;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (q & 0xFFFFFF) <= 2 ) {
-        q &= ~(uint32_t) 0xFFFF;
-        extSigZ[indexWordLo( 3 )] = q<<7;
-        x64 = sig64Z + (q>>27);
-        term[indexWord( 4, 3 )] = 0;
-        term[indexWord( 4, 2 )] = x64>>32;
-        term[indexWord( 4, 1 )] = x64;
-        term[indexWord( 4, 0 )] = q<<5;
-        rem[indexWord( 4, 0 )] = 0;
-        softfloat_remStep128MBy32( rem, 28, term, q, rem );
-        q = rem[indexWordHi( 4 )];
-        if ( q & 0x80000000 ) {
-            softfloat_sub1X96M( extSigZ );
+    if ((q & 0xFFFFFF) <= 2) {
+        q &= ~(uint32_t)0xFFFF;
+        extSigZ[indexWordLo(3)] = q << 7;
+        x64 = sig64Z + (q >> 27);
+        term[indexWord(4, 3)] = 0;
+        term[indexWord(4, 2)] = x64 >> 32;
+        term[indexWord(4, 1)] = (uint32_t)x64;
+        term[indexWord(4, 0)] = q << 5;
+        rem[indexWord(4, 0)] = 0;
+        softfloat_remStep128MBy32(rem, 28, term, q, rem);
+        q = rem[indexWordHi(4)];
+        if (q & 0x80000000) {
+            softfloat_sub1X96M(extSigZ);
         } else {
-            if ( q || rem[indexWord( 4, 1 )] || rem[indexWord( 4, 2 )] ) {
-                extSigZ[indexWordLo( 3 )] |= 1;
+            if (q || rem[indexWord(4, 1)] || rem[indexWord(4, 2)]) {
+                extSigZ[indexWordLo(3)] |= 1;
             }
         }
     }
     softfloat_roundPackMToExtF80M(
-        0, expZ, extSigZ, extF80_roundingPrecision, zSPtr );
+        0, expZ, extSigZ, extF80_roundingPrecision, zSPtr);
     return;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- invalid:
-    softfloat_invalidExtF80M( zSPtr );
+invalid:
+    softfloat_invalidExtF80M(zSPtr);
     return;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- copyA:
+copyA:
     zSPtr->signExp = uiA64;
-    zSPtr->signif  = rem64;
+    zSPtr->signif = rem64;
 
 }
 

@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 void
  softfloat_extF80UIToCommonNaN(
-     uint_fast16_t uiA64, uint_fast64_t uiA0, struct commonNaN *zPtr )
+     uint16_t uiA64, uint64_t uiA0, struct commonNaN *zPtr )
 {
 
     if ( softfloat_isSigNaNExtF80UI( uiA64, uiA0 ) ) {

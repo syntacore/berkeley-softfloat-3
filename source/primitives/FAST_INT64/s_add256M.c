@@ -34,18 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include <stdint.h>
-
-#include "primitives/types.h"
-
-#ifndef softfloat_add256M
+#include "primitives/functions.h"
 
 void
  softfloat_add256M(
      const uint64_t *aPtr, const uint64_t *bPtr, uint64_t *zPtr )
 {
     unsigned int index;
-    uint_fast8_t carry;
+    uint8_t carry;
     uint64_t wordA, wordZ;
 
     index = indexWordLo( 4 );
@@ -60,6 +56,3 @@ void
     }
 
 }
-
-#endif
-

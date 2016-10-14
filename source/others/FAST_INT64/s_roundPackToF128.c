@@ -43,16 +43,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
  softfloat_roundPackToF128(
      bool sign,
-     int_fast32_t exp,
-     uint_fast64_t sig64,
-     uint_fast64_t sig0,
-     uint_fast64_t sigExtra
+     int32_t exp,
+     uint64_t sig64,
+     uint64_t sig0,
+     uint64_t sigExtra
  )
 {
-    uint_fast8_t roundingMode;
+    uint8_t roundingMode;
     bool roundNearEven, doIncrement, isTiny;
     struct uint128_extra sig128Extra;
-    uint_fast64_t uiZ64, uiZ0;
+    uint64_t uiZ64, uiZ0;
     struct uint128 sig128;
     union ui128_f128 uZ;
 

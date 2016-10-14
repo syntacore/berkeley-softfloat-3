@@ -44,16 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t f64_sqrt( float64_t a )
 {
     union ui64_f64 uA;
-    uint_fast64_t uiA;
+    uint64_t uiA;
     bool signA;
-    int_fast16_t expA;
-    uint_fast64_t sigA, uiZ;
+    int16_t expA;
+    uint64_t sigA, uiZ;
     struct exp16_sig64 normExpSig;
-    int_fast16_t expZ;
+    int16_t expZ;
     uint32_t sig32A, recipSqrt32, sig32Z;
-    uint_fast64_t rem;
+    uint64_t rem;
     uint32_t q;
-    uint_fast64_t sigZ, shiftedSigZ;
+    uint64_t sigZ, shiftedSigZ;
     union ui64_f64 uZ;
 
     /*------------------------------------------------------------------------
@@ -97,20 +97,20 @@ float64_t f64_sqrt( float64_t a )
     sigA |= UINT64_C( 0x0010000000000000 );
     sig32A = sigA>>21;
     recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
-    sig32Z = ((uint_fast64_t) sig32A * recipSqrt32)>>32;
+    sig32Z = ((uint64_t) sig32A * recipSqrt32)>>32;
     if ( expA ) {
         sigA <<= 8;
         sig32Z >>= 1;
     } else {
         sigA <<= 9;
     }
-    rem = sigA - (uint_fast64_t) sig32Z * sig32Z;
-    q = ((uint32_t) (rem>>2) * (uint_fast64_t) recipSqrt32)>>32;
-    sigZ = ((uint_fast64_t) sig32Z<<32 | 1<<5) + ((uint_fast64_t) q<<3);
+    rem = sigA - (uint64_t) sig32Z * sig32Z;
+    q = ((uint32_t) (rem>>2) * (uint64_t) recipSqrt32)>>32;
+    sigZ = ((uint64_t) sig32Z<<32 | 1<<5) + ((uint64_t) q<<3);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     if ( (sigZ & 0x1FF) < 1<<5 ) {
-        sigZ &= ~(uint_fast64_t) 0x3F;
+        sigZ &= ~(uint64_t) 0x3F;
         shiftedSigZ = sigZ>>6;
         rem = (sigA<<52) - shiftedSigZ * shiftedSigZ;
         if ( rem & UINT64_C( 0x8000000000000000 ) ) {

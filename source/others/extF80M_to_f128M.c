@@ -43,20 +43,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-void extF80M_to_f128M( const extFloat80_t *aPtr, float128_t *zPtr )
+void extF80M_to_f128M(const extFloat80_t *aPtr, float128_t *zPtr)
 {
 
-    *zPtr = extF80_to_f128( *aPtr );
+    *zPtr = extF80_to_f128(*aPtr);
 
 }
 
 #else
 
-void extF80M_to_f128M( const extFloat80_t *aPtr, float128_t *zPtr )
+void extF80M_to_f128M(const extFloat80_t *aPtr, float128_t *zPtr)
 {
     const struct extFloat80M *aSPtr;
     uint32_t *zWPtr;
-    uint_fast16_t uiA64;
+    uint16_t uiA64;
     bool sign;
     int32_t exp;
     uint64_t sig;
@@ -67,58 +67,58 @@ void extF80M_to_f128M( const extFloat80_t *aPtr, float128_t *zPtr )
     *------------------------------------------------------------------------*/
     /** @bug cast to same type */
     aSPtr = (const struct extFloat80M *) aPtr;
-    zWPtr = (uint32_t *) zPtr;
+    zWPtr = (uint32_t *)zPtr;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiA64 = aSPtr->signExp;
-    sign = signExtF80UI64( uiA64 );
-    exp  = expExtF80UI64( uiA64 );
+    sign = signExtF80UI64(uiA64);
+    exp = expExtF80UI64(uiA64);
     sig = aSPtr->signif;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    zWPtr[indexWord( 4, 0 )] = 0;
-    if ( exp == 0x7FFF ) {
-        if ( sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
-            softfloat_extF80MToCommonNaN( aSPtr, &commonNaN );
-            softfloat_commonNaNToF128M( &commonNaN, zWPtr );
+    zWPtr[indexWord(4, 0)] = 0;
+    if (exp == 0x7FFF) {
+        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
+            softfloat_commonNaNToF128M(&commonNaN, zWPtr);
             return;
         }
-        uiZ96 = packToF128UI96( sign, 0x7FFF, 0 );
+        uiZ96 = packToF128UI96(sign, 0x7FFF, 0);
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) --exp;
-    if ( ! (sig & UINT64_C( 0x8000000000000000 )) ) {
-        if ( ! sig ) {
-            uiZ96 = packToF128UI96( sign, 0, 0 );
+    if (exp) --exp;
+    if (!(sig & UINT64_C(0x8000000000000000))) {
+        if (!sig) {
+            uiZ96 = packToF128UI96(sign, 0, 0);
             goto uiZ;
         }
-        exp += softfloat_normExtF80SigM( &sig );
+        exp += softfloat_normExtF80SigM(&sig);
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    zWPtr[indexWord( 4, 1 )] = (uint32_t) sig<<17;
+    zWPtr[indexWord(4, 1)] = (uint32_t)sig << 17;
     sig >>= 15;
-    zWPtr[indexWord( 4, 2 )] = sig;
-    if ( exp < 0 ) {
-        zWPtr[indexWordHi( 4 )] = sig>>32;
+    zWPtr[indexWord(4, 2)] = (uint32_t)sig;
+    if (exp < 0) {
+        zWPtr[indexWordHi(4)] = sig >> 32;
         softfloat_shiftRight96M(
-            &zWPtr[indexMultiwordHi( 4, 3 )],
+            &zWPtr[indexMultiwordHi(4, 3)],
             -exp,
-            &zWPtr[indexMultiwordHi( 4, 3 )]
+            &zWPtr[indexMultiwordHi(4, 3)]
         );
         exp = 0;
-        sig = (uint64_t) zWPtr[indexWordHi( 4 )]<<32;
+        sig = (uint64_t)zWPtr[indexWordHi(4)] << 32;
     }
-    zWPtr[indexWordHi( 4 )] = packToF128UI96( sign, exp, sig>>32 );
+    zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp, sig >> 32);
     return;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
- uiZ:
-    zWPtr[indexWord( 4, 3 )] = uiZ96;
-    zWPtr[indexWord( 4, 2 )] = 0;
-    zWPtr[indexWord( 4, 1 )] = 0;
+uiZ:
+    zWPtr[indexWord(4, 3)] = uiZ96;
+    zWPtr[indexWord(4, 2)] = 0;
+    zWPtr[indexWord(4, 1)] = 0;
 
 }
 

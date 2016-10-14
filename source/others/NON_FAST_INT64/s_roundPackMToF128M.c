@@ -44,7 +44,7 @@ void
  softfloat_roundPackMToF128M(
      bool sign, int32_t exp, uint32_t *extSigPtr, uint32_t *zWPtr )
 {
-    uint_fast8_t roundingMode;
+    uint8_t roundingMode;
     bool roundNearEven;
     uint32_t sigExtra;
     bool doIncrement, isTiny;

@@ -44,7 +44,7 @@ void
      bool sign, int32_t exp, uint32_t *extSigPtr, uint32_t *zWPtr )
 {
     const uint32_t *ptr;
-    int_fast16_t shiftDist;
+    int16_t shiftDist;
     uint32_t wordSig;
 
     ptr = extSigPtr + indexWordHi( 5 );

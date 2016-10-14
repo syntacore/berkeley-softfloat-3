@@ -44,12 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t f32_to_f16( float32_t a )
 {
     union ui32_f32 uA;
-    uint_fast32_t uiA;
+    uint32_t uiA;
     bool sign;
-    int_fast16_t exp;
-    uint_fast32_t frac;
+    int16_t exp;
+    uint32_t frac;
     struct commonNaN commonNaN;
-    uint_fast16_t uiZ, frac16;
+    uint16_t uiZ, frac16;
     union ui16_f16 uZ;
 
     /*------------------------------------------------------------------------

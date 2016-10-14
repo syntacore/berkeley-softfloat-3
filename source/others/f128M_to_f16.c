@@ -97,7 +97,7 @@ float16_t f128M_to_f16( const float128_t *aPtr )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     exp -= 0x3FF1;
-    if ( sizeof (int_fast16_t) < sizeof exp) {
+    if ( sizeof (int16_t) < sizeof exp) {
         if ( exp < -0x40 ) exp = -0x40;
     }
     return softfloat_roundPackToF16( sign, exp, frac16 | 0x4000 );
