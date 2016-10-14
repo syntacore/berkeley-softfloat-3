@@ -45,7 +45,6 @@ bool f32_le_quiet(float32_t a, float32_t b)
     uint32_t uiA;
     union ui32_f32 uB;
     uint32_t uiB;
-    bool signA, signB;
 
     uA.f = a;
     uiA = uA.ui;
@@ -56,12 +55,12 @@ bool f32_le_quiet(float32_t a, float32_t b)
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
         return false;
+    } else {
+        bool const signA = signF32UI(uiA);
+        bool const signB = signF32UI(uiB);
+        return
+            signA != signB ? signA || 0 == ((uiA | uiB) << 1) :
+            uiA == uiB || (signA ^ (uiA < uiB));
     }
-    signA = signF32UI(uiA);
-    signB = signF32UI(uiB);
-    return
-        (signA != signB) ? signA || !(uint32_t)((uiA | uiB) << 1)
-        : (uiA == uiB) || (signA ^ (uiA < uiB));
-
 }
 
