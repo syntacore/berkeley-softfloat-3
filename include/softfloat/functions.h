@@ -81,7 +81,6 @@ enum softfloat_round_mode {
 /*----------------------------------------------------------------------------
 | Software floating-point exception flags.
 *----------------------------------------------------------------------------*/
-extern THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags;
 enum softfloat_flags {
     softfloat_flag_inexact   = 1 << 0,
     softfloat_flag_underflow = 1 << 1,
@@ -94,7 +93,8 @@ enum softfloat_flags {
 | Routine to raise any or all of the software floating-point exception flags.
 *----------------------------------------------------------------------------*/
 void softfloat_raiseFlags( uint_fast8_t );
-
+void softfloat_clearFlags(void);
+uint_fast8_t softfloat_getFlags(void);
 /*----------------------------------------------------------------------------
 | Integer-to-floating-point conversion routines.
 *----------------------------------------------------------------------------*/
