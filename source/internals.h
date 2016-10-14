@@ -40,6 +40,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.h"
 #include "softfloat/types.h"
 
+#define signF16UI( a ) ((bool) ((uint16_t) (a)>>15))
+#define expF16UI( a ) ((int8_t) ((a)>>10) & 0x1F)
+#define fracF16UI( a ) ((a) & 0x03FF)
+#define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
+
+#define isNaNF16UI( a ) (((~(a) & 0x7C00) == 0) && ((a) & 0x03FF))
+#define signF32UI( a ) ((bool) ((uint32_t) (a)>>31))
+#define expF32UI( a ) ((int16_t) ((a)>>23) & 0xFF)
+#define fracF32UI( a ) ((a) & 0x007FFFFF)
+#define packToF32UI( sign, exp, sig ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<23) + (sig))
+
+#define isNaNF32UI( a ) (((~(a) & 0x7F800000) == 0) && ((a) & 0x007FFFFF))
+
+#define signF64UI( a ) ((bool) ((uint64_t) (a)>>63))
+#define expF64UI( a ) ((int16_t) ((a)>>52) & 0x7FF)
+#define fracF64UI( a ) ((a) & UINT64_C( 0x000FFFFFFFFFFFFF ))
+#define packToF64UI( sign, exp, sig ) ((uint64_t) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<52) + (sig)))
+
+#define isNaNF64UI( a ) (((~(a) & UINT64_C( 0x7FF0000000000000 )) == 0) && ((a) & UINT64_C( 0x000FFFFFFFFFFFFF )))
+#define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
+#define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
+#define packToExtF80UI64( sign, exp ) ((uint16_t) (sign)<<15 | (exp))
+
+#define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
+
 union ui16_f16
 {
     uint16_t ui; 
@@ -76,7 +101,6 @@ enum
     softfloat_mulAdd_subProd = 2
 };
 
-
 uint32_t
 softfloat_roundPackToUI32(bool, uint64_t, uint8_t, bool);
 
@@ -100,14 +124,6 @@ softfloat_roundPackToI64(
 int64_t softfloat_roundPackMToI64(bool, uint32_t *, uint8_t, bool);
 #endif
 
-
-#define signF16UI( a ) ((bool) ((uint16_t) (a)>>15))
-#define expF16UI( a ) ((int8_t) ((a)>>10) & 0x1F)
-#define fracF16UI( a ) ((a) & 0x03FF)
-#define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
-
-#define isNaNF16UI( a ) (((~(a) & 0x7C00) == 0) && ((a) & 0x03FF))
-
 struct exp8_sig16
 {
     int8_t exp; uint16_t sig;
@@ -123,14 +139,6 @@ float16_t
 softfloat_mulAddF16(
     uint16_t, uint16_t, uint16_t, uint8_t);
 
-
-#define signF32UI( a ) ((bool) ((uint32_t) (a)>>31))
-#define expF32UI( a ) ((int16_t) ((a)>>23) & 0xFF)
-#define fracF32UI( a ) ((a) & 0x007FFFFF)
-#define packToF32UI( sign, exp, sig ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<23) + (sig))
-
-#define isNaNF32UI( a ) (((~(a) & 0x7F800000) == 0) && ((a) & 0x007FFFFF))
-
 struct exp16_sig32
 {
     int16_t exp; uint32_t sig;
@@ -145,14 +153,6 @@ float32_t softfloat_subMagsF32(uint32_t, uint32_t);
 float32_t
 softfloat_mulAddF32(
     uint32_t, uint32_t, uint32_t, uint8_t);
-
-
-#define signF64UI( a ) ((bool) ((uint64_t) (a)>>63))
-#define expF64UI( a ) ((int16_t) ((a)>>52) & 0x7FF)
-#define fracF64UI( a ) ((a) & UINT64_C( 0x000FFFFFFFFFFFFF ))
-#define packToF64UI( sign, exp, sig ) ((uint64_t) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<52) + (sig)))
-
-#define isNaNF64UI( a ) (((~(a) & UINT64_C( 0x7FF0000000000000 )) == 0) && ((a) & UINT64_C( 0x000FFFFFFFFFFFFF )))
 
 struct exp16_sig64
 {
@@ -170,13 +170,14 @@ float64_t
 softfloat_mulAddF64(
     uint64_t, uint64_t, uint64_t, uint8_t);
 
-#define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
-#define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
-#define packToExtF80UI64( sign, exp ) ((uint16_t) (sign)<<15 | (exp))
-
-#define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
-
 #ifdef SOFTFLOAT_FAST_INT64
+
+#define signF128UI64( a64 ) ((bool) ((uint64_t) (a64)>>63))
+#define expF128UI64( a64 ) ((int32_t) ((a64)>>48) & 0x7FFF)
+#define fracF128UI64( a64 ) ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))
+#define packToF128UI64( sign, exp, sig64 ) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<48) + (sig64))
+
+#define isNaNF128UI( a64, a0 ) (((~(a64) & UINT64_C( 0x7FFF000000000000 )) == 0) && (a0 || ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))))
 
 struct exp32_sig64
 {
@@ -197,13 +198,6 @@ softfloat_addMagsExtF80(
 extFloat80_t
 softfloat_subMagsExtF80(
     uint16_t, uint64_t, uint16_t, uint64_t, bool);
-
-#define signF128UI64( a64 ) ((bool) ((uint64_t) (a64)>>63))
-#define expF128UI64( a64 ) ((int32_t) ((a64)>>48) & 0x7FFF)
-#define fracF128UI64( a64 ) ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))
-#define packToF128UI64( sign, exp, sig64 ) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<48) + (sig64))
-
-#define isNaNF128UI( a64, a0 ) (((~(a64) & UINT64_C( 0x7FFF000000000000 )) == 0) && (a0 || ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))))
 
 struct exp32_sig128
 {
@@ -239,6 +233,11 @@ softfloat_mulAddF128(
 
 #else
 
+#define signF128UI96( a96 ) ((bool) ((uint32_t) (a96)>>31))
+#define expF128UI96( a96 ) ((int32_t) ((a96)>>16) & 0x7FFF)
+#define fracF128UI96( a96 ) ((a96) & 0x0000FFFF)
+#define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
+
 bool
 softfloat_tryPropagateNaNExtF80M(
     const struct extFloat80M *,
@@ -268,11 +267,6 @@ int
 softfloat_compareNonnormExtF80M(
     const struct extFloat80M *, const struct extFloat80M *);
 
-#define signF128UI96( a96 ) ((bool) ((uint32_t) (a96)>>31))
-#define expF128UI96( a96 ) ((int32_t) ((a96)>>16) & 0x7FFF)
-#define fracF128UI96( a96 ) ((a96) & 0x0000FFFF)
-#define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
-
 bool softfloat_isNaNF128M(const uint32_t *);
 
 bool
@@ -299,4 +293,3 @@ softfloat_mulAddF128M(
 #endif
 
 #endif  /* SOFTFLOAT_INTERNALS_H_ */
-
