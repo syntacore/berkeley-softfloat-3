@@ -150,9 +150,7 @@ float32_t softfloat_normRoundPackToF32(bool, int16_t, uint32_t);
 
 float32_t softfloat_addMagsF32(uint32_t, uint32_t);
 float32_t softfloat_subMagsF32(uint32_t, uint32_t);
-float32_t
-softfloat_mulAddF32(
-    uint32_t, uint32_t, uint32_t, uint8_t);
+float32_t softfloat_mulAddF32(uint32_t, uint32_t, uint32_t, uint8_t);
 
 struct exp16_sig64
 {
