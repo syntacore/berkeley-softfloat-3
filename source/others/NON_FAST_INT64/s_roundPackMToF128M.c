@@ -45,7 +45,7 @@ softfloat_roundPackMToF128M(
     uint8_t roundingMode;
     bool roundNearEven;
     uint32_t sigExtra;
-    bool doIncrement, isTiny;
+    bool doIncrement;
     static const uint32_t maxSig[4] =
         INIT_UINTM4(0x0001FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
     uint32_t ui, uj;
@@ -62,14 +62,11 @@ softfloat_roundPackMToF128M(
     }
     if (0x7FFD <= (uint32_t)exp) {
         if (exp < 0) {
-            isTiny =
-                (softfloat_detectTininess
-                     == softfloat_tininess_beforeRounding)
-                || (exp < -1)
-                || !doIncrement
-                || (softfloat_compare128M(
-                extSigPtr + indexMultiwordHi(5, 4), maxSig)
-                        < 0);
+            bool const isTiny =
+                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
+                exp < -1 ||
+                !doIncrement ||
+                softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig) < 0;
             softfloat_shiftRightJam160M(extSigPtr, -exp, extSigPtr);
             exp = 0;
             sigExtra = extSigPtr[indexWordLo(5)];
@@ -87,19 +84,18 @@ softfloat_roundPackMToF128M(
                     && sigExtra;
             }
         } else if (
-            (0x7FFD < exp)
-            || ((exp == 0x7FFD) && doIncrement
-            && (softfloat_compare128M(
-            extSigPtr + indexMultiwordHi(5, 4), maxSig)
-            == 0))
-        ) {
-            softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact);
+                0x7FFD < exp ||
+                (
+            exp == 0x7FFD &&
+            doIncrement &&
+            softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig) == 0
+            )
+            ) {
+            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
             if (
-                   roundNearEven
-                || (roundingMode == softfloat_round_near_maxMag)
-                || (roundingMode
-                == (sign ? softfloat_round_min : softfloat_round_max))
+                roundNearEven ||
+                roundingMode == softfloat_round_near_maxMag ||
+                roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
             ) {
                 ui = packToF128UI96(sign, 0x7FFF, 0);
                 uj = 0;
@@ -114,7 +110,9 @@ softfloat_roundPackMToF128M(
             return;
         }
     }
-    if (sigExtra) softfloat_raiseFlags(softfloat_flag_inexact);
+    if (sigExtra) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
     uj = extSigPtr[indexWord(5, 1)];
     if (doIncrement) {
         ++uj;

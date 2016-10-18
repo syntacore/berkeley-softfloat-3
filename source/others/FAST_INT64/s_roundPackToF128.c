@@ -39,110 +39,92 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 float128_t
- softfloat_roundPackToF128(
-     bool sign,
-     int32_t exp,
-     uint64_t sig64,
-     uint64_t sig0,
-     uint64_t sigExtra
- )
+softfloat_roundPackToF128(
+    bool sign,
+    int32_t exp,
+    uint64_t sig64,
+    uint64_t sig0,
+    uint64_t sigExtra
+)
 {
-    uint8_t roundingMode;
-    bool roundNearEven, doIncrement, isTiny;
+    bool roundNearEven, doIncrement;
     struct uint128_extra sig128Extra;
     uint64_t uiZ64, uiZ0;
     struct uint128 sig128;
     union ui128_f128 uZ;
 
-    roundingMode = softfloat_roundingMode;
+    uint8_t const roundingMode = softfloat_roundingMode;
     roundNearEven = (roundingMode == softfloat_round_near_even);
-    doIncrement = (UINT64_C( 0x8000000000000000 ) <= sigExtra);
-    if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
+    doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
         doIncrement =
-            (roundingMode
-                 == (sign ? softfloat_round_min : softfloat_round_max))
-                && sigExtra;
+            (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) &&
+            sigExtra;
     }
-    if ( 0x7FFD <= (uint32_t) exp ) {
-        if ( exp < 0 ) {
-            isTiny =
-                   (softfloat_detectTininess
-                        == softfloat_tininess_beforeRounding)
-                || (exp < -1)
-                || ! doIncrement
-                || softfloat_lt128(
+    if (0x7FFD <= (uint32_t)exp) {
+        if (exp < 0) {
+            bool const isTiny =
+                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
+                exp < -1 ||
+                !doIncrement ||
+                softfloat_lt128(
                        sig64,
                        sig0,
-                       UINT64_C( 0x0001FFFFFFFFFFFF ),
-                       UINT64_C( 0xFFFFFFFFFFFFFFFF )
-                   );
-            sig128Extra =
-                softfloat_shiftRightJam128Extra( sig64, sig0, sigExtra, -exp );
+                       UINT64_C(0x0001FFFFFFFFFFFF),
+                       UINT64_MAX);
+            sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, -exp);
             sig64 = sig128Extra.v.v64;
-            sig0  = sig128Extra.v.v0;
+            sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
             exp = 0;
-            if ( isTiny && sigExtra ) {
-                softfloat_raiseFlags( softfloat_flag_underflow );
+            if (isTiny && sigExtra) {
+                softfloat_raiseFlags(softfloat_flag_underflow);
             }
-            doIncrement = (UINT64_C( 0x8000000000000000 ) <= sigExtra);
-            if (
-                   ! roundNearEven
-                && (roundingMode != softfloat_round_near_maxMag)
-            ) {
+            doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+            if (!roundNearEven && roundingMode != softfloat_round_near_maxMag) {
                 doIncrement =
-                    (roundingMode
-                         == (sign ? softfloat_round_min : softfloat_round_max))
-                        && sigExtra;
+                    roundingMode == (sign ? softfloat_round_min : softfloat_round_max) &&
+                    sigExtra;
             }
         } else if (
-               (0x7FFD < exp)
-            || ((exp == 0x7FFD)
-                    && softfloat_eq128( 
-                           sig64,
-                           sig0,
-                           UINT64_C( 0x0001FFFFFFFFFFFF ),
-                           UINT64_C( 0xFFFFFFFFFFFFFFFF )
-                       )
-                    && doIncrement)
+            0x7FFD < exp ||
+            (
+            exp == 0x7FFD &&
+            softfloat_eq128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF)) &&
+            doIncrement
+            )
         ) {
-            softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact );
-            if (
-                   roundNearEven
-                || (roundingMode == softfloat_round_near_maxMag)
-                || (roundingMode
-                        == (sign ? softfloat_round_min : softfloat_round_max))
+            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
+            if (roundNearEven ||
+                roundingMode == softfloat_round_near_maxMag ||
+                roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
             ) {
-                uiZ64 = packToF128UI64( sign, 0x7FFF, 0 );
-                uiZ0  = 0;
+                uiZ64 = packToF128UI64(sign, 0x7FFF, 0);
+                uiZ0 = 0;
             } else {
-                uiZ64 =
-                    packToF128UI64(
-                        sign, 0x7FFE, UINT64_C( 0x0000FFFFFFFFFFFF ) );
-                uiZ0 = UINT64_C( 0xFFFFFFFFFFFFFFFF );
+                uiZ64 = packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF));
+                uiZ0 = UINT64_MAX;
             }
             goto uiZ;
         }
     }
-    if ( sigExtra ) softfloat_raiseFlags(softfloat_flag_inexact);
-    if ( doIncrement ) {
-        sig128 = softfloat_add128( sig64, sig0, 0, 1 );
-        sig64 = sig128.v64;
-        sig0 =
-            sig128.v0
-                & ~(uint64_t)
-                       (! (sigExtra & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-                            & roundNearEven);
-    } else {
-        if ( ! (sig64 | sig0) ) exp = 0;
+    if (sigExtra) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    uiZ64 = packToF128UI64( sign, exp, sig64 );
-    uiZ0  = sig0;
- uiZ:
+    if (doIncrement) {
+        sig128 = softfloat_add128(sig64, sig0, 0, 1);
+        sig64 = sig128.v64;
+        sig0 = sig128.v0 &
+            ~(uint64_t)(!(sigExtra & INT64_MAX) & roundNearEven);
+    } else {
+        if (!(sig64 | sig0)) {
+            exp = 0;
+        }
+    }
+    uiZ64 = packToF128UI64(sign, exp, sig64);
+    uiZ0 = sig0;
+uiZ:
     uZ.ui.v64 = uiZ64;
-    uZ.ui.v0  = uiZ0;
+    uZ.ui.v0 = uiZ0;
     return uZ.f;
-
 }
-
