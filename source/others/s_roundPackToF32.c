@@ -40,21 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
 {
-    uint8_t roundingMode;
-    bool roundNearEven;
-    uint8_t roundIncrement, roundBits;
-    uint32_t uiZ;
-    union ui32_f32 uZ;
-
-    roundingMode = softfloat_roundingMode;
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    roundIncrement = 0x40;
-    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
-        roundIncrement =
-            roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ?
-            0x7F : 0;
-    }
-    roundBits = sig & 0x7F;
+    uint8_t const roundingMode = softfloat_roundingMode;
+    bool const roundNearEven = roundingMode == softfloat_round_near_even;
+    uint8_t const roundIncrement = 
+        roundNearEven || softfloat_round_near_maxMag == roundingMode ? 0x40 :
+        roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0x7F : 0;
+    uint8_t roundBits = sig & 0x7F;
     if (0xFD <= (unsigned int)exp) {
         if (exp < 0) {
             bool const isTiny =
@@ -67,22 +58,23 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
             if (isTiny && roundBits) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
-        } else if ((0xFD < exp) || (0x80000000 <= sig + roundIncrement)) {
-            softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact);
-            uiZ = packToF32UI(sign, 0xFF, 0) - !roundIncrement;
-            goto uiZ;
+        } else if (0xFD < exp || 0x80000000 <= sig + roundIncrement) {
+            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
+            {
+                union ui32_f32 uZ;
+                uZ.ui = packToF32UI(sign, 0xFF, 0) - !roundIncrement;
+                return uZ.f;
+            }
         }
     }
     if (roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    sig = (sig + roundIncrement) >> 7;
-    sig &= ~(uint32_t)(!(roundBits ^ 0x40) & roundNearEven);
-    uiZ = packToF32UI(sign, sig ? exp : 0, sig);
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    sig = ((sig + roundIncrement) >> 7) & (~(uint32_t)(!(roundBits ^ 0x40) & roundNearEven));
+    {
+        union ui32_f32 uZ;
+        uZ.ui = packToF32UI(sign, sig ? exp : 0, sig);
+        return uZ.f;
+    }
 }
 
