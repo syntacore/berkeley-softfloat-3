@@ -39,17 +39,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-uint32_t
- softfloat_propagateNaNF32UI( uint32_t uiA, uint32_t uiB )
-{
-    bool isSigNaNA;
+static uint32_t const quietNaN_bit = 0x00400000u;
 
-    isSigNaNA = softfloat_isSigNaNF32UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) return uiA | 0x00400000;
+uint32_t
+softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
+{
+    bool const isSigNaNA = softfloat_isSigNaNF32UI(uiA);
+    if (isSigNaNA || softfloat_isSigNaNF32UI(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) {
+            return uiA | quietNaN_bit;
+        }
     }
-    return (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
+    return (isNaNF32UI(uiA) ? uiA : uiB) | quietNaN_bit;
 
 }
 

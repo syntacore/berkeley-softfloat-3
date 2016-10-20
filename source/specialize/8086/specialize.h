@@ -126,7 +126,7 @@ Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point signaling NaN.
 Note:  This macro evaluates its argument more than once.
 */
-#define softfloat_isSigNaNF32UI( uiA ) ((((uiA) & 0x7FC00000) == 0x7F800000) && ((uiA) & 0x003FFFFF))
+#define softfloat_isSigNaNF32UI( uiA ) ((((uiA) & 0x7FC00000) == 0x7F800000) && 0 != ((uiA) & 0x003FFFFF))
 
 /**
 Assuming `uiA' has the bit pattern of a 32-bit floating-point NaN, converts

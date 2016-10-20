@@ -34,9 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
 #include "specialize.h"
+
 #include "softfloat/functions.h"
 
 /**
@@ -46,13 +45,11 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 uint32_t
- softfloat_propagateNaNF32UI( uint32_t uiA, uint32_t uiB )
+softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
 {
-
-    if ( softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
     return defaultNaNF32UI;
-
 }
 
