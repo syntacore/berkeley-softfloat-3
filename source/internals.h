@@ -165,8 +165,7 @@ float64_t softfloat_normRoundPackToF64(bool, int16_t, uint64_t);
 float64_t softfloat_addMagsF64(uint64_t, uint64_t, bool);
 float64_t softfloat_subMagsF64(uint64_t, uint64_t, bool);
 float64_t
-softfloat_mulAddF64(
-    uint64_t, uint64_t, uint64_t, uint8_t);
+softfloat_mulAddF64(uint64_t, uint64_t, uint64_t, uint8_t);
 
 #ifdef SOFTFLOAT_FAST_INT64
 
