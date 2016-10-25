@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.0)
+
+set(SRC_PRIMITIVES_FAST_INT64
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_add128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_add256M.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_mul128To256M.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_mul128By32.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_mul64To128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shiftRightJam128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shiftRightJam128Extra.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shiftRightJam256M.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_sub256M.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_mul64ByShifted32To128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shiftRightJam64Extra.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftLeft128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftRight128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftRightJam128.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftRightJam128Extra.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftRightJam64Extra.c
+PARENT_SCOPE)
