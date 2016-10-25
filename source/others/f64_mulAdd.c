@@ -40,20 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    union ui64_f64 uB;
-    uint64_t uiB;
-    union ui64_f64 uC;
-    uint64_t uiC;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
-    uC.f = c;
-    uiC = uC.ui;
-    return softfloat_mulAddF64( uiA, uiB, uiC, 0 );
-
+    return softfloat_mulAddF64(*(uint64_t const*)&a, *(uint64_t const*)&b, *(uint64_t const*)&c, 0 );
 }
 
