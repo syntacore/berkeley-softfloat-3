@@ -50,7 +50,14 @@ significant bit to 1.  This shifted-and-jammed value is returned.
 INLINE
 uint64_t softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
 {
-    return a >> dist | ((a & (((uint64_t)1 << dist) - 1)) != 0);
+    if (dist >= 63) {
+        return 0 != a;
+    } else {
+        uint8_t const shft = dist & 63;
+        uint64_t const mask = ~(~UINT64_C(0) << shft);
+        uint64_t const jam = 0 != (a & mask);
+        return a >> dist | jam;
+    }
 }
 #else
 uint64_t softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist);
@@ -68,8 +75,13 @@ is zero or nonzero.
 #if !defined(SOFTFLOAT_SHIFTRIGHTJAM32) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
 INLINE uint32_t softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
 {
-    return
-        (dist < 31) ? a >> dist | ((uint32_t)(a << (-(int16_t)dist & 31)) != 0) : (a != 0);
+    if (dist >= 31) {
+        return a != 0;
+    } else {
+        uint8_t const shft = -(int16_t)dist & 31;
+        uint32_t const jam = 0 != (a << shft);
+        return (a >> dist) | jam;
+    }
 }
 #else
 uint32_t softfloat_shiftRightJam32(uint32_t a, uint16_t dist);
@@ -87,8 +99,13 @@ is zero or nonzero.
 #if !defined(SOFTFLOAT_SHIFTRIGHTJAM64) && defined(INLINE_LEVEL) && (3 <= INLINE_LEVEL)
 INLINE uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
 {
-    return
-        dist >= 63 ? a != 0 : a >> dist | ((uint64_t)(a << (-(int32_t)dist & 63)) != 0);
+    if (dist >= 63) {
+        return a != 0;
+    } else {
+        uint8_t const shft = -(int32_t)dist & 63;
+        uint64_t const jam = 0 != (a << shft);
+        return (a >> dist) | jam;
+    }
 }
 #else
 uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist);
