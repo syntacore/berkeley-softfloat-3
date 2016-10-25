@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 #include "specialize.h"
+#include <assert.h>
 
 float16_t f16_rem(float16_t a, float16_t b)
 {
@@ -121,16 +122,16 @@ float16_t f16_rem(float16_t a, float16_t b)
     } else {
         recip32 = softfloat_approxRecip32_1((uint32_t)sigB << 21);
         /*
-        | Changing the shift of `rem' here requires also changing the initial
-        | subtraction from `expDiff'.
-        *--------------------------------------------------------------------*/
+        Changing the shift of `rem' here requires also changing the initial
+        subtraction from `expDiff'.
+        */
         rem <<= 4;
         expDiff -= 31;
         /*
-        | The scale of `sigB' affects how many bits are obtained during each
-        | cycle of the loop.  Currently this is 29 bits per loop iteration,
-        | which is believed to be the maximum possible.
-        *--------------------------------------------------------------------*/
+        The scale of `sigB' affects how many bits are obtained during each
+        cycle of the loop.  Currently this is 29 bits per loop iteration,
+        which is believed to be the maximum possible.
+        */
         sigB <<= 3;
         for (;;) {
             q32 = (rem * (uint64_t)recip32) >> 16;
@@ -140,9 +141,8 @@ float16_t f16_rem(float16_t a, float16_t b)
             rem = -(int16_t)((uint16_t)q32 * sigB);
             expDiff -= 29;
         }
-        /*
-        | (`expDiff' cannot be less than -30 here.)
-        *--------------------------------------------------------------------*/
+        /*`expDiff' cannot be less than -30 here.*/
+        assert(-30 <= expDiff);
         q32 >>= ~expDiff & 31;
         q = q32;
         rem = (rem << (expDiff + 30)) - q * sigB;

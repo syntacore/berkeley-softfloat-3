@@ -34,40 +34,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
-#include "primitives/types.h"
 #include "specialize.h"
-#include "softfloat/functions.h"
 
-/**
-Interpreting the unsigned integer formed from concatenating `uiA64' and
-`uiA0' as a 128-bit floating-point value, and likewise interpreting the
-unsigned integer formed from concatenating `uiB64' and `uiB0' as another
-128-bit floating-point value, and assuming at least on of these floating-
-point values is a NaN, returns the bit pattern of the combined NaN result.
-If either original floating-point value is a signaling NaN, the invalid
-exception is raised.
-*/
 struct uint128
- softfloat_propagateNaNF128UI(
-     uint64_t uiA64,
-     uint64_t uiA0,
-     uint64_t uiB64,
-     uint64_t uiB0
- )
+    softfloat_propagateNaNF128UI(
+        uint64_t uiA64,
+        uint64_t uiA0,
+        uint64_t uiB64,
+        uint64_t uiB0
+    )
 {
     struct uint128 uiZ;
 
-    if (
-           softfloat_isSigNaNF128UI( uiA64, uiA0 )
-        || softfloat_isSigNaNF128UI( uiB64, uiB0 )
-    ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
+    /** @todo use variable */
     uiZ.v64 = defaultNaNF128UI64;
-    uiZ.v0  = defaultNaNF128UI0;
+    uiZ.v0 = defaultNaNF128UI0;
     return uiZ;
-
 }
 

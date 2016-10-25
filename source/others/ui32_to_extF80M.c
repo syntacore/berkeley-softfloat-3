@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
+/** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
 void ui32_to_extF80M( uint32_t a, extFloat80_t *zPtr )

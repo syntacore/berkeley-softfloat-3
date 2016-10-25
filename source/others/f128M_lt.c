@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
+/** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
 bool f128M_lt( const float128_t *aPtr, const float128_t *bPtr )

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
+/** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
 uint64_t f128M_to_ui64_r_minMag( const float128_t *aPtr, bool exact )

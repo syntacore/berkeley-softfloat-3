@@ -1,6 +1,4 @@
-/** @file
-@todo split into different SOFTFLOAT_FAST_INT64 cases
-*/
+
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic

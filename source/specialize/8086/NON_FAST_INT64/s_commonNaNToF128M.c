@@ -1,11 +1,11 @@
 
-/** @file
+/*============================================================================
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
-All rights reserved.
+Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -39,12 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.h"
 #include "specialize.h"
 
-/**
-Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
-NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
-`zWPtr' points to an array of four 32-bit elements that concatenate in the
-platform's normal endian order to form a 128-bit floating-point value.
-*/
 void
  softfloat_commonNaNToF128M( const struct commonNaN *aPtr, uint32_t *zWPtr )
 {

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
+/** @todo split to different implementations */
 float64_t f64_mul( float64_t a, float64_t b )
 {
     union ui64_f64 uA;

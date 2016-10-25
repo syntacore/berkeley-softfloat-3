@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include <assert.h>
 
+/** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
 float32_t f128M_to_f32(const float128_t *aPtr)

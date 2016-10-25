@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
+/** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
 void f64_to_f128M( float64_t a, float128_t *zPtr )

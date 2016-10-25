@@ -65,16 +65,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
 
+/** @deprecated */
 union ui16_f16
 {
     uint16_t ui; 
     float16_t f;
 };
+/** @deprecated */
 union ui32_f32
 {
     uint32_t ui; 
     float32_t f;
 };
+/** @deprecated */
 union ui64_f64
 {
     uint64_t ui; 
@@ -88,6 +91,7 @@ union extF80M_extF80
     struct extFloat80M fM; 
     extFloat80_t f;
 };
+/** @deprecated */
 union ui128_f128
 {
     struct uint128 ui; 
@@ -106,8 +110,7 @@ softfloat_roundPackToUI32(bool, uint64_t, uint8_t, bool);
 
 #ifdef SOFTFLOAT_FAST_INT64
 uint64_t
-softfloat_roundPackToUI64(
-    bool, uint64_t, uint64_t, uint8_t, bool);
+softfloat_roundPackToUI64(bool, uint64_t, uint64_t, uint8_t, bool);
 #else
 uint64_t
 softfloat_roundPackMToUI64(bool, uint32_t *, uint8_t, bool);
@@ -118,15 +121,15 @@ softfloat_roundPackToI32(bool, uint64_t, uint8_t, bool);
 
 #ifdef SOFTFLOAT_FAST_INT64
 int64_t
-softfloat_roundPackToI64(
-    bool, uint64_t, uint64_t, uint8_t, bool);
+softfloat_roundPackToI64(bool, uint64_t, uint64_t, uint8_t, bool);
 #else
 int64_t softfloat_roundPackMToI64(bool, uint32_t *, uint8_t, bool);
 #endif
 
 struct exp8_sig16
 {
-    int8_t exp; uint16_t sig;
+    int8_t exp;
+    uint16_t sig;
 };
 struct exp8_sig16 softfloat_normSubnormalF16Sig(uint16_t);
 
@@ -136,12 +139,12 @@ float16_t softfloat_normRoundPackToF16(bool, int16_t, uint16_t);
 float16_t softfloat_addMagsF16(uint16_t, uint16_t);
 float16_t softfloat_subMagsF16(uint16_t, uint16_t);
 float16_t
-softfloat_mulAddF16(
-    uint16_t, uint16_t, uint16_t, uint8_t);
+softfloat_mulAddF16(uint16_t, uint16_t, uint16_t, uint8_t);
 
 struct exp16_sig32
 {
-    int16_t exp; uint32_t sig;
+    int16_t exp;
+    uint32_t sig;
 };
 struct exp16_sig32 softfloat_normSubnormalF32Sig(uint32_t);
 
@@ -178,23 +181,20 @@ softfloat_mulAddF64(uint64_t, uint64_t, uint64_t, uint8_t);
 
 struct exp32_sig64
 {
-    int32_t exp; uint64_t sig;
+    int32_t exp;
+    uint64_t sig;
 };
 struct exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
 
 extFloat80_t
-softfloat_roundPackToExtF80(
-    bool, int32_t, uint64_t, uint64_t, uint8_t);
+softfloat_roundPackToExtF80(bool, int32_t, uint64_t, uint64_t, uint8_t);
 extFloat80_t
-softfloat_normRoundPackToExtF80(
-    bool, int32_t, uint64_t, uint64_t, uint8_t);
+softfloat_normRoundPackToExtF80(bool, int32_t, uint64_t, uint64_t, uint8_t);
 
 extFloat80_t
-softfloat_addMagsExtF80(
-    uint16_t, uint64_t, uint16_t, uint64_t, bool);
+softfloat_addMagsExtF80(uint16_t, uint64_t, uint16_t, uint64_t, bool);
 extFloat80_t
-softfloat_subMagsExtF80(
-    uint16_t, uint64_t, uint16_t, uint64_t, bool);
+softfloat_subMagsExtF80(uint16_t, uint64_t, uint16_t, uint64_t, bool);
 
 struct exp32_sig128
 {
@@ -205,18 +205,14 @@ struct exp32_sig128
     softfloat_normSubnormalF128Sig(uint64_t, uint64_t);
 
 float128_t
-softfloat_roundPackToF128(
-    bool, int32_t, uint64_t, uint64_t, uint64_t);
+softfloat_roundPackToF128(bool, int32_t, uint64_t, uint64_t, uint64_t);
 float128_t
-softfloat_normRoundPackToF128(
-    bool, int32_t, uint64_t, uint64_t);
+softfloat_normRoundPackToF128(bool, int32_t, uint64_t, uint64_t);
 
 float128_t
-softfloat_addMagsF128(
-    uint64_t, uint64_t, uint64_t, uint64_t, bool);
+softfloat_addMagsF128(uint64_t, uint64_t, uint64_t, uint64_t, bool);
 float128_t
-softfloat_subMagsF128(
-    uint64_t, uint64_t, uint64_t, uint64_t, bool);
+softfloat_subMagsF128(uint64_t, uint64_t, uint64_t, uint64_t, bool);
 float128_t
 softfloat_mulAddF128(
     uint64_t,

@@ -36,8 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.h"
 
-#include "softfloat/functions.h"
-
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
 point values, at least one of which is a NaN, returns the bit pattern of

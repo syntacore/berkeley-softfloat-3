@@ -1,8 +1,4 @@
 /** @file
-@todo split into different SOFTFLOAT_FAST_INT64 cases
-*/
-
-/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -41,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
+/** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
 void i64_to_f128M(int64_t a, float128_t *zPtr)

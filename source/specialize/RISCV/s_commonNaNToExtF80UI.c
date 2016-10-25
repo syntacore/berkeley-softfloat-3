@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=============================================================================*/
+*/
 
 
 #include "primitives/types.h"
@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define softfloat_commonNaNToExtF80UI softfloat_commonNaNToExtF80UI
 #include "specialize.h"
 
-/*----------------------------------------------------------------------------
-| Converts the common NaN pointed to by `aPtr' into an 80-bit extended
-| floating-point NaN, and returns the bit pattern of this value as an unsigned
-| integer.
-*----------------------------------------------------------------------------*/
-struct uint128 softfloat_commonNaNToExtF80UI( const struct commonNaN *aPtr )
+/**
+Converts the common NaN pointed to by `aPtr' into an 80-bit extended
+floating-point NaN, and returns the bit pattern of this value as an unsigned
+integer.
+*/
+struct uint128 softfloat_commonNaNToExtF80UI(const struct commonNaN *aPtr)
 {
     struct uint128 uiZ;
 

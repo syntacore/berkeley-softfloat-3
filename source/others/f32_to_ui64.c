@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
+/** @todo split to different implementations */
 uint64_t f32_to_ui64( float32_t a, uint8_t roundingMode, bool exact )
 {
     union ui32_f32 uA;
