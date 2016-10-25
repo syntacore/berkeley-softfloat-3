@@ -38,56 +38,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-float64_t
- softfloat_roundPackToF64( bool sign, int16_t exp, uint64_t sig )
+static __inline float64_t
+u64_as_f64(uint64_t v)
 {
-    uint8_t roundingMode;
-    bool roundNearEven;
-    uint16_t roundIncrement, roundBits;
-    bool isTiny;
-    uint64_t uiZ;
-    union ui64_f64 uZ;
-
-    roundingMode = softfloat_roundingMode;
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    roundIncrement = 0x200;
-    if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
-        roundIncrement =
-            (roundingMode
-                 == (sign ? softfloat_round_min : softfloat_round_max))
-                ? 0x3FF
-                : 0;
-    }
-    roundBits = sig & 0x3FF;
-    if ( 0x7FD <= (uint16_t) exp ) {
-        if ( exp < 0 ) {
-            isTiny =
-                (softfloat_detectTininess == softfloat_tininess_beforeRounding)
-                    || (exp < -1)
-                    || (sig + roundIncrement < UINT64_C( 0x8000000000000000 ));
-            sig = softfloat_shiftRightJam64( sig, -exp );
-            exp = 0;
-            roundBits = sig & 0x3FF;
-            if ( isTiny && roundBits ) {
-                softfloat_raiseFlags( softfloat_flag_underflow );
-            }
-        } else if (
-            (0x7FD < exp)
-                || (UINT64_C( 0x8000000000000000 ) <= sig + roundIncrement)
-        ) {
-            softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact );
-            uiZ = packToF64UI( sign, 0x7FF, 0 ) - ! roundIncrement;
-            goto uiZ;
-        }
-    }
-    if ( roundBits ) softfloat_raiseFlags(softfloat_flag_inexact);
-    sig = (sig + roundIncrement)>>10;
-    sig &= ~(uint64_t) (! (roundBits ^ 0x200) & roundNearEven);
-    uiZ = packToF64UI( sign, sig ? exp : 0, sig );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return *(float64_t const*)&v;
 }
 
+float64_t
+softfloat_roundPackToF64(bool sign, int16_t exp, uint64_t sig)
+{
+    uint8_t const roundingMode = softfloat_roundingMode;
+    bool const roundNearEven = roundingMode == softfloat_round_near_even;
+    uint16_t const roundIncrement =
+        roundNearEven || roundingMode == softfloat_round_near_maxMag ? 0x200 :
+        roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0x3FF : 0;
+    uint16_t roundBits = sig & 0x3FF;
+    if (0x7FD <= (uint16_t)exp) {
+        if (exp < 0) {
+            bool const isTiny =
+                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
+                exp < -1 ||
+                sig + roundIncrement < (uint64_t)INT64_MIN;
+            sig = softfloat_shiftRightJam64(sig, -exp);
+            exp = 0;
+            roundBits = sig & 0x3FF;
+            if (isTiny && roundBits) {
+                softfloat_raiseFlags(softfloat_flag_underflow);
+            }
+        } else if (0x7FD < exp || (uint64_t)INT64_MIN <= sig + roundIncrement) {
+            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
+            return u64_as_f64(packToF64UI(sign, 0x7FF, 0) - !roundIncrement);
+        }
+    }
+    if (roundBits) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+    sig = ((sig + roundIncrement) >> 10) & (~(uint64_t)(!(roundBits ^ 0x200) && roundNearEven));
+    return u64_as_f64(packToF64UI(sign, sig ? exp : 0, sig));
+}
