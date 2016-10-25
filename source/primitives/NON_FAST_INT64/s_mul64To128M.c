@@ -34,35 +34,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
+#include "softfloat/functions.h"
 
 #include "primitives/types.h"
 
-#ifndef softfloat_mul64To128M
-
-void softfloat_mul64To128M( uint64_t a, uint64_t b, uint32_t *zPtr )
+void
+softfloat_mul64To128M(uint64_t a, uint64_t b, uint32_t *zPtr)
 {
-    uint32_t a32, a0, b32, b0;
-    uint64_t z0, mid1, z64, mid;
-
-    a32 = a>>32;
-    a0 = a;
-    b32 = b>>32;
-    b0 = b;
-    z0 = (uint64_t) a0 * b0;
-    mid1 = (uint64_t) a32 * b0;
-    mid = mid1 + (uint64_t) a0 * b32;
-    z64 = (uint64_t) a32 * b32;
-    z64 += (uint64_t) (mid < mid1)<<32 | mid>>32;
-    mid <<= 32;
-    z0 += mid;
-    zPtr[indexWord( 4, 1 )] = z0>>32;
-    zPtr[indexWord( 4, 0 )] = z0;
-    z64 += (z0 < mid);
-    zPtr[indexWord( 4, 3 )] = z64>>32;
-    zPtr[indexWord( 4, 2 )] = z64;
-
+    uint32_t const a32 = a >> 32;
+    uint32_t const a0 = (uint32_t)a;
+    uint32_t const b32 = b >> 32;
+    uint32_t const b0 = (uint32_t)b;
+    uint64_t const mid1 = (uint64_t)a32 * b0;
+    uint64_t const mid = mid1 + (uint64_t)a0 * b32;
+    uint64_t const mid2 = mid << 32;
+    uint64_t const z0 = (uint64_t)a0 * b0 + mid2;
+    uint64_t const z64 = ((uint64_t)a32 * b32 + (((uint64_t)(mid < mid1) << 32) | (mid >> 32))) + (z0 < mid2);
+    zPtr[indexWord(4, 1)] = z0 >> 32;
+    zPtr[indexWord(4, 0)] = (uint32_t)z0;
+    zPtr[indexWord(4, 3)] = z64 >> 32;
+    zPtr[indexWord(4, 2)] = (uint32_t)z64;
 }
-
-#endif
-
