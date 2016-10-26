@@ -65,7 +65,9 @@ uint64_t f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
     shiftDist = 0x433 - exp;
 #ifdef SOFTFLOAT_FAST_INT64
     if (shiftDist <= 0) {
-        if (shiftDist < -11) goto invalid;
+        if (shiftDist < -11) {
+            goto invalid;
+        }
         sigExtra.v = sig << -shiftDist;
         sigExtra.extra = 0;
     } else {
@@ -77,7 +79,9 @@ uint64_t f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
 #else
     extSig[indexWord(3, 0)] = 0;
     if (shiftDist <= 0) {
-        if (shiftDist < -11) goto invalid;
+        if (shiftDist < -11) {
+            goto invalid;
+        }
         sig <<= -shiftDist;
         extSig[indexWord(3, 2)] = sig >> 32;
         extSig[indexWord(3, 1)] = sig;
@@ -95,5 +99,5 @@ invalid:
         (exp == 0x7FF) && fracF64UI(uiA) ? ui64_fromNaN
         : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
 
-    }
+}
 

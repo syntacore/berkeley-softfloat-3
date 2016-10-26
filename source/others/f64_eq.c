@@ -51,14 +51,11 @@ bool f64_eq( float64_t a, float64_t b )
     uB.f = b;
     uiB = uB.ui;
     if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
-        if (
-            softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB )
-        ) {
+        if (softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB )) {
             softfloat_raiseFlags( softfloat_flag_invalid );
         }
         return false;
     }
-    return (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
-
+    return uiA == uiB || ! ((uiA | uiB) & (uint64_t)INT64_MAX);
 }
 

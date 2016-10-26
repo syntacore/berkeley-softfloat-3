@@ -42,48 +42,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-bool f128M_eq_signaling( const float128_t *aPtr, const float128_t *bPtr )
+bool f128M_eq_signaling(const float128_t *aPtr, const float128_t *bPtr)
 {
 
-    return f128_eq_signaling( *aPtr, *bPtr );
+    return f128_eq_signaling(*aPtr, *bPtr);
 
 }
 
 #else
 
-bool f128M_eq_signaling( const float128_t *aPtr, const float128_t *bPtr )
+bool f128M_eq_signaling(const float128_t *aPtr, const float128_t *bPtr)
 {
     const uint32_t *aWPtr, *bWPtr;
     uint32_t wordA, wordB, uiA96, uiB96;
     bool possibleOppositeZeros;
     uint32_t mashWord;
 
-    aWPtr = (const uint32_t *) aPtr;
-    bWPtr = (const uint32_t *) bPtr;
-    if ( softfloat_isNaNF128M( aWPtr ) || softfloat_isNaNF128M( bWPtr ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    aWPtr = (const uint32_t *)aPtr;
+    bWPtr = (const uint32_t *)bPtr;
+    if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
-    wordA = aWPtr[indexWord( 4, 2 )];
-    wordB = bWPtr[indexWord( 4, 2 )];
-    if ( wordA != wordB ) return false;
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    uiB96 = bWPtr[indexWordHi( 4 )];
+    wordA = aWPtr[indexWord(4, 2)];
+    wordB = bWPtr[indexWord(4, 2)];
+    if (wordA != wordB) {
+        return false;
+    }
+    uiA96 = aWPtr[indexWordHi(4)];
+    uiB96 = bWPtr[indexWordHi(4)];
     possibleOppositeZeros = false;
-    if ( uiA96 != uiB96 ) {
+    if (uiA96 != uiB96) {
         possibleOppositeZeros = (((uiA96 | uiB96) & 0x7FFFFFFF) == 0);
-        if ( ! possibleOppositeZeros ) return false;
+        if (!possibleOppositeZeros) {
+            return false;
+        }
     }
     mashWord = wordA | wordB;
-    wordA = aWPtr[indexWord( 4, 1 )];
-    wordB = bWPtr[indexWord( 4, 1 )];
-    if ( wordA != wordB ) return false;
+    wordA = aWPtr[indexWord(4, 1)];
+    wordB = bWPtr[indexWord(4, 1)];
+    if (wordA != wordB) {
+        return false;
+    }
     mashWord |= wordA | wordB;
-    wordA = aWPtr[indexWord( 4, 0 )];
-    wordB = bWPtr[indexWord( 4, 0 )];
+    wordA = aWPtr[indexWord(4, 0)];
+    wordB = bWPtr[indexWord(4, 0)];
     return
         (wordA == wordB)
-            && (! possibleOppositeZeros || ((mashWord | wordA | wordB) == 0));
+        && (!possibleOppositeZeros || ((mashWord | wordA | wordB) == 0));
 
 }
 

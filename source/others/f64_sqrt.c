@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float64_t f64_sqrt( float64_t a )
+float64_t f64_sqrt(float64_t a)
 {
     union ui64_f64 uA;
     uint64_t uiA;
@@ -54,30 +54,36 @@ float64_t f64_sqrt( float64_t a )
     uint64_t sigZ, shiftedSigZ;
     union ui64_f64 uZ;
 
-    
+
     uA.f = a;
     uiA = uA.ui;
-    signA = signF64UI( uiA );
-    expA  = expF64UI( uiA );
-    sigA  = fracF64UI( uiA );
-    
-    if ( expA == 0x7FF ) {
-        if ( sigA ) {
-            uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
+    signA = signF64UI(uiA);
+    expA = expF64UI(uiA);
+    sigA = fracF64UI(uiA);
+
+    if (expA == 0x7FF) {
+        if (sigA) {
+            uiZ = softfloat_propagateNaNF64UI(uiA, 0);
             goto uiZ;
         }
-        if ( ! signA ) return a;
+        if (!signA) {
+            return a;
+        }
         goto invalid;
     }
-    
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
+
+    if (signA) {
+        if (!(expA | sigA)) {
+            return a;
+        }
         goto invalid;
     }
-    
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
-        normExpSig = softfloat_normSubnormalF64Sig( sigA );
+
+    if (!expA) {
+        if (!sigA) {
+            return a;
+        }
+        normExpSig = softfloat_normSubnormalF64Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -86,38 +92,40 @@ float64_t f64_sqrt( float64_t a )
     | `sig32A', which makes `sig32Z' also a lower bound on the square root of
     | `sigA'.)
     *------------------------------------------------------------------------*/
-    expZ = ((expA - 0x3FF)>>1) + 0x3FE;
+    expZ = ((expA - 0x3FF) >> 1) + 0x3FE;
     expA &= 1;
-    sigA |= UINT64_C( 0x0010000000000000 );
-    sig32A = sigA>>21;
-    recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
-    sig32Z = ((uint64_t) sig32A * recipSqrt32)>>32;
-    if ( expA ) {
+    sigA |= UINT64_C(0x0010000000000000);
+    sig32A = sigA >> 21;
+    recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
+    sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;
+    if (expA) {
         sigA <<= 8;
         sig32Z >>= 1;
     } else {
         sigA <<= 9;
     }
-    rem = sigA - (uint64_t) sig32Z * sig32Z;
-    q = ((uint32_t) (rem>>2) * (uint64_t) recipSqrt32)>>32;
-    sigZ = ((uint64_t) sig32Z<<32 | 1<<5) + ((uint64_t) q<<3);
-    
-    if ( (sigZ & 0x1FF) < 1<<5 ) {
-        sigZ &= ~(uint64_t) 0x3F;
-        shiftedSigZ = sigZ>>6;
-        rem = (sigA<<52) - shiftedSigZ * shiftedSigZ;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+    rem = sigA - (uint64_t)sig32Z * sig32Z;
+    q = ((uint32_t)(rem >> 2) * (uint64_t)recipSqrt32) >> 32;
+    sigZ = ((uint64_t)sig32Z << 32 | 1 << 5) + ((uint64_t)q << 3);
+
+    if ((sigZ & 0x1FF) < 1 << 5) {
+        sigZ &= ~(uint64_t)0x3F;
+        shiftedSigZ = sigZ >> 6;
+        rem = (sigA << 52) - shiftedSigZ * shiftedSigZ;
+        if (rem & UINT64_C(0x8000000000000000)) {
             --sigZ;
         } else {
-            if ( rem ) sigZ |= 1;
+            if (rem) {
+                sigZ |= 1;
+            }
         }
     }
-    return softfloat_roundPackToF64( 0, expZ, sigZ );
-    
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+    return softfloat_roundPackToF64(0, expZ, sigZ);
+
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     uiZ = defaultNaNF64UI;
- uiZ:
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 

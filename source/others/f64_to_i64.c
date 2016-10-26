@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 /** @todo split to different implementations */
-int64_t f64_to_i64( float64_t a, uint8_t roundingMode, bool exact )
+int64_t f64_to_i64(float64_t a, uint8_t roundingMode, bool exact)
 {
     union ui64_f64 uA;
     uint64_t uiA;
@@ -54,46 +54,52 @@ int64_t f64_to_i64( float64_t a, uint8_t roundingMode, bool exact )
     uint32_t extSig[3];
 #endif
 
-    
+
     uA.f = a;
     uiA = uA.ui;
-    sign = signF64UI( uiA );
-    exp  = expF64UI( uiA );
-    sig  = fracF64UI( uiA );
-    
-    if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
+    sign = signF64UI(uiA);
+    exp = expF64UI(uiA);
+    sig = fracF64UI(uiA);
+
+    if (exp) {
+        sig |= UINT64_C(0x0010000000000000);
+    }
     shiftDist = 0x433 - exp;
 #ifdef SOFTFLOAT_FAST_INT64
-    if ( shiftDist <= 0 ) {
-        if ( shiftDist < -11 ) goto invalid;
-        sigExtra.v = sig<<-shiftDist;
+    if (shiftDist <= 0) {
+        if (shiftDist < -11) {
+            goto invalid;
+        }
+        sigExtra.v = sig << -shiftDist;
         sigExtra.extra = 0;
     } else {
-        sigExtra = softfloat_shiftRightJam64Extra( sig, 0, shiftDist );
+        sigExtra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
     }
     return
         softfloat_roundPackToI64(
-            sign, sigExtra.v, sigExtra.extra, roundingMode, exact );
+            sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 #else
-    extSig[indexWord( 3, 0 )] = 0;
-    if ( shiftDist <= 0 ) {
-        if ( shiftDist < -11 ) goto invalid;
+    extSig[indexWord(3, 0)] = 0;
+    if (shiftDist <= 0) {
+        if (shiftDist < -11) {
+            goto invalid;
+        }
         sig <<= -shiftDist;
-        extSig[indexWord( 3, 2 )] = sig>>32;
-        extSig[indexWord( 3, 1 )] = sig;
+        extSig[indexWord(3, 2)] = sig >> 32;
+        extSig[indexWord(3, 1)] = sig;
     } else {
-        extSig[indexWord( 3, 2 )] = sig>>32;
-        extSig[indexWord( 3, 1 )] = sig;
-        softfloat_shiftRightJam96M( extSig, shiftDist, extSig );
+        extSig[indexWord(3, 2)] = sig >> 32;
+        extSig[indexWord(3, 1)] = sig;
+        softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
     }
-    return softfloat_roundPackMToI64( sign, extSig, roundingMode, exact );
+    return softfloat_roundPackMToI64(sign, extSig, roundingMode, exact);
 #endif
-    
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     return
-        (exp == 0x7FF) && fracF64UI( uiA ) ? i64_fromNaN
-            : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        (exp == 0x7FF) && fracF64UI(uiA) ? i64_fromNaN
+        : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
 }
 

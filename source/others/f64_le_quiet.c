@@ -45,26 +45,22 @@ bool f64_le_quiet( float64_t a, float64_t b )
     uint64_t uiA;
     union ui64_f64 uB;
     uint64_t uiB;
-    bool signA, signB;
 
     uA.f = a;
     uiA = uA.ui;
     uB.f = b;
     uiB = uB.ui;
     if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
-        if (
-            softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB )
-        ) {
+        if (softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB )) {
             softfloat_raiseFlags( softfloat_flag_invalid );
         }
         return false;
+    } else {
+        bool const signA = signF64UI(uiA);
+        bool const signB = signF64UI(uiB);
+        return
+            signA != signB ? signA || !((uiA | uiB) & (uint64_t)INT64_MAX) :
+            uiA == uiB || (signA ^ (uiA < uiB));
     }
-    signA = signF64UI( uiA );
-    signB = signF64UI( uiB );
-    return
-        (signA != signB)
-            ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-            : (uiA == uiB) || (signA ^ (uiA < uiB));
-
 }
 
