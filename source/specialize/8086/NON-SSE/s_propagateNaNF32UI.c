@@ -34,49 +34,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "specialize.h"
 
 #include "internals.h"
-#include "specialize.h"
 #include "softfloat/functions.h"
 
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
 uint32_t
- softfloat_propagateNaNF32UI( uint32_t uiA, uint32_t uiB )
+softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
 {
-    bool isSigNaNA, isSigNaNB;
-    uint32_t uiNonsigA, uiNonsigB, uiMagA, uiMagB;
+    bool const isSigNaNA = softfloat_isSigNaNF32UI(uiA);
+    bool const isSigNaNB = softfloat_isSigNaNF32UI(uiB);
+    /* Make NaNs non-signaling. */
+    uint32_t const uiNonsigA = uiA | 0x00400000;
+    uint32_t const uiNonsigB = uiB | 0x00400000;
 
-    
-    isSigNaNA = softfloat_isSigNaNF32UI( uiA );
-    isSigNaNB = softfloat_isSigNaNF32UI( uiB );
-    /*------------------------------------------------------------------------
-    | Make NaNs non-signaling.
-    *------------------------------------------------------------------------*/
-    uiNonsigA = uiA | 0x00400000;
-    uiNonsigB = uiB | 0x00400000;
-    
-    if ( isSigNaNA | isSigNaNB ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) {
-            if ( isSigNaNB ) goto returnLargerMag;
-            return isNaNF32UI( uiB ) ? uiNonsigB : uiNonsigA;
+    if (isSigNaNA || isSigNaNB) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) {
+            if (isSigNaNB) {
+                uint32_t const uiMagA = uiNonsigA & 0x7FFFFFFF;
+                uint32_t const uiMagB = uiNonsigB & 0x7FFFFFFF;
+                return 
+                    uiMagA < uiMagB ? uiNonsigB:
+                    uiMagB < uiMagA ? uiNonsigA :
+                    uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
+            }
+            return isNaNF32UI(uiB) ? uiNonsigB : uiNonsigA;
         } else {
-            return isNaNF32UI( uiA ) ? uiNonsigA : uiNonsigB;
+            return isNaNF32UI(uiA) ? uiNonsigA : uiNonsigB;
         }
     }
- returnLargerMag:
-    uiMagA = uiNonsigA & 0x7FFFFFFF;
-    uiMagB = uiNonsigB & 0x7FFFFFFF;
-    if ( uiMagA < uiMagB ) return uiNonsigB;
-    if ( uiMagB < uiMagA ) return uiNonsigA;
-    return (uiNonsigA < uiNonsigB) ? uiNonsigA : uiNonsigB;
-
 }
-

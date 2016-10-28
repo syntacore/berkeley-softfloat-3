@@ -40,21 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t f64_sub( float64_t a, float64_t b )
 {
-    union ui64_f64 uA;
     uint64_t uiA;
     bool signA;
-    union ui64_f64 uB;
     uint64_t uiB;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     float64_t (*magsFuncPtr)( uint64_t, uint64_t, bool );
 #endif
 
-    uA.f = a;
-    uiA = uA.ui;
+    uiA = f64_as_ui64(a);
     signA = signF64UI( uiA );
-    uB.f = b;
-    uiB = uB.ui;
+    uiB = f64_as_ui64(b);
     signB = signF64UI( uiB );
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
     if ( signA == signB ) {

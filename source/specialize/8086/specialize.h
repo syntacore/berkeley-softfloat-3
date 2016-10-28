@@ -122,13 +122,6 @@ The bit pattern for a default generated 32-bit floating-point NaN.
 #define defaultNaNF32UI 0xFFC00000
 
 /**
-Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
-32-bit floating-point signaling NaN.
-Note:  This macro evaluates its argument more than once.
-*/
-#define softfloat_isSigNaNF32UI( uiA ) ((((uiA) & 0x7FC00000) == 0x7F800000) && 0 != ((uiA) & 0x003FFFFF))
-
-/**
 Assuming `uiA' has the bit pattern of a 32-bit floating-point NaN, converts
 this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid

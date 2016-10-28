@@ -41,18 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int32_t f32_to_i32(float32_t a, uint8_t roundingMode, bool exact)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    bool sign;
-    int16_t exp;
     uint32_t sig;
     uint64_t sig64;
     int16_t shiftDist;
 
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF32UI(uiA);
-    exp = expF32UI(uiA);
+    uint32_t const uiA = f32_as_ui32(a);
+    bool sign = signF32UI(uiA);
+    int16_t const exp = expF32UI(uiA);
     sig = fracF32UI(uiA);
 
 #if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)

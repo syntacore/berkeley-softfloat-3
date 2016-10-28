@@ -41,17 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 uint32_t f16_to_ui32_r_minMag( float16_t a, bool exact )
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
     int8_t exp;
     uint16_t frac;
     int8_t shiftDist;
     bool sign;
     uint32_t alignedSig;
 
-    
-    uA.f = a;
-    uiA = uA.ui;
+    uint16_t const uiA = f16_as_ui16(a);
     exp  = expF16UI( uiA );
     frac = fracF16UI( uiA );
     

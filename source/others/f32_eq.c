@@ -41,22 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool f32_eq(float32_t a, float32_t b)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    union ui32_f32 uB;
-    uint32_t uiB;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
+    uint32_t const uiA = f32_as_ui32(a);
+    uint32_t const uiB = f32_as_ui32(b);
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
         return false;
     }
-    return (uiA == uiB) || !(uint32_t)((uiA | uiB) << 1);
+    return uiA == uiB || !(uint32_t)((uiA | uiB) << 1);
 
 }
 

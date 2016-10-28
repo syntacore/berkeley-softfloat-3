@@ -40,6 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
 {
-    return softfloat_mulAddF64(*(uint64_t const*)&a, *(uint64_t const*)&b, *(uint64_t const*)&c, 0 );
+    return softfloat_mulAddF64(f64_as_ui64(a), f64_as_ui64(b), f64_as_ui64(c), 0 );
 }
 

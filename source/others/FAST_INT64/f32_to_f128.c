@@ -39,52 +39,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float128_t f32_to_f128( float32_t a )
+float128_t f32_to_f128(float32_t a)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    bool sign;
     int16_t exp;
     uint32_t frac;
     struct commonNaN commonNaN;
     struct uint128 uiZ;
     struct exp16_sig32 normExpSig;
-    union ui128_f128 uZ;
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF32UI( uiA );
-    exp  = expF32UI( uiA );
-    frac = fracF32UI( uiA );
-    
-    if ( exp == 0xFF ) {
-        if ( frac ) {
-            softfloat_f32UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF128UI( &commonNaN );
+    uint32_t const uiA = f32_as_ui32(a);
+    bool const sign = signF32UI(uiA);
+    exp = expF32UI(uiA);
+    frac = fracF32UI(uiA);
+
+    if (exp == 0xFF) {
+        if (frac) {
+            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
+            uiZ = softfloat_commonNaNToF128UI(&commonNaN);
         } else {
-            uiZ.v64 = packToF128UI64( sign, 0x7FFF, 0 );
-            uiZ.v0  = 0;
+            uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
+            uiZ.v0 = 0;
         }
-        goto uiZ;
+        return ui128_as_f128(uiZ);
     }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ.v64 = packToF128UI64( sign, 0, 0 );
-            uiZ.v0  = 0;
-            goto uiZ;
+
+    if (!exp) {
+        if (!frac) {
+            uiZ.v64 = packToF128UI64(sign, 0, 0);
+            uiZ.v0 = 0;
+            return ui128_as_f128(uiZ);
         }
-        normExpSig = softfloat_normSubnormalF32Sig( frac );
+        normExpSig = softfloat_normSubnormalF32Sig(frac);
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
-    
-    uiZ.v64 = packToF128UI64( sign, exp + 0x3F80, (uint64_t) frac<<25 );
-    uiZ.v0  = 0;
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
 
+    uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
+    uiZ.v0 = 0;
+    return ui128_as_f128(uiZ);
 }
 

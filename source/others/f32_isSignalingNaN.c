@@ -37,14 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.h"
-#include "specialize.h"
 
-bool f32_isSignalingNaN( float32_t a )
+bool
+f32_isSignalingNaN( float32_t a )
 {
-    union ui32_f32 uA;
-
-    uA.f = a;
-    return softfloat_isSigNaNF32UI( uA.ui );
-
+    return softfloat_isSigNaNF32UI(f32_as_ui32(a));
 }
-

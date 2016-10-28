@@ -39,90 +39,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-float32_t softfloat_subMagsF32( uint32_t uiA, uint32_t uiB )
+float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
 {
-    int16_t expA;
-    uint32_t sigA;
-    int16_t expB;
-    uint32_t sigB;
-    int16_t expDiff;
-    uint32_t uiZ;
     int32_t sigDiff;
     bool signZ;
-    int8_t shiftDist;
     int16_t expZ;
-    uint32_t sigX, sigY;
-    union ui32_f32 uZ;
 
-    expA = expF32UI( uiA );
-    sigA = fracF32UI( uiA );
-    expB = expF32UI( uiB );
-    sigB = fracF32UI( uiB );
+    int16_t expA = expF32UI(uiA);
+    uint32_t sigA = fracF32UI(uiA);
+    int16_t const expB = expF32UI(uiB);
+    uint32_t sigB = fracF32UI(uiB);
 
-    expDiff = expA - expB;
-    if ( ! expDiff ) {
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
-            softfloat_raiseFlags( softfloat_flag_invalid );
-            uiZ = defaultNaNF32UI;
-            goto uiZ;
+    int16_t expDiff = expA - expB;
+    if (!expDiff) {
+        int8_t shiftDist;
+        if (expA == 0xFF) {
+            if (sigA | sigB) {
+                return ui32_as_f32(softfloat_propagateNaNF32UI(uiA, uiB));
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return ui32_as_f32(defaultNaNF32UI);
+            }
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
-            uiZ =
-                packToF32UI(
-                    (softfloat_roundingMode == softfloat_round_min), 0, 0 );
-            goto uiZ;
+        if (!sigDiff) {
+            return ui32_as_f32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
         }
-        if ( expA ) --expA;
-        signZ = signF32UI( uiA );
-        if ( sigDiff < 0 ) {
-            signZ = ! signZ;
+        if (expA) {
+            --expA;
+        }
+        signZ = signF32UI(uiA);
+        if (sigDiff < 0) {
+            signZ = !signZ;
             sigDiff = -sigDiff;
         }
-        shiftDist = softfloat_countLeadingZeros32( sigDiff ) - 8;
+        shiftDist = softfloat_countLeadingZeros32(sigDiff) - 8;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        if (expZ < 0) {
             shiftDist = expA;
             expZ = 0;
         }
-        uiZ = packToF32UI( signZ, expZ, sigDiff<<shiftDist );
-        goto uiZ;
+        return ui32_as_f32(packToF32UI(signZ, expZ, sigDiff << shiftDist));
     } else {
-        signZ = signF32UI( uiA );
+        uint32_t sigX, sigY;
+        signZ = signF32UI(uiA);
         sigA <<= 7;
         sigB <<= 7;
-        if ( expDiff < 0 ) {
-            signZ = ! signZ;
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
-                uiZ = packToF32UI( signZ, 0xFF, 0 );
-                goto uiZ;
+        if (expDiff < 0) {
+            signZ = !signZ;
+            if (expB == 0xFF) {
+                if (sigB) {
+                    return ui32_as_f32(softfloat_propagateNaNF32UI(uiA, uiB));
+                }
+                return ui32_as_f32(packToF32UI(signZ, 0xFF, 0));
             }
             expZ = expB - 1;
             sigX = sigB | 0x40000000;
             sigY = sigA + (expA ? 0x40000000 : sigA);
             expDiff = -expDiff;
         } else {
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
-                uiZ = uiA;
-                goto uiZ;
+            if (expA == 0xFF) {
+                if (sigA) {
+                    return ui32_as_f32(softfloat_propagateNaNF32UI(uiA, uiB));
+                }
+                return ui32_as_f32(uiA);
             }
             expZ = expA - 1;
             sigX = sigA | 0x40000000;
             sigY = sigB + (expB ? 0x40000000 : sigB);
         }
         return
-            softfloat_normRoundPackToF32(
-                signZ, expZ, sigX - softfloat_shiftRightJam32( sigY, expDiff )
-            );
+            softfloat_normRoundPackToF32(signZ, expZ, sigX - softfloat_shiftRightJam32(sigY, expDiff));
     }
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }

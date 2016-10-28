@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 #include "softfloat/functions.h"
+#include "internals.h"
 
 void softfloat_f32UIToCommonNaN(uint32_t uiA, struct commonNaN *zPtr)
 {

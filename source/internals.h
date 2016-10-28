@@ -105,6 +105,92 @@ enum
     softfloat_mulAdd_subProd = 2
 };
 
+static inline uint16_t
+f16_as_ui16(float16_t v)
+{
+    return *(uint16_t const*)&v;
+}
+static inline float16_t
+ui16_as_f16(uint16_t v)
+{
+    return *(float16_t const*)&v;
+}
+static inline uint32_t
+f32_as_ui32(float32_t v)
+{
+    return *(uint32_t const*)&v;
+}
+static inline float32_t
+ui32_as_f32(uint32_t v)
+{
+    return *(float32_t const*)&v;
+}
+
+static inline uint64_t
+f64_as_ui64(float64_t v)
+{
+    return *(uint64_t const*)&v;
+}
+static inline float64_t
+ui64_as_f64(uint64_t v)
+{
+    return *(float64_t const*)&v;
+}
+
+#ifdef SOFTFLOAT_FAST_INT64
+static inline struct uint128
+f128_as_ui128(float128_t v)
+{
+    return *(struct uint128 const*)&v;
+}
+static inline float128_t
+ui128_as_f128(struct uint128 v)
+{
+    return *(float128_t const*)&v;
+}
+#endif  /* SOFTFLOAT_FAST_INT64 */
+
+/**
+@returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
+32-bit floating-point NaN.
+*/
+static inline bool
+softfloat_isNaNF32UI(uint32_t uiA)
+{
+    static uint32_t exp_mask = ~(~UINT32_C(0) << 8) << 23;
+    static uint32_t sgnf_mask = ~(~UINT32_C(0) << 23);
+    return
+        (uiA & exp_mask) == exp_mask &&
+        0 != (uiA & sgnf_mask);
+}
+/**
+@returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
+64-bit floating-point NaN.
+*/
+static inline bool
+softfloat_isNaNF64UI(uint64_t uiA)
+{
+    static uint64_t exp_mask = ~(~UINT64_C(0) << 11) << 52;
+    static uint64_t sgnf_mask = ~(~UINT64_C(0) << 52);
+    return
+        (uiA & exp_mask) == exp_mask &&
+        0 != (uiA & sgnf_mask);
+}
+/**
+Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
+32-bit floating-point signaling NaN.
+*/
+static inline bool
+softfloat_isSigNaNF32UI(uint32_t uiA)
+{
+    static uint32_t exp_mask = ~(~UINT32_C(0) << 8) << 23;
+    static uint32_t quite_mask = ~(~UINT32_C(0) << 1) << 22;
+    static uint32_t sgnf_mask = ~(~UINT32_C(0) << 23);
+    return
+        (uiA & (exp_mask | quite_mask)) == exp_mask &&
+        0 != (uiA & sgnf_mask);
+}
+
 uint32_t
 softfloat_roundPackToUI32(bool, uint64_t, uint8_t, bool);
 

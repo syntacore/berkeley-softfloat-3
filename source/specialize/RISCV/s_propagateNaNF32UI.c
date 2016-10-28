@@ -36,12 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.h"
 
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
+#include "internals.h"
+
 uint32_t
 softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
 {
