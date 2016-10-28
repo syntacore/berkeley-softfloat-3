@@ -50,18 +50,18 @@ softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
 
     if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
-        if (isSigNaNA) {
-            if (isSigNaNB) {
-                uint32_t const uiMagA = uiNonsigA & 0x7FFFFFFF;
-                uint32_t const uiMagB = uiNonsigB & 0x7FFFFFFF;
-                return 
-                    uiMagA < uiMagB ? uiNonsigB:
-                    uiMagB < uiMagA ? uiNonsigA :
-                    uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
-            }
-            return isNaNF32UI(uiB) ? uiNonsigB : uiNonsigA;
-        } else {
+        if (!isSigNaNA) {
             return isNaNF32UI(uiA) ? uiNonsigA : uiNonsigB;
+        } else if (!isSigNaNB) {
+            return isNaNF32UI(uiB) ? uiNonsigB : uiNonsigA;
         }
+    }
+    {
+        uint32_t const uiMagA = uiNonsigA & 0x7FFFFFFF;
+        uint32_t const uiMagB = uiNonsigB & 0x7FFFFFFF;
+        return
+            uiMagA < uiMagB ? uiNonsigB :
+            uiMagB < uiMagA ? uiNonsigA :
+            uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
     }
 }

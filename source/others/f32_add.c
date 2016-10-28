@@ -38,31 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-float32_t f32_add( float32_t a, float32_t b )
+float32_t f32_add(float32_t a, float32_t b)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    union ui32_f32 uB;
-    uint32_t uiB;
-#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 1)
-    float32_t (*magsFuncPtr)( uint32_t, uint32_t );
-#endif
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
-#if defined INLINE_LEVEL && (1 <= INLINE_LEVEL)
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_subMagsF32( uiA, uiB );
-    } else {
-        return softfloat_addMagsF32( uiA, uiB );
-    }
-#else
-    magsFuncPtr =
-        signF32UI( uiA ^ uiB ) ? softfloat_subMagsF32 : softfloat_addMagsF32;
-    return (*magsFuncPtr)( uiA, uiB );
-#endif
-
+    uint32_t const uiA = f_as_u_32(a);
+    uint32_t const uiB = f_as_u_32(b);
+    return
+        signF32UI(uiA ^ uiB) ? softfloat_subMagsF32(uiA, uiB) : softfloat_addMagsF32(uiA, uiB);
 }
 

@@ -45,9 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float32_t f128M_to_f32(const float128_t *aPtr)
 {
-
     return f128_to_f32(*aPtr);
-
 }
 
 #else
@@ -55,8 +53,6 @@ float32_t f128M_to_f32(const float128_t *aPtr)
 float32_t f128M_to_f32(const float128_t *aPtr)
 {
     uint32_t uiZ;
-    union ui32_f32 uZ;
-
     const uint32_t *aWPtr = (const uint32_t *)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
@@ -87,8 +83,7 @@ float32_t f128M_to_f32(const float128_t *aPtr)
             uiZ = packToF32UI(sign, 0xFF, 0);
         }
     }
-    uZ.ui = uiZ;
-    return uZ.f;
+    return u_as_f_32(uiZ);
 }
 
 #endif

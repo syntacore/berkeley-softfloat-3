@@ -55,15 +55,15 @@ float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
         int8_t shiftDist;
         if (expA == 0xFF) {
             if (sigA | sigB) {
-                return ui32_as_f32(softfloat_propagateNaNF32UI(uiA, uiB));
+                return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
             } else {
                 softfloat_raiseFlags(softfloat_flag_invalid);
-                return ui32_as_f32(defaultNaNF32UI);
+                return u_as_f_32(defaultNaNF32UI);
             }
         }
         sigDiff = sigA - sigB;
         if (!sigDiff) {
-            return ui32_as_f32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+            return u_as_f_32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
         }
         if (expA) {
             --expA;
@@ -79,7 +79,7 @@ float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
             shiftDist = expA;
             expZ = 0;
         }
-        return ui32_as_f32(packToF32UI(signZ, expZ, sigDiff << shiftDist));
+        return u_as_f_32(packToF32UI(signZ, expZ, sigDiff << shiftDist));
     } else {
         uint32_t sigX, sigY;
         signZ = signF32UI(uiA);
@@ -89,9 +89,9 @@ float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
             signZ = !signZ;
             if (expB == 0xFF) {
                 if (sigB) {
-                    return ui32_as_f32(softfloat_propagateNaNF32UI(uiA, uiB));
+                    return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
                 }
-                return ui32_as_f32(packToF32UI(signZ, 0xFF, 0));
+                return u_as_f_32(packToF32UI(signZ, 0xFF, 0));
             }
             expZ = expB - 1;
             sigX = sigB | 0x40000000;
@@ -100,9 +100,9 @@ float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
         } else {
             if (expA == 0xFF) {
                 if (sigA) {
-                    return ui32_as_f32(softfloat_propagateNaNF32UI(uiA, uiB));
+                    return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
                 }
-                return ui32_as_f32(uiA);
+                return u_as_f_32(uiA);
             }
             expZ = expA - 1;
             sigX = sigA | 0x40000000;

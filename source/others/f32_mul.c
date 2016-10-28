@@ -40,96 +40,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float32_t f32_mul(float32_t a, float32_t b)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    bool signA;
-    int16_t expA;
-    uint32_t sigA;
-    union ui32_f32 uB;
-    uint32_t uiB;
-    bool signB;
-    int16_t expB;
-    uint32_t sigB;
-    bool signZ;
-    uint32_t magBits;
-    struct exp16_sig32 normExpSig;
-    int16_t expZ;
-    uint32_t sigZ;
-    uint32_t uiZ;
-    union ui32_f32 uZ;
-
-    uA.f = a;
-    uiA = uA.ui;
-    signA = signF32UI(uiA);
-    expA = expF32UI(uiA);
-    sigA = fracF32UI(uiA);
-    uB.f = b;
-    uiB = uB.ui;
-    signB = signF32UI(uiB);
-    expB = expF32UI(uiB);
-    sigB = fracF32UI(uiB);
-    signZ = signA ^ signB;
-
-    if (expA == 0xFF) {
-        if (sigA || ((expB == 0xFF) && sigB)) {
-            goto propagateNaN;
-        }
-        magBits = expB | sigB;
-        goto infArg;
-    }
-    if (expB == 0xFF) {
-        if (sigB) {
-            goto propagateNaN;
-        }
-        magBits = expA | sigA;
-        goto infArg;
-    }
-
-    if (!expA) {
-        if (!sigA) {
-            goto zero;
-        }
-        normExpSig = softfloat_normSubnormalF32Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-    if (!expB) {
-        if (!sigB) {
-            goto zero;
-        }
-        normExpSig = softfloat_normSubnormalF32Sig(sigB);
-        expB = normExpSig.exp;
-        sigB = normExpSig.sig;
-    }
-
-    expZ = expA + expB - 0x7F;
-    sigA = (sigA | 0x00800000) << 7;
-    sigB = (sigB | 0x00800000) << 8;
-    sigZ = (uint32_t)softfloat_shortShiftRightJam64((uint64_t)sigA * sigB, 32);
-    if (sigZ < 0x40000000) {
-        --expZ;
-        sigZ <<= 1;
-    }
-    return softfloat_roundPackToF32(signZ, expZ, sigZ);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNF32UI(uiA, uiB);
-    goto uiZ;
-
-infArg:
-    if (!magBits) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        uiZ = defaultNaNF32UI;
+    uint32_t const uiA = f_as_u_32(a);
+    uint32_t const uiB = f_as_u_32(b);
+    if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB)) {
+        return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
     } else {
-        uiZ = packToF32UI(signZ, 0xFF, 0);
+        bool const signA = signF32UI(uiA);
+        int16_t expA = expF32UI(uiA);
+        uint32_t sigA = fracF32UI(uiA);
+        bool const signB = signF32UI(uiB);
+        int16_t expB = expF32UI(uiB);
+        uint32_t sigB = fracF32UI(uiB);
+        bool const signZ = signA ^ signB;
+
+        if (expA == 0xFF || expB == 0xFF) {
+            bool const is_undefined =
+                expA == 0xFF ? 0 == expB && 0 == sigB :
+                0 == expA && 0 == sigA;
+            if (is_undefined) {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return u_as_f_32(defaultNaNF32UI);
+            } else {
+                return u_as_f_32(packToF32UI(signZ, 0xFF, 0));
+            }
+        } else {
+            struct exp16_sig32 normExpSig;
+            if (!expA) {
+                if (!sigA) {
+                    return u_as_f_32(packToF32UI(signZ, 0, 0));
+                }
+                normExpSig = softfloat_normSubnormalF32Sig(sigA);
+                expA = normExpSig.exp;
+                sigA = normExpSig.sig;
+            }
+            if (!expB) {
+                if (!sigB) {
+                    return u_as_f_32(packToF32UI(signZ, 0, 0));
+                }
+                normExpSig = softfloat_normSubnormalF32Sig(sigB);
+                expB = normExpSig.exp;
+                sigB = normExpSig.sig;
+            }
+
+            {
+                int16_t expZ = expA + expB - 0x7F;
+                sigA = (sigA | 0x00800000) << 7;
+                sigB = (sigB | 0x00800000) << 8;
+                uint32_t sigZ = (uint32_t)softfloat_shortShiftRightJam64((uint64_t)sigA * sigB, 32);
+                if (sigZ < 0x40000000) {
+                    --expZ;
+                    sigZ <<= 1;
+                }
+                return softfloat_roundPackToF32(signZ, expZ, sigZ);
+            }
+        }
     }
-    goto uiZ;
-
-zero:
-    uiZ = packToF32UI(signZ, 0, 0);
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-

@@ -47,7 +47,7 @@ uint32_t f16_to_ui32_r_minMag( float16_t a, bool exact )
     bool sign;
     uint32_t alignedSig;
 
-    uint16_t const uiA = f16_as_ui16(a);
+    uint16_t const uiA = f_as_u_16(a);
     exp  = expF16UI( uiA );
     frac = fracF16UI( uiA );
     

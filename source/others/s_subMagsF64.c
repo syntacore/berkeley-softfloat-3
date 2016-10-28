@@ -123,7 +123,7 @@ softfloat_subMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
 propagateNaN:
     uiZ = softfloat_propagateNaNF64UI(uiA, uiB);
 uiZ:
-    return ui64_as_f64(uiZ);
+    return u_as_f_64(uiZ);
 
 }
 

@@ -45,7 +45,7 @@ int32_t f32_to_i32(float32_t a, uint8_t roundingMode, bool exact)
     uint64_t sig64;
     int16_t shiftDist;
 
-    uint32_t const uiA = f32_as_ui32(a);
+    uint32_t const uiA = f_as_u_32(a);
     bool sign = signF32UI(uiA);
     int16_t const exp = expF32UI(uiA);
     sig = fracF32UI(uiA);

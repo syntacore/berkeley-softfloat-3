@@ -43,7 +43,7 @@ float32_t
 softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
 {
     if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB) || softfloat_isNaNF32UI(uiC)) {
-        return ui32_as_f32(softfloat_propagateNaNF32UI(softfloat_propagateNaNF32UI(uiA, uiB), uiC));
+        return u_as_f_32(softfloat_propagateNaNF32UI(softfloat_propagateNaNF32UI(uiA, uiB), uiC));
     } else {
         bool const signA = signF32UI(uiA);
         int16_t expA = expF32UI(uiA);
@@ -71,26 +71,26 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                 uint32_t const uiZ = packToF32UI(signProd, 0xFF, 0);
                 if (expC != 0xFF) {
                     /* summand c is finite, return product as result */
-                    return ui32_as_f32(uiZ);
+                    return u_as_f_32(uiZ);
                 }
                 /* summand c is inf, check for same sign */
                 if (signProd == signC) {
                     /* summands are same sign inf */
-                    return ui32_as_f32(uiZ);
+                    return u_as_f_32(uiZ);
                 }
                 /* summands are different sign inf, undefined sum */
             }
             /* product is undefined or undefined sum */
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return ui32_as_f32(softfloat_propagateNaNF32UI(defaultNaNF32UI, uiC));
+            return u_as_f_32(softfloat_propagateNaNF32UI(defaultNaNF32UI, uiC));
         } else if (expC == 0xFF) {
-            return ui32_as_f32(uiC);
+            return u_as_f_32(uiC);
         } else {
             if (0 == expA) {
                 /* a is zero or subnormal */
                 if (0 == sigA) {
                     /* a is zero */
-                    return ui32_as_f32(0 == (expC | sigC) && signProd != signC ? packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+                    return u_as_f_32(0 == (expC | sigC) && signProd != signC ? packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
                 } else {
                     struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                     expA = normExpSig.exp;
@@ -101,7 +101,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                 /* b is zero or subnormal */
                 if (!sigB) {
                     /* b is zero */
-                    return ui32_as_f32(!(expC | sigC) && signProd != signC ? packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+                    return u_as_f_32(!(expC | sigC) && signProd != signC ? packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
                 } else {
                     struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
                     expB = normExpSig.exp;
@@ -161,7 +161,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                                 expZ = expProd;
                                 sig64Z = sigProd - sig64C;
                                 if (!sig64Z) {
-                                    return ui32_as_f32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+                                    return u_as_f_32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
                                 } else if (sig64Z & INT64_MIN) {
                                     signZ = !signZ;
                                     sig64Z = -(int64_t)sig64Z;

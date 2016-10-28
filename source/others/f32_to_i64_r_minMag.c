@@ -39,50 +39,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-int64_t f32_to_i64_r_minMag( float32_t a, bool exact )
+int64_t
+f32_to_i64_r_minMag(float32_t a, bool exact)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    int16_t exp;
-    uint32_t sig;
-    int16_t shiftDist;
-    bool sign;
-    uint64_t sig64;
-    int64_t absZ;
+    uint32_t const uiA = f_as_u_32(a);
+    int16_t const exp = expF32UI(uiA);
+    uint32_t sig = fracF32UI(uiA);
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    exp = expF32UI( uiA );
-    sig = fracF32UI( uiA );
-    
-    shiftDist = 0xBE - exp;
-    if ( 64 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    int16_t shiftDist = 0xBE - exp;
+    if (64 <= shiftDist) {
+        if (exact && (exp | sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
         return 0;
-    }
-    
-    sign = signF32UI( uiA );
-    if ( shiftDist <= 0 ) {
-        if ( uiA == packToF32UI( 1, 0xBE, 0 ) ) {
-            return -INT64_C( 0x7FFFFFFFFFFFFFFF ) - 1;
+    } else {
+        bool const sign = signF32UI(uiA);
+        if (shiftDist <= 0) {
+            if (uiA == packToF32UI(1, 0xBE, 0)) {
+                return INT64_MIN;
+            }
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                exp == 0xFF && sig ? i64_fromNaN :
+                sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return
-            (exp == 0xFF) && sig ? i64_fromNaN
-                : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-    }
-    
-    sig |= 0x00800000;
-    sig64 = (uint64_t) sig<<40;
-    absZ = sig64>>shiftDist;
-    shiftDist = 40 - shiftDist;
-    if ( exact && (shiftDist < 0) && (uint32_t) (sig<<(shiftDist & 31)) ) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-    return sign ? -absZ : absZ;
 
+        sig |= 0x00800000;
+        {
+            uint64_t const sig64 = (uint64_t)sig << 40;
+            int64_t const absZ = sig64 >> shiftDist;
+            shiftDist = 40 - shiftDist;
+            if (exact && (shiftDist < 0) && (uint32_t)(sig << (shiftDist & 31))) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+            return sign ? -absZ : absZ;
+        }
+    }
 }
-

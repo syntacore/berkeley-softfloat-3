@@ -39,44 +39,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float16_t f32_to_f16( float32_t a )
+float16_t f32_to_f16(float32_t a)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    bool sign;
-    int16_t exp;
-    uint32_t frac;
     struct commonNaN commonNaN;
-    uint16_t uiZ, frac16;
-    union ui16_f16 uZ;
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF32UI( uiA );
-    exp  = expF32UI( uiA );
-    frac = fracF32UI( uiA );
-    
-    if ( exp == 0xFF ) {
-        if ( frac ) {
-            softfloat_f32UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF16UI( &commonNaN );
+    uint32_t const uiA = f_as_u_32(a);
+    bool const sign = signF32UI(uiA);
+    int16_t exp = expF32UI(uiA);
+    uint32_t const frac = fracF32UI(uiA);
+
+    if (exp == 0xFF) {
+        if (frac) {
+            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
+            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
         } else {
-            uiZ = packToF16UI( sign, 0x1F, 0 );
+            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-        goto uiZ;
+    } else {
+        uint16_t const frac16 = frac >> 9 | ((frac & 0x1FF) != 0);
+        return
+            !(exp | frac16) ? u_as_f_16(packToF16UI(sign, 0, 0)) :
+            softfloat_roundPackToF16(sign, exp - 0x71, frac16 | 0x4000);
     }
-    
-    frac16 = frac>>9 | ((frac & 0x1FF) != 0);
-    if ( ! (exp | frac16) ) {
-        uiZ = packToF16UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    
-    return softfloat_roundPackToF16( sign, exp - 0x71, frac16 | 0x4000 );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
 
