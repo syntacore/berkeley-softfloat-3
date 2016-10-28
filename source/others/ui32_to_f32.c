@@ -37,19 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 #include "internals.h"
 
-float32_t ui32_to_f32( uint32_t a )
+float32_t ui32_to_f32(uint32_t a)
 {
-    union ui32_f32 uZ;
-
-    if ( ! a ) {
-        uZ.ui = 0;
-        return uZ.f;
-    }
-    if ( a & 0x80000000 ) {
-        return softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
-    } else {
-        return softfloat_normRoundPackToF32( 0, 0x9C, a );
-    }
-
+    return
+        !a ? u_as_f_32(0) :
+        0 != (a & 0x80000000) ? softfloat_roundPackToF32(0, 0x9D, a >> 1 | (a & 1)) :
+        softfloat_normRoundPackToF32(0, 0x9C, a);
 }
 

@@ -41,14 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t i32_to_f32(int32_t a)
 {
     bool const sign = a < 0;
-    if (!(a & 0x7FFFFFFF)) {
-        /** @todo ui32_as_f32() */
-        union ui32_f32 uZ;
-        uZ.ui = sign ? packToF32UI(1, 0x9E, 0) : 0;
-        return uZ.f;
-    } else {
-        uint32_t absA = sign ? -a : a;
-        return softfloat_normRoundPackToF32(sign, 0x9C, absA);
-    }
+    return
+        0 == (a & INT32_MAX) ? u_as_f_32(sign ? packToF32UI(1, 0x9E, 0) : 0) :
+        softfloat_normRoundPackToF32(sign, 0x9C, sign ? -a : a);
 }
-

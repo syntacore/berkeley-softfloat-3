@@ -42,8 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 uint64_t f32_to_ui64(float32_t a, uint8_t roundingMode, bool exact)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
     bool sign;
     int16_t exp;
     uint32_t sig;
@@ -56,8 +54,7 @@ uint64_t f32_to_ui64(float32_t a, uint8_t roundingMode, bool exact)
 #endif
 
 
-    uA.f = a;
-    uiA = uA.ui;
+    uint32_t const uiA = f_as_u_32(a);
     sign = signF32UI(uiA);
     exp = expF32UI(uiA);
     sig = fracF32UI(uiA);

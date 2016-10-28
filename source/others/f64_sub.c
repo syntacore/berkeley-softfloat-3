@@ -48,9 +48,9 @@ float64_t f64_sub( float64_t a, float64_t b )
     float64_t (*magsFuncPtr)( uint64_t, uint64_t, bool );
 #endif
 
-    uiA = f64_as_ui64(a);
+    uiA = f_as_u_64(a);
     signA = signF64UI( uiA );
-    uiB = f64_as_ui64(b);
+    uiB = f_as_u_64(b);
     signB = signF64UI( uiB );
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
     if ( signA == signB ) {

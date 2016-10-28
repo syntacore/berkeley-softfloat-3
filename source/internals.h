@@ -106,45 +106,45 @@ enum
 };
 
 static inline uint16_t
-f16_as_ui16(float16_t v)
+f_as_u_16(float16_t v)
 {
     return *(uint16_t const*)&v;
 }
 static inline float16_t
-ui16_as_f16(uint16_t v)
+u_as_f_16(uint16_t v)
 {
     return *(float16_t const*)&v;
 }
 static inline uint32_t
-f32_as_ui32(float32_t v)
+f_as_u_32(float32_t v)
 {
     return *(uint32_t const*)&v;
 }
 static inline float32_t
-ui32_as_f32(uint32_t v)
+u_as_f_32(uint32_t v)
 {
     return *(float32_t const*)&v;
 }
 
 static inline uint64_t
-f64_as_ui64(float64_t v)
+f_as_u_64(float64_t v)
 {
     return *(uint64_t const*)&v;
 }
 static inline float64_t
-ui64_as_f64(uint64_t v)
+u_as_f_64(uint64_t v)
 {
     return *(float64_t const*)&v;
 }
 
 #ifdef SOFTFLOAT_FAST_INT64
 static inline struct uint128
-f128_as_ui128(float128_t v)
+f_as_u_128(float128_t v)
 {
     return *(struct uint128 const*)&v;
 }
 static inline float128_t
-ui128_as_f128(struct uint128 v)
+u_as_f_128(struct uint128 v)
 {
     return *(float128_t const*)&v;
 }

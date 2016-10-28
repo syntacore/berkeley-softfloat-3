@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 uint32_t f32_to_ui32_r_minMag(float32_t a, bool exact)
 {
-    uint32_t const uiA = f32_as_ui32(a);
+    uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);
 

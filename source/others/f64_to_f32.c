@@ -41,37 +41,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float32_t f64_to_f32(float64_t a)
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    bool sign;
-    int16_t exp;
-    uint64_t frac;
-    uint32_t uiZ;
-    union ui32_f32 uZ;
-
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF64UI(uiA);
-    exp = expF64UI(uiA);
-    frac = fracF64UI(uiA);
+    uint64_t const uiA = f_as_u_64(a);
+    bool const sign = signF64UI(uiA);
+    int16_t const exp = expF64UI(uiA);
+    uint64_t const frac = fracF64UI(uiA);
     if (exp != INT16_MAX) {
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac, 22);
         if (exp | frac32) {
             return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
         } else {
-            uiZ = packToF32UI(sign, 0, 0);
+            return u_as_f_32(packToF32UI(sign, 0, 0));
         }
     } else {
         if (frac) {
             struct commonNaN commonNaN;
             softfloat_f64UIToCommonNaN(uiA, &commonNaN);
-            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
+            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            uiZ = packToF32UI(sign, 0xFF, 0);
+            return u_as_f_32(packToF32UI(sign, 0xFF, 0));
         }
     }
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-

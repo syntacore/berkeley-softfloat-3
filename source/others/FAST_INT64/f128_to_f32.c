@@ -45,18 +45,14 @@ float32_t f128_to_f32(float128_t a)
 {
     union ui128_f128 uA;
     uint64_t uiA64, uiA0;
-    bool sign;
-    int32_t exp;
-    uint64_t frac64;
     uint32_t uiZ;
-    union ui32_f32 uZ;
 
     uA.f = a;
     uiA64 = uA.ui.v64;
     uiA0 = uA.ui.v0;
-    sign = signF128UI64(uiA64);
-    exp = expF128UI64(uiA64);
-    frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
+    bool const sign = signF128UI64(uiA64);
+    int32_t exp = expF128UI64(uiA64);
+    uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
     if (exp != INT16_MAX) {
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac64, 18);
         if (exp | frac32) {
@@ -78,8 +74,5 @@ float32_t f128_to_f32(float128_t a)
             uiZ = packToF32UI(sign, 0xFF, 0);
         }
     }
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return u_as_f_32(uiZ);
 }
-

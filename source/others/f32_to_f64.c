@@ -39,49 +39,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float64_t f32_to_f64( float32_t a )
+float64_t f32_to_f64(float32_t a)
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    bool sign;
-    int16_t exp;
-    uint32_t frac;
-    struct commonNaN commonNaN;
-    uint64_t uiZ;
-    struct exp16_sig32 normExpSig;
-    union ui64_f64 uZ;
+    uint32_t const uiA = f_as_u_32(a);
+    bool const sign = signF32UI(uiA);
+    int16_t exp = expF32UI(uiA);
+    uint32_t frac = fracF32UI(uiA);
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF32UI( uiA );
-    exp  = expF32UI( uiA );
-    frac = fracF32UI( uiA );
-    
-    if ( exp == 0xFF ) {
-        if ( frac ) {
-            softfloat_f32UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF64UI( &commonNaN );
+    if (exp == 0xFF) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
+            return u_as_f_64(softfloat_commonNaNToF64UI(&commonNaN));
         } else {
-            uiZ = packToF64UI( sign, 0x7FF, 0 );
+            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-        goto uiZ;
-    }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ = packToF64UI( sign, 0, 0 );
-            goto uiZ;
+    } else if (!exp) {
+        if (!frac) {
+            return u_as_f_64(packToF64UI(sign, 0, 0));
+        } else {
+            struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+            exp = normExpSig.exp - 1;
+            frac = normExpSig.sig;
         }
-        normExpSig = softfloat_normSubnormalF32Sig( frac );
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
     }
-    
-    uiZ = packToF64UI( sign, exp + 0x380, (uint64_t) frac<<29 );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return u_as_f_64(packToF64UI(sign, exp + 0x380, (uint64_t)frac << 29));
 }
-

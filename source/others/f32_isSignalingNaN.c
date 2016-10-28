@@ -41,5 +41,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 f32_isSignalingNaN( float32_t a )
 {
-    return softfloat_isSigNaNF32UI(f32_as_ui32(a));
+    return softfloat_isSigNaNF32UI(f_as_u_32(a));
 }

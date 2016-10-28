@@ -46,7 +46,8 @@ float32_t extF80_to_f32(extFloat80_t a)
     /** @bug union of same type */
     union
     {
-        struct extFloat80M s; extFloat80_t f;
+        struct extFloat80M s; 
+        extFloat80_t f;
     } uA;
     uint16_t uiA64;
     uint64_t uiA0;
@@ -54,7 +55,6 @@ float32_t extF80_to_f32(extFloat80_t a)
     int32_t exp;
     uint64_t sig;
     uint32_t uiZ;
-    union ui32_f32 uZ;
 
     uA.f = a;
     uiA64 = uA.s.signExp;
@@ -85,7 +85,6 @@ float32_t extF80_to_f32(extFloat80_t a)
             uiZ = packToF32UI(sign, 0, 0);
         }
     }
-    uZ.ui = uiZ;
-    return uZ.f;
+    return u_as_f_32(uiZ);
 }
 

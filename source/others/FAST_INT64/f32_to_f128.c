@@ -47,7 +47,7 @@ float128_t f32_to_f128(float32_t a)
     struct uint128 uiZ;
     struct exp16_sig32 normExpSig;
 
-    uint32_t const uiA = f32_as_ui32(a);
+    uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     exp = expF32UI(uiA);
     frac = fracF32UI(uiA);
@@ -60,14 +60,14 @@ float128_t f32_to_f128(float32_t a)
             uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
             uiZ.v0 = 0;
         }
-        return ui128_as_f128(uiZ);
+        return u_as_f_128(uiZ);
     }
 
     if (!exp) {
         if (!frac) {
             uiZ.v64 = packToF128UI64(sign, 0, 0);
             uiZ.v0 = 0;
-            return ui128_as_f128(uiZ);
+            return u_as_f_128(uiZ);
         }
         normExpSig = softfloat_normSubnormalF32Sig(frac);
         exp = normExpSig.exp - 1;
@@ -76,6 +76,6 @@ float128_t f32_to_f128(float32_t a)
 
     uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
     uiZ.v0 = 0;
-    return ui128_as_f128(uiZ);
+    return u_as_f_128(uiZ);
 }
 

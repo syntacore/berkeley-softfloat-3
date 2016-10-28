@@ -39,49 +39,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float32_t f16_to_f32( float16_t a )
+float32_t f16_to_f32(float16_t a)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool sign;
-    int8_t exp;
-    uint16_t frac;
-    struct commonNaN commonNaN;
-    uint32_t uiZ;
-    struct exp8_sig16 normExpSig;
-    union ui32_f32 uZ;
+    uint16_t const uiA = f_as_u_16(a);
+    bool const sign = signF16UI(uiA);
+    int8_t exp = expF16UI(uiA);
+    uint16_t frac = fracF16UI(uiA);
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF16UI( uiA );
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    
-    if ( exp == 0x1F ) {
-        if ( frac ) {
-            softfloat_f16UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF32UI( &commonNaN );
+    if (exp == 0x1F) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
+            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            uiZ = packToF32UI( sign, 0xFF, 0 );
+            return u_as_f_32(packToF32UI(sign, 0xFF, 0));
         }
-        goto uiZ;
-    }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ = packToF32UI( sign, 0, 0 );
-            goto uiZ;
+    } else {
+        if (!exp) {
+            if (!frac) {
+                return u_as_f_32(packToF32UI(sign, 0, 0));
+            } else {
+                struct exp8_sig16 normExpSig;
+                normExpSig = softfloat_normSubnormalF16Sig(frac);
+                exp = normExpSig.exp - 1;
+                frac = normExpSig.sig;
+            }
         }
-        normExpSig = softfloat_normSubnormalF16Sig( frac );
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
+        return u_as_f_32(packToF32UI(sign, exp + 0x70, (uint32_t)frac << 13));
     }
-    
-    uiZ = packToF32UI( sign, exp + 0x70, (uint32_t) frac<<13 );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-
