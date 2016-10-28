@@ -40,20 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
 {
-    union ui32_f32 uA;
-    uint32_t uiA;
-    union ui32_f32 uB;
-    uint32_t uiB;
-    union ui32_f32 uC;
-    uint32_t uiC;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
-    uC.f = c;
-    uiC = uC.ui;
-    return softfloat_mulAddF32( uiA, uiB, uiC, 0 );
-
+    return softfloat_mulAddF32(*(uint32_t const*)&a, *(uint32_t const*)&b, *(uint32_t const*)&c, 0 );
 }
 
