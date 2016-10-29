@@ -39,50 +39,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float16_t f128_to_f16( float128_t a )
+float16_t f128_to_f16(float128_t a)
 {
     union ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    bool sign;
-    int32_t exp;
-    uint64_t frac64;
-    struct commonNaN commonNaN;
-    uint16_t uiZ, frac16;
-    union ui16_f16 uZ;
-
-    
     uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
-    sign  = signF128UI64( uiA64 );
-    exp   = expF128UI64( uiA64 );
-    frac64 = fracF128UI64( uiA64 ) | (uiA0 != 0);
-    
-    if ( exp == 0x7FFF ) {
-        if ( frac64 ) {
-            softfloat_f128UIToCommonNaN( uiA64, uiA0, &commonNaN );
-            uiZ = softfloat_commonNaNToF16UI( &commonNaN );
+    uint64_t const uiA64 = uA.ui.v64;
+    uint64_t const uiA0 = uA.ui.v0;
+    bool const sign = signF128UI64(uiA64);
+    int32_t exp = expF128UI64(uiA64);
+    uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
+    if (exp == 0x7FFF) {
+        if (frac64) {
+            struct commonNaN commonNaN;
+            softfloat_f128UIToCommonNaN(uiA64, uiA0, &commonNaN);
+            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
         } else {
-            uiZ = packToF16UI( sign, 0x1F, 0 );
+            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-        goto uiZ;
+    } else {
+        uint16_t const frac16 = (uint16_t)softfloat_shortShiftRightJam64(frac64, 34);
+        if (!(exp | frac16)) {
+            return u_as_f_16(packToF16UI(sign, 0, 0));
+        } else {
+            exp -= 0x3FF1;
+            if (sizeof(int16_t) < sizeof exp) {
+                if (exp < -0x40) {
+                    exp = -0x40;
+                }
+            }
+            return softfloat_roundPackToF16(sign, exp, frac16 | 0x4000);
+        }
     }
-    
-    frac16 = (uint16_t)softfloat_shortShiftRightJam64( frac64, 34 );
-    if ( ! (exp | frac16) ) {
-        uiZ = packToF16UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    
-    exp -= 0x3FF1;
-    if ( sizeof (int16_t) < sizeof exp) {
-        if ( exp < -0x40 ) exp = -0x40;
-    }
-    return softfloat_roundPackToF16( sign, exp, frac16 | 0x4000 );
-    
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-

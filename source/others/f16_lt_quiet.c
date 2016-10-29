@@ -39,29 +39,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-bool f16_lt_quiet(float16_t a, float16_t b)
+bool
+f16_lt_quiet(float16_t a, float16_t b)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    union ui16_f16 uB;
-    uint16_t uiB;
-    bool signA, signB;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
+    uint16_t const uiA = f_as_u_16(a);
+    uint16_t const uiB = f_as_u_16(b);
     if (isNaNF16UI(uiA) || isNaNF16UI(uiB)) {
         if (softfloat_isSigNaNF16UI(uiA) || softfloat_isSigNaNF16UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
         return false;
+    } else {
+        bool const signA = signF16UI(uiA);
+        bool const signB = signF16UI(uiB);
+        return
+            signA != signB ? signA && (uint16_t)((uiA | uiB) << 1) != 0 :
+            uiA != uiB && (signA ^ (uiA < uiB));
     }
-    signA = signF16UI(uiA);
-    signB = signF16UI(uiB);
-    return
-        (signA != signB) ? signA && ((uint16_t)((uiA | uiB) << 1) != 0)
-        : (uiA != uiB) && (signA ^ (uiA < uiB));
-
 }
-

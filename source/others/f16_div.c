@@ -168,13 +168,13 @@ float16_t f16_div(float16_t a, float16_t b)
     
 propagateNaN:
     uiZ = softfloat_propagateNaNF16UI(uiA, uiB);
-    goto uiZ;
-    
+    return u_as_f_16(uiZ);
+
 invalid:
     softfloat_raiseFlags(softfloat_flag_invalid);
     uiZ = defaultNaNF16UI;
-    goto uiZ;
-    
+    return u_as_f_16(uiZ);
+
 infinity:
     uiZ = packToF16UI(signZ, 0x1F, 0);
     goto uiZ;
@@ -182,8 +182,5 @@ infinity:
 zero:
     uiZ = packToF16UI(signZ, 0, 0);
 uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return u_as_f_16(uiZ);
 }
-

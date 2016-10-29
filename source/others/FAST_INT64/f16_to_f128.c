@@ -39,52 +39,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float128_t f16_to_f128( float16_t a )
+float128_t
+f16_to_f128(float16_t a)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool sign;
-    int8_t exp;
-    uint16_t frac;
-    struct commonNaN commonNaN;
+    uint16_t const uiA = f_as_u_16(a);
+    bool const sign = signF16UI(uiA);
+    int8_t exp = expF16UI(uiA);
+    uint16_t frac = fracF16UI(uiA);
+
     struct uint128 uiZ;
-    struct exp8_sig16 normExpSig;
-    union ui128_f128 uZ;
-
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF16UI( uiA );
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    
-    if ( exp == 0x1F ) {
-        if ( frac ) {
-            softfloat_f16UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF128UI( &commonNaN );
+    if (exp == 0x1F) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
+            uiZ = softfloat_commonNaNToF128UI(&commonNaN);
         } else {
-            uiZ.v64 = packToF128UI64( sign, 0x7FFF, 0 );
-            uiZ.v0  = 0;
+            uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
+            uiZ.v0 = 0;
         }
-        goto uiZ;
-    }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ.v64 = packToF128UI64( sign, 0, 0 );
-            uiZ.v0  = 0;
-            goto uiZ;
+    } else {
+        if (!exp) {
+            if (frac) {
+                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+                exp = normExpSig.exp - 1;
+                frac = normExpSig.sig;
+            } else {
+                uiZ.v64 = packToF128UI64(sign, 0, 0);
+                uiZ.v0 = 0;
+                goto uiZ;
+            }
         }
-        normExpSig = softfloat_normSubnormalF16Sig( frac );
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
+        uiZ.v64 = packToF128UI64(sign, exp + 0x3FF0, (uint64_t)frac << 38);
+        uiZ.v0 = 0;
     }
-    
-    uiZ.v64 = packToF128UI64( sign, exp + 0x3FF0, (uint64_t) frac<<38 );
-    uiZ.v0  = 0;
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+uiZ:
+    {
+        union ui128_f128 uZ;
+        uZ.ui = uiZ;
+        return uZ.f;
+    }
 }
-

@@ -38,22 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-float16_t f16_mulAdd( float16_t a, float16_t b, float16_t c )
+float16_t
+f16_mulAdd(float16_t a, float16_t b, float16_t c)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    union ui16_f16 uB;
-    uint16_t uiB;
-    union ui16_f16 uC;
-    uint16_t uiC;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
-    uC.f = c;
-    uiC = uC.ui;
-    return softfloat_mulAddF16( uiA, uiB, uiC, 0 );
-
+    return softfloat_mulAddF16(f_as_u_16(a), f_as_u_16(b), f_as_u_16(c), 0);
 }
-

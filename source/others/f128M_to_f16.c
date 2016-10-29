@@ -42,65 +42,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-float16_t f128M_to_f16( const float128_t *aPtr )
+float16_t
+f128M_to_f16(const float128_t *aPtr)
 {
-
-    return f128_to_f16( *aPtr );
-
+    return f128_to_f16(*aPtr);
 }
 
 #else
 
-float16_t f128M_to_f16( const float128_t *aPtr )
+float16_t
+f128M_to_f16(const float128_t *aPtr)
 {
-    const uint32_t *aWPtr;
-    uint32_t uiA96;
-    bool sign;
-    int32_t exp;
-    uint32_t frac32;
-    struct commonNaN commonNaN;
-    uint16_t uiZ, frac16;
-    union ui16_f16 uZ;
+    uint32_t const *const aWPtr = (uint32_t const *)aPtr;
 
-    
-    aWPtr = (const uint32_t *) aPtr;
-    
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    sign = signF128UI96( uiA96 );
-    exp  = expF128UI96( uiA96 );
-    frac32 =
-        fracF128UI96( uiA96 )
-            | ((aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )]
-                    | aWPtr[indexWord( 4, 0 )])
-                   != 0);
-    
-    if ( exp == 0x7FFF ) {
-        if ( frac32 ) {
-            softfloat_f128MToCommonNaN( aWPtr, &commonNaN );
-            uiZ = softfloat_commonNaNToF16UI( &commonNaN );
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool const sign = signF128UI96(uiA96);
+    int32_t exp = expF128UI96(uiA96);
+    uint32_t const frac32 =
+        fracF128UI96(uiA96) |
+        ((aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0);
+
+    if (exp == 0x7FFF) {
+        if (frac32) {
+            struct commonNaN commonNaN;
+            softfloat_f128MToCommonNaN(aWPtr, &commonNaN);
+            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
         } else {
-            uiZ = packToF16UI( sign, 0x1F, 0 );
+            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-        goto uiZ;
+    } else {
+        uint16_t const frac16 = frac32 >> 2 | (frac32 & 3);
+        if (!(exp | frac16)) {
+            return u_as_f_16(packToF16UI(sign, 0, 0));
+        } else {
+            exp -= 0x3FF1;
+            if (sizeof(int16_t) < sizeof exp) {
+                if (exp < -0x40) {
+                    exp = -0x40;
+                }
+            }
+            return softfloat_roundPackToF16(sign, exp, frac16 | 0x4000);
+        }
     }
-    
-    frac16 = frac32>>2 | (frac32 & 3);
-    if ( ! (exp | frac16) ) {
-        uiZ = packToF16UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    
-    exp -= 0x3FF1;
-    if ( sizeof (int16_t) < sizeof exp) {
-        if ( exp < -0x40 ) exp = -0x40;
-    }
-    return softfloat_roundPackToF16( sign, exp, frac16 | 0x4000 );
-    
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-
 #endif
 

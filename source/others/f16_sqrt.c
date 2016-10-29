@@ -44,97 +44,72 @@ extern const uint16_t softfloat_approxRecipSqrt_1k1s[];
 
 float16_t f16_sqrt(float16_t a)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool signA;
-    int8_t expA;
-    uint16_t sigA, uiZ;
-    struct exp8_sig16 normExpSig;
-    int8_t expZ;
-    int index;
-    uint16_t r0;
-    uint32_t ESqrR0;
-    uint16_t sigma0;
-    uint16_t recipSqrt16, sigZ, shiftedSigZ;
-    uint16_t negRem;
-    union ui16_f16 uZ;
-
-    uA.f = a;
-    uiA = uA.ui;
-    signA = signF16UI(uiA);
-    expA = expF16UI(uiA);
-    sigA = fracF16UI(uiA);
+    uint16_t const uiA = f_as_u_16(a);
+    bool const signA = signF16UI(uiA);
+    int8_t expA = expF16UI(uiA);
+    uint16_t sigA = fracF16UI(uiA);
 
     if (expA == 0x1F) {
         if (sigA) {
-            uiZ = softfloat_propagateNaNF16UI(uiA, 0);
-            goto uiZ;
-        }
-        if (!signA) {
+            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, 0));
+        } else if (!signA) {
             return a;
+        } else {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_16(defaultNaNF16UI);
         }
-        goto invalid;
-    }
-
-    if (signA) {
+    } else if (signA) {
         if (!(expA | sigA)) {
             return a;
-        }
-        goto invalid;
-    }
-
-    if (!expA) {
-        if (!sigA) {
-            return a;
-        }
-        normExpSig = softfloat_normSubnormalF16Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-
-    expZ = ((expA - 0xF) >> 1) + 0xE;
-    expA &= 1;
-    sigA |= 0x0400;
-    index = (sigA >> 6 & 0xE) + expA;
-    r0 = softfloat_approxRecipSqrt_1k0s[index]
-        - (((uint32_t)softfloat_approxRecipSqrt_1k1s[index]
-           * (sigA & 0x7F))
-               >> 11);
-    ESqrR0 = ((uint32_t)r0 * r0) >> 1;
-    if (expA) {
-        ESqrR0 >>= 1;
-    }
-    sigma0 = ~(uint16_t)((ESqrR0 * sigA) >> 16);
-    recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
-    if (!(recipSqrt16 & 0x8000)) {
-        recipSqrt16 = 0x8000;
-    }
-    sigZ = ((uint32_t)(sigA << 5) * recipSqrt16) >> 16;
-    if (expA) {
-        sigZ >>= 1;
-    }
-
-    ++sigZ;
-    if (!(sigZ & 7)) {
-        shiftedSigZ = sigZ >> 1;
-        negRem = shiftedSigZ * shiftedSigZ;
-        sigZ &= ~1;
-        if (negRem & 0x8000) {
-            sigZ |= 1;
         } else {
-            if (negRem) {
-                --sigZ;
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_16(defaultNaNF16UI);
+        }
+    } else {
+        if (!expA) {
+            if (!sigA) {
+                return a;
+            } else {
+                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+                expA = normExpSig.exp;
+                sigA = normExpSig.sig;
             }
         }
+
+        int8_t expZ = ((expA - 0xF) >> 1) + 0xE;
+        expA &= 1;
+        sigA |= 0x0400;
+        int const index = (sigA >> 6 & 0xE) + expA;
+        uint16_t const r0 =
+            softfloat_approxRecipSqrt_1k0s[index] - 
+            (((uint32_t)softfloat_approxRecipSqrt_1k1s[index] * (sigA & 0x7F)) >> 11);
+        uint32_t ESqrR0 = ((uint32_t)r0 * r0) >> 1;
+        if (expA) {
+            ESqrR0 >>= 1;
+        }
+        uint16_t const sigma0 = ~(uint16_t)((ESqrR0 * sigA) >> 16);
+        uint16_t recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
+        if (!(recipSqrt16 & 0x8000)) {
+            recipSqrt16 = 0x8000;
+        }
+        uint16_t sigZ = ((uint32_t)(sigA << 5) * recipSqrt16) >> 16;
+        if (expA) {
+            sigZ >>= 1;
+        }
+
+        ++sigZ;
+        if (!(sigZ & 7)) {
+            uint16_t const shiftedSigZ = sigZ >> 1;
+            uint16_t const negRem = shiftedSigZ * shiftedSigZ;
+            sigZ &= ~1;
+            if (negRem & 0x8000) {
+                sigZ |= 1;
+            } else {
+                if (negRem) {
+                    --sigZ;
+                }
+            }
+        }
+        return softfloat_roundPackToF16(0, expZ, sigZ);
     }
-    return softfloat_roundPackToF16(0, expZ, sigZ);
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    uiZ = defaultNaNF16UI;
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-
