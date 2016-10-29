@@ -39,12 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-bool f64_isSignalingNaN( float64_t a )
+bool
+f64_isSignalingNaN(float64_t a)
 {
-    union ui64_f64 uA;
-
-    uA.f = a;
-    return softfloat_isSigNaNF64UI( uA.ui );
-
+    return softfloat_isSigNaNF64UI(f_as_u_64(a));
 }
-

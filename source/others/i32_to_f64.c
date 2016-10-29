@@ -38,20 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-float64_t i32_to_f64(int32_t a)
+float64_t
+i32_to_f64(int32_t a)
 {
-    uint64_t uiZ;
-    union ui64_f64 uZ;
-
     if (!a) {
-        uiZ = 0;
+        return u_as_f_64(0);
     } else {
         bool const sign = (a < 0);
         uint32_t const absA = sign ? -a : a;
-        int8_t shiftDist = softfloat_countLeadingZeros32(absA) + 21;
-        uiZ = packToF64UI(sign, 0x432 - shiftDist, (uint64_t)absA << shiftDist);
+        int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 21;
+        return u_as_f_64(packToF64UI(sign, 0x432 - shiftDist, (uint64_t)absA << shiftDist));
     }
-    /** @todo ui64_as_f64() */
-    uZ.ui = uiZ;
-    return uZ.f;
 }

@@ -41,15 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool f64_le_quiet( float64_t a, float64_t b )
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    union ui64_f64 uB;
-    uint64_t uiB;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
+    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiB = f_as_u_64(b);
     if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         if (softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB )) {
             softfloat_raiseFlags( softfloat_flag_invalid );
@@ -63,4 +56,3 @@ bool f64_le_quiet( float64_t a, float64_t b )
             uiA == uiB || (signA ^ (uiA < uiB));
     }
 }
-

@@ -39,28 +39,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float128_t f64_to_f128( float64_t a )
+float128_t
+f64_to_f128( float64_t a )
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    bool sign;
-    int16_t exp;
-    uint64_t frac;
-    struct commonNaN commonNaN;
     struct uint128 uiZ;
-    struct exp16_sig64 normExpSig;
-    struct uint128 frac128;
     union ui128_f128 uZ;
 
     
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF64UI( uiA );
-    exp  = expF64UI( uiA );
-    frac = fracF64UI( uiA );
+    uint64_t const uiA = f_as_u_64(a);
+    bool const sign = signF64UI(uiA);
+    int16_t exp = expF64UI(uiA);
+    uint64_t frac = fracF64UI(uiA);
     
     if ( exp == 0x7FF ) {
         if ( frac ) {
+            struct commonNaN commonNaN;
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF128UI( &commonNaN );
         } else {
@@ -76,12 +69,12 @@ float128_t f64_to_f128( float64_t a )
             uiZ.v0  = 0;
             goto uiZ;
         }
-        normExpSig = softfloat_normSubnormalF64Sig( frac );
+        struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
     
-    frac128 = softfloat_shortShiftLeft128( 0, frac, 60 );
+    struct uint128 const frac128 = softfloat_shortShiftLeft128(0, frac, 60);
     uiZ.v64 = packToF128UI64( sign, exp + 0x3C00, frac128.v64 );
     uiZ.v0  = frac128.v0;
  uiZ:

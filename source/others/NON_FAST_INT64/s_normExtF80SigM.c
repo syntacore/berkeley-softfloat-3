@@ -36,15 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-int softfloat_normExtF80SigM(uint64_t *sigPtr)
+int
+softfloat_normExtF80SigM(uint64_t *sigPtr)
 {
-    uint64_t sig;
-    int8_t shiftDist;
-
-    sig = *sigPtr;
-    shiftDist = softfloat_countLeadingZeros64(sig);
+    uint64_t const sig = *sigPtr;
+    int8_t const shiftDist = softfloat_countLeadingZeros64(sig);
     *sigPtr = sig << shiftDist;
     return -shiftDist;
-
 }
-

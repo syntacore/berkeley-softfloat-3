@@ -39,44 +39,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float16_t f64_to_f16( float64_t a )
+float16_t
+f64_to_f16(float64_t a)
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    bool sign;
-    int16_t exp;
-    uint64_t frac;
-    struct commonNaN commonNaN;
-    uint16_t uiZ, frac16;
-    union ui16_f16 uZ;
+    uint64_t const uiA = f_as_u_64(a);
+    bool const sign = signF64UI(uiA);
+    int16_t const exp = expF64UI(uiA);
+    uint64_t const frac = fracF64UI(uiA);
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF64UI( uiA );
-    exp  = expF64UI( uiA );
-    frac = fracF64UI( uiA );
-    
-    if ( exp == 0x7FF ) {
-        if ( frac ) {
-            softfloat_f64UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToF16UI( &commonNaN );
+    if (exp == 0x7FF) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f64UIToCommonNaN(uiA, &commonNaN);
+            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
         } else {
-            uiZ = packToF16UI( sign, 0x1F, 0 );
+            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-        goto uiZ;
     }
-    
-    frac16 = (uint16_t)softfloat_shortShiftRightJam64( frac, 38 );
-    if ( ! (exp | frac16) ) {
-        uiZ = packToF16UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    
-    return softfloat_roundPackToF16( sign, exp - 0x3F1, frac16 | 0x4000 );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
 
+    uint16_t const frac16 = (uint16_t)softfloat_shortShiftRightJam64(frac, 38);
+    if (0 == (exp | frac16)) {
+        return u_as_f_16(packToF16UI(sign, 0, 0));
+    }
+    return softfloat_roundPackToF16(sign, exp - 0x3F1, frac16 | 0x4000);
 }
-

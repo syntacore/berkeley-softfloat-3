@@ -39,60 +39,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-int64_t f64_to_i64_r_minMag(float64_t a, bool exact)
+int64_t
+f64_to_i64_r_minMag(float64_t a, bool exact)
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    bool sign;
-    int16_t exp;
-    uint64_t sig;
-    int16_t shiftDist;
     int64_t absZ;
 
-
-
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF64UI(uiA);
-    exp = expF64UI(uiA);
-    sig = fracF64UI(uiA);
-
-
-    shiftDist = 0x433 - exp;
+    uint64_t const uiA = f_as_u_64(a);
+    bool const sign = signF64UI(uiA);
+    int16_t const exp = expF64UI(uiA);
+    uint64_t sig = fracF64UI(uiA);
+    int16_t const shiftDist = 0x433 - exp;
     if (shiftDist <= 0) {
-
-
         if (shiftDist < -10) {
             if (uiA == packToF64UI(1, 0x43E, 0)) {
-                return -INT64_C(0x7FFFFFFFFFFFFFFF) - 1;
+                return INT64_MIN;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return
+                    exp == 0x7FF && sig ? i64_fromNaN :
+                    sign ? i64_fromNegOverflow : i64_fromPosOverflow;
             }
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                (exp == 0x7FF) && sig ? i64_fromNaN
-                : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        } else {
+            sig |= UINT64_C(0x0010000000000000);
+            absZ = sig << -shiftDist;
         }
-
-
-        sig |= UINT64_C(0x0010000000000000);
-        absZ = sig << -shiftDist;
     } else {
-
-
         if (53 <= shiftDist) {
             if (exact && (exp | sig)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
             return 0;
-        }
-
-
-        sig |= UINT64_C(0x0010000000000000);
-        absZ = sig >> shiftDist;
-        if (exact && (absZ << shiftDist != sig)) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
+        } else {
+            sig |= UINT64_C(0x0010000000000000);
+            absZ = sig >> shiftDist;
+            if (exact && (absZ << shiftDist != sig)) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
         }
     }
     return sign ? -absZ : absZ;
-
 }
 

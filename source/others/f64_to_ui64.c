@@ -39,34 +39,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-uint64_t f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
+/** @todo split implementations */
+uint64_t
+f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    bool sign;
-    int16_t exp;
-    uint64_t sig;
-    int16_t shiftDist;
-#ifdef SOFTFLOAT_FAST_INT64
-    struct uint64_extra sigExtra;
-#else
-    uint32_t extSig[3];
-#endif
-
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF64UI(uiA);
-    exp = expF64UI(uiA);
-    sig = fracF64UI(uiA);
+    uint64_t const uiA = f_as_u_64(a);
+    bool const sign = signF64UI(uiA);
+    int16_t const exp = expF64UI(uiA);
+    uint64_t sig = fracF64UI(uiA);
 
     if (exp) {
         sig |= UINT64_C(0x0010000000000000);
     }
-    shiftDist = 0x433 - exp;
+    int16_t const shiftDist = 0x433 - exp;
 #ifdef SOFTFLOAT_FAST_INT64
+    struct uint64_extra sigExtra;
     if (shiftDist <= 0) {
         if (shiftDist < -11) {
-            goto invalid;
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                exp == 0x7FF && fracF64UI(uiA) ? ui64_fromNaN :
+                sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
         }
         sigExtra.v = sig << -shiftDist;
         sigExtra.extra = 0;
@@ -74,13 +67,16 @@ uint64_t f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
         sigExtra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
     }
     return
-        softfloat_roundPackToUI64(
-            sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
+        softfloat_roundPackToUI64(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 #else
+    uint32_t extSig[3];
     extSig[indexWord(3, 0)] = 0;
     if (shiftDist <= 0) {
         if (shiftDist < -11) {
-            goto invalid;
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                exp == 0x7FF && fracF64UI(uiA) ? ui64_fromNaN :
+                sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
         }
         sig <<= -shiftDist;
         extSig[indexWord(3, 2)] = sig >> 32;
@@ -92,12 +88,5 @@ uint64_t f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
     }
     return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
 #endif
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    return
-        (exp == 0x7FF) && fracF64UI(uiA) ? ui64_fromNaN
-        : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-
 }
 

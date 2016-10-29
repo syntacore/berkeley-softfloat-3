@@ -39,30 +39,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-extFloat80_t f64_to_extF80( float64_t a )
+extFloat80_t
+f64_to_extF80( float64_t a )
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    bool sign;
-    int16_t exp;
-    uint64_t frac;
-    struct commonNaN commonNaN;
     struct uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    struct exp16_sig64 normExpSig;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uZ;
 
     
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF64UI( uiA );
-    exp  = expF64UI( uiA );
-    frac = fracF64UI( uiA );
+    uint64_t const uiA = f_as_u_64(a);
+    bool const sign = signF64UI(uiA);
+    int16_t exp = expF64UI(uiA);
+    uint64_t frac = fracF64UI(uiA);
     
     if ( exp == 0x7FF ) {
         if ( frac ) {
+            struct commonNaN commonNaN;
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToExtF80UI( &commonNaN );
             uiZ64 = uiZ.v64;
@@ -80,7 +74,7 @@ extFloat80_t f64_to_extF80( float64_t a )
             uiZ0  = 0;
             goto uiZ;
         }
-        normExpSig = softfloat_normSubnormalF64Sig( frac );
+        struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig( frac );
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
@@ -91,6 +85,4 @@ extFloat80_t f64_to_extF80( float64_t a )
     uZ.s.signExp = uiZ64;
     uZ.s.signif  = uiZ0;
     return uZ.f;
-
 }
-

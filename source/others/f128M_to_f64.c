@@ -42,64 +42,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-float64_t f128M_to_f64( const float128_t *aPtr )
+float64_t f128M_to_f64(const float128_t *aPtr)
 {
 
-    return f128_to_f64( *aPtr );
+    return f128_to_f64(*aPtr);
 
 }
 
 #else
 
-float64_t f128M_to_f64( const float128_t *aPtr )
+float64_t
+f128M_to_f64(const float128_t *aPtr)
 {
-    const uint32_t *aWPtr;
-    uint32_t uiA96;
-    bool sign;
-    int32_t exp;
-    uint64_t frac64;
-    struct commonNaN commonNaN;
-    uint64_t uiZ;
-    uint32_t frac32;
-    union ui64_f64 uZ;
+    uint32_t const *aWPtr = (const uint32_t *)aPtr;
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool const sign = signF128UI96(uiA96);
+    int32_t exp = expF128UI96(uiA96);
+    uint64_t frac64 = (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)];
 
-    
-    aWPtr = (const uint32_t *) aPtr;
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    sign = signF128UI96( uiA96 );
-    exp  = expF128UI96( uiA96 );
-    frac64 = (uint64_t) fracF128UI96( uiA96 )<<32 | aWPtr[indexWord( 4, 2 )];
-    
-    if ( exp == 0x7FFF ) {
-        if ( frac64 || aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )] ) {
-            softfloat_f128MToCommonNaN( aWPtr, &commonNaN );
-            uiZ = softfloat_commonNaNToF64UI( &commonNaN );
+    if (exp == 0x7FFF) {
+        if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
+            struct commonNaN commonNaN;
+            softfloat_f128MToCommonNaN(aWPtr, &commonNaN);
+            return u_as_f_64(softfloat_commonNaNToF64UI(&commonNaN));
         } else {
-            uiZ = packToF64UI( sign, 0x7FF, 0 );
+            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-        goto uiZ;
+    } else {
+        uint32_t const frac32 = aWPtr[indexWord(4, 1)];
+        frac64 = frac64 << 14 | frac32 >> 18;
+        if ((frac32 & 0x0003FFFF) || aWPtr[indexWord(4, 0)]) {
+            frac64 |= 1;
+        }
+        if (!(exp | frac64)) {
+            return u_as_f_64(packToF64UI(sign, 0, 0));
+        } else {
+            exp -= 0x3C01;
+            if (sizeof(int16_t) < sizeof exp) {
+                if (exp < -0x1000) exp = -0x1000;
+            }
+            return
+                softfloat_roundPackToF64(sign, exp, frac64 | UINT64_C(0x4000000000000000));
+        }
     }
-    
-    frac32 = aWPtr[indexWord( 4, 1 )];
-    frac64 = frac64<<14 | frac32>>18;
-    if ( (frac32 & 0x0003FFFF) || aWPtr[indexWord( 4, 0 )] ) frac64 |= 1;
-    if ( ! (exp | frac64) ) {
-        uiZ = packToF64UI( sign, 0, 0 );
-        goto uiZ;
-    }
-    
-    exp -= 0x3C01;
-    if ( sizeof (int16_t) < sizeof exp) {
-        if ( exp < -0x1000 ) exp = -0x1000;
-    }
-    return
-        softfloat_roundPackToF64(
-            sign, exp, frac64 | UINT64_C( 0x4000000000000000 ) );
-    
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
 
 #endif

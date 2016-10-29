@@ -39,83 +39,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 float64_t
- softfloat_addMagsF64( uint64_t uiA, uint64_t uiB, bool signZ )
+softfloat_addMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
 {
-    int16_t expA;
-    uint64_t sigA;
-    int16_t expB;
-    uint64_t sigB;
-    int16_t expDiff;
-    uint64_t uiZ;
-    int16_t expZ;
-    uint64_t sigZ;
-    union ui64_f64 uZ;
-
-    
-    expA = expF64UI( uiA );
-    sigA = fracF64UI( uiA );
-    expB = expF64UI( uiB );
-    sigB = fracF64UI( uiB );
-    
-    expDiff = expA - expB;
-    if ( ! expDiff ) {
-        
-        if ( ! expA ) {
-            uiZ = uiA + sigB;
-            goto uiZ;
+    int16_t const expA = expF64UI(uiA);
+    uint64_t sigA = fracF64UI(uiA);
+    int16_t const expB = expF64UI(uiB);
+    uint64_t sigB = fracF64UI(uiB);
+    int16_t const expDiff = expA - expB;
+    if (!expDiff) {
+        if (!expA) {
+            return u_as_f_64(uiA + sigB);
+        } else if (expA == 0x7FF) {
+            return u_as_f_64(sigA | sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
+        } else {
+            return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
         }
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
-            uiZ = uiA;
-            goto uiZ;
-        }
-        expZ = expA;
-        sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
-        sigZ <<= 9;
     } else {
-        
+        int16_t expZ;
         sigA <<= 9;
         sigB <<= 9;
-        if ( expDiff < 0 ) {
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
-                uiZ = packToF64UI( signZ, 0x7FF, 0 );
-                goto uiZ;
-            }
-            expZ = expB;
-            if ( expA ) {
-                sigA += UINT64_C( 0x2000000000000000 );
+        if (expDiff < 0) {
+            if (expB == 0x7FF) {
+                return u_as_f_64(sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
             } else {
-                sigA <<= 1;
+                expZ = expB;
+                if (expA) {
+                    sigA += UINT64_C(0x2000000000000000);
+                } else {
+                    sigA <<= 1;
+                }
+                sigA = softfloat_shiftRightJam64(sigA, -expDiff);
             }
-            sigA = softfloat_shiftRightJam64( sigA, -expDiff );
         } else {
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
-                uiZ = uiA;
-                goto uiZ;
-            }
-            expZ = expA;
-            if ( expB ) {
-                sigB += UINT64_C( 0x2000000000000000 );
+            if (expA == 0x7FF) {
+                return u_as_f_64(sigA ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
             } else {
-                sigB <<= 1;
+                expZ = expA;
+                if (expB) {
+                    sigB += UINT64_C(0x2000000000000000);
+                } else {
+                    sigB <<= 1;
+                }
+                sigB = softfloat_shiftRightJam64(sigB, expDiff);
             }
-            sigB = softfloat_shiftRightJam64( sigB, expDiff );
         }
-        sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        uint64_t sigZ = UINT64_C(0x2000000000000000) + sigA + sigB;
+        if (sigZ < UINT64_C(0x4000000000000000)) {
             --expZ;
             sigZ <<= 1;
         }
+        return softfloat_roundPackToF64(signZ, expZ, sigZ);
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
-    
- propagateNaN:
-    uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
- uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-

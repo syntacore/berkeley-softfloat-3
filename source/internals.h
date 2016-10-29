@@ -71,18 +71,6 @@ union ui16_f16
     uint16_t ui; 
     float16_t f;
 };
-/** @deprecated */
-union ui32_f32
-{
-    uint32_t ui; 
-    float32_t f;
-};
-/** @deprecated */
-union ui64_f64
-{
-    uint64_t ui; 
-    float64_t f;
-};
 
 #ifdef SOFTFLOAT_FAST_INT64
 /** @bug union of same type */

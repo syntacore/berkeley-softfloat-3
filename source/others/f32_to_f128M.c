@@ -42,68 +42,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void f32_to_f128M( float32_t a, float128_t *zPtr )
+void f32_to_f128M(float32_t a, float128_t *zPtr)
 {
 
-    *zPtr = f32_to_f128( a );
+    *zPtr = f32_to_f128(a);
 
 }
 
 #else
 
-void f32_to_f128M( float32_t a, float128_t *zPtr )
+void f32_to_f128M(float32_t a, float128_t *zPtr)
 {
-    uint32_t *zWPtr;
-    union ui32_f32 uA;
-    uint32_t uiA;
-    bool sign;
-    int16_t exp;
-    uint32_t frac, uiZ64;
-    struct commonNaN commonNaN;
-    uint32_t uiZ96;
-    struct exp16_sig32 normExpSig;
-    uint64_t frac64;
+    uint32_t *zWPtr = (uint32_t *)zPtr;
+    uint32_t const uiA = f_as_u_32(a);
+    bool const sign = signF32UI(uiA);
+    int16_t exp = expF32UI(uiA);
+    uint32_t frac = fracF32UI(uiA);
 
-    
-    zWPtr = (uint32_t *) zPtr;
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF32UI( uiA );
-    exp  = expF32UI( uiA );
-    frac = fracF32UI( uiA );
-    
-    uiZ64 = 0;
-    if ( exp == 0xFF ) {
-        if ( frac ) {
-            softfloat_f32UIToCommonNaN( uiA, &commonNaN );
-            softfloat_commonNaNToF128M( &commonNaN, zWPtr );
+    if (exp == 0xFF) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
+            softfloat_commonNaNToF128M(&commonNaN, zWPtr);
+            return;
+        } else {
+            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[indexWord(4, 0)] = 0;
             return;
         }
-        uiZ96 = packToF128UI96( sign, 0x7FFF, 0 );
-        goto uiZ;
-    }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ96 = packToF128UI96( sign, 0, 0 );
-            goto uiZ;
+    } else {
+        if (!exp) {
+            if (!frac) {
+                zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
+                zWPtr[indexWord(4, 2)] = 0;
+                zWPtr[indexWord(4, 1)] = 0;
+                zWPtr[indexWord(4, 0)] = 0;
+                return;
+            } else {
+                struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+                exp = normExpSig.exp - 1;
+                frac = normExpSig.sig;
+            }
         }
-        normExpSig = softfloat_normSubnormalF32Sig( frac );
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
-    }
-    
-    frac64 = (uint64_t) frac<<25;
-    uiZ96 = packToF128UI96( sign, exp + 0x3F80, frac64>>32 );
-    uiZ64 = frac64;
- uiZ:
-    zWPtr[indexWord( 4, 3 )] = uiZ96;
-    zWPtr[indexWord( 4, 2 )] = uiZ64;
-    zWPtr[indexWord( 4, 1 )] = 0;
-    zWPtr[indexWord( 4, 0 )] = 0;
 
+        uint64_t const frac64 = (uint64_t)frac << 25;
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3F80, frac64 >> 32);
+        zWPtr[indexWord(4, 2)] = frac64;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
+    }
 }
 
 #endif
-

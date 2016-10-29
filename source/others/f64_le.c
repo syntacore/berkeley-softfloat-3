@@ -38,28 +38,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-bool f64_le( float64_t a, float64_t b )
+bool f64_le(float64_t a, float64_t b)
 {
-    union ui64_f64 uA;
-    uint64_t uiA;
-    union ui64_f64 uB;
-    uint64_t uiB;
-    bool signA, signB;
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiB = f_as_u_64(b);
+    if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
+    } else {
+        bool const signA = signF64UI(uiA);
+        bool const signB = signF64UI(uiB);
+        return
+            signA != signB ? signA || !((uiA | uiB) & INT64_MAX) :
+            uiA == uiB || (signA ^ (uiA < uiB));
     }
-    signA = signF64UI( uiA );
-    signB = signF64UI( uiB );
-    return
-        (signA != signB)
-            ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-            : (uiA == uiB) || (signA ^ (uiA < uiB));
-
 }
-

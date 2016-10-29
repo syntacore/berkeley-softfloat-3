@@ -45,70 +45,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t extF80M_to_f64(const extFloat80_t *aPtr)
 {
-
     return extF80_to_f64(*aPtr);
-
 }
 
 #else
 
-float64_t extF80M_to_f64(const extFloat80_t *aPtr)
+float64_t
+extF80M_to_f64(extFloat80_t const *aPtr)
 {
-    const struct extFloat80M *aSPtr;
-    uint16_t uiA64;
-    bool sign;
-    int32_t exp;
-    uint64_t sig;
-    struct commonNaN commonNaN;
-    uint64_t uiZ;
-    union ui64_f64 uZ;
-
-    
-
     /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    
-
-    uiA64 = aSPtr->signExp;
-    sign = signExtF80UI64(uiA64);
-    exp = expExtF80UI64(uiA64);
-    sig = aSPtr->signif;
-    
+    struct extFloat80M const *aSPtr = (const struct extFloat80M *) aPtr;
+    uint16_t const uiA64 = aSPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t exp = expExtF80UI64(uiA64);
+    uint64_t sig = aSPtr->signif;
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            struct commonNaN commonNaN;
             softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
-            uiZ = softfloat_commonNaNToF64UI(&commonNaN);
+            return u_as_f_64(softfloat_commonNaNToF64UI(&commonNaN));
         } else {
-            uiZ = packToF64UI(sign, 0x7FF, 0);
+            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-        goto uiZ;
-    }
-    
-
-    if (!(sig & UINT64_C(0x8000000000000000))) {
-        if (!sig) {
-            uiZ = packToF64UI(sign, 0, 0);
-            goto uiZ;
+    } else {
+        if (!(sig & UINT64_C(0x8000000000000000))) {
+            if (!sig) {
+                return u_as_f_64(packToF64UI(sign, 0, 0));
+            } else {
+                exp += softfloat_normExtF80SigM(&sig);
+            }
         }
-        exp += softfloat_normExtF80SigM(&sig);
-    }
-    
-
-    sig = softfloat_shortShiftRightJam64(sig, 1);
-    exp -= 0x3C01;
-    if (sizeof(int16_t) < sizeof exp) {
-        if (exp < -0x1000) {
-            exp = -0x1000;
+        sig = softfloat_shortShiftRightJam64(sig, 1);
+        exp -= 0x3C01;
+        if (sizeof(int16_t) < sizeof exp) {
+            if (exp < -0x1000) {
+                exp = -0x1000;
+            }
         }
+        return softfloat_roundPackToF64(sign, exp, sig);
     }
-    return softfloat_roundPackToF64(sign, exp, sig);
-    
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
 
 #endif
-

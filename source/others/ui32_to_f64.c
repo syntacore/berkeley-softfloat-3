@@ -37,21 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 #include "internals.h"
 
-float64_t ui32_to_f64( uint32_t a )
+float64_t
+ui32_to_f64(uint32_t a)
 {
-    uint64_t uiZ;
-    int8_t shiftDist;
-    union ui64_f64 uZ;
-
-    if ( ! a ) {
-        uiZ = 0;
+    if (!a) {
+        return u_as_f_64(0);
     } else {
-        shiftDist = softfloat_countLeadingZeros32( a ) + 21;
-        uiZ =
-            packToF64UI( 0, 0x432 - shiftDist, (uint64_t) a<<shiftDist );
+        int8_t const shiftDist = softfloat_countLeadingZeros32(a) + 21;
+        return u_as_f_64(packToF64UI(0, 0x432 - shiftDist, (uint64_t)a << shiftDist));
     }
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-
