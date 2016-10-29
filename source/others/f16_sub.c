@@ -38,31 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-float16_t f16_sub( float16_t a, float16_t b )
+float16_t
+f16_sub(float16_t a, float16_t b)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    union ui16_f16 uB;
-    uint16_t uiB;
-#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 1)
-    float16_t (*magsFuncPtr)( uint16_t, uint16_t );
-#endif
-
-    uA.f = a;
-    uiA = uA.ui;
-    uB.f = b;
-    uiB = uB.ui;
-#if defined INLINE_LEVEL && (1 <= INLINE_LEVEL)
-    if ( signF16UI( uiA ^ uiB ) ) {
-        return softfloat_addMagsF16( uiA, uiB );
-    } else {
-        return softfloat_subMagsF16( uiA, uiB );
-    }
-#else
-    magsFuncPtr =
-        signF16UI( uiA ^ uiB ) ? softfloat_addMagsF16 : softfloat_subMagsF16;
-    return (*magsFuncPtr)( uiA, uiB );
-#endif
-
+    uint16_t const uiA = f_as_u_16(a);
+    uint16_t const uiB = f_as_u_16(b);
+    return
+        signF16UI(uiA ^ uiB) ?
+        softfloat_addMagsF16(uiA, uiB) :
+        softfloat_subMagsF16(uiA, uiB);
 }
-

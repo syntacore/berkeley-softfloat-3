@@ -40,137 +40,112 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include <assert.h>
 
-float16_t f16_rem(float16_t a, float16_t b)
+float16_t
+f16_rem(float16_t a, float16_t b)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool signA;
-    int8_t expA;
-    uint16_t sigA;
-    union ui16_f16 uB;
-    uint16_t uiB;
-    int8_t expB;
-    uint16_t sigB;
-    struct exp8_sig16 normExpSig;
-    uint16_t rem;
-    int8_t expDiff;
-    uint16_t q;
-    uint32_t recip32, q32;
-    uint16_t altRem, meanRem;
-    bool signRem;
-    uint16_t uiZ;
-    union ui16_f16 uZ;
-
-    uA.f = a;
-    uiA = uA.ui;
-    signA = signF16UI(uiA);
-    expA = expF16UI(uiA);
-    sigA = fracF16UI(uiA);
-    uB.f = b;
-    uiB = uB.ui;
-    expB = expF16UI(uiB);
-    sigB = fracF16UI(uiB);
+    uint16_t const uiA = f_as_u_16(a);
+    bool const signA = signF16UI(uiA);
+    int8_t expA = expF16UI(uiA);
+    uint16_t sigA = fracF16UI(uiA);
+    uint16_t const uiB = f_as_u_16(b);
+    int8_t expB = expF16UI(uiB);
+    uint16_t sigB = fracF16UI(uiB);
 
     if (expA == 0x1F) {
         if (sigA || ((expB == 0x1F) && sigB)) {
-            goto propagateNaN;
-        }
-        goto invalid;
-    }
-    if (expB == 0x1F) {
-        if (sigB) {
-            goto propagateNaN;
-        }
-        return a;
-    }
-
-    if (!expB) {
-        if (!sigB) {
-            goto invalid;
-        }
-        normExpSig = softfloat_normSubnormalF16Sig(sigB);
-        expB = normExpSig.exp;
-        sigB = normExpSig.sig;
-    }
-    if (!expA) {
-        if (!sigA) {
-            return a;
-        }
-        normExpSig = softfloat_normSubnormalF16Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-
-    rem = sigA | 0x0400;
-    sigB |= 0x0400;
-    expDiff = expA - expB;
-    if (expDiff < 1) {
-        if (expDiff < -1) {
-            return a;
-        }
-        sigB <<= 3;
-        if (expDiff) {
-            rem <<= 2;
-            q = 0;
+            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
         } else {
-            rem <<= 3;
-            q = (sigB <= rem);
-            if (q) {
-                rem -= sigB;
-            }
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_16(defaultNaNF16UI);
         }
+    } else if (expB == 0x1F) {
+        return sigB ? u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB)) : a;
     } else {
-        recip32 = softfloat_approxRecip32_1((uint32_t)sigB << 21);
-        /*
-        Changing the shift of `rem' here requires also changing the initial
-        subtraction from `expDiff'.
-        */
-        rem <<= 4;
-        expDiff -= 31;
-        /*
-        The scale of `sigB' affects how many bits are obtained during each
-        cycle of the loop.  Currently this is 29 bits per loop iteration,
-        which is believed to be the maximum possible.
-        */
-        sigB <<= 3;
-        for (;;) {
-            q32 = (rem * (uint64_t)recip32) >> 16;
-            if (expDiff < 0) {
-                break;
+        if (!expB) {
+            if (!sigB) {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return u_as_f_16(defaultNaNF16UI);
+            } else {
+                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+                expB = normExpSig.exp;
+                sigB = normExpSig.sig;
             }
-            rem = -(int16_t)((uint16_t)q32 * sigB);
-            expDiff -= 29;
         }
-        /*`expDiff' cannot be less than -30 here.*/
-        assert(-30 <= expDiff);
-        q32 >>= ~expDiff & 31;
-        q = q32;
-        rem = (rem << (expDiff + 30)) - q * sigB;
-    }
-    
-    do {
-        altRem = rem;
-        ++q;
-        rem -= sigB;
-    } while (!(rem & 0x8000));
-    meanRem = rem + altRem;
-    if ((meanRem & 0x8000) || (!meanRem && (q & 1))) {
-        rem = altRem;
-    }
-    signRem = signA;
-    if (0x8000 <= rem) {
-        signRem = !signRem;
-        rem = -rem;
-    }
-    return softfloat_normRoundPackToF16(signRem, expB, rem);
+        if (!expA) {
+            if (!sigA) {
+                return a;
+            } else {
+                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+                expA = normExpSig.exp;
+                sigA = normExpSig.sig;
+            }
+        }
 
-propagateNaN:
-    uiZ = softfloat_propagateNaNF16UI(uiA, uiB);
-    goto uiZ;
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    uiZ = defaultNaNF16UI;
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
+        uint16_t rem = sigA | 0x0400;
+        sigB |= 0x0400;
+        int8_t expDiff = expA - expB;
+        uint16_t q;
+        if (expDiff < 1) {
+            if (expDiff < -1) {
+                return a;
+            } else {
+                sigB <<= 3;
+                if (expDiff) {
+                    rem <<= 2;
+                    q = 0;
+                } else {
+                    rem <<= 3;
+                    q = (sigB <= rem);
+                    if (q) {
+                        rem -= sigB;
+                    }
+                }
+            }
+        } else {
+            uint32_t const recip32 = softfloat_approxRecip32_1((uint32_t)sigB << 21);
+            /*
+            Changing the shift of `rem' here requires also changing the initial
+            subtraction from `expDiff'.
+            */
+            rem <<= 4;
+            expDiff -= 31;
+            /*
+            The scale of `sigB' affects how many bits are obtained during each
+            cycle of the loop.  Currently this is 29 bits per loop iteration,
+            which is believed to be the maximum possible.
+            */
+            sigB <<= 3;
+            uint32_t q32;
+            for (;;) {
+                q32 = (rem * (uint64_t)recip32) >> 16;
+                if (expDiff < 0) {
+                    break;
+                }
+                rem = -(int16_t)((uint16_t)q32 * sigB);
+                expDiff -= 29;
+            }
+            /*`expDiff' cannot be less than -30 here.*/
+            assert(-30 <= expDiff);
+            q32 >>= ~expDiff & 31;
+            q = q32;
+            rem = (rem << (expDiff + 30)) - q * sigB;
+        }
+
+        uint16_t altRem;
+        do {
+            altRem = rem;
+            ++q;
+            rem -= sigB;
+        } while (!(rem & 0x8000));
+        uint16_t const meanRem = rem + altRem;
+        if ((meanRem & 0x8000) || (!meanRem && (q & 1))) {
+            rem = altRem;
+        }
+        bool signRem = signA;
+        if (0x8000 <= rem) {
+            signRem = !signRem;
+            rem = -rem;
+        }
+        return softfloat_normRoundPackToF16(signRem, expB, rem);
+    }
 }

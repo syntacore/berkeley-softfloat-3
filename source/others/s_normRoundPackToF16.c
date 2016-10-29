@@ -37,19 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 
 float16_t
- softfloat_normRoundPackToF16( bool sign, int16_t exp, uint16_t sig )
+softfloat_normRoundPackToF16(bool sign, int16_t exp, uint16_t sig)
 {
-    int8_t shiftDist;
-    union ui16_f16 uZ;
-
-    shiftDist = softfloat_countLeadingZeros16( sig ) - 1;
+    int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 1;
     exp -= shiftDist;
-    if ( (4 <= shiftDist) && ((unsigned int) exp < 0x1D) ) {
-        uZ.ui = packToF16UI( sign, sig ? exp : 0, sig<<(shiftDist - 4) );
-        return uZ.f;
+    if (4 <= shiftDist && (unsigned int)exp < 0x1D) {
+        return u_as_f_16(packToF16UI(sign, sig ? exp : 0, sig << (shiftDist - 4)));
     } else {
-        return softfloat_roundPackToF16( sign, exp, sig<<shiftDist );
+        return softfloat_roundPackToF16(sign, exp, sig << shiftDist);
     }
-
 }
-

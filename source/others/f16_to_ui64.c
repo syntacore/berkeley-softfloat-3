@@ -41,40 +41,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 uint64_t f16_to_ui64(float16_t a, uint8_t roundingMode, bool exact)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool sign;
-    int8_t exp;
-    uint16_t frac;
-    uint32_t sig32;
-    int8_t shiftDist;
-
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF16UI(uiA);
-    exp = expF16UI(uiA);
-    frac = fracF16UI(uiA);
-
+    uint16_t const uiA = f_as_u_16(a);
+    bool const sign = signF16UI(uiA);
+    int8_t const exp = expF16UI(uiA);
+    uint16_t const frac = fracF16UI(uiA);
     if (exp == 0x1F) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            frac ? ui64_fromNaN
-            : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-    }
-
-    sig32 = frac;
-    if (exp) {
-        sig32 |= 0x0400;
-        shiftDist = exp - 0x19;
-        if ((0 <= shiftDist) && !sign) {
-            return sig32 << shiftDist;
+            frac ? ui64_fromNaN :
+            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+    } else {
+        uint32_t sig32 = frac;
+        int8_t shiftDist;
+        if (exp) {
+            sig32 |= 0x0400;
+            shiftDist = exp - 0x19;
+            if ((0 <= shiftDist) && !sign) {
+                return sig32 << shiftDist;
+            }
+            shiftDist = exp - 0x0D;
+            if (0 < shiftDist) {
+                sig32 <<= shiftDist;
+            }
         }
-        shiftDist = exp - 0x0D;
-        if (0 < shiftDist) {
-            sig32 <<= shiftDist;
-        }
+        return softfloat_roundPackToUI32(sign, sig32, roundingMode, exact);
     }
-    return softfloat_roundPackToUI32(sign, sig32, roundingMode, exact);
-
 }
 

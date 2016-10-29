@@ -38,26 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-float16_t ui64_to_f16( uint64_t a )
+float16_t
+ui64_to_f16(uint64_t a)
 {
-    int8_t shiftDist;
-    union ui16_f16 u;
-    uint16_t sig;
-
-    shiftDist = softfloat_countLeadingZeros64( a ) - 53;
-    if ( 0 <= shiftDist ) {
-        u.ui =
-            a ? packToF16UI(
-                    0, 0x18 - shiftDist, (uint16_t) a<<shiftDist )
-                : 0;
-        return u.f;
+    int8_t shiftDist = softfloat_countLeadingZeros64(a) - 53;
+    if (0 <= shiftDist) {
+        return u_as_f_16(a ? packToF16UI(0, 0x18 - shiftDist, (uint16_t)a << shiftDist) : 0);
     } else {
         shiftDist += 4;
-        sig =
-            (shiftDist < 0) ? softfloat_shortShiftRightJam64( a, -shiftDist )
-                : (uint16_t) a<<shiftDist;
-        return softfloat_roundPackToF16( 0, 0x1C - shiftDist, sig );
+        uint16_t const sig =
+            shiftDist < 0 ? softfloat_shortShiftRightJam64(a, -shiftDist) :
+            (uint16_t)a << shiftDist;
+        return softfloat_roundPackToF16(0, 0x1C - shiftDist, sig);
     }
-
 }
-

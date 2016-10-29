@@ -42,66 +42,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void f16_to_extF80M( float16_t a, extFloat80_t *zPtr )
+void
+f16_to_extF80M(float16_t a, extFloat80_t *zPtr)
 {
-
-    *zPtr = f16_to_extF80( a );
-
+    *zPtr = f16_to_extF80(a);
 }
 
 #else
 
-void f16_to_extF80M( float16_t a, extFloat80_t *zPtr )
+void f16_to_extF80M(float16_t a, extFloat80_t *zPtr)
 {
-    struct extFloat80M *zSPtr;
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool sign;
-    int8_t exp;
-    uint16_t frac;
-    struct commonNaN commonNaN;
     uint16_t uiZ64;
     uint32_t uiZ32;
-    struct exp8_sig16 normExpSig;
 
-    
     /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF16UI( uiA );
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    
-    if ( exp == 0x1F ) {
-        if ( frac ) {
-            softfloat_f16UIToCommonNaN( uiA, &commonNaN );
-            softfloat_commonNaNToExtF80M( &commonNaN, zSPtr );
+    struct extFloat80M *const zSPtr = (struct extFloat80M *) zPtr;
+    uint16_t const uiA = f_as_u_16(a);
+    bool const sign = signF16UI(uiA);
+    int8_t exp = expF16UI(uiA);
+    uint16_t frac = fracF16UI(uiA);
+
+    if (exp == 0x1F) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
+            softfloat_commonNaNToExtF80M(&commonNaN, zSPtr);
             return;
-        }
-        uiZ64 = packToExtF80UI64( sign, 0x7FFF );
-        uiZ32 = 0x80000000;
-        goto uiZ;
-    }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ64 = packToExtF80UI64( sign, 0 );
-            uiZ32 = 0;
+        } else {
+            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
+            uiZ32 = 0x80000000;
             goto uiZ;
         }
-        normExpSig = softfloat_normSubnormalF16Sig( frac );
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
     }
-    
-    uiZ64 = packToExtF80UI64( sign, exp + 0x3FF0 );
-    uiZ32 = 0x80000000 | (uint32_t) frac<<21;
- uiZ:
-    zSPtr->signExp = uiZ64;
-    zSPtr->signif = (uint64_t) uiZ32<<32;
+    if (!exp) {
+        if (!frac) {
+            uiZ64 = packToExtF80UI64(sign, 0);
+            uiZ32 = 0;
+            goto uiZ;
+        } else {
+            struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+            exp = normExpSig.exp;
+            frac = normExpSig.sig;
+        }
+    }
 
+    uiZ64 = packToExtF80UI64(sign, exp + 0x3FF0);
+    uiZ32 = 0x80000000 | (uint32_t)frac << 21;
+uiZ:
+    zSPtr->signExp = uiZ64;
+    zSPtr->signif = (uint64_t)uiZ32 << 32;
 }
 
 #endif
-

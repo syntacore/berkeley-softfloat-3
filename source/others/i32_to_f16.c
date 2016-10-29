@@ -45,9 +45,7 @@ float16_t i32_to_f16(int32_t a)
     uint32_t absA = sign ? -a : a;
     int8_t shiftDist = softfloat_countLeadingZeros32(absA) - 21;
     if (0 <= shiftDist) {
-        union ui16_f16 u;
-        u.ui = a ? packToF16UI(sign, 0x18 - shiftDist, (uint16_t)absA << shiftDist) : 0;
-        return u.f;
+        return u_as_f_16(a ? packToF16UI(sign, 0x18 - shiftDist, (uint16_t)absA << shiftDist) : 0);
     } else {
         uint16_t sig;
         shiftDist += 4;
