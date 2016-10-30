@@ -39,12 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-bool f16_isSignalingNaN( float16_t a )
+/** @todo make inline */
+bool
+f16_isSignalingNaN(float16_t a)
 {
-    union ui16_f16 uA;
-
-    uA.f = a;
-    return softfloat_isSigNaNF16UI( uA.ui );
-
+    return softfloat_isSigNaNF16UI(f_as_u_16(a));
 }
-

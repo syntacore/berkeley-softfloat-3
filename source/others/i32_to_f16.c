@@ -47,11 +47,9 @@ float16_t i32_to_f16(int32_t a)
     if (0 <= shiftDist) {
         return u_as_f_16(a ? packToF16UI(sign, 0x18 - shiftDist, (uint16_t)absA << shiftDist) : 0);
     } else {
-        uint16_t sig;
         shiftDist += 4;
-        sig =
-            shiftDist < 0 ? absA >> (-shiftDist) | 
-            ((uint32_t)(absA << (shiftDist & 31)) != 0) :
+        uint16_t const sig =
+            shiftDist < 0 ? absA >> (-shiftDist) | ((uint32_t)(absA << (shiftDist & 31)) != 0) :
             (uint16_t)absA << shiftDist;
         return softfloat_roundPackToF16(sign, 0x1C - shiftDist, sig);
     }

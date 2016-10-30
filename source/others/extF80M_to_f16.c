@@ -42,67 +42,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
-
-float16_t extF80M_to_f16(const extFloat80_t *aPtr)
+float16_t
+extF80M_to_f16(const extFloat80_t *aPtr)
 {
-
     return extF80_to_f16(*aPtr);
-
 }
 
 #else
 
 float16_t extF80M_to_f16(const extFloat80_t *aPtr)
 {
-    const struct extFloat80M *aSPtr;
-    uint16_t uiA64;
-    bool sign;
-    int32_t exp;
-    uint64_t sig;
-    struct commonNaN commonNaN;
-    uint16_t uiZ, sig16;
-    union ui16_f16 uZ;
-
     /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-
-    uiA64 = aSPtr->signExp;
-    sign = signExtF80UI64(uiA64);
-    exp = expExtF80UI64(uiA64);
-    sig = aSPtr->signif;
+    struct extFloat80M const *const aSPtr = (struct extFloat80M const *)aPtr;
+    uint16_t const uiA64 = aSPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t exp = expExtF80UI64(uiA64);
+    uint64_t sig = aSPtr->signif;
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            struct commonNaN commonNaN;
             softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
-            uiZ = softfloat_commonNaNToF16UI(&commonNaN);
+            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
         } else {
-            uiZ = packToF16UI(sign, 0x1F, 0);
+            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-        goto uiZ;
-    }
-
-    if (!(sig & UINT64_C(0x8000000000000000))) {
-        if (!sig) {
-            uiZ = packToF16UI(sign, 0, 0);
-            goto uiZ;
+    } else {
+        if (!(sig & INT64_MIN)) {
+            if (!sig) {
+                return u_as_f_16(packToF16UI(sign, 0, 0));
+            } else {
+                exp += softfloat_normExtF80SigM(&sig);
+            }
         }
-        exp += softfloat_normExtF80SigM(&sig);
-    }
-
-    sig16 = (uint16_t)softfloat_shortShiftRightJam64(sig, 49);
-    exp -= 0x3FF1;
-    if (sizeof(int16_t) < sizeof exp) {
-        if (exp < -0x40) {
-            exp = -0x40;
+        uint16_t const sig16 = (uint16_t)softfloat_shortShiftRightJam64(sig, 49);
+        exp -= 0x3FF1;
+        if (sizeof(int16_t) < sizeof exp) {
+            if (exp < -0x40) {
+                exp = -0x40;
+            }
         }
+        return softfloat_roundPackToF16(sign, exp, sig16);
     }
-    return softfloat_roundPackToF16(sign, exp, sig16);
-
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-
 #endif
-

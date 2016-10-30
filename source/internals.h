@@ -65,13 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
 
-/** @deprecated */
-union ui16_f16
-{
-    uint16_t ui; 
-    float16_t f;
-};
-
 #ifdef SOFTFLOAT_FAST_INT64
 /** @bug union of same type */
 union extF80M_extF80

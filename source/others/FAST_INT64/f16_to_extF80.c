@@ -39,58 +39,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-extFloat80_t f16_to_extF80( float16_t a )
+extFloat80_t
+f16_to_extF80(float16_t a)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool sign;
-    int8_t exp;
-    uint16_t frac;
-    struct commonNaN commonNaN;
     struct uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    struct exp8_sig16 normExpSig;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uZ;
+    union
+    {
+        struct extFloat80M s; 
+        extFloat80_t f;
+    } uZ;
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    sign = signF16UI( uiA );
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    
-    if ( exp == 0x1F ) {
-        if ( frac ) {
-            softfloat_f16UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToExtF80UI( &commonNaN );
+
+    uint16_t const uiA = f_as_u_16(a);
+    bool const sign = signF16UI(uiA);
+    int8_t exp = expF16UI(uiA);
+    uint16_t frac = fracF16UI(uiA);
+
+    if (exp == 0x1F) {
+        if (frac) {
+            struct commonNaN commonNaN;
+            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
+            uiZ = softfloat_commonNaNToExtF80UI(&commonNaN);
             uiZ64 = uiZ.v64;
-            uiZ0  = uiZ.v0;
+            uiZ0 = uiZ.v0;
         } else {
-            uiZ64 = packToExtF80UI64( sign, 0x7FFF );
-            uiZ0  = UINT64_C( 0x8000000000000000 );
+            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
+            uiZ0 = UINT64_C(0x8000000000000000);
         }
         goto uiZ;
     }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ64 = packToExtF80UI64( sign, 0 );
-            uiZ0  = 0;
+
+    if (!exp) {
+        if (!frac) {
+            uiZ64 = packToExtF80UI64(sign, 0);
+            uiZ0 = 0;
             goto uiZ;
         }
-        normExpSig = softfloat_normSubnormalF16Sig( frac );
+        struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
-    
-    uiZ64 = packToExtF80UI64( sign, exp + 0x3FF0 );
-    uiZ0  = (uint64_t) (frac | 0x0400)<<53;
- uiZ:
+
+    uiZ64 = packToExtF80UI64(sign, exp + 0x3FF0);
+    uiZ0 = (uint64_t)(frac | 0x0400) << 53;
+uiZ:
     uZ.s.signExp = uiZ64;
-    uZ.s.signif  = uiZ0;
+    uZ.s.signif = uiZ0;
     return uZ.f;
-
 }
-

@@ -39,76 +39,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float16_t f16_mul(float16_t a, float16_t b)
+float16_t
+f16_mul(float16_t a, float16_t b)
 {
-    union ui16_f16 uA;
-    uint16_t uiA;
-    bool signA;
-    int8_t expA;
-    uint16_t sigA;
-    union ui16_f16 uB;
-    uint16_t uiB;
-    bool signB;
-    int8_t expB;
-    uint16_t sigB;
-    bool signZ;
-    uint16_t magBits;
-    struct exp8_sig16 normExpSig;
-    int8_t expZ;
-    uint32_t sig32Z;
-    uint16_t sigZ, uiZ;
-    union ui16_f16 uZ;
+    uint16_t const uiA = f_as_u_16(a);
+    bool const signA = signF16UI(uiA);
+    int8_t expA = expF16UI(uiA);
+    uint16_t sigA = fracF16UI(uiA);
+    uint16_t const uiB = f_as_u_16(b);
+    bool const signB = signF16UI(uiB);
+    int8_t expB = expF16UI(uiB);
+    uint16_t sigB = fracF16UI(uiB);
+    bool const signZ = signA ^ signB;
 
-    
-    uA.f = a;
-    uiA = uA.ui;
-    signA = signF16UI(uiA);
-    expA = expF16UI(uiA);
-    sigA = fracF16UI(uiA);
-    uB.f = b;
-    uiB = uB.ui;
-    signB = signF16UI(uiB);
-    expB = expF16UI(uiB);
-    sigB = fracF16UI(uiB);
-    signZ = signA ^ signB;
-    
     if (expA == 0x1F) {
         if (sigA || ((expB == 0x1F) && sigB)) {
-            goto propagateNaN;
+            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
+        } else {
+            uint16_t const magBits = expB | sigB;
+            if (!magBits) {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return u_as_f_16(defaultNaNF16UI);
+            } else {
+                return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
+            }
         }
-        magBits = expB | sigB;
-        goto infArg;
-    }
-    if (expB == 0x1F) {
+    } else if (expB == 0x1F) {
         if (sigB) {
-            goto propagateNaN;
+            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
+        } else {
+            uint16_t const magBits = expA | sigA;
+            if (!magBits) {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return u_as_f_16(defaultNaNF16UI);
+            } else {
+                return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
+            }
         }
-        magBits = expA | sigA;
-        goto infArg;
-    }
-    
-    if (!expA) {
+    } else if (!expA) {
         if (!sigA) {
-            goto zero;
+            return u_as_f_16(packToF16UI(signZ, 0, 0));
+        } else {
+            struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+            expA = normExpSig.exp;
+            sigA = normExpSig.sig;
         }
-        normExpSig = softfloat_normSubnormalF16Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
     }
     if (!expB) {
         if (!sigB) {
-            goto zero;
+            return u_as_f_16(packToF16UI(signZ, 0, 0));
+        } else {
+            struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+            expB = normExpSig.exp;
+            sigB = normExpSig.sig;
         }
-        normExpSig = softfloat_normSubnormalF16Sig(sigB);
-        expB = normExpSig.exp;
-        sigB = normExpSig.sig;
     }
-    
-    expZ = expA + expB - 0xF;
+
+    int8_t expZ = expA + expB - 0xF;
     sigA = (sigA | 0x0400) << 4;
     sigB = (sigB | 0x0400) << 5;
-    sig32Z = (uint32_t)sigA * sigB;
-    sigZ = sig32Z >> 16;
+    uint32_t const sig32Z = (uint32_t)sigA * sigB;
+    uint16_t sigZ = sig32Z >> 16;
     if (sig32Z & 0xFFFF) {
         sigZ |= 1;
     }
@@ -117,25 +108,4 @@ float16_t f16_mul(float16_t a, float16_t b)
         sigZ <<= 1;
     }
     return softfloat_roundPackToF16(signZ, expZ, sigZ);
-    
-propagateNaN:
-    uiZ = softfloat_propagateNaNF16UI(uiA, uiB);
-    goto uiZ;
-    
-infArg:
-    if (!magBits) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        uiZ = defaultNaNF16UI;
-    } else {
-        uiZ = packToF16UI(signZ, 0x1F, 0);
-    }
-    goto uiZ;
-    
-zero:
-    uiZ = packToF16UI(signZ, 0, 0);
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
-
