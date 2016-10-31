@@ -34,49 +34,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "specialize.h"
 
 #include "internals.h"
-#include "specialize.h"
 #include "softfloat/functions.h"
 
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
 uint64_t
- softfloat_propagateNaNF64UI( uint64_t uiA, uint64_t uiB )
+softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
 {
-    bool isSigNaNA, isSigNaNB;
-    uint64_t uiNonsigA, uiNonsigB, uiMagA, uiMagB;
+    bool const isSigNaNA = softfloat_isSigNaNF64UI(uiA);
+    bool const isSigNaNB = softfloat_isSigNaNF64UI(uiB);
+    /* Make NaNs non-signaling. */
+    uint64_t const uiNonsigA = uiA | UINT64_C(0x0008000000000000);
+    uint64_t const uiNonsigB = uiB | UINT64_C(0x0008000000000000);
 
-    
-    isSigNaNA = softfloat_isSigNaNF64UI( uiA );
-    isSigNaNB = softfloat_isSigNaNF64UI( uiB );
-    /*------------------------------------------------------------------------
-    | Make NaNs non-signaling.
-    *------------------------------------------------------------------------*/
-    uiNonsigA = uiA | UINT64_C( 0x0008000000000000 );
-    uiNonsigB = uiB | UINT64_C( 0x0008000000000000 );
-    
-    if ( isSigNaNA | isSigNaNB ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) {
-            if ( isSigNaNB ) goto returnLargerMag;
-            return isNaNF64UI( uiB ) ? uiNonsigB : uiNonsigA;
+    if (isSigNaNA | isSigNaNB) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) {
+            if (isSigNaNB) {
+                goto returnLargerMag;
+            }
+            return isNaNF64UI(uiB) ? uiNonsigB : uiNonsigA;
         } else {
-            return isNaNF64UI( uiA ) ? uiNonsigA : uiNonsigB;
+            return isNaNF64UI(uiA) ? uiNonsigA : uiNonsigB;
         }
     }
- returnLargerMag:
-    uiMagA = uiNonsigA & UINT64_C( 0x7FFFFFFFFFFFFFFF );
-    uiMagB = uiNonsigB & UINT64_C( 0x7FFFFFFFFFFFFFFF );
-    if ( uiMagA < uiMagB ) return uiNonsigB;
-    if ( uiMagB < uiMagA ) return uiNonsigA;
-    return (uiNonsigA < uiNonsigB) ? uiNonsigA : uiNonsigB;
-
+returnLargerMag:
+    {
+        uint64_t const uiMagA = uiNonsigA & UINT64_C(0x7FFFFFFFFFFFFFFF);
+        uint64_t const uiMagB = uiNonsigB & UINT64_C(0x7FFFFFFFFFFFFFFF);
+        return
+            uiMagA < uiMagB ? uiNonsigB :
+            uiMagB < uiMagA ? uiNonsigA :
+            uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
+    }
 }
-

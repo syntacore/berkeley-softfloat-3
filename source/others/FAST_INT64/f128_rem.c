@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 #include "specialize.h"
+#include <assert.h>
 
-float128_t f128_rem( float128_t a, float128_t b )
+float128_t
+f128_rem( float128_t a, float128_t b )
 {
     union ui128_f128 uA;
     uint64_t uiA64, uiA0;
@@ -132,9 +134,8 @@ float128_t f128_rem( float128_t a, float128_t b )
             }
             expDiff -= 29;
         }
-        /*--------------------------------------------------------------------
-        | (`expDiff' cannot be less than -29 here.)
-        *--------------------------------------------------------------------*/
+        /* `expDiff' cannot be less than -29 here.*/
+        assert(-29 <= expDiff);
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
         rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, expDiff + 30 );
         term = softfloat_mul128By32( sigB.v64, sigB.v0, q );

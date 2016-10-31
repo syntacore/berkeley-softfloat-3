@@ -45,7 +45,6 @@ f32_to_i32_r_minMag(float32_t a, bool exact)
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);
-
     int16_t const shiftDist = 0x9E - exp;
     if (32 <= shiftDist) {
         if (exact && (exp | sig)) {
@@ -53,24 +52,23 @@ f32_to_i32_r_minMag(float32_t a, bool exact)
         }
         return 0;
     } else {
-        int32_t absZ;
         bool const sign = signF32UI(uiA);
         if (shiftDist <= 0) {
             if (uiA == packToF32UI(1, 0x9E, 0)) {
                 return INT32_MIN;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return
+                    exp == 0xFF && sig ? i32_fromNaN :
+                    sign ? i32_fromNegOverflow : i32_fromPosOverflow;
             }
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                exp == 0xFF && sig ? i32_fromNaN :
-                sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+        } else {
+            sig = (sig | 0x00800000) << 8;
+            int32_t absZ = sig >> shiftDist;
+            if (exact && ((uint32_t)absZ << shiftDist != sig)) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+            return sign ? -absZ : absZ;
         }
-
-        sig = (sig | 0x00800000) << 8;
-        absZ = sig >> shiftDist;
-        if (exact && ((uint32_t)absZ << shiftDist != sig)) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-        return sign ? -absZ : absZ;
     }
 }
-

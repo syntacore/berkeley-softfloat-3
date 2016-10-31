@@ -1,5 +1,5 @@
 
-/*============================================================================
+/** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -40,11 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 void
- softfloat_commonNaNToF128M( const struct commonNaN *aPtr, uint32_t *zWPtr )
+softfloat_commonNaNToF128M(const struct commonNaN *aPtr, uint32_t *zWPtr)
 {
-
-    softfloat_shortShiftRight128M( (const uint32_t *) &aPtr->v0, 16, zWPtr );
-    zWPtr[indexWordHi( 4 )] |= (uint32_t) aPtr->sign<<31 | 0x7FFF8000;
+    softfloat_shortShiftRight128M((const uint32_t *)&aPtr->v0, 16, zWPtr);
+    zWPtr[indexWordHi(4)] |= (uint32_t)aPtr->sign << 31 | 0x7FFF8000;
 
 }
 

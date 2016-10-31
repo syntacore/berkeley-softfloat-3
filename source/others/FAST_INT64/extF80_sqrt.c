@@ -92,11 +92,11 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    /*------------------------------------------------------------------------
-    | (`sig32Z' is guaranteed to be a lower bound on the square root of
-    | `sig32A', which makes `sig32Z' also a lower bound on the square root of
-    | `sigA'.)
-    *------------------------------------------------------------------------*/
+    /*
+    `sig32Z' is guaranteed to be a lower bound on the square root of
+    `sig32A', which makes `sig32Z' also a lower bound on the square root of
+    `sigA'.)
+    */
     expZ = ((expA - 0x3FFF)>>1) + 0x3FFF;
     expA &= 1;
     sig32A = sigA>>32;

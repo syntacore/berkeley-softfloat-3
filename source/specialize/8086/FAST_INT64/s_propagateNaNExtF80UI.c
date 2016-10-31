@@ -55,47 +55,61 @@ struct uint128
         uint64_t uiB0
     )
 {
-    bool isSigNaNA, isSigNaNB;
-    uint64_t uiNonsigA0, uiNonsigB0;
-    uint16_t uiMagA64, uiMagB64;
-    struct uint128 uiZ;
+    bool const isSigNaNA = softfloat_isSigNaNExtF80UI(uiA64, uiA0);
+    bool const isSigNaNB = softfloat_isSigNaNExtF80UI(uiB64, uiB0);
+    /* Make NaNs non-signaling. */
+    uint64_t const uiNonsigA0 = uiA0 | UINT64_C(0xC000000000000000);
+    uint64_t const uiNonsigB0 = uiB0 | UINT64_C(0xC000000000000000);
 
-    
-    isSigNaNA = softfloat_isSigNaNExtF80UI(uiA64, uiA0);
-    isSigNaNB = softfloat_isSigNaNExtF80UI(uiB64, uiB0);
-    /*------------------------------------------------------------------------
-    | Make NaNs non-signaling.
-    *------------------------------------------------------------------------*/
-    uiNonsigA0 = uiA0 | UINT64_C(0xC000000000000000);
-    uiNonsigB0 = uiB0 | UINT64_C(0xC000000000000000);
-    
     if (isSigNaNA | isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         if (isSigNaNA) {
-            if (isSigNaNB) goto returnLargerMag;
-            if (isNaNExtF80UI(uiB64, uiB0)) goto returnB;
+            if (isSigNaNB) {
+                goto returnLargerMag;
+            }
+            if (isNaNExtF80UI(uiB64, uiB0)) {
+                goto returnB;
+            }
             goto returnA;
         } else {
-            if (isNaNExtF80UI(uiA64, uiA0)) goto returnA;
+            if (isNaNExtF80UI(uiA64, uiA0)) {
+                goto returnA;
+            }
             goto returnB;
         }
     }
 returnLargerMag:
-    uiMagA64 = uiA64 & 0x7FFF;
-    uiMagB64 = uiB64 & 0x7FFF;
-    if (uiMagA64 < uiMagB64) goto returnB;
-    if (uiMagB64 < uiMagA64) goto returnA;
-    if (uiNonsigA0 < uiNonsigB0) goto returnB;
-    if (uiNonsigB0 < uiNonsigA0) goto returnA;
-    if (uiA64 < uiB64) goto returnA;
+    {
+        uint16_t const uiMagA64 = uiA64 & 0x7FFF;
+        uint16_t const uiMagB64 = uiB64 & 0x7FFF;
+        if (uiMagA64 < uiMagB64) {
+            goto returnB;
+        }
+        if (uiMagB64 < uiMagA64) {
+            goto returnA;
+        }
+        if (uiNonsigA0 < uiNonsigB0) {
+            goto returnB;
+        }
+        if (uiNonsigB0 < uiNonsigA0) {
+            goto returnA;
+        }
+        if (uiA64 < uiB64) {
+            goto returnA;
+        }
+    }
 returnB:
-    uiZ.v64 = uiB64;
-    uiZ.v0 = uiNonsigB0;
-    return uiZ;
+    {
+        struct uint128 uiZ;
+        uiZ.v64 = uiB64;
+        uiZ.v0 = uiNonsigB0;
+        return uiZ;
+    }
 returnA:
-    uiZ.v64 = uiA64;
-    uiZ.v0 = uiNonsigA0;
-    return uiZ;
-
+    {
+        struct uint128 uiZ;
+        uiZ.v64 = uiA64;
+        uiZ.v0 = uiNonsigA0;
+        return uiZ;
+    }
 }
-

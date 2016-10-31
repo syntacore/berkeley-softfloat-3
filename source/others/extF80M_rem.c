@@ -156,9 +156,7 @@ extF80M_rem(
             }
             expDiff -= 29;
         }
-        /*
-        | (`expDiff' cannot be less than -29 here.)
-        *--------------------------------------------------------------------*/
+        /* `expDiff' cannot be less than -29 here. */
         q = (uint32_t)(x64 >> 32) >> (~expDiff & 31);
         softfloat_remStep96MBy32(rem, expDiff + 30, x, q, rem);
         if (rem[indexWordHi(3)] & 0x80000000) {

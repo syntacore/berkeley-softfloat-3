@@ -42,9 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 f64_div(float64_t a, float64_t b)
 {
-    struct exp16_sig64 normExpSig;
-    uint32_t q;
-
     uint64_t const uiA = f_as_u_64(a);
     bool const signA = signF64UI(uiA);
     int16_t expA = expF64UI(uiA);
@@ -81,7 +78,7 @@ f64_div(float64_t a, float64_t b)
                     return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
                 }
             } else {
-                normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -90,7 +87,7 @@ f64_div(float64_t a, float64_t b)
             if (!sigA) {
                 return u_as_f_64(packToF64UI(signZ, 0, 0));
             } else {
-                normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }
@@ -112,7 +109,7 @@ f64_div(float64_t a, float64_t b)
         uint64_t rem =
             ((sigA - (uint64_t)doubleTerm * (uint32_t)(sigB >> 32)) << 28) -
             (uint64_t)doubleTerm * ((uint32_t)sigB >> 4);
-        q = (((uint32_t)(rem >> 32) * (uint64_t)recip32) >> 32) + 4;
+        uint32_t q = (((uint32_t)(rem >> 32) * (uint64_t)recip32) >> 32) + 4;
         uint64_t sigZ = ((uint64_t)sig32Z << 32) + ((uint64_t)q << 4);
 
         if ((sigZ & 0x1FF) < 4 << 4) {

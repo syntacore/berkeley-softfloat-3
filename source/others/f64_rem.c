@@ -41,9 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t f64_rem(float64_t a, float64_t b)
 {
-    uint64_t altRem, meanRem;
-
-
     uint64_t const uiA = f_as_u_64(a);
     bool const signA = signF64UI(uiA);
     int16_t expA = expF64UI(uiA);
@@ -60,50 +57,48 @@ float64_t f64_rem(float64_t a, float64_t b)
             return u_as_f_64(defaultNaNF64UI);
         }
     } else if (expB == 0x7FF) {
-        if (sigB) {
-            return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-        } else {
-            return a;
-        }
+        return sigB ? u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB)) : a;
     } else if (expA < expB - 1) {
         return a;
     } else {
-
         if (!expB) {
             if (!sigB) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return u_as_f_64(defaultNaNF64UI);
+            } else {
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                expB = normExpSig.exp;
+                sigB = normExpSig.sig;
             }
-            struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
-            expB = normExpSig.exp;
-            sigB = normExpSig.sig;
         }
         if (!expA) {
             if (!sigA) {
                 return a;
+            } else {
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                expA = normExpSig.exp;
+                sigA = normExpSig.sig;
             }
-            struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
-            expA = normExpSig.exp;
-            sigA = normExpSig.sig;
         }
-
         uint64_t rem = sigA | UINT64_C(0x0010000000000000);
         sigB |= UINT64_C(0x0010000000000000);
         int16_t expDiff = expA - expB;
         uint32_t q;
+        uint64_t altRem;
         if (expDiff < 1) {
             if (expDiff < -1) {
                 return a;
-            }
-            sigB <<= 9;
-            if (expDiff) {
-                rem <<= 8;
-                q = 0;
             } else {
-                rem <<= 9;
-                q = (sigB <= rem);
-                if (q) {
-                    rem -= sigB;
+                sigB <<= 9;
+                if (expDiff) {
+                    rem <<= 8;
+                    q = 0;
+                } else {
+                    rem <<= 9;
+                    q = (sigB <= rem);
+                    if (q) {
+                        rem -= sigB;
+                    }
                 }
             }
         } else {
@@ -153,15 +148,17 @@ float64_t f64_rem(float64_t a, float64_t b)
             rem -= sigB;
         } while (!(rem & UINT64_C(0x8000000000000000)));
 selectRem:
-        meanRem = rem + altRem;
-        if ((meanRem & UINT64_C(0x8000000000000000)) || (!meanRem && (q & 1))) {
-            rem = altRem;
+        {
+            uint64_t const meanRem = rem + altRem;
+            if ((meanRem & UINT64_C(0x8000000000000000)) || (!meanRem && (q & 1))) {
+                rem = altRem;
+            }
+            bool signRem = signA;
+            if (rem & UINT64_C(0x8000000000000000)) {
+                signRem = !signRem;
+                rem = -(int64_t)rem;
+            }
+            return softfloat_normRoundPackToF64(signRem, expB, rem);
         }
-        bool signRem = signA;
-        if (rem & UINT64_C(0x8000000000000000)) {
-            signRem = !signRem;
-            rem = -(int64_t)rem;
-        }
-        return softfloat_normRoundPackToF64(signRem, expB, rem);
     }
 }

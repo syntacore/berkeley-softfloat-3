@@ -117,9 +117,7 @@ void
             }
             expDiff -= 29;
         }
-        /*
-        | (`expDiff' cannot be less than -29 here.)
-        *--------------------------------------------------------------------*/
+        /* `expDiff' cannot be less than -29 here. */
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
         softfloat_remStep128MBy32( remPtr, expDiff + 30, x, q, remPtr );
         if ( remPtr[indexWordHi( 4 )] & 0x80000000 ) {

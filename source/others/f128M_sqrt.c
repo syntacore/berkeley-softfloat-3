@@ -90,10 +90,10 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     if (expA == -128) goto copyA;
     if (signA) goto invalid;
     /*
-    | (`sig32Z' is guaranteed to be a lower bound on the square root of
-    | `sig32A', which makes `sig32Z' also a lower bound on the square root of
-    | `sigA'.)
-    *------------------------------------------------------------------------*/
+    `sig32Z' is guaranteed to be a lower bound on the square root of
+    `sig32A', which makes `sig32Z' also a lower bound on the square root of
+    `sigA'.
+    */
     expZ = ((expA - 0x3FFF) >> 1) + 0x3FFE;
     expA &= 1;
     rem64 = (uint64_t)rem[indexWord(4, 3)] << 32 | rem[indexWord(4, 2)];
@@ -127,9 +127,7 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
     
     q = ((uint32_t)(rem64 >> 2) * (uint64_t)recipSqrt32) >> 32;
     sig64Z <<= 1;
-    /*
-    | (Repeating this loop is a rare occurrence.)
-    *------------------------------------------------------------------------*/
+    /* Repeating this loop is a rare occurrence. */
     for (;;) {
         x64 = sig64Z + (q >> 26);
         term[indexWord(4, 2)] = x64 >> 32;

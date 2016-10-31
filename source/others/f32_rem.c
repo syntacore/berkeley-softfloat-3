@@ -113,14 +113,14 @@ float32_t f32_rem(float32_t a, float32_t b)
                 /*
                  Changing the shift of `rem' here requires also changing the initial
                  subtraction from `expDiff'.
-                --------------------------------------------------------------------*/
+                */
                 rem <<= 7;
                 expDiff -= 31;
                 /*
                 The scale of `sigB' affects how many bits are obtained during each
                 cycle of the loop.  Currently this is 29 bits per loop iteration,
                 which is believed to be the maximum possible.
-                -------------------------------------------------------------------*/
+                */
                 sigB <<= 6;
                 for (;;) {
                     q = (rem * (uint64_t)recip32) >> 32;
@@ -130,9 +130,7 @@ float32_t f32_rem(float32_t a, float32_t b)
                     rem = -(int32_t)(q * sigB);
                     expDiff -= 29;
                 }
-                /*
-                `expDiff' cannot be less than -30 here.
-                --------------------------------------------------------------------*/
+                /* `expDiff' cannot be less than -30 here. */
                 q >>= ~expDiff & 31;
                 rem = (rem << (expDiff + 30)) - q * (uint32_t)sigB;
             }

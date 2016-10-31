@@ -38,31 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-float64_t f64_sub( float64_t a, float64_t b )
+float64_t
+f64_sub(float64_t a, float64_t b)
 {
-    uint64_t uiA;
-    bool signA;
-    uint64_t uiB;
-    bool signB;
-#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
-    float64_t (*magsFuncPtr)( uint64_t, uint64_t, bool );
-#endif
-
-    uiA = f_as_u_64(a);
-    signA = signF64UI( uiA );
-    uiB = f_as_u_64(b);
-    signB = signF64UI( uiB );
-#if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
-    if ( signA == signB ) {
-        return softfloat_subMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_addMagsF64( uiA, uiB, signA );
-    }
-#else
-    magsFuncPtr =
-        (signA == signB) ? softfloat_subMagsF64 : softfloat_addMagsF64;
-    return (*magsFuncPtr)( uiA, uiB, signA );
-#endif
-
+    uint64_t const uiA = f_as_u_64(a);
+    bool const signA = signF64UI(uiA);
+    uint64_t const uiB = f_as_u_64(b);
+    bool const signB = signF64UI(uiB);
+    return
+        signA == signB ? softfloat_subMagsF64(uiA, uiB, signA) : softfloat_addMagsF64(uiA, uiB, signA);
 }
-

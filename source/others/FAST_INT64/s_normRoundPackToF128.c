@@ -37,42 +37,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 
 float128_t
- softfloat_normRoundPackToF128(
-     bool sign, int32_t exp, uint64_t sig64, uint64_t sig0 )
+softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t sig0)
 {
-    int8_t shiftDist;
-    struct uint128 sig128;
-    union ui128_f128 uZ;
     uint64_t sigExtra;
-    struct uint128_extra sig128Extra;
 
-    if ( ! sig64 ) {
+    if (!sig64) {
         exp -= 64;
         sig64 = sig0;
         sig0 = 0;
     }
-    shiftDist = softfloat_countLeadingZeros64( sig64 ) - 15;
+    int8_t const shiftDist = softfloat_countLeadingZeros64(sig64) - 15;
     exp -= shiftDist;
-    if ( 0 <= shiftDist ) {
-        if ( shiftDist ) {
-            sig128 = softfloat_shortShiftLeft128( sig64, sig0, shiftDist );
+    if (0 <= shiftDist) {
+        if (shiftDist) {
+            struct uint128 const sig128 = softfloat_shortShiftLeft128(sig64, sig0, shiftDist);
             sig64 = sig128.v64;
-            sig0  = sig128.v0;
+            sig0 = sig128.v0;
         }
-        if ( (uint32_t) exp < 0x7FFD ) {
-            uZ.ui.v64 = packToF128UI64( sign, sig64 | sig0 ? exp : 0, sig64 );
-            uZ.ui.v0  = sig0;
+        if ((uint32_t)exp < 0x7FFD) {
+            union ui128_f128 uZ;
+            uZ.ui.v64 = packToF128UI64(sign, sig64 | sig0 ? exp : 0, sig64);
+            uZ.ui.v0 = sig0;
             return uZ.f;
         }
         sigExtra = 0;
     } else {
-        sig128Extra =
-            softfloat_shortShiftRightJam128Extra( sig64, sig0, 0, -shiftDist );
+        struct uint128_extra const sig128Extra =
+            softfloat_shortShiftRightJam128Extra(sig64, sig0, 0, -shiftDist);
         sig64 = sig128Extra.v.v64;
-        sig0  = sig128Extra.v.v0;
+        sig0 = sig128Extra.v.v0;
         sigExtra = sig128Extra.extra;
     }
-    return softfloat_roundPackToF128( sign, exp, sig64, sig0, sigExtra );
-
+    return softfloat_roundPackToF128(sign, exp, sig64, sig0, sigExtra);
 }
-
