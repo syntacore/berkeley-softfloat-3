@@ -42,57 +42,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-bool extF80M_le( const extFloat80_t *aPtr, const extFloat80_t *bPtr )
+bool
+extF80M_le(extFloat80_t const *aPtr, extFloat80_t const *bPtr)
 {
-
-    return extF80_le( *aPtr, *bPtr );
-
+    return extF80_le(*aPtr, *bPtr);
 }
 
 #else
 
-bool extF80M_le( const extFloat80_t *aPtr, const extFloat80_t *bPtr )
+bool
+extF80M_le(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
-    const struct extFloat80M *aSPtr, *bSPtr;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    bool signA, ltMags;
-
     /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
+    struct extFloat80M const *const aSPtr = (struct extFloat80M const *)aPtr;
     /** @bug cast to same type */
-    bSPtr = (const struct extFloat80M *) bPtr;
+    struct extFloat80M const *const bSPtr = (struct extFloat80M const *)bPtr;
+    uint16_t const uiA64 = aSPtr->signExp;
+    uint64_t const uiA0 = aSPtr->signif;
+    uint16_t const uiB64 = bSPtr->signExp;
+    uint64_t const uiB0 = bSPtr->signif;
 
-    uiA64 = aSPtr->signExp;
-    uiA0  = aSPtr->signif;
-    uiB64 = bSPtr->signExp;
-    uiB0  = bSPtr->signif;
-
-    if ( isNaNExtF80UI( uiA64, uiA0 ) || isNaNExtF80UI( uiB64, uiB0 ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    }
-
-    signA = signExtF80UI64( uiA64 );
-    if ( (uiA64 ^ uiB64) & 0x8000 ) {
-        /* Signs are different. */
-        return signA || ! (uiA0 | uiB0);
     } else {
-        /* Signs are the same. */
-        if ( ! ((uiA0 & uiB0) & UINT64_C( 0x8000000000000000 )) ) {
-            return (softfloat_compareNonnormExtF80M( aSPtr, bSPtr ) <= 0);
-        }
-        if ( uiA64 == uiB64 ) {
-            if ( uiA0 == uiB0 ) {return true;}
-            ltMags = (uiA0 < uiB0);
+        bool const signA = signExtF80UI64(uiA64);
+        if ((uiA64 ^ uiB64) & 0x8000) {
+            /* Signs are different. */
+            return signA || !(uiA0 | uiB0);
+        } else if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+            /* Signs are the same. */
+            return (softfloat_compareNonnormExtF80M(aSPtr, bSPtr) <= 0);
         } else {
-            ltMags = (uiA64 < uiB64);
+            if (uiA64 == uiB64) {
+                return uiA0 == uiB0 || signA != (uiA0 < uiB0);
+            } else {
+                return signA != (uiA64 < uiB64);
+            }
         }
-        return signA ^ ltMags;
     }
-
 }
 
 #endif

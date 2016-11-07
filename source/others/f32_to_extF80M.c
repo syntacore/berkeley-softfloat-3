@@ -53,7 +53,7 @@ void
 f32_to_extF80M(float32_t a, extFloat80_t *zPtr)
 {
     /** @bug cast to same type */
-    struct extFloat80M *zSPtr = (struct extFloat80M *) zPtr;
+    struct extFloat80M *const zSPtr = (struct extFloat80M *)zPtr;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t exp = expF32UI(uiA);

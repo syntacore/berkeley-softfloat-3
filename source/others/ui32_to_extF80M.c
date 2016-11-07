@@ -41,35 +41,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void ui32_to_extF80M( uint32_t a, extFloat80_t *zPtr )
+void
+ui32_to_extF80M(uint32_t a, extFloat80_t *zPtr)
 {
-
-    *zPtr = ui32_to_extF80( a );
-
+    *zPtr = ui32_to_extF80(a);
 }
 
 #else
 
-void ui32_to_extF80M( uint32_t a, extFloat80_t *zPtr )
+void
+ui32_to_extF80M(uint32_t a, extFloat80_t *zPtr)
 {
-    struct extFloat80M *zSPtr;
-    uint16_t uiZ64;
-    uint64_t sigZ;
-    int8_t shiftDist;
 
     /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
-    uiZ64 = 0;
-    sigZ = 0;
-    if ( a ) {
-        shiftDist = softfloat_countLeadingZeros32( a );
-        uiZ64 = packToExtF80UI64( 0, 0x401E - shiftDist );
-        sigZ = (uint64_t) (a<<shiftDist)<<32;
+    struct extFloat80M *const zSPtr = (struct extFloat80M *) zPtr;
+    uint16_t uiZ64 = 0;
+    uint64_t sigZ = 0;
+    if (0 != a) {
+        int8_t const shiftDist = softfloat_countLeadingZeros32(a);
+        uiZ64 = packToExtF80UI64(0, 0x401E - shiftDist);
+        sigZ = (uint64_t)(a << shiftDist) << 32;
     }
     zSPtr->signExp = uiZ64;
     zSPtr->signif = sigZ;
-
 }
 
 #endif
-

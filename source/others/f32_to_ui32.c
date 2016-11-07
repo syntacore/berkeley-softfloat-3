@@ -41,9 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 uint32_t f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
 {
-    uint64_t sig64;
-    int16_t shiftDist;
-
     uint32_t const uiA = f_as_u_32(a);
     bool sign = signF32UI(uiA);
     int16_t const exp = expF32UI(uiA);
@@ -65,8 +62,8 @@ uint32_t f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
     if (exp) {
         sig |= 0x00800000;
     }
-    sig64 = (uint64_t)sig << 32;
-    shiftDist = 0xAA - exp;
+    uint64_t sig64 = (uint64_t)sig << 32;
+    int16_t const shiftDist = 0xAA - exp;
     if (0 < shiftDist) {
         sig64 = softfloat_shiftRightJam64(sig64, shiftDist);
     }

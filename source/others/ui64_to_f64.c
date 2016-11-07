@@ -41,12 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 ui64_to_f64(uint64_t a)
 {
-    if (!a) {
-        return u_as_f_64(0);
-    } else if (a & UINT64_C(0x8000000000000000)) {
-        return
-            softfloat_roundPackToF64(0, 0x43D, softfloat_shortShiftRightJam64(a, 1));
-    } else {
-        return softfloat_normRoundPackToF64(0, 0x43C, a);
-    }
+    return
+        0 == a ? u_as_f_64(0) :
+        0 != (a & INT64_MIN) ? softfloat_roundPackToF64(0, 0x43D, softfloat_shortShiftRightJam64(a, 1)) :
+        softfloat_normRoundPackToF64(0, 0x43C, a);
 }

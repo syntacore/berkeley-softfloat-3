@@ -42,9 +42,7 @@ float64_t
 i64_to_f64(int64_t a)
 {
     bool const sign = a < 0;
-    if (!(a & INT64_MAX)) {
-        return u_as_f_64(sign ? packToF64UI(1, 0x43E, 0) : 0);
-    } else {
-        return softfloat_normRoundPackToF64(sign, 0x43C, sign ? -a : a);
-    }
+    return 
+        0 == (a & INT64_MAX) ? u_as_f_64(sign ? packToF64UI(1, 0x43E, 0) : 0):
+        softfloat_normRoundPackToF64(sign, 0x43C, sign ? -a : a);
 }
