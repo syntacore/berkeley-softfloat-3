@@ -158,7 +158,7 @@ f128_sqrt(float128_t a)
                         --sigZExtra;
                     } else {
                         sigZ = softfloat_sub128(sigZ.v64, sigZ.v0, 0, 1);
-                        sigZExtra = ~0;
+                        sigZExtra = ~UINT64_C(0);
                     }
                 }
             }
