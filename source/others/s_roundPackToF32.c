@@ -36,17 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 #include "softfloat/functions.h"
+#include <assert.h>
 
 float32_t
 softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
 {
-    uint8_t const roundingMode = softfloat_roundingMode;
-    bool const roundNearEven = roundingMode == softfloat_round_near_even;
+    assert(softfloat_round_near_even <= softfloat_roundingMode && softfloat_roundingMode <= softfloat_round_near_maxMag);
+    enum softfloat_round_mode const roundingMode = (enum softfloat_round_mode)softfloat_roundingMode;
     uint8_t const roundIncrement =
-        roundNearEven || softfloat_round_near_maxMag == roundingMode ? 0x40 :
-        roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0x7F : 0;
+        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x40 :
+        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x7F : 0;
     uint8_t roundBits = sig & 0x7F;
-    if (0xFD <= (unsigned int)exp) {
+    if (0xFD <= (uint16_t)exp) {
         if (exp < 0) {
             bool const isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||
@@ -66,7 +67,8 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     if (roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    sig = ((sig + roundIncrement) >> 7) & (~(uint32_t)(!(roundBits ^ 0x40) & roundNearEven));
-    return u_as_f_32(packToF32UI(sign, sig ? exp : 0, sig));
+    sig =
+        ((sig + roundIncrement) >> 7) &
+        ~(uint32_t)(0 == (roundBits ^ 0x40) && softfloat_round_near_even == roundingMode);
+    return u_as_f_32(packToF32UI(sign, 0 != sig ? exp : 0, sig));
 }
-
