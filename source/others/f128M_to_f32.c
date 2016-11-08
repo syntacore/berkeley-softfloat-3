@@ -52,14 +52,13 @@ float32_t f128M_to_f32(const float128_t *aPtr)
 
 float32_t f128M_to_f32(const float128_t *aPtr)
 {
-    uint32_t uiZ;
-    const uint32_t *aWPtr = (const uint32_t *)aPtr;
+    uint32_t const * const aWPtr = (const uint32_t *)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t exp = expF128UI96(uiA96);
     uint64_t const frac64 =
         (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)] |
-        ((aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0);
+        (0 != (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]));
     if (exp != INT16_MAX) {
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac64, 18);
         if (exp | frac32) {
@@ -72,18 +71,17 @@ float32_t f128M_to_f32(const float128_t *aPtr)
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
         } else {
-            uiZ = packToF32UI(sign, 0, 0);
+            return u_as_f_32(packToF32UI(sign, 0, 0));
         }
     } else {
         if (frac64) {
             struct commonNaN commonNaN;
             softfloat_f128MToCommonNaN(aWPtr, &commonNaN);
-            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
+            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            uiZ = packToF32UI(sign, 0xFF, 0);
+            return u_as_f_32(packToF32UI(sign, 0xFF, 0));
         }
     }
-    return u_as_f_32(uiZ);
 }
 
 #endif

@@ -36,15 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
-struct exp16_sig32 softfloat_normSubnormalF32Sig( uint32_t sig )
+struct exp16_sig32
+    softfloat_normSubnormalF32Sig(uint32_t sig)
 {
-    int8_t shiftDist;
+    int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 8;
     struct exp16_sig32 z;
-
-    shiftDist = softfloat_countLeadingZeros32( sig ) - 8;
     z.exp = 1 - shiftDist;
-    z.sig = sig<<shiftDist;
+    z.sig = sig << shiftDist;
     return z;
-
 }
-

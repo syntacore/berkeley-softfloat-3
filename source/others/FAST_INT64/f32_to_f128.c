@@ -39,43 +39,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float128_t f32_to_f128(float32_t a)
+float128_t
+f32_to_f128(float32_t a)
 {
-    int16_t exp;
-    uint32_t frac;
-    struct commonNaN commonNaN;
-    struct uint128 uiZ;
-    struct exp16_sig32 normExpSig;
-
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
-    exp = expF32UI(uiA);
-    frac = fracF32UI(uiA);
+    int16_t exp = expF32UI(uiA);
+    uint32_t frac = fracF32UI(uiA);
 
     if (exp == 0xFF) {
         if (frac) {
+            struct commonNaN commonNaN;
             softfloat_f32UIToCommonNaN(uiA, &commonNaN);
-            uiZ = softfloat_commonNaNToF128UI(&commonNaN);
+            return u_as_f_128(softfloat_commonNaNToF128UI(&commonNaN));
         } else {
+            struct uint128 uiZ;
             uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
-            uiZ.v0 = 0;
-        }
-        return u_as_f_128(uiZ);
-    }
-
-    if (!exp) {
-        if (!frac) {
-            uiZ.v64 = packToF128UI64(sign, 0, 0);
             uiZ.v0 = 0;
             return u_as_f_128(uiZ);
         }
-        normExpSig = softfloat_normSubnormalF32Sig(frac);
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
+    } else if (0 == exp) {
+        if (0 == frac) {
+            struct uint128 uiZ;
+            uiZ.v64 = packToF128UI64(sign, 0, 0);
+            uiZ.v0 = 0;
+            return u_as_f_128(uiZ);
+        } else {
+            struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+            exp = normExpSig.exp - 1;
+            frac = normExpSig.sig;
+        }
     }
-
-    uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
-    uiZ.v0 = 0;
-    return u_as_f_128(uiZ);
+    {
+        struct uint128 uiZ;
+        uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
+        uiZ.v0 = 0;
+        return u_as_f_128(uiZ);
+    }
 }
 

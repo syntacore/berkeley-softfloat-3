@@ -41,15 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assert.h>
 
-float32_t f128_to_f32(float128_t a)
+float32_t
+f128_to_f32(float128_t a)
 {
     union ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    uint32_t uiZ;
 
     uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
+    uint64_t const uiA64 = uA.ui.v64;
+    uint64_t const uiA0 = uA.ui.v0;
     bool const sign = signF128UI64(uiA64);
     int32_t exp = expF128UI64(uiA64);
     uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
@@ -58,21 +57,22 @@ float32_t f128_to_f32(float128_t a)
         if (exp | frac32) {
             exp -= 0x3F81;
             if (sizeof(int16_t) < sizeof exp) {
-                if (exp < -0x1000) {exp = -0x1000;}
+                if (exp < -0x1000) {
+                    exp = -0x1000;
+                }
             }
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
         } else {
-            uiZ = packToF32UI(sign, 0, 0);
+            return u_as_f_32(packToF32UI(sign, 0, 0));
         }
     } else {
         if (frac64) {
             struct commonNaN commonNaN;
             softfloat_f128UIToCommonNaN(uiA64, uiA0, &commonNaN);
-            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
+            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            uiZ = packToF32UI(sign, 0xFF, 0);
+            return u_as_f_32(packToF32UI(sign, 0xFF, 0));
         }
     }
-    return u_as_f_32(uiZ);
 }
