@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float32_t f32_roundToInt(float32_t a, uint8_t roundingMode, bool exact)
+float32_t
+f32_roundToInt(float32_t a, uint8_t roundingMode, bool exact)
 {
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
@@ -51,7 +52,7 @@ float32_t f32_roundToInt(float32_t a, uint8_t roundingMode, bool exact)
             if (exact) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
-            uint32_t const uiZ = uiA & packToF32UI(1, 0, 0);
+            uint32_t const uiZ = uiA & signed_zero_F32UI(true);
             switch (roundingMode) {
             case softfloat_round_near_even:
                 if (!fracF32UI(uiA)) {
@@ -59,17 +60,17 @@ float32_t f32_roundToInt(float32_t a, uint8_t roundingMode, bool exact)
                 }
             case softfloat_round_near_maxMag:
                 if (exp == 0x7E) {
-                    return u_as_f_32(uiZ | packToF32UI(0, 0x7F, 0));
+                    return u_as_f_32(uiZ | packToF32UI(false, 0x7F, 0));
                 }
                 break;
             case softfloat_round_min:
                 if (uiZ) {
-                    return u_as_f_32(packToF32UI(1, 0x7F, 0));
+                    return u_as_f_32(packToF32UI(true, 0x7F, 0));
                 }
                 break;
             case softfloat_round_max:
                 if (!uiZ) {
-                    return u_as_f_32(packToF32UI(0, 0x7F, 0));
+                    return u_as_f_32(packToF32UI(false, 0x7F, 0));
                 }
                 break;
             }

@@ -62,10 +62,10 @@ float32_t f32_div(float32_t a, float32_t b)
                 return u_as_f_32(defaultNaNF32UI);
             }
         } else {
-            return u_as_f_32(packToF32UI(signZ, 0xFF, 0));
+            return signed_inf_F32(signZ);
         }
     } else if (expB == 0xFF) {
-        return u_as_f_32(sigB ? softfloat_propagateNaNF32UI(uiA, uiB) : packToF32UI(signZ, 0, 0));
+        return sigB ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB)) : signed_zero_F32(signZ);
     } else {
         if (!expB) {
             if (!sigB) {
@@ -74,7 +74,7 @@ float32_t f32_div(float32_t a, float32_t b)
                     return u_as_f_32(defaultNaNF32UI);
                 } else {
                     softfloat_raiseFlags(softfloat_flag_infinite);
-                    return u_as_f_32(packToF32UI(signZ, 0xFF, 0));
+                    return signed_inf_F32(signZ);
                 }
             } else {
                 struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
@@ -84,7 +84,7 @@ float32_t f32_div(float32_t a, float32_t b)
         }
         if (!expA) {
             if (!sigA) {
-                return u_as_f_32(packToF32UI(signZ, 0, 0));
+                return signed_zero_F32(signZ);
             } else {
                 struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                 expA = normExpSig.exp;

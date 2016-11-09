@@ -71,7 +71,7 @@ float32_t f128M_to_f32(const float128_t *aPtr)
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
         } else {
-            return u_as_f_32(packToF32UI(sign, 0, 0));
+            return signed_zero_F32(sign);
         }
     } else {
         if (frac64) {
@@ -79,7 +79,7 @@ float32_t f128M_to_f32(const float128_t *aPtr)
             softfloat_f128MToCommonNaN(aWPtr, &commonNaN);
             return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            return u_as_f_32(packToF32UI(sign, 0xFF, 0));
+            return signed_inf_F32(sign);
         }
     }
 }

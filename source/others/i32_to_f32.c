@@ -42,6 +42,6 @@ float32_t i32_to_f32(int32_t a)
 {
     bool const sign = a < 0;
     return
-        0 == (a & INT32_MAX) ? u_as_f_32(sign ? packToF32UI(1, 0x9E, 0) : 0) :
+        0 == (a & INT32_MAX) ? u_as_f_32(sign ? packToF32UI(true, 0x9E, 0) : 0) :
         softfloat_normRoundPackToF32(sign, 0x9C, sign ? -a : a);
 }

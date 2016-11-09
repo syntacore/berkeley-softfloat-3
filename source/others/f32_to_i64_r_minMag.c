@@ -55,7 +55,7 @@ f32_to_i64_r_minMag(float32_t a, bool exact)
     } else {
         bool const sign = signF32UI(uiA);
         if (shiftDist <= 0) {
-            if (uiA == packToF32UI(1, 0xBE, 0)) {
+            if (uiA == packToF32UI(true, 0xBE, 0)) {
                 return INT64_MIN;
             }
             softfloat_raiseFlags(softfloat_flag_invalid);

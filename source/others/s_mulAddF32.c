@@ -57,18 +57,13 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
         bool const signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
 
         if (expA == 0xFF || expB == 0xFF) {
-            bool is_product_undefined;
-            if (expA == 0xFF) {
-                /* a is inf, check b for zero  */
-                is_product_undefined = 0 == expB && 0 == sigB;
-            } else /* if (expB == 0xFF) */ {
-                /* b is inf, check a for zero */
-                is_product_undefined = 0 == expA && 0 == sigA;
-            }
+            bool const is_product_undefined = 
+                expA == 0xFF ? /* a is inf, check b for zero  */ 0 == expB && 0 == sigB :
+                /* expB == 0xFF b is inf, check a for zero*/ 0 == expA && 0 == sigA;
             /* product is inf or undefined */
             if (!is_product_undefined) {
                 /* product is inf */
-                uint32_t const uiZ = packToF32UI(signProd, 0xFF, 0);
+                uint32_t const uiZ = signed_inf_F32UI(signProd);
                 if (expC != 0xFF) {
                     /* summand c is finite, return product as result */
                     return u_as_f_32(uiZ);
@@ -90,7 +85,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                 /* a is zero or subnormal */
                 if (0 == sigA) {
                     /* a is zero */
-                    return u_as_f_32(0 == (expC | sigC) && signProd != signC ? packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+                    return 0 == (expC | sigC) && signProd != signC ? signed_zero_F32(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
                 } else {
                     struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                     expA = normExpSig.exp;
@@ -101,7 +96,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                 /* b is zero or subnormal */
                 if (!sigB) {
                     /* b is zero */
-                    return u_as_f_32(!(expC | sigC) && signProd != signC ? packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+                    return 0 == (expC | sigC) && signProd != signC ? signed_zero_F32(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
                 } else {
                     struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
                     expB = normExpSig.exp;
@@ -161,7 +156,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                                 expZ = expProd;
                                 sig64Z = sigProd - sig64C;
                                 if (!sig64Z) {
-                                    return u_as_f_32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+                                    return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
                                 } else if (sig64Z & INT64_MIN) {
                                     signZ = !signZ;
                                     sig64Z = -(int64_t)sig64Z;

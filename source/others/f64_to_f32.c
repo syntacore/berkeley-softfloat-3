@@ -50,7 +50,7 @@ float32_t f64_to_f32(float64_t a)
         if (exp | frac32) {
             return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
         } else {
-            return u_as_f_32(packToF32UI(sign, 0, 0));
+            return signed_zero_F32(sign);
         }
     } else {
         if (frac) {
@@ -58,7 +58,7 @@ float32_t f64_to_f32(float64_t a)
             softfloat_f64UIToCommonNaN(uiA, &commonNaN);
             return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            return u_as_f_32(packToF32UI(sign, 0xFF, 0));
+            return signed_inf_F32(sign);
         }
     }
 }

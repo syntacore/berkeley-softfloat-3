@@ -63,7 +63,7 @@ float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
         }
         sigDiff = sigA - sigB;
         if (!sigDiff) {
-            return u_as_f_32(packToF32UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+            return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
         }
         if (expA) {
             --expA;
@@ -91,7 +91,7 @@ float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
                 if (sigB) {
                     return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
                 }
-                return u_as_f_32(packToF32UI(signZ, 0xFF, 0));
+                return signed_inf_F32(signZ);
             }
             expZ = expB - 1;
             sigX = sigB | 0x40000000;

@@ -41,34 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assert.h>
 
-float32_t extF80_to_f32(extFloat80_t a)
+float32_t
+extF80_to_f32(extFloat80_t a)
 {
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s; 
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    bool sign;
-    int32_t exp;
-    uint64_t sig;
-    uint32_t uiZ;
-
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0 = uA.s.signif;
-    sign = signExtF80UI64(uiA64);
-    exp = expExtF80UI64(uiA64);
-    sig = uiA0;
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 = a.signif;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t exp = expExtF80UI64(uiA64);
+    uint64_t const sig = uiA0;
     if (exp == INT16_MAX) {
         if (sig & INT64_MAX) {
             struct commonNaN commonNaN;
             softfloat_extF80UIToCommonNaN(uiA64, uiA0, &commonNaN);
-            uiZ = softfloat_commonNaNToF32UI(&commonNaN);
+            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
         } else {
-            uiZ = packToF32UI(sign, 0xFF, 0);
+            return signed_inf_F32(sign);
         }
     } else {
         uint32_t const sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
@@ -82,9 +69,7 @@ float32_t extF80_to_f32(extFloat80_t a)
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
         } else {
-            uiZ = packToF32UI(sign, 0, 0);
+            return signed_zero_F32(sign);
         }
     }
-    return u_as_f_32(uiZ);
 }
-
