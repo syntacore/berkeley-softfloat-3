@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.h"
 #include "softfloat/types.h"
+#include <assert.h>
 
 #define signF16UI( a ) ((bool) ((uint16_t) (a)>>15))
 #define expF16UI( a ) ((int8_t) ((a)>>10) & 0x1F)
@@ -46,45 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
 
 #define isNaNF16UI( a ) (((~(a) & 0x7C00) == 0) && ((a) & 0x03FF))
-#define signF32UI( a ) ((bool) ((uint32_t) (a)>>31))
-#define expF32UI( a ) ((int16_t) ((a)>>23) & 0xFF)
-#define fracF32UI( a ) ((a) & 0x007FFFFF)
-#define packToF32UI( sign, exp, sig ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<23) + (sig))
-
-#define isNaNF32UI( a ) (((~(a) & 0x7F800000) == 0) && ((a) & 0x007FFFFF))
-
-#define signF64UI( a ) ((bool) ((uint64_t) (a)>>63))
-#define expF64UI( a ) ((int16_t) ((a)>>52) & 0x7FF)
-#define fracF64UI( a ) ((a) & UINT64_C( 0x000FFFFFFFFFFFFF ))
-#define packToF64UI( sign, exp, sig ) ((uint64_t) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<52) + (sig)))
-
-#define isNaNF64UI( a ) (((~(a) & UINT64_C( 0x7FF0000000000000 )) == 0) && ((a) & UINT64_C( 0x000FFFFFFFFFFFFF )))
-#define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
-#define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
-#define packToExtF80UI64( sign, exp ) ((uint16_t) (sign)<<15 | (exp))
-
-#define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
-
-#ifdef SOFTFLOAT_FAST_INT64
-/** @bug union of same type */
-union extF80M_extF80
-{
-    struct extFloat80M fM; 
-    extFloat80_t f;
-};
-/** @deprecated */
-union ui128_f128
-{
-    struct uint128 ui; 
-    float128_t f;
-};
-#endif
-
-enum
-{
-    softfloat_mulAdd_subC = 1,
-    softfloat_mulAdd_subProd = 2
-};
 
 static inline uint16_t
 f_as_u_16(float16_t v)
@@ -117,6 +79,118 @@ u_as_f_64(uint64_t v)
 {
     return *(float64_t const*)&v;
 }
+
+static inline bool
+signF32UI(uint32_t a)
+{
+    return (int32_t)a < 0;
+}
+
+/** @bug return signed 16-bits value instead unsigned 8-bits value */
+static inline int16_t
+expF32UI(uint32_t a)
+{
+    return (int16_t)((a >> 23) & ~(~UINT32_C(0) << 8));
+}
+
+static inline uint32_t
+fracF32UI(uint32_t a)
+{
+    return a & ~(~UINT32_C(0) << 23);
+}
+
+static inline uint32_t
+packToF32UI(bool sign, int16_t exp, uint32_t sgnf)
+{
+#if 0
+    assert(0 <= exp && exp <= 255);
+    assert(0 == (sgnf & (~UINT32_C(0) << 23)));
+#endif
+    uint32_t const u_res = ((uint32_t)exp << 23) + sgnf;
+    assert(0 == (u_res & (UINT32_C(1) << 31)));
+    return ((uint32_t)!!sign << 31) | u_res;
+}
+
+static inline uint32_t
+signed_zero_F32UI(bool sign)
+{
+    return packToF32UI(sign, 0, 0);
+}
+
+static inline float32_t
+signed_zero_F32(bool sign)
+{
+    return u_as_f_32(signed_zero_F32UI(sign));
+}
+
+static inline uint32_t
+signed_inf_F32UI(bool sign)
+{
+    return packToF32UI(sign, 0xFF, 0);
+}
+
+static inline float32_t
+signed_inf_F32(bool sign)
+{
+    return u_as_f_32(signed_inf_F32UI(sign));
+}
+
+static inline bool
+isNaNF32UI(uint32_t a)
+{
+    return 255 == expF32UI(a) && 0 != fracF32UI(a);
+}
+
+static inline bool
+isInf32UI(uint32_t a)
+{
+    return 255 == expF32UI(a) && 0 == fracF32UI(a);
+}
+
+static inline bool
+isZero32UI(uint32_t a)
+{
+    return 0 == expF32UI(a) && 0 == fracF32UI(a);
+}
+
+static inline bool
+isSubnormal32UI(uint32_t a)
+{
+    return 0 == expF32UI(a) && 0 != fracF32UI(a);
+}
+
+#define signF64UI( a ) ((bool) ((uint64_t) (a)>>63))
+#define expF64UI( a ) ((int16_t) ((a)>>52) & 0x7FF)
+#define fracF64UI( a ) ((a) & UINT64_C( 0x000FFFFFFFFFFFFF ))
+#define packToF64UI( sign, exp, sig ) ((uint64_t) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<52) + (sig)))
+
+#define isNaNF64UI( a ) (((~(a) & UINT64_C( 0x7FF0000000000000 )) == 0) && ((a) & UINT64_C( 0x000FFFFFFFFFFFFF )))
+#define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
+#define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
+#define packToExtF80UI64( sign, exp ) ((uint16_t) (sign)<<15 | (exp))
+
+#define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
+
+#ifdef SOFTFLOAT_FAST_INT64
+/** @bug union of same type */
+union extF80M_extF80
+{
+    struct extFloat80M fM;
+    extFloat80_t f;
+};
+/** @deprecated */
+union ui128_f128
+{
+    struct uint128 ui;
+    float128_t f;
+};
+#endif
+
+enum
+{
+    softfloat_mulAdd_subC = 1,
+    softfloat_mulAdd_subProd = 2
+};
 
 #ifdef SOFTFLOAT_FAST_INT64
 static inline struct uint128
@@ -224,7 +298,7 @@ float32_t softfloat_mulAddF32(uint32_t, uint32_t, uint32_t, uint8_t);
 
 struct exp16_sig64
 {
-    int16_t exp; 
+    int16_t exp;
     uint64_t sig;
 };
 struct exp16_sig64 softfloat_normSubnormalF64Sig(uint64_t);
@@ -265,7 +339,7 @@ softfloat_subMagsExtF80(uint16_t, uint64_t, uint16_t, uint64_t, bool);
 
 struct exp32_sig128
 {
-    int32_t exp; 
+    int32_t exp;
     struct uint128 sig;
 };
 struct exp32_sig128
