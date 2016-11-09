@@ -38,56 +38,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.h"
 
-float32_t softfloat_addMagsF32(uint32_t uiA, uint32_t uiB)
+float32_t
+softfloat_addMagsF32(uint32_t uiA, uint32_t uiB)
 {
-
-    int16_t expA = expF32UI(uiA);
-    uint32_t sigA = fracF32UI(uiA);
-    int16_t expB = expF32UI(uiB);
-    uint32_t sigB = fracF32UI(uiB);
-    int16_t expDiff = expA - expB;
-    if (!expDiff) {
-        if (!expA) {
-            return u_as_f_32(uiA + sigB);
-        } else if (expA == 0xFF) {
-            return u_as_f_32(sigA | sigB ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA);
-        }
-        bool const signZ = signF32UI(uiA);
-        int16_t expZ = expA;
-        uint32_t const sigZ = 0x01000000 + sigA + sigB;
-        return 
-            !(sigZ & 1) && (expZ < 0xFE)? u_as_f_32(packToF32UI(signZ, expZ, sigZ >> 1)):
-            softfloat_roundPackToF32(signZ, expZ, sigZ << 6);
+    if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
+        return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+    } if (isInf32UI(uiA) || isInf32UI(uiB)) {
+        return signed_inf_F32(signF32UI(uiA));
     } else {
-        bool const signZ = signF32UI(uiA);
-        int16_t expZ;
-        sigA <<= 6;
-        sigB <<= 6;
-        if (expDiff < 0) {
-            if (expB == 0xFF) {
-                return u_as_f_32(sigB ? softfloat_propagateNaNF32UI(uiA, uiB) : packToF32UI(signZ, 0xFF, 0));
-            }
-            expZ = expB;
-            sigA += expA ? 0x20000000 : sigA;
-            sigA = softfloat_shiftRightJam32(sigA, -expDiff);
-        } else {
-            if (expA == 0xFF) {
-                if (sigA) {
-                    return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+        int16_t const expA = expF32UI(uiA);
+        uint32_t const sigA = fracF32UI(uiA);
+        int16_t const expB = expF32UI(uiB);
+        uint32_t const sigB = fracF32UI(uiB);
+        int16_t const expDiff = expA - expB;
+        if (0 == expDiff) {
+            /* same exponent, aligned significand fields */
+            if (0 == expA) {
+                /* a and b are subnormal or zero, result is simple sum, carry to exponent is valid */
+                return u_as_f_32(uiA + sigB);
+            } else {
+                /* case aligned normalized */
+                bool const signA = signF32UI(uiA);
+                uint32_t const sigZ = (sigA + (UINT32_C(1) << 23)) + (sigB + (UINT32_C(1) << 23));
+                if (0 == (sigZ & 1) && expA < 0xFE) {
+                    /* lowest bit is 0 and sum exponent in normal range */
+                    return u_as_f_32(packToF32UI(signA, expA + 1, (sigZ >> 1) & ~(~UINT32_C(0) << 23)));
+                } else {
+                    return softfloat_roundPackToF32(signA, expA, sigZ << 6);
                 }
-                return u_as_f_32(uiA);
             }
-            expZ = expA;
-            sigB += expB ? 0x20000000 : sigB;
-            sigB = softfloat_shiftRightJam32(sigB, expDiff);
-        }
-        {
-            uint32_t sigZ = 0x20000000 + sigA + sigB;
-            if (sigZ < 0x40000000) {
-                --expZ;
-                sigZ <<= 1;
+        } else {
+            /* unaligned significand fields */
+            bool const signA = signF32UI(uiA);
+            int16_t expZ;
+            /* fractional bits before shift are [22..0] and after shift are [28..6] */
+            uint32_t sigA_scaled = sigA << 6;
+            uint32_t sigB_scaled = sigB << 6;
+            /* bit before point is [30] */
+            static uint32_t const hidden_bit = UINT32_C(1) << 29;
+            if (expDiff < 0) {
+                /* magnitude b greater than magnitude a */
+                expZ = expB;
+                /* add hidden bit and shift */
+                /** @todo check suspicious  */
+                sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit : sigA_scaled), -expDiff);
+                sigB_scaled += hidden_bit;
+            } else {
+                /* magnitude a greater than magnitude b */
+                expZ = expA;
+                /* add hidden bit and shift */
+                sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit : sigB_scaled), expDiff);
+                sigA_scaled += hidden_bit;
             }
-            return softfloat_roundPackToF32(signZ, expZ, sigZ);
+            {
+                uint32_t sigZ = sigA_scaled + sigB_scaled;
+                if (sigZ < 2 * hidden_bit) {
+                    --expZ;
+                    sigZ <<= 1;
+                }
+                return softfloat_roundPackToF32(signA, expZ, sigZ);
+            }
         }
     }
 }
