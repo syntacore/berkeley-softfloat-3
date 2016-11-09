@@ -44,9 +44,9 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     assert(softfloat_round_near_even <= softfloat_roundingMode && softfloat_roundingMode <= softfloat_round_near_maxMag);
     enum softfloat_round_mode const roundingMode = (enum softfloat_round_mode)softfloat_roundingMode;
     uint8_t const roundIncrement =
-        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x40 :
+        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? /* one half */ 0x40 :
         (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x7F : 0;
-    uint8_t roundBits = sig & 0x7F;
+    uint32_t roundBits = sig & ~(~UINT32_C(0) << 7);
     if (0xFD <= (uint16_t)exp) {
         if (exp < 0) {
             bool const isTiny =
@@ -55,8 +55,8 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
                 sig + roundIncrement < 0x80000000;
             sig = softfloat_shiftRightJam32(sig, -exp);
             exp = 0;
-            roundBits = sig & 0x7F;
-            if (isTiny && roundBits) {
+            roundBits = sig & ~(~UINT32_C(0) << 7);
+            if (isTiny && 0 != roundBits) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
         } else if (0xFD < exp || 0x80000000 <= sig + roundIncrement) {
@@ -64,11 +64,11 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
             return u_as_f_32(packToF32UI(sign, 0xFF, 0) - !roundIncrement);
         }
     }
-    if (roundBits) {
+    if (0 != roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    sig =
-        ((sig + roundIncrement) >> 7) &
-        ~(uint32_t)(0 == (roundBits ^ 0x40) && softfloat_round_near_even == roundingMode);
-    return u_as_f_32(packToF32UI(sign, 0 != sig ? exp : 0, sig));
+    bool const exact_mid_point = 0 == (roundBits ^ 0x40);
+    bool const to_even = exact_mid_point && softfloat_round_near_even == roundingMode;
+    uint32_t const sig1 = ((sig + roundIncrement) >> 7) & ~(uint32_t)to_even;
+    return u_as_f_32(packToF32UI(sign, 0 != sig1 ? exp : 0, sig1));
 }
