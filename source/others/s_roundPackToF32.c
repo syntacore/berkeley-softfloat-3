@@ -38,6 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 #include <assert.h>
 
+/**
+@param[in] sign sign bit
+@param[in] exp exponent 8-bit field
+@param[in] sig mantissa bits [30..0]
+*/
 float32_t
 softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
 {
