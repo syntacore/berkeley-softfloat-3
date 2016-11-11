@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
 {
-    if (softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB) || softfloat_isNaNF64UI(uiC)) {
+    if (softfloat_isNaNF64UI(uiC) || softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB)) {
         return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));
     } else {
         bool const signA = signF64UI(uiA);
@@ -56,11 +56,10 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
         uint64_t sigC = fracF64UI(uiC);
         bool signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
 
-        if (expA == 0x7FF || expB == 0x7FF) {
+        if (isInf64UI(uiA) || isInf64UI(uiB)) {
             /* a or b is inf, product is inf or undefined, check other operand for zero */
             bool const is_product_undefined =
-                expA == 0x7FF ? 0 == expB || 0 == sigB :
-                0 == expA && 0 == sigA;
+                isInf64UI(uiA) ? isZero64UI(uiB) : isZero64UI(uiA);
             if (!is_product_undefined) {
                 /* product is inf */
                 uint64_t const uiZ = packToF64UI(signZ, 0x7FF, 0);
@@ -81,7 +80,6 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
             return u_as_f_64(uiC);
         } else {
             uint32_t sig128C[4];
-            struct exp16_sig64 normExpSig;
             int16_t expZ;
             uint32_t sig128Z[4];
             uint64_t sigZ;
@@ -91,7 +89,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 if (!sigA) {
                     return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
                 }
-                normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }
@@ -99,7 +97,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 if (!sigB) {
                     return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
                 }
-                normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -124,7 +122,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                         softfloat_roundPackToF64(signZ, expZ - 1,
                                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
                 }
-                normExpSig = softfloat_normSubnormalF64Sig(sigC);
+                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
                 expC = normExpSig.exp;
                 sigC = normExpSig.sig;
             }
@@ -164,8 +162,8 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 } else {
                     softfloat_add128M(sig128Z, sig128C, sig128Z);
                     sigZ =
-                        (uint64_t)sig128Z[indexWord(4, 3)] << 32
-                        | sig128Z[indexWord(4, 2)];
+                        (uint64_t)sig128Z[indexWord(4, 3)] << 32 |
+                        sig128Z[indexWord(4, 2)];
                 }
                 if (sigZ & UINT64_C(0x8000000000000000)) {
                     ++expZ;
@@ -193,7 +191,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                     }
                 } else if (!expDiff) {
                     sigZ -= sigC;
-                    if (!sigZ && !sig128Z[indexWord(4, 1)] && !sig128Z[indexWord(4, 0)]) {
+                    if (0 == sigZ && !sig128Z[indexWord(4, 1)] && !sig128Z[indexWord(4, 0)]) {
                         return u_as_f_64(packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
                     }
                     sig128Z[indexWord(4, 3)] = sigZ >> 32;
