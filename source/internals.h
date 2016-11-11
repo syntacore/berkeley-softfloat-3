@@ -159,12 +159,51 @@ isSubnormal32UI(uint32_t a)
     return 0 == expF32UI(a) && 0 != fracF32UI(a);
 }
 
-#define signF64UI( a ) ((bool) ((uint64_t) (a)>>63))
-#define expF64UI( a ) ((int16_t) ((a)>>52) & 0x7FF)
-#define fracF64UI( a ) ((a) & UINT64_C( 0x000FFFFFFFFFFFFF ))
-#define packToF64UI( sign, exp, sig ) ((uint64_t) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<52) + (sig)))
+static inline bool
+signF64UI(uint64_t a)
+{
+    return (int64_t)a < 0;
+}
+static int16_t
+expF64UI(uint64_t a)
+{
+    return (int16_t)((a >> 52) & ~(~UINT32_C(0) << 11));
+}
+static inline uint64_t
+fracF64UI(uint64_t a)
+{
+    return a & ~(~UINT64_C(0) << 52);
+}
+static inline uint64_t
+packToF64UI(bool sign, int16_t exp, uint64_t sgnf)
+{
+#if 0
+    assert(0 <= exp && exp <= 2047);
+    assert(0 == (sgnf & (~UINT32_C(0) << 52)));
+#endif
+    uint64_t const u_res = ((uint64_t)exp << 52) + sgnf;
+    assert(0 == (u_res & (UINT64_C(1) << 63)));
+    return ((uint64_t)!!sign << 63) | u_res;
+}
 
-#define isNaNF64UI( a ) (((~(a) & UINT64_C( 0x7FF0000000000000 )) == 0) && ((a) & UINT64_C( 0x000FFFFFFFFFFFFF )))
+static inline bool
+isNaNF64UI(uint64_t a)
+{
+    return 2047 == expF64UI(a) && 0 != fracF64UI(a);
+}
+
+static inline bool
+isInf64UI(uint64_t a)
+{
+    return 2047 == expF64UI(a) && 0 == fracF64UI(a);
+}
+
+static inline bool
+isZero64UI(uint64_t a)
+{
+    return 0 == expF64UI(a) && 0 == fracF64UI(a);
+}
+
 #define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
 #define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
 #define packToExtF80UI64( sign, exp ) ((uint16_t) (sign)<<15 | (exp))
