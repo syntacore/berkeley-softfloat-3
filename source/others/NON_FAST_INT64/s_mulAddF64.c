@@ -46,10 +46,8 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
         return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));
     } else {
         bool const signA = signF64UI(uiA);
-        int16_t expA = expF64UI(uiA);
         uint64_t sigA = fracF64UI(uiA);
         bool const signB = signF64UI(uiB);
-        int16_t expB = expF64UI(uiB);
         uint64_t sigB = fracF64UI(uiB);
         bool const signC = signF64UI(uiC) ^ (op == softfloat_mulAdd_subC);
         int16_t expC = expF64UI(uiC);
@@ -77,14 +75,10 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
         } else if (expC == 0x7FF) {
+            /** if c is infinity while a and b are finite, return c */
             return u_as_f_64(uiC);
         } else {
-            uint32_t sig128C[4];
-            int16_t expZ;
-            uint32_t sig128Z[4];
-            uint64_t sigZ;
-            int16_t shiftDist;
-            int16_t expDiff;
+            int16_t expA = expF64UI(uiA);
             if (!expA) {
                 if (!sigA) {
                     return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
@@ -93,6 +87,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }
+            int16_t expB = expF64UI(uiB);
             if (!expB) {
                 if (!sigB) {
                     return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
@@ -102,33 +97,35 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 sigB = normExpSig.sig;
             }
 
-            expZ = expA + expB - 0x3FE;
+            int16_t expZ = expA + expB - 0x3FE;
             sigA = (sigA | UINT64_C(0x0010000000000000)) << 10;
             sigB = (sigB | UINT64_C(0x0010000000000000)) << 11;
+            uint32_t sig128Z[4];
             softfloat_mul64To128M(sigA, sigB, sig128Z);
-            sigZ =
-                (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
-            shiftDist = 0;
-            if (!(sigZ & UINT64_C(0x4000000000000000))) {
+            uint64_t sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+            int16_t shiftDist = 0;
+            if (0 == (sigZ & UINT64_C(0x4000000000000000))) {
                 --expZ;
                 shiftDist = -1;
             }
-            if (!expC) {
-                if (!sigC) {
-                    if (shiftDist) {
+            if (0 == expC) {
+                if (0 == sigC) {
+                    if (0 != shiftDist) {
                         sigZ <<= 1;
                     }
                     return
                         softfloat_roundPackToF64(signZ, expZ - 1,
                                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
+                } else {
+                    struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
+                    expC = normExpSig.exp;
+                    sigC = normExpSig.sig;
                 }
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
-                expC = normExpSig.exp;
-                sigC = normExpSig.sig;
             }
             sigC = (sigC | UINT64_C(0x0010000000000000)) << 10;
 
-            expDiff = expZ - expC;
+            int16_t const expDiff = expZ - expC;
+            uint32_t sig128C[4];
             if (expDiff < 0) {
                 expZ = expC;
                 if ((signZ == signC) || (expDiff < -1)) {
@@ -145,7 +142,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 if (shiftDist) {
                     softfloat_add128M(sig128Z, sig128Z, sig128Z);
                 }
-                if (!expDiff) {
+                if (0 == expDiff) {
                     sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
                 } else {
                     sig128C[indexWord(4, 3)] = sigC >> 32;
