@@ -39,76 +39,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat/functions.h"
 
-float32_t softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
+float32_t
+softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
 {
-    int32_t sigDiff;
-    bool signZ;
-    int16_t expZ;
-
     int16_t expA = expF32UI(uiA);
     uint32_t sigA = fracF32UI(uiA);
     int16_t const expB = expF32UI(uiB);
     uint32_t sigB = fracF32UI(uiB);
 
     int16_t expDiff = expA - expB;
-    if (!expDiff) {
-        int8_t shiftDist;
-        if (expA == 0xFF) {
-            if (sigA | sigB) {
+    if (0 == expDiff) {
+        if (0xFF == expA) {
+            if (0 != sigA || 0 != sigB) {
                 return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
             } else {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return u_as_f_32(defaultNaNF32UI);
             }
+        } else {
+            int32_t sigDiff = sigA - sigB;
+            if (0 == sigDiff) {
+                return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
+            } else {
+                if (expA) {
+                    --expA;
+                }
+                if (sigDiff < 0) {
+                    sigDiff = -sigDiff;
+                }
+                bool const signZ = sigDiff < 0 :!signF32UI(uiA) : signF32UI(uiA);
+                int8_t const shiftDist = softfloat_countLeadingZeros32(sigDiff) - 8;
+                int16_t const expZ = expA - shiftDist;
+                return u_as_f_32(expZ < 0 ? packToF32UI(signZ, 0, sigDiff << expA) : packToF32UI(signZ, expZ, sigDiff << shiftDist));
+            }
         }
-        sigDiff = sigA - sigB;
-        if (!sigDiff) {
-            return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
-        }
-        if (expA) {
-            --expA;
-        }
-        signZ = signF32UI(uiA);
-        if (sigDiff < 0) {
-            signZ = !signZ;
-            sigDiff = -sigDiff;
-        }
-        shiftDist = softfloat_countLeadingZeros32(sigDiff) - 8;
-        expZ = expA - shiftDist;
-        if (expZ < 0) {
-            shiftDist = expA;
-            expZ = 0;
-        }
-        return u_as_f_32(packToF32UI(signZ, expZ, sigDiff << shiftDist));
     } else {
-        uint32_t sigX, sigY;
-        signZ = signF32UI(uiA);
+        bool const signZ = signF32UI(uiA);
         sigA <<= 7;
         sigB <<= 7;
         if (expDiff < 0) {
-            signZ = !signZ;
-            if (expB == 0xFF) {
-                if (sigB) {
-                    return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-                }
-                return signed_inf_F32(signZ);
-            }
-            expZ = expB - 1;
-            sigX = sigB | 0x40000000;
-            sigY = sigA + (expA ? 0x40000000 : sigA);
-            expDiff = -expDiff;
+            return
+                0xFF == expB ? (0 != sigB ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB)) : signed_inf_F32(!signZ)) :
+                softfloat_normRoundPackToF32(!signZ,
+                                             expB - 1,
+                                             (sigB | 0x40000000) -
+                                             softfloat_shiftRightJam32(sigA + (expA ? 0x40000000 : sigA), -expDiff));
         } else {
-            if (expA == 0xFF) {
-                if (sigA) {
-                    return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-                }
-                return u_as_f_32(uiA);
-            }
-            expZ = expA - 1;
-            sigX = sigA | 0x40000000;
-            sigY = sigB + (expB ? 0x40000000 : sigB);
+            return
+                0xFF == expA ? u_as_f_32(0 != sigA ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA) :
+                softfloat_normRoundPackToF32(signZ,
+                                             expA - 1,
+                                             (sigA | 0x40000000) -
+                                             softfloat_shiftRightJam32(sigB + (expB ? 0x40000000 : sigB), expDiff));
         }
-        return
-            softfloat_normRoundPackToF32(signZ, expZ, sigX - softfloat_shiftRightJam32(sigY, expDiff));
     }
 }
