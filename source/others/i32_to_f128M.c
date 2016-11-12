@@ -44,29 +44,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void i32_to_f128M(int32_t a, float128_t *zPtr)
+void
+i32_to_f128M(int32_t a, float128_t *zPtr)
 {
     *zPtr = i32_to_f128(a);
 }
 
 #else
 
-void i32_to_f128M(int32_t a, float128_t *zPtr)
+void
+i32_to_f128M(int32_t a, float128_t *zPtr)
 {
-    uint32_t *zWPtr = (uint32_t *)zPtr;
-    uint32_t uiZ96 = 0;
-    uint32_t uiZ64 = 0;
-    if (a) {
+    uint32_t *const zWPtr = (uint32_t *)zPtr;
+    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[indexWord(4, 1)] = 0;
+    if (0 == a) {
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 3)] = 0;
+
+    } else {
         bool const sign = a < 0;
         uint32_t const absA = sign ? -a : a;
         int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 17;
         uint64_t const normAbsA = (uint64_t)absA << shiftDist;
-        uiZ96 = packToF128UI96(sign, 0x402E - shiftDist, normAbsA >> 32);
-        uiZ64 = normAbsA;
+        zWPtr[indexWord(4, 2)] = (uint32_t)normAbsA;
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x402E - shiftDist, normAbsA >> 32);
     }
-    zWPtr[indexWord(4, 3)] = uiZ96;
-    zWPtr[indexWord(4, 2)] = uiZ64;
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
 }
 #endif

@@ -48,10 +48,9 @@ float64_t
 softfloat_roundPackToF64(bool sign, int16_t exp, uint64_t sig)
 {
     uint8_t const roundingMode = softfloat_roundingMode;
-    bool const roundNearEven = roundingMode == softfloat_round_near_even;
     uint16_t const roundIncrement =
-        roundNearEven || roundingMode == softfloat_round_near_maxMag ? 0x200 :
-        roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0x3FF : 0;
+        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x200 :
+        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x3FF : 0;
     uint16_t roundBits = sig & 0x3FF;
     if (0x7FD <= (uint16_t)exp) {
         if (exp < 0) {
@@ -70,9 +69,9 @@ softfloat_roundPackToF64(bool sign, int16_t exp, uint64_t sig)
             return u64_as_f64(packToF64UI(sign, 0x7FF, 0) - !roundIncrement);
         }
     }
-    if (roundBits) {
+    if (0 != roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    sig = ((sig + roundIncrement) >> 10) & (~(uint64_t)(!(roundBits ^ 0x200) && roundNearEven));
+    sig = ((sig + roundIncrement) >> 10) & (~(uint64_t)(!(roundBits ^ 0x200) && softfloat_round_near_even == roundingMode));
     return u64_as_f64(packToF64UI(sign, sig ? exp : 0, sig));
 }
