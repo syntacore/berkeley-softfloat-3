@@ -66,10 +66,8 @@ float64_t f128_to_f64(float128_t a)
             return u_as_f_64(packToF64UI(sign, 0, 0));
         } else {
             exp -= 0x3C01;
-            if (sizeof(int16_t) < sizeof exp) {
-                if (exp < -0x1000) {
-                    exp = -0x1000;
-                }
+            if (exp < -0x1000) {
+                exp = -0x1000;
             }
             return
                 softfloat_roundPackToF64(sign, exp, frac64 | UINT64_C(0x4000000000000000));

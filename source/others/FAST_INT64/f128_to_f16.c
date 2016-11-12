@@ -62,10 +62,8 @@ float16_t f128_to_f16(float128_t a)
             return u_as_f_16(packToF16UI(sign, 0, 0));
         } else {
             exp -= 0x3FF1;
-            if (sizeof(int16_t) < sizeof exp) {
-                if (exp < -0x40) {
-                    exp = -0x40;
-                }
+            if (exp < -0x40) {
+                exp = -0x40;
             }
             return softfloat_roundPackToF16(sign, exp, frac16 | 0x4000);
         }

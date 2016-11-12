@@ -78,10 +78,8 @@ extF80M_to_f64(extFloat80_t const *aPtr)
         }
         sig = softfloat_shortShiftRightJam64(sig, 1);
         exp -= 0x3C01;
-        if (sizeof(int16_t) < sizeof exp) {
-            if (exp < -0x1000) {
-                exp = -0x1000;
-            }
+        if (exp < -0x1000) {
+            exp = -0x1000;
         }
         return softfloat_roundPackToF64(sign, exp, sig);
     }

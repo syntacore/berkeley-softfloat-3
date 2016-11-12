@@ -71,15 +71,15 @@ f128M_to_f64(const float128_t *aPtr)
     } else {
         uint32_t const frac32 = aWPtr[indexWord(4, 1)];
         frac64 = frac64 << 14 | frac32 >> 18;
-        if ((frac32 & 0x0003FFFF) || aWPtr[indexWord(4, 0)]) {
+        if (0 != (frac32 & 0x0003FFFF) || 0 != aWPtr[indexWord(4, 0)]) {
             frac64 |= 1;
         }
-        if (!(exp | frac64)) {
+        if (0 == exp && 0 == frac64) {
             return u_as_f_64(packToF64UI(sign, 0, 0));
         } else {
             exp -= 0x3C01;
-            if (sizeof(int16_t) < sizeof exp) {
-                if (exp < -0x1000) exp = -0x1000;
+            if (exp < -0x1000) {
+                exp = -0x1000;
             }
             return
                 softfloat_roundPackToF64(sign, exp, frac64 | UINT64_C(0x4000000000000000));

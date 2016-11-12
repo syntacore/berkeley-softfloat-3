@@ -61,10 +61,8 @@ extF80_to_f32(extFloat80_t a)
         uint32_t const sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
         if (exp | sig32) {
             exp -= 0x3F81;
-            if (sizeof(int16_t) < sizeof exp) {
-                if (exp < -0x1000) {
-                    exp = -0x1000;
-                }
+            if (exp < -0x1000) {
+                exp = -0x1000;
             }
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
