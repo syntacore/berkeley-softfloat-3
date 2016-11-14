@@ -67,7 +67,7 @@ softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
                 if (sigDiff < 0) {
                     sigDiff = -sigDiff;
                 }
-                bool const signZ = sigDiff < 0 :!signF32UI(uiA) : signF32UI(uiA);
+                bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
                 int8_t const shiftDist = softfloat_countLeadingZeros32(sigDiff) - 8;
                 int16_t const expZ = expA - shiftDist;
                 return u_as_f_32(expZ < 0 ? packToF32UI(signZ, 0, sigDiff << expA) : packToF32UI(signZ, expZ, sigDiff << shiftDist));
