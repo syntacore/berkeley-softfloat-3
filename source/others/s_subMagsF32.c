@@ -64,13 +64,11 @@ softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
                 if (expA) {
                     --expA;
                 }
-                if (sigDiff < 0) {
-                    sigDiff = -sigDiff;
-                }
                 bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
-                int8_t const shiftDist = softfloat_countLeadingZeros32(sigDiff) - 8;
+                int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
+                int8_t const shiftDist = softfloat_countLeadingZeros32(sigAbsDiff) - 8;
                 int16_t const expZ = expA - shiftDist;
-                return u_as_f_32(expZ < 0 ? packToF32UI(signZ, 0, sigDiff << expA) : packToF32UI(signZ, expZ, sigDiff << shiftDist));
+                return u_as_f_32(expZ < 0 ? packToF32UI(signZ, 0, sigAbsDiff << expA) : packToF32UI(signZ, expZ, sigAbsDiff << shiftDist));
             }
         }
     } else {
