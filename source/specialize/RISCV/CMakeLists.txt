@@ -89,7 +89,6 @@ add_library(softfloat-RISCV-fi64 EXCLUDE_FROM_ALL
     ${SRC_SPECIALIZE_FAST_INT64}
     ${SRC_SPECIALIZE_RISCV}
 )
-set_property(TARGET softfloat-RISCV-fi64 PROPERTY C_STANDARD 99)
 add_library(softfloat-RISCV-nfi64 EXCLUDE_FROM_ALL
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
@@ -103,7 +102,6 @@ add_library(softfloat-RISCV-nfi64 EXCLUDE_FROM_ALL
     ${SRC_SPECIALIZE_NON_FAST_INT64}
     ${SRC_SPECIALIZE_RISCV}
 )
-set_property(TARGET softfloat-RISCV-nfi64 PROPERTY C_STANDARD 99)
 
 set_target_properties(softfloat-RISCV-fi64 PROPERTIES FOLDER "softfloat/RISCV")
 set_target_properties(softfloat-RISCV-nfi64 PROPERTIES FOLDER "softfloat/RISCV")

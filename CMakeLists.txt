@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(berkeley-softfloat-3)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_C_STANDARD 99)
 
 set(SOFTFLOAT_INLINE "static __inline" CACHE STRING "inline")
 set(SOFTFLOAT_INLINE_LEVEL "5" CACHE STRING "INLINE_LEVEL")
