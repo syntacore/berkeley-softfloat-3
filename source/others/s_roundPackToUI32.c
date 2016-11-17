@@ -40,37 +40,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 uint32_t
- softfloat_roundPackToUI32(
-     bool sign, uint64_t sig, uint8_t roundingMode, bool exact )
+softfloat_roundPackToUI32(bool sign, uint64_t sig, uint8_t roundingMode, bool exact)
 {
-    bool roundNearEven;
-    uint16_t roundIncrement, roundBits;
-    uint32_t z;
-
-    
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    roundIncrement = 0x800;
-    if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
-        roundIncrement =
-            (roundingMode
-                 == (sign ? softfloat_round_min : softfloat_round_max))
-                ? 0xFFF
-                : 0;
-    }
-    roundBits = sig & 0xFFF;
+    uint16_t const roundIncrement =
+        softfloat_round_near_even != roundingMode &&
+        softfloat_round_near_maxMag != roundingMode ?
+        ((sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0xFFF : 0) :
+        0x800;
+    uint16_t const roundBits = sig & 0xFFF;
     sig += roundIncrement;
-    if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
-    z = sig>>12;
-    z &= ~(uint32_t) (! (roundBits ^ 0x800) & roundNearEven);
-    if ( sign && z ) goto invalid;
-    if ( exact && roundBits ) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
+    if (0 != (sig & UINT64_C(0xFFFFF00000000000))) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+    } else {
+        uint32_t const z =
+            (sig >> 12) &
+            ~(uint32_t)!!(0 == (roundBits ^ 0x800) && softfloat_round_near_even == roundingMode);
+        if (sign && 0 != z) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+        } else {
+            if (exact && 0 != roundBits) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+            return z;
+        }
     }
-    return z;
-    
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
-    return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-
 }
-
