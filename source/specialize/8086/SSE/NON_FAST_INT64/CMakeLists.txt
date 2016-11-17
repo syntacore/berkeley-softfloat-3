@@ -58,4 +58,5 @@ add_library(softfloat-8086-SSE-nfi64 EXCLUDE_FROM_ALL
     ${INC_SPECIALIZE}
     ${SRC_SPECIALIZE_NON_FAST_INT64}
 )
+set_property(TARGET softfloat-8086-SSE-nfi64 PROPERTY C_STANDARD 99)
 set_target_properties(softfloat-8086-SSE-nfi64 PROPERTIES FOLDER "softfloat/8086-SSE")
