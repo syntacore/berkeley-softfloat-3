@@ -47,17 +47,13 @@ into the least-significant bit of the shifted value by setting the least-
 significant bit to 1.  This shifted-and-jammed value is returned.
 */
 #if !defined(SOFTFLOAT_SHORTSHIFTRIGHTJAM64) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
-INLINE
-uint64_t softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
+INLINE uint64_t
+softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
 {
-    if (dist >= 63) {
-        return 0 != a;
-    } else {
-        uint8_t const shft = dist & 63;
-        uint64_t const mask = ~(~UINT64_C(0) << shft);
-        uint64_t const jam = 0 != (a & mask);
-        return a >> dist | jam;
-    }
+    uint8_t const shft = dist >= 63 ? 63 : dist;
+    return 
+        ((((a << (63 - shft)) >> 1) + (~UINT64_C(0) >> 1)) >> 63) | 
+        (a >> shft);
 }
 #else
 uint64_t softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist);
@@ -73,15 +69,13 @@ greater than 32, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
 #if !defined(SOFTFLOAT_SHIFTRIGHTJAM32) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
-INLINE uint32_t softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
+INLINE uint32_t
+softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
 {
-    if (dist >= 31) {
-        return a != 0;
-    } else {
-        uint8_t const shft = -(int16_t)dist & 31;
-        uint32_t const jam = 0 != (a << shft);
-        return (a >> dist) | jam;
-    }
+    uint8_t const dist1 = dist >= 31 ? 31 : (uint8_t)dist;
+    uint32_t const mask = ~(~UINT32_C(0) << dist1);
+    uint32_t const jam_bits = (a & mask) + mask;
+    return (a | jam_bits) >> dist1;
 }
 #else
 uint32_t softfloat_shiftRightJam32(uint32_t a, uint16_t dist);
@@ -97,15 +91,13 @@ greater than 64, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
 #if !defined(SOFTFLOAT_SHIFTRIGHTJAM64) && defined(INLINE_LEVEL) && (3 <= INLINE_LEVEL)
-INLINE uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
+INLINE uint64_t
+softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
 {
-    if (dist >= 63) {
-        return a != 0;
-    } else {
-        uint8_t const shft = -(int32_t)dist & 63;
-        uint64_t const jam = 0 != (a << shft);
-        return (a >> dist) | jam;
-    }
+    uint8_t const dist1 = dist >= 63 ? 63 : (uint8_t)dist;
+    uint64_t const mask = ~(~UINT64_C(0) << dist1);
+    uint64_t const jam_bits = (a & mask) + mask;
+    return (a | jam_bits) >> dist1;
 }
 #else
 uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist);
@@ -906,7 +898,7 @@ This function or macro is the same as `softfloat_negXM' with `size_words' = 8 (N
 #define softfloat_negX256M( zPtr ) softfloat_negXM( 8, zPtr )
 
 /**
-Subtracts 1 from the N-bit integer pointed to by `zPtr', where N = `size_words' * 32.  
+Subtracts 1 from the N-bit integer pointed to by `zPtr', where N = `size_words' * 32.
 The subtraction is modulo 2^N, so any borrow out (carry
 out) is lost.  Argument `zPtr' points to a `size_words'-long array of 32-bit
 elements that concatenate in the platform's normal endian order to form an
@@ -925,8 +917,8 @@ This function or macro is the same as `softfloat_sub1XM' with `size_words' = 5 (
 #define softfloat_sub1X160M( zPtr ) softfloat_sub1XM( 5, zPtr )
 
 /**
-Subtracts the two N-bit integers pointed to by `aPtr' and `bPtr', where N = `size_words' * 32.  
-The subtraction is modulo 2^N, so any borrow out (carry out) is lost.  
+Subtracts the two N-bit integers pointed to by `aPtr' and `bPtr', where N = `size_words' * 32.
+The subtraction is modulo 2^N, so any borrow out (carry out) is lost.
 The N-bit difference is stored at the location pointed to by `zPtr'.
 Each of `aPtr', `bPtr', and `zPtr' points to a `size_words'-long
 array of 32-bit elements that concatenate in the platform's normal endian
