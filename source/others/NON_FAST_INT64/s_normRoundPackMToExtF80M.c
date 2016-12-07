@@ -36,21 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.h"
 
+/**
+@param[out] zSPtr
+@bug use extFloat80_t
+*/
 void
-softfloat_normRoundPackMToExtF80M(
-    bool sign,
-    int32_t exp,
-    uint32_t *extSigPtr,
-    uint8_t roundingPrecision,
-   /** @bug use extFloat80_t */
-   struct extFloat80M *zSPtr
-)
+softfloat_normRoundPackMToExtF80M(bool sign,
+                                  int32_t exp,
+                                  uint32_t *extSigPtr,
+                                  uint8_t roundingPrecision,
+                                  struct extFloat80M *zSPtr)
 {
-    int16_t shiftDist;
-    uint32_t wordSig;
-
-    shiftDist = 0;
-    wordSig = extSigPtr[indexWord(3, 2)];
+    int16_t shiftDist = 0;
+    uint32_t wordSig = extSigPtr[indexWord(3, 2)];
     if (!wordSig) {
         shiftDist = 32;
         wordSig = extSigPtr[indexWord(3, 1)];
