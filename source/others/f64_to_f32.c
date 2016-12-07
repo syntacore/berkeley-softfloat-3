@@ -39,13 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float32_t f64_to_f32(float64_t a)
+float32_t
+f64_to_f32(float64_t a)
 {
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t const exp = expF64UI(uiA);
     uint64_t const frac = fracF64UI(uiA);
-    if (exp != INT16_MAX) {
+    if (exp != 0x7FF) {
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac, 22);
         if (exp | frac32) {
             return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
