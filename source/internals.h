@@ -201,7 +201,7 @@ isInf64UI(uint64_t a)
 static inline bool
 isZero64UI(uint64_t a)
 {
-    return 0 == expF64UI(a) && 0 == fracF64UI(a);
+    return 0 == (a << 1);
 }
 
 #define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
