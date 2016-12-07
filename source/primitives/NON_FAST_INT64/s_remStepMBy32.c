@@ -41,42 +41,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef softfloat_remStepMBy32
 
 void
- softfloat_remStepMBy32(
-     uint8_t size_words,
-     const uint32_t *remPtr,
-     uint8_t dist,
-     const uint32_t *bPtr,
-     uint32_t q,
-     uint32_t *zPtr
- )
+softfloat_remStepMBy32(uint8_t size_words,
+                       uint32_t const *remPtr,
+                       uint8_t dist,
+                       uint32_t const *bPtr,
+                       uint32_t q,
+                       uint32_t *zPtr)
 {
-    unsigned int index, lastIndex;
-    uint64_t dwordProd;
-    uint32_t wordRem, wordShiftedRem, wordProd;
-    uint8_t uNegDist, borrow;
+    uint8_t uNegDist;
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    dwordProd = (uint64_t) bPtr[index] * q;
-    wordRem = remPtr[index];
-    wordShiftedRem = wordRem<<dist;
-    wordProd = dwordProd;
+    unsigned index = indexWordLo(size_words);
+    unsigned const lastIndex = indexWordHi(size_words);
+    uint64_t dwordProd = (uint64_t)bPtr[index] * q;
+    uint32_t wordRem = remPtr[index];
+    uint32_t wordShiftedRem = wordRem << dist;
+    /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
+    uint32_t wordProd = dwordProd;
     zPtr[index] = wordShiftedRem - wordProd;
-    if ( index != lastIndex ) {
+    if (index != lastIndex) {
         uNegDist = -dist;
-        borrow = (wordShiftedRem < wordProd);
+        uint8_t borrow = (wordShiftedRem < wordProd);
         for (;;) {
-            wordShiftedRem = wordRem>>(uNegDist & 31);
+            wordShiftedRem = wordRem >> (uNegDist & 31);
             index += wordIncr;
-            dwordProd = (uint64_t) bPtr[index] * q + (dwordProd>>32);
+            dwordProd = (uint64_t)bPtr[index] * q + (dwordProd >> 32);
             wordRem = remPtr[index];
-            wordShiftedRem |= wordRem<<dist;
+            wordShiftedRem |= wordRem << dist;
             wordProd = dwordProd;
             zPtr[index] = wordShiftedRem - wordProd - borrow;
-            if ( index == lastIndex ) break;
-            borrow =
-                borrow ? (wordShiftedRem <= wordProd)
-                    : (wordShiftedRem < wordProd);
+            if (index == lastIndex) {
+                break;
+            }
+            borrow = borrow ? wordShiftedRem <= wordProd : wordShiftedRem < wordProd;
         }
     }
 
