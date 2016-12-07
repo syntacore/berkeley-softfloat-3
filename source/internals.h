@@ -290,10 +290,17 @@ softfloat_roundPackToUI32(bool, uint64_t, uint8_t, bool);
 
 #ifdef SOFTFLOAT_FAST_INT64
 uint64_t
-softfloat_roundPackToUI64(bool, uint64_t, uint64_t, uint8_t, bool);
+softfloat_roundPackToUI64(bool,
+                          uint64_t,
+                          uint64_t,
+                          uint8_t,
+                          bool);
 #else
 uint64_t
-softfloat_roundPackMToUI64(bool, uint32_t *, uint8_t, bool);
+softfloat_roundPackMToUI64(bool,
+                           uint32_t *,
+                           uint8_t,
+                           bool);
 #endif
 
 int32_t
@@ -301,9 +308,17 @@ softfloat_roundPackToI32(bool, uint64_t, uint8_t, bool);
 
 #ifdef SOFTFLOAT_FAST_INT64
 int64_t
-softfloat_roundPackToI64(bool, uint64_t, uint64_t, uint8_t, bool);
+softfloat_roundPackToI64(bool,
+                         uint64_t,
+                         uint64_t,
+                         uint8_t,
+                         bool);
 #else
-int64_t softfloat_roundPackMToI64(bool, uint32_t *, uint8_t, bool);
+int64_t
+softfloat_roundPackMToI64(bool,
+                          uint32_t *,
+                          uint8_t,
+                          bool);
 #endif
 
 struct exp8_sig16
@@ -311,44 +326,89 @@ struct exp8_sig16
     int8_t exp;
     uint16_t sig;
 };
-struct exp8_sig16 softfloat_normSubnormalF16Sig(uint16_t);
+struct exp8_sig16
+    softfloat_normSubnormalF16Sig(uint16_t);
 
-float16_t softfloat_roundPackToF16(bool, int16_t, uint16_t);
-float16_t softfloat_normRoundPackToF16(bool, int16_t, uint16_t);
-
-float16_t softfloat_addMagsF16(uint16_t, uint16_t);
-float16_t softfloat_subMagsF16(uint16_t, uint16_t);
 float16_t
-softfloat_mulAddF16(uint16_t, uint16_t, uint16_t, uint8_t);
+softfloat_roundPackToF16(bool,
+                         int16_t,
+                         uint16_t);
+float16_t
+softfloat_normRoundPackToF16(bool,
+                             int16_t,
+                             uint16_t);
+
+float16_t
+softfloat_addMagsF16(uint16_t,
+                     uint16_t);
+float16_t
+softfloat_subMagsF16(uint16_t,
+                     uint16_t);
+float16_t
+softfloat_mulAddF16(uint16_t,
+                    uint16_t,
+                    uint16_t,
+                    uint8_t);
 
 struct exp16_sig32
 {
     int16_t exp;
     uint32_t sig;
 };
-struct exp16_sig32 softfloat_normSubnormalF32Sig(uint32_t);
+struct exp16_sig32
+    softfloat_normSubnormalF32Sig(uint32_t);
 
-float32_t softfloat_roundPackToF32(bool, int16_t, uint32_t);
-float32_t softfloat_normRoundPackToF32(bool, int16_t, uint32_t);
+float32_t
+softfloat_roundPackToF32(bool,
+                         int16_t,
+                         uint32_t);
+float32_t
+softfloat_normRoundPackToF32(bool,
+                             int16_t,
+                             uint32_t);
 
-float32_t softfloat_addMagsF32(uint32_t, uint32_t);
-float32_t softfloat_subMagsF32(uint32_t, uint32_t);
-float32_t softfloat_mulAddF32(uint32_t, uint32_t, uint32_t, uint8_t);
+float32_t
+softfloat_addMagsF32(uint32_t,
+                     uint32_t);
+float32_t
+softfloat_subMagsF32(uint32_t,
+                     uint32_t);
+float32_t
+softfloat_mulAddF32(uint32_t,
+                    uint32_t,
+                    uint32_t,
+                    uint8_t);
 
 struct exp16_sig64
 {
     int16_t exp;
     uint64_t sig;
 };
-struct exp16_sig64 softfloat_normSubnormalF64Sig(uint64_t);
+struct exp16_sig64
+    softfloat_normSubnormalF64Sig(uint64_t);
 
-float64_t softfloat_roundPackToF64(bool, int16_t, uint64_t);
-float64_t softfloat_normRoundPackToF64(bool, int16_t, uint64_t);
-
-float64_t softfloat_addMagsF64(uint64_t, uint64_t, bool);
-float64_t softfloat_subMagsF64(uint64_t, uint64_t, bool);
 float64_t
-softfloat_mulAddF64(uint64_t, uint64_t, uint64_t, uint8_t);
+softfloat_roundPackToF64(bool,
+                         int16_t,
+                         uint64_t);
+float64_t
+softfloat_normRoundPackToF64(bool,
+                             int16_t,
+                             uint64_t);
+
+float64_t
+softfloat_addMagsF64(uint64_t,
+                     uint64_t,
+                     bool);
+float64_t
+softfloat_subMagsF64(uint64_t,
+                     uint64_t,
+                     bool);
+float64_t
+softfloat_mulAddF64(uint64_t,
+                    uint64_t,
+                    uint64_t,
+                    uint8_t);
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -367,42 +427,69 @@ struct exp32_sig64
 struct exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
 
 extFloat80_t
-softfloat_roundPackToExtF80(bool, int32_t, uint64_t, uint64_t, uint8_t);
+softfloat_roundPackToExtF80(bool,
+                            int32_t,
+                            uint64_t,
+                            uint64_t,
+                            uint8_t);
 extFloat80_t
-softfloat_normRoundPackToExtF80(bool, int32_t, uint64_t, uint64_t, uint8_t);
+softfloat_normRoundPackToExtF80(bool,
+                                int32_t,
+                                uint64_t,
+                                uint64_t,
+                                uint8_t);
 
 extFloat80_t
-softfloat_addMagsExtF80(uint16_t, uint64_t, uint16_t, uint64_t, bool);
+softfloat_addMagsExtF80(uint16_t,
+                        uint64_t,
+                        uint16_t,
+                        uint64_t,
+                        bool);
 extFloat80_t
-softfloat_subMagsExtF80(uint16_t, uint64_t, uint16_t, uint64_t, bool);
+softfloat_subMagsExtF80(uint16_t,
+                        uint64_t,
+                        uint16_t,
+                        uint64_t,
+                        bool);
 
 struct exp32_sig128
 {
     int32_t exp;
     struct uint128 sig;
 };
+
 struct exp32_sig128
-    softfloat_normSubnormalF128Sig(uint64_t, uint64_t);
+    softfloat_normSubnormalF128Sig(uint64_t,
+                                   uint64_t);
 
 float128_t
-softfloat_roundPackToF128(bool, int32_t, uint64_t, uint64_t, uint64_t);
+softfloat_roundPackToF128(bool,
+                          int32_t,
+                          uint64_t,
+                          uint64_t,
+                          uint64_t);
 float128_t
-softfloat_normRoundPackToF128(bool, int32_t, uint64_t, uint64_t);
+softfloat_normRoundPackToF128(bool,
+                              int32_t,
+                              uint64_t,
+                              uint64_t);
 
 float128_t
 softfloat_addMagsF128(uint64_t, uint64_t, uint64_t, uint64_t, bool);
 float128_t
-softfloat_subMagsF128(uint64_t, uint64_t, uint64_t, uint64_t, bool);
+softfloat_subMagsF128(uint64_t,
+                      uint64_t,
+                      uint64_t,
+                      uint64_t,
+                      bool);
 float128_t
-softfloat_mulAddF128(
-    uint64_t,
-    uint64_t,
-    uint64_t,
-    uint64_t,
-    uint64_t,
-    uint64_t,
-    uint8_t
-);
+softfloat_mulAddF128(uint64_t,
+                     uint64_t,
+                     uint64_t,
+                     uint64_t,
+                     uint64_t,
+                     uint64_t,
+                     uint8_t);
 
 #else
 
@@ -412,56 +499,67 @@ softfloat_mulAddF128(
 #define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
 
 bool
-softfloat_tryPropagateNaNExtF80M(
-    const struct extFloat80M *,
-    const struct extFloat80M *,
-    struct extFloat80M *
-);
-void softfloat_invalidExtF80M(struct extFloat80M *);
-
-int softfloat_normExtF80SigM(uint64_t *);
-
+softfloat_tryPropagateNaNExtF80M(struct extFloat80M const*,
+                                 struct extFloat80M const*,
+                                 struct extFloat80M*);
 void
-softfloat_roundPackMToExtF80M(
-    bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *);
-void
-softfloat_normRoundPackMToExtF80M(
-    bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *);
-
-void
-softfloat_addExtF80M(
-    const struct extFloat80M *,
-    const struct extFloat80M *,
-    struct extFloat80M *,
-    bool
-);
+softfloat_invalidExtF80M(struct extFloat80M *);
 
 int
-softfloat_compareNonnormExtF80M(
-    const struct extFloat80M *, const struct extFloat80M *);
+softfloat_normExtF80SigM(uint64_t *);
 
-bool softfloat_isNaNF128M(const uint32_t *);
+void
+softfloat_roundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *);
+void
+softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *);
+
+void
+softfloat_addExtF80M(struct extFloat80M const*,
+                     struct extFloat80M const*,
+                     struct extFloat80M*,
+                     bool);
+
+int
+softfloat_compareNonnormExtF80M(struct extFloat80M const*,
+                                struct extFloat80M const*);
+
+bool softfloat_isNaNF128M(uint32_t const*);
 
 bool
-softfloat_tryPropagateNaNF128M(
-    const uint32_t *, const uint32_t *, uint32_t *);
-void softfloat_invalidF128M(uint32_t *);
-
-int softfloat_shiftNormSigF128M(const uint32_t *, uint8_t, uint32_t *);
-
-void softfloat_roundPackMToF128M(bool, int32_t, uint32_t *, uint32_t *);
-void softfloat_normRoundPackMToF128M(bool, int32_t, uint32_t *, uint32_t *);
+softfloat_tryPropagateNaNF128M(uint32_t const*,
+                               uint32_t const*,
+                               uint32_t *);
 
 void
-softfloat_addF128M(const uint32_t *, const uint32_t *, uint32_t *, bool);
+softfloat_invalidF128M(uint32_t *);
+
+int
+softfloat_shiftNormSigF128M(uint32_t const *, 
+                            uint8_t, 
+                            uint32_t *);
+
 void
-softfloat_mulAddF128M(
-    const uint32_t *,
-    const uint32_t *,
-    const uint32_t *,
-    uint32_t *,
-    uint8_t
-);
+softfloat_roundPackMToF128M(bool, 
+                            int32_t, 
+                            uint32_t *, 
+                            uint32_t *);
+void
+softfloat_normRoundPackMToF128M(bool, 
+                                int32_t, 
+                                uint32_t *, 
+                                uint32_t *);
+
+void
+softfloat_addF128M(uint32_t const*,
+                   uint32_t const *, 
+                   uint32_t *, 
+                   bool);
+void
+softfloat_mulAddF128M(uint32_t const*,
+                      uint32_t const*,
+                      uint32_t const*,
+                      uint32_t*,
+                      uint8_t);
 
 #endif
 
