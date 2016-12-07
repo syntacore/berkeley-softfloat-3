@@ -39,45 +39,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-uint32_t extF80_to_ui32_r_minMag( extFloat80_t a, bool exact )
+uint32_t extF80_to_ui32_r_minMag(extFloat80_t a, bool exact)
 {
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint16_t uiA64;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
-    bool sign;
-    uint32_t z;
+    union
+    {
+        struct extFloat80M s; 
+        extFloat80_t f;
+    } uA;
 
-    
     uA.f = a;
-    uiA64 = uA.s.signExp;
-    exp = expExtF80UI64( uiA64 );
-    sig = uA.s.signif;
-    
-    shiftDist = 0x403E - exp;
-    if ( 64 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    uint16_t const uiA64 = uA.s.signExp;
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = uA.s.signif;
+
+    int32_t const shiftDist = 0x403E - exp;
+    if (64 <= shiftDist) {
+        if (exact && (exp | sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
         return 0;
+    } else {
+        bool const sign = signExtF80UI64(uiA64);
+        if (sign || shiftDist < 32) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                0x7FFF == exp && 0 != (sig & INT64_MAX) ? ui32_fromNaN :
+                sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+        } else {
+            uint32_t const z = sig >> shiftDist;
+            if (exact && ((uint64_t)z << shiftDist != sig)) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+            return z;
+        }
     }
-    
-    sign = signExtF80UI64( uiA64 );
-    if ( sign || (shiftDist < 32) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return
-            (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-                ? ui32_fromNaN
-                : sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-    }
-    
-    z = sig>>shiftDist;
-    if ( exact && ((uint64_t) z<<shiftDist != sig) ) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-    return z;
-
 }
 
