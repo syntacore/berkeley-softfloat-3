@@ -116,14 +116,14 @@ extF80M_rem(
         }
         expA += softfloat_normExtF80SigM(&sigA);
     }
-    
+
 
     expDiff = expA - expB;
     if (expDiff < -1) {
         goto copyA;
     }
     rem[indexWord(3, 2)] = sigA >> 34;
-    rem[indexWord(3, 1)] = sigA >> 2;
+    rem[indexWord(3, 1)] = (uint32_t)(sigA >> 2);
     rem[indexWord(3, 0)] = (uint32_t)sigA << 30;
     x[indexWord(3, 0)] = (uint32_t)x64 << 30;
     sig32B = x64 >> 32;
@@ -158,6 +158,7 @@ extF80M_rem(
         }
         /* `expDiff' cannot be less than -29 here. */
         q = (uint32_t)(x64 >> 32) >> (~expDiff & 31);
+        /** @todo Warning	C4244	'=': conversion from 'int' to 'uint8_t', possible loss of data */
         softfloat_remStep96MBy32(rem, expDiff + 30, x, q, rem);
         if (rem[indexWordHi(3)] & 0x80000000) {
             remPtr = rem;
@@ -198,6 +199,7 @@ copyA:
         sigA >>= 1 - expA;
         expA = 0;
     }
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     zSPtr->signExp = packToExtF80UI64(signRem, expA);
     zSPtr->signif = sigA;
 

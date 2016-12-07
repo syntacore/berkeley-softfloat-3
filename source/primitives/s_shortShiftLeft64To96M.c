@@ -39,13 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.h"
 
 void
- softfloat_shortShiftLeft64To96M(
-     uint64_t a, uint8_t dist, uint32_t *zPtr )
+softfloat_shortShiftLeft64To96M(uint64_t a, 
+                                uint8_t dist, 
+                                uint32_t *zPtr)
 {
 
-    zPtr[indexWord( 3, 0 )] = (uint32_t) a<<dist;
+    zPtr[indexWord(3, 0)] = (uint32_t)a << dist;
     a >>= 32 - dist;
-    zPtr[indexWord( 3, 2 )] = a>>32;
-    zPtr[indexWord( 3, 1 )] = a;
-
+    zPtr[indexWord(3, 2)] = a >> 32;
+    zPtr[indexWord(3, 1)] = (uint32_t)a;
 }

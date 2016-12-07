@@ -80,7 +80,7 @@ f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
         }
         sig <<= -shiftDist;
         extSig[indexWord(3, 2)] = sig >> 32;
-        extSig[indexWord(3, 1)] = sig;
+        extSig[indexWord(3, 1)] = (uint32_t)sig;
     } else {
         extSig[indexWord(3, 2)] = sig >> 32;
         extSig[indexWord(3, 1)] = (uint32_t)sig;
