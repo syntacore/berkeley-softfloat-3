@@ -37,19 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/types.h"
 
-struct uint128 softfloat_mul64To128(uint64_t a, uint64_t b)
+struct uint128
+    softfloat_mul64To128(uint64_t a, uint64_t b)
 {
-    uint32_t a32, a0, b32, b0;
+    uint32_t const a32 = a >> 32;
+    uint32_t const a0 = (uint32_t)a;
+    uint32_t const b32 = b >> 32;
+    uint32_t const b0 = (uint32_t)b;
     struct uint128 z;
-    uint64_t mid1, mid;
-
-    a32 = a >> 32;
-    a0 = a;
-    b32 = b >> 32;
-    b0 = b;
     z.v0 = (uint64_t)a0 * b0;
-    mid1 = (uint64_t)a32 * b0;
-    mid = mid1 + (uint64_t)a0 * b32;
+    uint64_t const mid1 = (uint64_t)a32 * b0;
+    uint64_t mid = mid1 + (uint64_t)a0 * b32;
     z.v64 = (uint64_t)a32 * b32;
     z.v64 += (uint64_t)(mid < mid1) << 32 | mid >> 32;
     mid <<= 32;
