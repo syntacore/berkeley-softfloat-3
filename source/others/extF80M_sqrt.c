@@ -102,8 +102,8 @@ void extF80M_sqrt(const extFloat80_t *aPtr, extFloat80_t *zPtr)
 
     expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
     expA &= 1;
-    softfloat_shortShiftLeft64To96M(
-        rem64, 30 - expA, &rem[indexMultiwordHi(4, 3)]);
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
+    softfloat_shortShiftLeft64To96M(rem64, 30 - expA, &rem[indexMultiwordHi(4, 3)]);
     sig32A = rem64 >> 32;
     recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
     sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;

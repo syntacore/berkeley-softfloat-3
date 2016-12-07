@@ -77,6 +77,7 @@ f128M_to_i32_r_minMag(const float128_t *aPtr, bool exact)
             sig64 |= UINT64_C(0x0001000000000000);
             uint32_t const absZ = sig64 >> shiftDist;
             uint32_t const uiZ = sign ? -(int64_t)absZ : absZ;
+            /**@todo */
             if (uiZ >> 31 != sign) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return

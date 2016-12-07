@@ -43,6 +43,7 @@ struct uint128
     struct uint128 z;
 
     if ( dist < 64 ) {
+        /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
         u8NegDist = -(int32_t)dist;
         z.v64 = a64>>dist;
         z.v0 =

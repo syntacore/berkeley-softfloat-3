@@ -82,6 +82,7 @@ int32_t extF80_to_i32_r_minMag( extFloat80_t a, bool exact )
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
     
+    /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'int32_t', possible loss of data */
     absZ = sig>>shiftDist;
     if ( exact && ((uint64_t) (uint32_t) absZ<<shiftDist != sig) ) {
         softfloat_raiseFlags(softfloat_flag_inexact);

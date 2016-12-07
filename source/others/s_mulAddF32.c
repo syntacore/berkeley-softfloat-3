@@ -119,6 +119,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                     uint32_t sigZ;
                     if (!expC) {
                         if (!sigC) {
+                            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
                             sigZ = softfloat_shortShiftRightJam64(sigProd, 31);
                             return softfloat_roundPackToF32(signZ, expProd - 1, sigZ);
                         } else {
@@ -136,6 +137,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                         if (signProd == signC) {
                             if (expDiff <= 0) {
                                 expZ = expC;
+                                /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
                                 sigZ = sigC + softfloat_shiftRightJam64(sigProd, 32 - expDiff);
                             } else {
                                 expZ = expProd;
@@ -169,6 +171,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                                 int8_t shiftDist = softfloat_countLeadingZeros64(sig64Z) - 1;
                                 expZ -= shiftDist;
                                 shiftDist -= 32;
+                                /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
                                 sigZ =
                                     shiftDist < 0 ? softfloat_shortShiftRightJam64(sig64Z, -shiftDist) :
                                     (uint32_t)sig64Z << shiftDist;

@@ -200,6 +200,7 @@ overflow:
     }
 
 packReturn:
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     zSPtr->signExp = packToExtF80UI64(sign, exp);
     zSPtr->signif = sig;
 }

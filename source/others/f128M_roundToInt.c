@@ -133,6 +133,7 @@ void
         goto ui96;
     }
     
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
     bitPos = 0x406F - exp;
     roundNear =
            (roundingMode == softfloat_round_near_maxMag)

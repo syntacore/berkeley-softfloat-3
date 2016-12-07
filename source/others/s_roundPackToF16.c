@@ -57,6 +57,7 @@ softfloat_roundPackToF16(bool sign, int16_t exp, uint16_t sig)
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||
                 exp < -1 ||
                 sig + roundIncrement < 0x8000;
+            /** @todo  Warning	C4242	'=': conversion from 'uint32_t' to 'uint16_t', possible loss of data */
             sig = softfloat_shiftRightJam32(sig, -exp);
             exp = 0;
             roundBits = sig & 0xF;

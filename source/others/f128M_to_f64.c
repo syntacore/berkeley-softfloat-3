@@ -81,6 +81,7 @@ f128M_to_f64(const float128_t *aPtr)
             if (exp < -0x1000) {
                 exp = -0x1000;
             }
+            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
             return
                 softfloat_roundPackToF64(sign, exp, frac64 | UINT64_C(0x4000000000000000));
         }

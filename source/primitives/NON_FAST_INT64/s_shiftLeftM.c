@@ -60,6 +60,7 @@ void
         aPtr += indexMultiwordLoBut( size_words, wordDist );
         innerDist = dist & 31;
         if ( innerDist ) {
+            /** @todo Warning	C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
             softfloat_shortShiftLeftM(
                 size_words - wordDist,
                 aPtr,
@@ -70,6 +71,7 @@ void
         } else {
             aPtr += indexWordHi( size_words - wordDist );
             destPtr = zPtr + indexWordHi( size_words );
+            /** @todo Warning	C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
             for ( i = size_words - wordDist; i; --i ) {
                 *destPtr = *aPtr;
                 aPtr -= wordIncr;

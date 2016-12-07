@@ -65,6 +65,7 @@ float16_t f128_to_f16(float128_t a)
             if (exp < -0x40) {
                 exp = -0x40;
             }
+            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
             return softfloat_roundPackToF16(sign, exp, frac16 | 0x4000);
         }
     }

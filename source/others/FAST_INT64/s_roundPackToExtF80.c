@@ -207,6 +207,7 @@ overflow:
         if (!sig) exp = 0;
     }
 packReturn:
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uZ.s.signExp = packToExtF80UI64(sign, exp);
     uZ.s.signif = sig;
     return uZ.f;

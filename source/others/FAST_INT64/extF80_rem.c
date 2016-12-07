@@ -165,6 +165,7 @@ extF80_rem(extFloat80_t a, extFloat80_t b)
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
         q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
+        /** @todo Warning	C4244	'=': conversion from 'int' to 'uint8_t', possible loss of data */
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, expDiff + 30);
         term = softfloat_mul64ByShifted32To128(sigB, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
@@ -200,6 +201,7 @@ selectRem:
 
 propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+    /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
     uiZ64 = uiZ.v64;
     uiZ0 = uiZ.v0;
     goto uiZ;
@@ -215,6 +217,7 @@ copyA:
         sigA >>= 1 - expA;
         expA = 0;
     }
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uiZ64 = packToExtF80UI64(signA, expA);
     uiZ0 = sigA;
 uiZ:

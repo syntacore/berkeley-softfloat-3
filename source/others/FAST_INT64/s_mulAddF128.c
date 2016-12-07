@@ -282,7 +282,9 @@ float128_t
         if ( 0 < shiftDist ) goto shiftRightRoundPack;
         if ( shiftDist ) {
             shiftDist = -shiftDist;
+            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int8_t', possible loss of data */
             sigZ = softfloat_shortShiftLeft128( sigZ.v64, sigZ.v0, shiftDist );
+            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int8_t', possible loss of data */
             x128 = softfloat_shortShiftLeft128( 0, sigZExtra, shiftDist );
             sigZ.v0 |= x128.v64;
             sigZExtra = x128.v0;
@@ -293,6 +295,7 @@ float128_t
     sigZExtra = sig256Z[indexWord( 4, 1 )] | sig256Z[indexWord( 4, 0 )];
  shiftRightRoundPack:
     sigZExtra = (uint64_t) (sigZ.v0<<(64 - shiftDist)) | (sigZExtra != 0);
+    /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int8_t', possible loss of data */
     sigZ = softfloat_shortShiftRight128( sigZ.v64, sigZ.v0, shiftDist );
  roundPack:
     return

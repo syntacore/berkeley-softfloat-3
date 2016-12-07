@@ -72,6 +72,7 @@ extF80_to_f64(extFloat80_t a)
         if (exp < -0x1000) {
             exp = -0x1000;
         }
+        /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
         return softfloat_roundPackToF64(sign, exp, sig);
     }
 }

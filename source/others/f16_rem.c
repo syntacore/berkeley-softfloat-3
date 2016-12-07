@@ -127,6 +127,7 @@ f16_rem(float16_t a, float16_t b)
             /*`expDiff' cannot be less than -30 here.*/
             assert(-30 <= expDiff);
             q32 >>= ~expDiff & 31;
+            /** @todo Warning	C4242	'=': conversion from 'uint32_t' to 'uint16_t', possible loss of data*/
             q = q32;
             rem = (rem << (expDiff + 30)) - q * sigB;
         }

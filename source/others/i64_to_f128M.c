@@ -71,6 +71,7 @@ void i64_to_f128M(int64_t a, float128_t *zPtr)
         } else {
             absA <<= shiftDist - 32;
             uiZ96 = packToF128UI96(sign, 0x404E - shiftDist, absA >> 32);
+            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
             uiZ64 = absA;
         }
     }

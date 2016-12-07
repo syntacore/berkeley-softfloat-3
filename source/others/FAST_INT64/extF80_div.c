@@ -167,6 +167,7 @@ extFloat80_t extF80_div( extFloat80_t a, extFloat80_t b )
     
  propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, uiB64, uiB0 );
+    /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
     uiZ64 = uiZ.v64;
     uiZ0  = uiZ.v0;
     goto uiZ;

@@ -72,6 +72,7 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     if ( expA == 0x7FFF ) {
         if ( sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
             uiZ = softfloat_propagateNaNExtF80UI( uiA64, uiA0, 0, 0 );
+            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
             uiZ0  = uiZ.v0;
             goto uiZ;
@@ -113,6 +114,7 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     q = ((uint32_t) (rem.v64>>2) * (uint64_t) recipSqrt32)>>32;
     sigZ = ((uint64_t) sig32Z<<32) + (q<<3);
     x64 = ((uint64_t) sig32Z<<32) + sigZ;
+    /** @todo Warning	C4242	'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
     term = softfloat_mul64ByShifted32To128( x64, q );
     rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, 29 );
     rem = softfloat_sub128( rem.v64, rem.v0, term.v64, term.v0 );
@@ -125,6 +127,7 @@ extFloat80_t extF80_sqrt( extFloat80_t a )
     if ( (q & 0xFFFFFF) <= 2 ) {
         q &= ~(uint64_t) 0xFFFF;
         sigZExtra = (uint64_t) (q<<39);
+        /** @todo Warning	C4242	'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
         term = softfloat_mul64ByShifted32To128( x64 + (q>>27), q );
         x64 = (uint32_t) (q<<5) * (uint64_t) (uint32_t) q;
         term = softfloat_add128( term.v64, term.v0, 0, x64 );

@@ -80,6 +80,7 @@ uint32_t extF80M_to_ui32_r_minMag(const extFloat80_t *aPtr, bool exact)
                     if (shiftedSig >> 32) {
                         goto invalid;
                     }
+                    /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
                     z = shiftedSig;
                 } else {
                     shiftedSig = sig;
@@ -89,6 +90,7 @@ uint32_t extF80M_to_ui32_r_minMag(const extFloat80_t *aPtr, bool exact)
                     if (shiftedSig >> 32) {
                         goto invalid;
                     }
+                    /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
                     z = shiftedSig;
                     if (sign && z) {
                         goto invalid;

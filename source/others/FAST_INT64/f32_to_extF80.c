@@ -63,6 +63,7 @@ extFloat80_t f32_to_extF80(float32_t a)
         if (frac) {
             softfloat_f32UIToCommonNaN(uiA, &commonNaN);
             uiZ = softfloat_commonNaNToExtF80UI(&commonNaN);
+            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
             uiZ0 = uiZ.v0;
         } else {

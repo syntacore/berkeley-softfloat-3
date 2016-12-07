@@ -119,6 +119,7 @@ void
         }
         /* `expDiff' cannot be less than -29 here. */
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
+        /** @todo Warning	C4244	'=': conversion from 'int' to 'uint8_t', possible loss of data */
         softfloat_remStep128MBy32( remPtr, expDiff + 30, x, q, remPtr );
         if ( remPtr[indexWordHi( 4 )] & 0x80000000 ) {
             altRemPtr = &rem2[indexMultiwordLo( 5, 4 )];

@@ -82,6 +82,7 @@ int32_t f128_to_i32_r_minMag( float128_t a, bool exact )
     }
     
     sig64 |= UINT64_C( 0x0001000000000000 );
+    /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'int32_t', possible loss of data */
     absZ = sig64>>shiftDist;
     if (
         exact && ((uint64_t) (uint32_t) absZ<<shiftDist != sig64)

@@ -102,8 +102,10 @@ void f128M_sqrt(const float128_t *aPtr, float128_t *zPtr)
             softfloat_shortShiftRight128M(rem, 1, rem);
             rem64 >>= 1;
         }
+        /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
         sig32A = rem64 >> 29;
     } else {
+        /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
         sig32A = rem64 >> 30;
     }
     recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);

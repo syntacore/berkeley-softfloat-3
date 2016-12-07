@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 uint64_t
- f128_to_ui64( float128_t a, uint8_t roundingMode, bool exact )
+f128_to_ui64(float128_t a, uint8_t roundingMode, bool exact)
 {
     union ui128_f128 uA;
     uint64_t uiA64, uiA0;
@@ -51,39 +51,40 @@ uint64_t
     struct uint128 sig128;
     struct uint64_extra sigExtra;
 
-    
+
     uA.f = a;
     uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
-    sign  = signF128UI64( uiA64 );
-    exp   = expF128UI64( uiA64 );
-    sig64 = fracF128UI64( uiA64 );
-    sig0  = uiA0;
-    
+    uiA0 = uA.ui.v0;
+    sign = signF128UI64(uiA64);
+    exp = expF128UI64(uiA64);
+    sig64 = fracF128UI64(uiA64);
+    sig0 = uiA0;
+
     shiftDist = 0x402F - exp;
-    if ( shiftDist <= 0 ) {
-        
-        if ( shiftDist < -15 ) {
-            softfloat_raiseFlags( softfloat_flag_invalid );
+    if (shiftDist <= 0) {
+
+        if (shiftDist < -15) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
             return
                 (exp == 0x7FFF) && (sig64 | sig0) ? ui64_fromNaN
-                    : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+                : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
         }
-        
-        sig64 |= UINT64_C( 0x0001000000000000 );
-        if ( shiftDist ) {
-            sig128 = softfloat_shortShiftLeft128( sig64, sig0, -shiftDist );
+
+        sig64 |= UINT64_C(0x0001000000000000);
+        if (shiftDist) {
+            /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
+            sig128 = softfloat_shortShiftLeft128(sig64, sig0, -shiftDist);
             sig64 = sig128.v64;
-            sig0  = sig128.v0;
+            sig0 = sig128.v0;
         }
     } else {
-        
-        if ( exp ) sig64 |= UINT64_C( 0x0001000000000000 );
-        sigExtra = softfloat_shiftRightJam64Extra( sig64, sig0, shiftDist );
+
+        if (exp) sig64 |= UINT64_C(0x0001000000000000);
+        sigExtra = softfloat_shiftRightJam64Extra(sig64, sig0, shiftDist);
         sig64 = sigExtra.v;
-        sig0  = sigExtra.extra;
+        sig0 = sigExtra.extra;
     }
-    return softfloat_roundPackToUI64( sign, sig64, sig0, roundingMode, exact );
+    return softfloat_roundPackToUI64(sign, sig64, sig0, roundingMode, exact);
 
 }
 

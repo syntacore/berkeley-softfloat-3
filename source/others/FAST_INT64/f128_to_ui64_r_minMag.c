@@ -64,6 +64,7 @@ uint64_t f128_to_ui64_r_minMag( float128_t a, bool exact )
         
         if ( sign || (shiftDist < -15) ) goto invalid;
         sig64 |= UINT64_C( 0x0001000000000000 );
+        /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'int8_t', possible loss of data */
         negShiftDist = -shiftDist;
         z = sig64<<negShiftDist | sig0>>(shiftDist & 63);
         if ( exact && (uint64_t) (sig0<<negShiftDist) ) {

@@ -43,6 +43,7 @@ softfloat_countLeadingZeros64( uint64_t a )
     uint32_t a32 = a>>32;
     if ( ! a32 ) {
         count = 32;
+        /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
         a32 = a;
     }
     /* From here, result is current count + count leading zeros of `a32'. */

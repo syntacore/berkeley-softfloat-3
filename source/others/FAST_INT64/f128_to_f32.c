@@ -53,6 +53,7 @@ f128_to_f32(float128_t a)
     int32_t exp = expF128UI64(uiA64);
     uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
     if (exp != INT16_MAX) {
+        /** @todo Warning	C4242	'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac64, 18);
         if (exp | frac32) {
             exp -= 0x3F81;

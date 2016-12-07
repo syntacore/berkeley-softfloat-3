@@ -95,6 +95,7 @@ softfloat_shiftRightJam256M(
         aPtr += indexMultiwordHiBut(4, wordDist);
         innerDist = dist & 63;
         if (innerDist) {
+            /** @todo Warning	C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
             softfloat_shortShiftRightJamM(
                 4 - wordDist,
                 aPtr,

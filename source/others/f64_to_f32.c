@@ -47,6 +47,7 @@ f64_to_f32(float64_t a)
     int16_t const exp = expF64UI(uiA);
     uint64_t const frac = fracF64UI(uiA);
     if (exp != 0x7FF) {
+        /** @todo Warning	C4242	'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac, 22);
         if (exp | frac32) {
             return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);

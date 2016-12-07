@@ -59,6 +59,7 @@ f64_to_extF80( float64_t a )
             struct commonNaN commonNaN;
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToExtF80UI( &commonNaN );
+            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
             uiZ0  = uiZ.v0;
         } else {

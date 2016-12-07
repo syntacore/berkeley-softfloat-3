@@ -60,6 +60,7 @@ float32_t f128M_to_f32(const float128_t *aPtr)
         (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)] |
         (0 != (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]));
     if (exp != INT16_MAX) {
+        /** @todo Warning	C4242	'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
         uint32_t const frac32 = softfloat_shortShiftRightJam64(frac64, 18);
         if (exp | frac32) {
             exp -= 0x3F81;

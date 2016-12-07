@@ -137,6 +137,7 @@ f128_rem( float128_t a, float128_t b )
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
+        /** @todo Warning	C4244	'=': conversion from 'int' to 'uint8_t', possible loss of data */
         rem = softfloat_shortShiftLeft128( rem.v64, rem.v0, expDiff + 30 );
         term = softfloat_mul128By32( sigB.v64, sigB.v0, q );
         rem = softfloat_sub128( rem.v64, rem.v0, term.v64, term.v0 );

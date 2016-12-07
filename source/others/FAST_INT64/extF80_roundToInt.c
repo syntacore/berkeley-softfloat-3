@@ -77,6 +77,7 @@ extFloat80_t
         if ( exp == 0x7FFF ) {
             if ( sigA & UINT64_C( 0x7FFFFFFFFFFFFFFF ) ) {
                 uiZ = softfloat_propagateNaNExtF80UI( uiA64, sigA, 0, 0 );
+                /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
                 uiZ64 = uiZ.v64;
                 sigZ  = uiZ.v0;
                 goto uiZ;
@@ -85,6 +86,7 @@ extFloat80_t
         } else {
             sigZ = sigA;
         }
+        /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
         uiZ64 = signUI64 | exp;
         goto uiZ;
     }
@@ -112,6 +114,7 @@ extFloat80_t
         goto uiZ;
     }
     
+    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uiZ64 = signUI64 | exp;
     lastBitMask = (uint64_t) 1<<(0x403E - exp);
     roundBitsMask = lastBitMask - 1;
