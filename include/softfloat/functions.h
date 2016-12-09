@@ -61,18 +61,17 @@ extern "C" {
     /**
     Software floating-point underflow tininess-detection mode.
     */
-    extern THREAD_LOCAL uint8_t softfloat_detectTininess;
     enum softfloat_tininess
     {
         softfloat_tininess_beforeRounding = 0,
         softfloat_tininess_afterRounding = 1
     };
+    extern THREAD_LOCAL enum softfloat_tininess softfloat_detectTininess;
 
     /**
     Software floating-point rounding mode.
     */
     /**@{*/
-    extern THREAD_LOCAL uint8_t softfloat_roundingMode;
     enum softfloat_round_mode
     {
         softfloat_round_near_even = 0,
@@ -81,6 +80,7 @@ extern "C" {
         softfloat_round_max = 3,
         softfloat_round_near_maxMag = 4
     };
+    extern THREAD_LOCAL enum softfloat_round_mode softfloat_roundingMode;
     /**@}*/
 
     /**

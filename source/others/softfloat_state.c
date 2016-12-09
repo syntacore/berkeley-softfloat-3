@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define THREAD_LOCAL
 #endif
 
-THREAD_LOCAL uint8_t softfloat_roundingMode = softfloat_round_near_even;
-THREAD_LOCAL uint8_t softfloat_detectTininess = init_detectTininess;
+THREAD_LOCAL enum softfloat_round_mode softfloat_roundingMode = softfloat_round_near_even;
+THREAD_LOCAL enum softfloat_tininess softfloat_detectTininess = init_detectTininess;
 
 THREAD_LOCAL uint8_t extF80_roundingPrecision = 80;
 
