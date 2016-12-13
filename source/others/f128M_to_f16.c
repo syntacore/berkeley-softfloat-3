@@ -64,9 +64,7 @@ f128M_to_f16(const float128_t *aPtr)
 
     if (exp == 0x7FFF) {
         if (frac32) {
-            struct commonNaN commonNaN;
-            softfloat_f128MToCommonNaN(aWPtr, &commonNaN);
-            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
+            return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f128MToCommonNaN(aWPtr)));
         } else {
             return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }

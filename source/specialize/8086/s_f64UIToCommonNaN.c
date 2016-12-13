@@ -39,13 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-void softfloat_f64UIToCommonNaN( uint64_t uiA, struct commonNaN *zPtr )
+struct commonNaN
+softfloat_f64UIToCommonNaN(uint64_t uiA)
 {
     if ( softfloat_isSigNaNF64UI( uiA ) ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
     }
-    zPtr->sign = uiA>>63;
-    zPtr->v64  = uiA<<12;
-    zPtr->v0   = 0;
+    {
+        struct commonNaN z;
+        z.sign = uiA >> 63;
+        z.v64 = uiA << 12;
+        z.v0 = 0;
+        return z;
+    }
 }
 

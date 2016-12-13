@@ -59,32 +59,27 @@ extF80M_roundToInt(
 #else
 
 void
-extF80M_roundToInt(
-    const extFloat80_t *aPtr,
-    uint8_t roundingMode,
-    bool exact,
-    extFloat80_t *zPtr
-)
+extF80M_roundToInt(extFloat80_t const *aPtr,
+                   uint8_t roundingMode,
+                   bool exact,
+                   extFloat80_t *zPtr)
 {
-    const struct extFloat80M *aSPtr;
-    struct extFloat80M *zSPtr;
-    uint16_t uiA64, signUI64;
-    int32_t exp;
-    uint64_t sigA;
     uint16_t uiZ64;
-    uint64_t sigZ, lastBitMask, roundBitsMask;
+    uint64_t sigZ;
+    uint64_t lastBitMask;
+    uint64_t roundBitsMask;
 
     /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
+    struct extFloat80M const *aSPtr = (const struct extFloat80M *) aPtr;
     /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
+    struct extFloat80M *zSPtr = (struct extFloat80M *)zPtr;
 
-    uiA64 = aSPtr->signExp;
-    signUI64 = uiA64 & packToExtF80UI64(1, 0);
-    exp = expExtF80UI64(uiA64);
-    sigA = aSPtr->signif;
+    uint16_t const uiA64 = aSPtr->signExp;
+    uint16_t const signUI64 = uiA64 & packToExtF80UI64(1, 0);
+    int32_t exp = expExtF80UI64(uiA64);
+    uint64_t sigA = aSPtr->signif;
 
-    if (!(sigA & UINT64_C(0x8000000000000000)) && (exp != 0x7FFF)) {
+    if (0 == (sigA & INT64_MIN) && 0x7FFF != exp) {
         if (!sigA) {
             uiZ64 = signUI64;
             sigZ = 0;
@@ -99,11 +94,11 @@ extF80M_roundToInt(
         }
         switch (roundingMode) {
         case softfloat_round_near_even:
-            if (!(sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            if (0 == (sigA & INT64_MAX)) {
                 break;
             }
         case softfloat_round_near_maxMag:
-            if (exp == 0x3FFE) {
+            if (0x3FFE == exp) {
                 goto mag1;
             }
             break;
@@ -123,17 +118,17 @@ extF80M_roundToInt(
         goto uiZ;
 mag1:
         uiZ64 = signUI64 | 0x3FFF;
-        sigZ = UINT64_C(0x8000000000000000);
+        sigZ = (uint64_t)INT64_MIN;
         goto uiZ;
     }
 
     if (0x403E <= exp) {
-        if (exp == 0x7FFF) {
-            if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+        if (INT16_MAX == exp) {
+            if (0 != (sigA & INT64_MAX)) {
                 softfloat_propagateNaNExtF80M(aSPtr, 0, zSPtr);
                 return;
             }
-            sigZ = UINT64_C(0x8000000000000000);
+            sigZ = (uint64_t)INT64_MIN;
         } else {
             sigZ = sigA;
         }
@@ -147,11 +142,11 @@ mag1:
     lastBitMask = (uint64_t)1 << (0x403E - exp);
     roundBitsMask = lastBitMask - 1;
     sigZ = sigA;
-    if (roundingMode == softfloat_round_near_maxMag) {
+    if (softfloat_round_near_maxMag == roundingMode) {
         sigZ += lastBitMask >> 1;
-    } else if (roundingMode == softfloat_round_near_even) {
+    } else if (softfloat_round_near_even == roundingMode) {
         sigZ += lastBitMask >> 1;
-        if (!(sigZ & roundBitsMask)) {
+        if (0 == (sigZ & roundBitsMask)) {
             sigZ &= ~lastBitMask;
         }
     } else if (roundingMode != softfloat_round_minMag) {
@@ -171,7 +166,6 @@ uiZ:
     zSPtr->signExp = uiZ64;
     zSPtr->signif = sigZ;
     return;
-
 }
 
 #endif

@@ -61,9 +61,7 @@ f32_to_extF80M(float32_t a, extFloat80_t *zPtr)
 
     if (exp == 0xFF) {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
-            softfloat_commonNaNToExtF80M(&commonNaN, zSPtr);
+            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f32UIToCommonNaN(uiA));
             return;
         } else {
             zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);

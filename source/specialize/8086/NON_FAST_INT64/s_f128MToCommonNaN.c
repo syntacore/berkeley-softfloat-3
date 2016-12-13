@@ -34,29 +34,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
+#include "specialize.h"
 
 #include "primitives/functions.h"
-#include "specialize.h"
 #include "softfloat/functions.h"
 
 /**
 Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,
-converts this NaN to the common NaN form, and stores the resulting common
-NaN at the location pointed to by `zPtr'.  If the NaN is a signaling NaN,
-the invalid exception is raised.  Argument `aWPtr' points to an array of
-four 32-bit elements that concatenate in the platform's normal endian order
+converts this NaN to the common NaN form, and stores.
+
+If the NaN is a signaling NaN, the invalid exception is raised.
+
+@param[in] aWPtr points to an array of four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
+
+@param[out] zPtr pointed to location for resulting common NaN
 */
-void
- softfloat_f128MToCommonNaN( const uint32_t *aWPtr, struct commonNaN *zPtr )
+struct commonNaN
+softfloat_f128MToCommonNaN(uint32_t const *aWPtr)
 {
-
-    if ( f128M_isSignalingNaN( (const float128_t *) aWPtr ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (f128M_isSignalingNaN((float128_t const *)aWPtr)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    zPtr->sign = aWPtr[indexWordHi( 4 )]>>31;
-    softfloat_shortShiftLeft128M( aWPtr, 16, (uint32_t *) &zPtr->v0 );
-
+    {
+        struct commonNaN z;
+        z.sign = aWPtr[indexWordHi(4)] >> 31;
+        softfloat_shortShiftLeft128M(aWPtr, 16, (uint32_t *)&z.v0);
+        return z;
+    }
 }
-

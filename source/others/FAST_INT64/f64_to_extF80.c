@@ -40,50 +40,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 extFloat80_t
-f64_to_extF80( float64_t a )
+f64_to_extF80(float64_t a)
 {
     struct uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uZ;
+    union
+    {
+        struct extFloat80M s; extFloat80_t f;
+    } uZ;
 
-    
+
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
     uint64_t frac = fracF64UI(uiA);
-    
-    if ( exp == 0x7FF ) {
-        if ( frac ) {
-            struct commonNaN commonNaN;
-            softfloat_f64UIToCommonNaN( uiA, &commonNaN );
-            uiZ = softfloat_commonNaNToExtF80UI( &commonNaN );
+
+    if (exp == 0x7FF) {
+        if (frac) {
+            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f64UIToCommonNaN(uiA));
             /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
-            uiZ0  = uiZ.v0;
+            uiZ0 = uiZ.v0;
         } else {
-            uiZ64 = packToExtF80UI64( sign, 0x7FFF );
-            uiZ0  = UINT64_C( 0x8000000000000000 );
+            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
+            uiZ0 = UINT64_C(0x8000000000000000);
         }
         goto uiZ;
     }
-    
-    if ( ! exp ) {
-        if ( ! frac ) {
-            uiZ64 = packToExtF80UI64( sign, 0 );
-            uiZ0  = 0;
+
+    if (!exp) {
+        if (!frac) {
+            uiZ64 = packToExtF80UI64(sign, 0);
+            uiZ0 = 0;
             goto uiZ;
         }
-        struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig( frac );
+        struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
-    
-    uiZ64 = packToExtF80UI64( sign, exp + 0x3C00 );
-    uiZ0  = (frac | UINT64_C( 0x0010000000000000 ))<<11;
- uiZ:
+
+    uiZ64 = packToExtF80UI64(sign, exp + 0x3C00);
+    uiZ0 = (frac | UINT64_C(0x0010000000000000)) << 11;
+uiZ:
     uZ.s.signExp = uiZ64;
-    uZ.s.signif  = uiZ0;
+    uZ.s.signif = uiZ0;
     return uZ.f;
 }

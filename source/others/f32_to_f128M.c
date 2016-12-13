@@ -61,9 +61,7 @@ void f32_to_f128M(float32_t a, float128_t *zPtr)
 
     if (exp == 0xFF) {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
-            softfloat_commonNaNToF128M(&commonNaN, zWPtr);
+            softfloat_commonNaNToF128M(softfloat_f32UIToCommonNaN(uiA), zWPtr);
             return;
         } else {
             zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);

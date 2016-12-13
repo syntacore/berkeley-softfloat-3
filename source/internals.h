@@ -206,7 +206,11 @@ isZero64UI(uint64_t a)
 
 #define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
 #define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
-#define packToExtF80UI64( sign, exp ) ((uint16_t) (sign)<<15 | (exp))
+static __inline uint16_t
+packToExtF80UI64(bool sign, int32_t exp) 
+{
+    return (uint16_t)!!sign << 15 | (uint16_t)exp;
+}
 
 #define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
 

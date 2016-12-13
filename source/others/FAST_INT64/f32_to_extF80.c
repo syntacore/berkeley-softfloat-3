@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extFloat80_t f32_to_extF80(float32_t a)
 {
-    struct commonNaN commonNaN;
     struct uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
@@ -61,8 +60,7 @@ extFloat80_t f32_to_extF80(float32_t a)
 
     if (exp == 0xFF) {
         if (frac) {
-            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
-            uiZ = softfloat_commonNaNToExtF80UI(&commonNaN);
+            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(uiA));
             /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
             uiZ0 = uiZ.v0;

@@ -49,9 +49,7 @@ f64_to_f16(float64_t a)
 
     if (exp == 0x7FF) {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f64UIToCommonNaN(uiA, &commonNaN);
-            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
+            return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f64UIToCommonNaN(uiA)));
         } else {
             return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }

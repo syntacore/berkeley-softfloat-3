@@ -39,10 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float16_t f32_to_f16(float32_t a)
+float16_t
+f32_to_f16(float32_t a)
 {
-    struct commonNaN commonNaN;
-
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t exp = expF32UI(uiA);
@@ -50,8 +49,7 @@ float16_t f32_to_f16(float32_t a)
 
     if (exp == 0xFF) {
         if (frac) {
-            softfloat_f32UIToCommonNaN(uiA, &commonNaN);
-            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
+            return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f32UIToCommonNaN(uiA)));
         } else {
             return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }

@@ -51,9 +51,7 @@ extF80_to_f32(extFloat80_t a)
     uint64_t const sig = uiA0;
     if (exp == INT16_MAX) {
         if (sig & INT64_MAX) {
-            struct commonNaN commonNaN;
-            softfloat_extF80UIToCommonNaN(uiA64, uiA0, &commonNaN);
-            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
+            return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
         } else {
             return signed_inf_F32(sign);
         }

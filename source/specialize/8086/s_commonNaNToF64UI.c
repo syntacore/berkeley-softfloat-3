@@ -37,11 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.h"
 
-uint64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr )
+uint64_t
+softfloat_commonNaNToF64UI(struct commonNaN a)
 {
     return
-        (uint64_t) aPtr->sign<<63 | UINT64_C( 0x7FF8000000000000 )
-            | aPtr->v64>>12;
-
+        (uint64_t)a.sign << 63 | UINT64_C(0x7FF8000000000000) | 
+        a.v64 >> 12;
 }
-

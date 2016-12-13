@@ -62,9 +62,7 @@ extF80M_to_f64(extFloat80_t const *aPtr)
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            struct commonNaN commonNaN;
-            softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
-            return u_as_f_64(softfloat_commonNaNToF64UI(&commonNaN));
+            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_extF80MToCommonNaN(*aSPtr)));
         } else {
             return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }

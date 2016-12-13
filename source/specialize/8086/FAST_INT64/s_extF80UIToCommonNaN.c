@@ -44,17 +44,18 @@ this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
-void
-softfloat_extF80UIToCommonNaN(
-    uint16_t uiA64, uint64_t uiA0, struct commonNaN *zPtr)
+struct commonNaN
+softfloat_extF80UIToCommonNaN(uint16_t uiA64, 
+                              uint64_t uiA0)
 {
-
     if (softfloat_isSigNaNExtF80UI(uiA64, uiA0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    zPtr->sign = uiA64 >> 15;
-    zPtr->v64 = uiA0 << 1;
-    zPtr->v0 = 0;
-
+    {
+        struct commonNaN z;
+        z.sign = uiA64 >> 15;
+        z.v64 = uiA0 << 1;
+        z.v0 = 0;
+        return z;
+    }
 }
-

@@ -47,17 +47,19 @@ common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
 NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
-void
- softfloat_extF80MToCommonNaN(
-     const struct extFloat80M *aSPtr, struct commonNaN *zPtr )
+struct commonNaN
+    softfloat_extF80MToCommonNaN(struct extFloat80M a)
 {
 
-    if ( extF80M_isSignalingNaN( (const extFloat80_t *) aSPtr ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    if (extF80M_isSignalingNaN(&a)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    zPtr->sign = signExtF80UI64( aSPtr->signExp );
-    zPtr->v64 = aSPtr->signif<<1;
-    zPtr->v0  = 0;
-
+    {
+        struct commonNaN z;
+        z.sign = signExtF80UI64(a.signExp);
+        z.v64 = a.signif << 1;
+        z.v0 = 0;
+        return z;
+    }
 }
 

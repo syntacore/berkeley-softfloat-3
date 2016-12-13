@@ -58,9 +58,7 @@ extF80_to_f16(extFloat80_t a)
 
     if (exp == 0x7FFF) {
         if (sig & INT64_MAX) {
-            struct commonNaN commonNaN;
-            softfloat_extF80UIToCommonNaN(uiA64, uiA0, &commonNaN);
-            return u_as_f_16(softfloat_commonNaNToF16UI(&commonNaN));
+            return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
         } else {
             return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }

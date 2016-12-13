@@ -60,9 +60,7 @@ f16_to_extF80(float16_t a)
 
     if (exp == 0x1F) {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
-            uiZ = softfloat_commonNaNToExtF80UI(&commonNaN);
+            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(uiA));
             /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
             uiZ0 = uiZ.v0;

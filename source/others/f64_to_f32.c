@@ -56,9 +56,7 @@ f64_to_f32(float64_t a)
         }
     } else {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f64UIToCommonNaN(uiA, &commonNaN);
-            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
+            return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(uiA)));
         } else {
             return signed_inf_F32(sign);
         }

@@ -51,8 +51,8 @@ INLINE uint64_t
 softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
 {
     uint8_t const shft = dist >= 63 ? 63 : dist;
-    return 
-        ((((a << (63 - shft)) >> 1) + (~UINT64_C(0) >> 1)) >> 63) | 
+    return
+        ((((a << (63 - shft)) >> 1) + (~UINT64_C(0) >> 1)) >> 63) |
         (a >> shft);
 }
 #else
@@ -647,38 +647,37 @@ This function or macro is the same as `softfloat_shortShiftLeftM' with
 #define softfloat_shortShiftLeft160M( aPtr, dist, zPtr ) softfloat_shortShiftLeftM( 5, aPtr, dist, zPtr )
 
 /**
-Shifts the N-bit unsigned integer pointed to by `aPtr' left by the number
-of bits given in `dist', where N = `size_words' * 32.  The value of `dist'
-must not be zero.  Any nonzero bits shifted off are lost.  The shifted
-N-bit result is stored at the location pointed to by `zPtr'.  Each of `aPtr'
-and `zPtr' points to a `size_words'-long array of 32-bit elements that
+Shifts the N-bit unsigned integer left by the number of bits given in `dist', where N = `size_words' * 32.
+Any nonzero bits shifted off are lost.
+Each of `aPtr' and `zPtr' points to a `size_words'-long array of 32-bit elements that
 concatenate in the platform's normal endian order to form an N-bit integer.
-The value of `dist' can be arbitrarily large.  In particular, if `dist' is
-greater than N, the stored result will be 0.
+
+@param[in] size_words size of array in 32-bit elements
+@param[in] aPtr pointer to N-bit unsigned integer
+@param[in] dist shift in bits.
+    The value of `dist' can be arbitrarily large.
+    In particular, if `dist' is greater than N, the stored result will be 0.
+    @pre The value of `dist' must not be zero.
+@param[out] zPtr pointer to store location for the shifted N-bit result.
 */
 void
-softfloat_shiftLeftM(
-    uint8_t size_words,
-    const uint32_t *aPtr,
-    uint32_t dist,
-    uint32_t *zPtr
-);
+softfloat_shiftLeftM(uint8_t size_words,
+                     uint32_t const *aPtr,
+                     uint32_t dist,
+                     uint32_t *zPtr);
 
 /**
-This function or macro is the same as `softfloat_shiftLeftM' with
-`size_words' = 3 (N = 96).
+This function or macro is the same as `softfloat_shiftLeftM' with `size_words' = 3 (N = 96).
 */
 #define softfloat_shiftLeft96M( aPtr, dist, zPtr ) softfloat_shiftLeftM( 3, aPtr, dist, zPtr )
 
 /**
-This function or macro is the same as `softfloat_shiftLeftM' with
-`size_words' = 4 (N = 128).
+This function or macro is the same as `softfloat_shiftLeftM' with `size_words' = 4 (N = 128).
 */
 #define softfloat_shiftLeft128M( aPtr, dist, zPtr ) softfloat_shiftLeftM( 4, aPtr, dist, zPtr )
 
 /**
-This function or macro is the same as `softfloat_shiftLeftM' with
-`size_words' = 5 (N = 160).
+This function or macro is the same as `softfloat_shiftLeftM' with `size_words' = 5 (N = 160).
 */
 #define softfloat_shiftLeft160M( aPtr, dist, zPtr ) softfloat_shiftLeftM( 5, aPtr, dist, zPtr )
 
@@ -769,12 +768,10 @@ is greater than N, the stored result will be either 0 or 1, depending on
 whether the original N bits are all zeros.
 */
 void
-softfloat_shiftRightJamM(
-    uint8_t size_words,
-    const uint32_t *aPtr,
-    uint32_t dist,
-    uint32_t *zPtr
-);
+softfloat_shiftRightJamM(uint8_t size_words,
+                         uint32_t const *aPtr,
+                         uint32_t dist,
+                         uint32_t *zPtr);
 
 /**
 This function or macro is the same as `softfloat_shiftRightJamM' with

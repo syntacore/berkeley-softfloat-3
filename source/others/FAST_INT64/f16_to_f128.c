@@ -50,9 +50,7 @@ f16_to_f128(float16_t a)
     struct uint128 uiZ;
     if (exp == 0x1F) {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
-            uiZ = softfloat_commonNaNToF128UI(&commonNaN);
+            uiZ = softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA));
         } else {
             uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
             uiZ.v0 = 0;

@@ -39,15 +39,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "specialize.h"
 
-float128_t extF80_to_f128( extFloat80_t a )
+float128_t extF80_to_f128(extFloat80_t a)
 {
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
+    union
+    {
+        struct extFloat80M s; extFloat80_t f;
+    } uA;
     uint16_t uiA64;
     uint64_t uiA0;
     uint16_t exp;
     uint64_t frac;
-    struct commonNaN commonNaN;
     struct uint128 uiZ;
     bool sign;
     struct uint128 frac128;
@@ -55,17 +57,16 @@ float128_t extF80_to_f128( extFloat80_t a )
 
     uA.f = a;
     uiA64 = uA.s.signExp;
-    uiA0  = uA.s.signif;
-    exp = expExtF80UI64( uiA64 );
-    frac = uiA0 & UINT64_C( 0x7FFFFFFFFFFFFFFF );
-    if ( (exp == 0x7FFF) && frac ) {
-        softfloat_extF80UIToCommonNaN( uiA64, uiA0, &commonNaN );
-        uiZ = softfloat_commonNaNToF128UI( &commonNaN );
+    uiA0 = uA.s.signif;
+    exp = expExtF80UI64(uiA64);
+    frac = uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF);
+    if ((exp == 0x7FFF) && frac) {
+        uiZ = softfloat_commonNaNToF128UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0));
     } else {
-        sign = signExtF80UI64( uiA64 );
-        frac128 = softfloat_shortShiftLeft128( 0, frac, 49 );
-        uiZ.v64 = packToF128UI64( sign, exp, frac128.v64 );
-        uiZ.v0  = frac128.v0;
+        sign = signExtF80UI64(uiA64);
+        frac128 = softfloat_shortShiftLeft128(0, frac, 49);
+        uiZ.v64 = packToF128UI64(sign, exp, frac128.v64);
+        uiZ.v0 = frac128.v0;
     }
     uZ.ui = uiZ;
     return uZ.f;

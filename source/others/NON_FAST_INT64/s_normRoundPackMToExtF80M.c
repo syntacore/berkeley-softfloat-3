@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 
 /**
+@param[in] sign
+@param[in] exp
+@param[in] extSigPtr
+@param[in] roundingPrecision
 @param[out] zSPtr
 @bug use extFloat80_t
 */

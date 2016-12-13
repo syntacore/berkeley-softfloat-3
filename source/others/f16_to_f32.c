@@ -49,9 +49,7 @@ f16_to_f32(float16_t a)
 
     if (exp == 0x1F) {
         if (frac) {
-            struct commonNaN commonNaN;
-            softfloat_f16UIToCommonNaN(uiA, &commonNaN);
-            return u_as_f_32(softfloat_commonNaNToF32UI(&commonNaN));
+            return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f16UIToCommonNaN(uiA)));
         } else {
             return signed_inf_F32(sign);
         }

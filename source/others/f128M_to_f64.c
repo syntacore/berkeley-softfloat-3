@@ -62,9 +62,7 @@ f128M_to_f64(const float128_t *aPtr)
 
     if (exp == 0x7FFF) {
         if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
-            struct commonNaN commonNaN;
-            softfloat_f128MToCommonNaN(aWPtr, &commonNaN);
-            return u_as_f_64(softfloat_commonNaNToF64UI(&commonNaN));
+            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f128MToCommonNaN(aWPtr)));
         } else {
             return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }

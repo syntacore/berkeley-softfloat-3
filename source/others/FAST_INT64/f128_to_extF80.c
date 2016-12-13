@@ -46,7 +46,6 @@ extFloat80_t f128_to_extF80( float128_t a )
     bool sign;
     int32_t exp;
     uint64_t frac64, frac0;
-    struct commonNaN commonNaN;
     struct uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
@@ -66,8 +65,7 @@ extFloat80_t f128_to_extF80( float128_t a )
     
     if ( exp == 0x7FFF ) {
         if ( frac64 | frac0 ) {
-            softfloat_f128UIToCommonNaN( uiA64, uiA0, &commonNaN );
-            uiZ = softfloat_commonNaNToExtF80UI( &commonNaN );
+            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f128UIToCommonNaN(uiA64, uiA0));
             /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
             uiZ64 = uiZ.v64;
             uiZ0  = uiZ.v0;

@@ -83,7 +83,8 @@ extF80M_rem(
             return;
         }
         if (expA == 0x7FFF) {
-            goto invalid;
+            softfloat_invalidExtF80M(zSPtr);
+            return;
         }
         /*
         If we get here, then argument b is an infinity and `expB' is 0x7FFF;
@@ -100,7 +101,8 @@ extF80M_rem(
     x64 = bSPtr->signif;
     if (!(x64 & UINT64_C(0x8000000000000000))) {
         if (!x64) {
-            goto invalid;
+            softfloat_invalidExtF80M(zSPtr);
+            return;
         }
         expB += softfloat_normExtF80SigM(&x64);
     }
@@ -188,10 +190,6 @@ selectRem:
         softfloat_negX96M(remPtr);
     }
     softfloat_normRoundPackMToExtF80M(signRem, expB + 2, remPtr, 80, zSPtr);
-    return;
-
-invalid:
-    softfloat_invalidExtF80M(zSPtr);
     return;
 
 copyA:

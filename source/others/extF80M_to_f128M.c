@@ -60,7 +60,6 @@ void extF80M_to_f128M(const extFloat80_t *aPtr, float128_t *zPtr)
     bool sign;
     int32_t exp;
     uint64_t sig;
-    struct commonNaN commonNaN;
     uint32_t uiZ96;
 
     
@@ -76,8 +75,7 @@ void extF80M_to_f128M(const extFloat80_t *aPtr, float128_t *zPtr)
     zWPtr[indexWord(4, 0)] = 0;
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            softfloat_extF80MToCommonNaN(aSPtr, &commonNaN);
-            softfloat_commonNaNToF128M(&commonNaN, zWPtr);
+            softfloat_commonNaNToF128M(softfloat_extF80MToCommonNaN(*aSPtr), zWPtr);
             return;
         }
         uiZ96 = packToF128UI96(sign, 0x7FFF, 0);

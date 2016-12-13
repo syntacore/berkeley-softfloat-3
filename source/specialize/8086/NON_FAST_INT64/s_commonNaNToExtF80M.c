@@ -34,10 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
+#include "specialize.h"
 
 #include "internals.h"
-#include "specialize.h"
 
 /**
 Converts the common NaN pointed to by `aPtr' into an 80-bit extended
@@ -45,12 +44,10 @@ floating-point NaN, and stores this NaN at the location pointed to by
 `zSPtr'.
 */
 /** @bug use extFloat80_t */
-void
-softfloat_commonNaNToExtF80M(const struct commonNaN *aPtr, struct extFloat80M *zSPtr)
+struct extFloat80M
+softfloat_commonNaNToExtF80M(struct commonNaN a)
 {
-
-    zSPtr->signExp = packToExtF80UI64(aPtr->sign, 0x7FFF);
-    zSPtr->signif = UINT64_C(0xC000000000000000) | aPtr->v64 >> 1;
-
+    struct extFloat80M z;
+    z.signExp = packToExtF80UI64(a.sign, 0x7FFF);
+    z.signif = UINT64_C(0xC000000000000000) | a.v64 >> 1;
 }
-

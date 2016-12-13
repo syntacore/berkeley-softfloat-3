@@ -34,16 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
-#include "primitives/functions.h"
 #include "specialize.h"
 
+#include "primitives/functions.h"
+
 void
-softfloat_commonNaNToF128M(const struct commonNaN *aPtr, uint32_t *zWPtr)
+softfloat_commonNaNToF128M(struct commonNaN a, uint32_t *zWPtr)
 {
-    softfloat_shortShiftRight128M((const uint32_t *)&aPtr->v0, 16, zWPtr);
-    zWPtr[indexWordHi(4)] |= (uint32_t)aPtr->sign << 31 | 0x7FFF8000;
-
+    softfloat_shortShiftRight128M((const uint32_t *)&a.v0, 16, zWPtr);
+    zWPtr[indexWordHi(4)] |= (uint32_t)a.sign << 31 | 0x7FFF8000;
 }
-
