@@ -48,7 +48,7 @@ f64_to_ui32(float64_t a, uint8_t roundingMode, bool exact)
     uint64_t sig = fracF64UI(uiA);
 
 #if (ui32_fromNaN != ui32_fromPosOverflow) || (ui32_fromNaN != ui32_fromNegOverflow)
-    if ((exp == 0x7FF) && sig) {
+    if (0x7FF == exp && sig) {
 #if (ui32_fromNaN == ui32_fromPosOverflow)
         sign = 0;
 #elif (ui32_fromNaN == ui32_fromNegOverflow)
