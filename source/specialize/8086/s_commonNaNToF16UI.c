@@ -41,8 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Converts the common NaN into a 16-bit floating-point NaN, 
 
 @returns the bit pattern of this value as an unsigned integer.
-
-@param[in] aPtr pointer to common NaN
 */
 uint16_t
 softfloat_commonNaNToF16UI(struct commonNaN a)

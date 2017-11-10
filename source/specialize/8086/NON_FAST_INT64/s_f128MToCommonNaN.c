@@ -47,8 +47,6 @@ If the NaN is a signaling NaN, the invalid exception is raised.
 
 @param[in] aWPtr points to an array of four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
-
-@param[out] zPtr pointed to location for resulting common NaN
 */
 struct commonNaN
 softfloat_f128MToCommonNaN(uint32_t const *aWPtr)
