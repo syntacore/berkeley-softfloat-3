@@ -112,7 +112,7 @@ softfloat_f16UIToCommonNaN(uint16_t uiA)
     }
     {
         /** @todo initialize */
-        struct commonNaN z;
+		struct commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -151,7 +151,7 @@ softfloat_f32UIToCommonNaN(uint32_t uiA)
     }
     {
         /** @todo initialize */
-        struct commonNaN z;
+        struct commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -193,7 +193,7 @@ softfloat_f64UIToCommonNaN(uint64_t uiA)
     }
     {
         /** @todo initialize*/
-        struct commonNaN z;
+        struct commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -265,7 +265,7 @@ softfloat_extF80UIToCommonNaN(uint64_t uiA64,
     }
     {
         /** @todo initialize */
-        struct commonNaN z;
+        struct commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -300,7 +300,7 @@ softfloat_f128UIToCommonNaN(uint64_t uiA64, uint64_t uiA0)
     }
     {
         /** @todo initialize */
-        struct commonNaN z;
+        struct commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -408,7 +408,7 @@ softfloat_extF80MToCommonNaN(extFloat80_t a)
     }
     {
         /** @todo initialize*/
-        struct commonNaN z;
+        struct commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -429,7 +429,7 @@ static __inline struct commonNaN
     }
     {
         /** @todo initialize */
-        struct commonNaN z;
+        struct commonNaN z = {0,0,0};
         return z;
     }
 }
