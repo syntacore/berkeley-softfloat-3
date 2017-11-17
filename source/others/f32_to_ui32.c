@@ -56,7 +56,7 @@ f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
     }
     if (isInf32UI(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return sig ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+        return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 
     if (0 != exp) {
