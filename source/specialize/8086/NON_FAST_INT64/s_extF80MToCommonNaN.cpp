@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
 #include "internals.hpp"
 #include "specialize.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 /**
 Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is

@@ -34,12 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "internals.hpp"
 #include "specialize.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-

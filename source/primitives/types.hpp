@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PRIMITIVETYPES_H_
 #define PRIMITIVETYPES_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #ifdef SOFTFLOAT_FAST_INT64
 

@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 #include "specialize.hpp"
-#include <assert.h>
+
+#include <cassert>
 
 extFloat80_t
 extF80_rem(extFloat80_t a, extFloat80_t b)

@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 #include "softfloat/types.h"
-#include <assert.h>
+
+#include <cassert>
 
 #define signF16UI( a ) ((bool) ((uint16_t) (a)>>15))
 #define expF16UI( a ) ((int8_t) ((a)>>10) & 0x1F)

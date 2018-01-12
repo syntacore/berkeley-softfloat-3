@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PRIMITIVES_H_
 
 #include "primitives/types.hpp"
-#include <stdbool.h>
 
 /**
 Shifts `a' right by the number of bits given in `dist', which must be in

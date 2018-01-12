@@ -34,12 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "internals.hpp"
 #include "specialize.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 /**
 Assuming at least one of the two 128-bit floating-point values pointed to by
@@ -71,6 +70,4 @@ void
     zWPtr[indexWord( 4, 2 )] = ptr[indexWord( 4, 2 )];
     zWPtr[indexWord( 4, 1 )] = ptr[indexWord( 4, 1 )];
     zWPtr[indexWord( 4, 0 )] = ptr[indexWord( 4, 0 )];
-
 }
-

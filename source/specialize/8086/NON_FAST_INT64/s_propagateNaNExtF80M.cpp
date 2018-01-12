@@ -34,12 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "internals.hpp"
 #include "specialize.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values

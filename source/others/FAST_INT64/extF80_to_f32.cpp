@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 float32_t
 extF80_to_f32(extFloat80_t a)

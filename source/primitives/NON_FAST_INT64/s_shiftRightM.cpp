@@ -34,13 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
+#include "primitives/functions.hpp"
+#include <cstdint>
 
 #ifndef softfloat_shiftRightM
-
 #define softfloat_shiftRightM softfloat_shiftRightM
-#include "primitives/functions.hpp"
 
 void
  softfloat_shiftRightM(

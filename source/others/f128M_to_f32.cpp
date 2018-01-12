@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 #include "specialize.hpp"
-#include <assert.h>
+
+#include <cassert>
 
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64

@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 void
 softfloat_shiftRightJamM(

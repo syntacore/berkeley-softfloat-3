@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
-#include "primitives/types.hpp"
 #include "specialize.hpp"
+#include "primitives/types.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 void
 softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr)

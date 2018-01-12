@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
 #include "primitives/types.hpp"
 #include "specialize.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values
@@ -70,6 +70,4 @@ void
     }
     zSPtr->signExp = defaultNaNExtF80UI64;
     zSPtr->signif  = defaultNaNExtF80UI0;
-
 }
-

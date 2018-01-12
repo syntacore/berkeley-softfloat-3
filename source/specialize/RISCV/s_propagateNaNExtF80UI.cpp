@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
 #include "primitives/types.hpp"
 #include "specialize.hpp"
 #include "softfloat/functions.h"
+
+#include <cstdint>
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
@@ -68,6 +68,4 @@ struct uint128
     uiZ.v64 = defaultNaNExtF80UI64;
     uiZ.v0  = defaultNaNExtF80UI0;
     return uiZ;
-
 }
-

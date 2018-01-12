@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SPECIALIZE_H_
 
 #include "softfloat/types.h"
-#include <stdbool.h>
 
 /**
 Default value for `softfloat_detectTininess'.

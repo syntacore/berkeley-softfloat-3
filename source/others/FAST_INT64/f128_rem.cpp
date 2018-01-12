@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 #include "specialize.hpp"
-#include <assert.h>
+
+#include <cassert>
 
 float128_t
 f128_rem( float128_t a, float128_t b )

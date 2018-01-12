@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 #include "softfloat/functions.h"
-#include <assert.h>
+
+#include <cassert>
 
 /**
 @param[in] sign sign bit

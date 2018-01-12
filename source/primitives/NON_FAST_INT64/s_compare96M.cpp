@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdint.h>
-
 #include "primitives/types.hpp"
+
+#include <cstdint>
 
 #ifndef softfloat_compare96M
 

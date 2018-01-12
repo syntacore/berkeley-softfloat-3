@@ -34,11 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "internals.hpp"
 #include "specialize.hpp"
+
+#include <cstdint>
 
 bool
  softfloat_tryPropagateNaNF128M(
