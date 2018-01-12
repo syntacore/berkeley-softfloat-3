@@ -50,4 +50,5 @@ softfloat_commonNaNToExtF80M(struct commonNaN a)
     struct extFloat80M z;
     z.signExp = packToExtF80UI64(a.sign, 0x7FFF);
     z.signif = UINT64_C(0xC000000000000000) | a.v64 >> 1;
+    return z;
 }
