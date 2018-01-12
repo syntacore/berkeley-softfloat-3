@@ -5,19 +5,19 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DLITTLEENDIAN)
 add_definitions(-DSOFTFLOAT_FAST_DIV32TO16)
 
-set(INC_SPECIALIZE ${CMAKE_CURRENT_SOURCE_DIR}/specialize.h)
+set(INC_SPECIALIZE ${CMAKE_CURRENT_SOURCE_DIR}/specialize.hpp)
 set(SRC_SPECIALIZE_RISCV
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF16UI.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF32UI.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF64UI.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF16UI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF32UI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF64UI.cpp
 )
 set(SRC_SPECIALIZE_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80UI.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128UI.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80UI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128UI.cpp
 )
 set(SRC_SPECIALIZE_NON_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80M.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128M.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80M.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128M.cpp
 )
 source_group(include
 FILES
@@ -89,7 +89,6 @@ add_library(softfloat-RISCV-fi64 EXCLUDE_FROM_ALL
     ${SRC_SPECIALIZE_FAST_INT64}
     ${SRC_SPECIALIZE_RISCV}
 )
-set_property(TARGET softfloat-RISCV-fi64 PROPERTY C_STANDARD 99)
 set_target_properties(softfloat-RISCV-fi64 PROPERTIES FOLDER "softfloat/RISCV")
 
 add_library(softfloat-RISCV-nfi64 EXCLUDE_FROM_ALL
@@ -105,7 +104,6 @@ add_library(softfloat-RISCV-nfi64 EXCLUDE_FROM_ALL
     ${SRC_SPECIALIZE_NON_FAST_INT64}
     ${SRC_SPECIALIZE_RISCV}
 )
-set_property(TARGET softfloat-RISCV-nfi64 PROPERTY C_STANDARD 99)
 set_target_properties(softfloat-RISCV-nfi64 PROPERTIES FOLDER "softfloat/RISCV")
 
 target_compile_definitions(softfloat-RISCV-fi64 PRIVATE SOFTFLOAT_FAST_INT64)

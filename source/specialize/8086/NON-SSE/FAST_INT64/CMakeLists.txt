@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(SRC_SPECIALIZE_FAST_INT64
     ${SRC_SPECIALIZE-8086_FAST_INT64}
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128UI.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128UI.cpp
 )
 
 source_group(include
@@ -63,7 +63,6 @@ add_library(softfloat-8086-fi64 EXCLUDE_FROM_ALL
     ${INC_SPECIALIZE}
     ${SRC_SPECIALIZE_FAST_INT64}
 )
-set_property(TARGET softfloat-8086-fi64 PROPERTY C_STANDARD 99)
 set_target_properties(softfloat-8086-fi64  PROPERTIES FOLDER "softfloat/8086"   )
 
 target_compile_definitions(softfloat-8086-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
