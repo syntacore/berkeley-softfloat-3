@@ -25,7 +25,7 @@ add_definitions(-DINLINE_LEVEL=${SOFTFLOAT_INLINE_LEVEL})
 
 add_compile_options(-Wall)
 if(MSVC) 
-    add_compile_options(/wd4820)
+    add_compile_options(/wd4820 /wd4514)
 endif()
 
 add_subdirectory(source)
