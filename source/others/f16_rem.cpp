@@ -140,7 +140,7 @@ f16_rem(float16_t a, float16_t b)
             rem -= sigB;
         } while (!(rem & 0x8000));
         uint16_t const meanRem = rem + altRem;
-        if ((meanRem & 0x8000) || (!meanRem && (q & 1))) {
+        if (0 != (meanRem & 0x8000) || (!meanRem && 0 != (q & 1))) {
             rem = altRem;
         }
         bool signRem = signA;

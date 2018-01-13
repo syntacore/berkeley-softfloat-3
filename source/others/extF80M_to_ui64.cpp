@@ -65,18 +65,18 @@ extF80M_to_ui64(
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == INT16_MAX && (sig & INT64_MAX) ? ui64_fromNaN : 
+            exp == INT16_MAX && (sig & INT64_MAX) ? ui64_fromNaN :
             sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-    } else {
-        uint32_t extSig[3];
-        extSig[indexWord(3, 2)] = sig >> 32;
-        extSig[indexWord(3, 1)] = (uint32_t)sig;
-        extSig[indexWord(3, 0)] = 0;
-        if (shiftDist) {
-            softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
-        }
-        return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
     }
+
+    uint32_t extSig[3];
+    extSig[indexWord(3, 2)] = sig >> 32;
+    extSig[indexWord(3, 1)] = (uint32_t)sig;
+    extSig[indexWord(3, 0)] = 0;
+    if (shiftDist) {
+        softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
+    }
+    return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
 }
 
 #endif

@@ -43,165 +43,181 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
- f128M_roundToInt(
-     const float128_t *aPtr,
-     uint8_t roundingMode,
-     bool exact,
-     float128_t *zPtr
- )
+f128M_roundToInt(float128_t const * aPtr,
+                 uint8_t roundingMode,
+                 bool exact,
+                 float128_t* zPtr)
 {
-
-    *zPtr = f128_roundToInt( *aPtr, roundingMode, exact );
-
+    *zPtr = f128_roundToInt(*aPtr, roundingMode, exact);
 }
 
 #else
 
 void
- f128M_roundToInt(
-     const float128_t *aPtr,
-     uint8_t roundingMode,
-     bool exact,
-     float128_t *zPtr
- )
+f128M_roundToInt(float128_t const *aPtr,
+                 uint8_t roundingMode,
+                 bool exact,
+                 float128_t* zPtr)
 {
-    const uint32_t *aWPtr;
-    uint32_t *zWPtr;
-    uint32_t ui96;
-    int32_t exp;
     uint32_t sigExtra;
     bool sign;
-    uint8_t bitPos;
-    bool roundNear;
     unsigned int index, lastIndex;
     bool extra;
-    uint32_t wordA, bit, wordZ;
-    uint8_t carry;
+    uint32_t wordA, wordZ;
     uint32_t extrasMask;
 
-    
-    aWPtr = (const uint32_t *) aPtr;
-    zWPtr = (uint32_t *) zPtr;
-    
-    ui96 = aWPtr[indexWordHi( 4 )];
-    exp = expF128UI96( ui96 );
-    
-    if ( exp < 0x3FFF ) {
-        zWPtr[indexWord( 4, 2 )] = 0;
-        zWPtr[indexWord( 4, 1 )] = 0;
-        zWPtr[indexWord( 4, 0 )] = 0;
-        sigExtra = aWPtr[indexWord( 4, 2 )];
-        if ( ! sigExtra ) {
-            sigExtra = aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )];
+
+    uint32_t const * const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+
+    uint32_t const ui96 = aWPtr[indexWordHi(4)];
+    auto const exp= expF128UI96(ui96);
+
+    if (exp < 0x3FFF) {
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        sigExtra = aWPtr[indexWord(4, 2)];
+
+        if (!sigExtra) {
+            sigExtra = aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)];
         }
-        if ( ! sigExtra && ! (ui96 & 0x7FFFFFFF) ) goto ui96;
-        if ( exact ) softfloat_raiseFlags(softfloat_flag_inexact);
-        sign = signF128UI96( ui96 );
-        switch ( roundingMode ) {
-         case softfloat_round_near_even:
-            if ( ! fracF128UI96( ui96 ) && ! sigExtra ) break;
-         case softfloat_round_near_maxMag:
-            if ( exp == 0x3FFE ) goto mag1;
-            break;
-         case softfloat_round_min:
-            if ( sign ) goto mag1;
-            break;
-         case softfloat_round_max:
-            if ( ! sign ) goto mag1;
-            break;
-        }
-        ui96 = packToF128UI96( sign, 0, 0 );
-        goto ui96;
-     mag1:
-        ui96 = packToF128UI96( sign, 0x3FFF, 0 );
-        goto ui96;
-    }
-    
-    if ( 0x406F <= exp ) {
-        if (
-            (exp == 0x7FFF)
-                && (fracF128UI96( ui96 )
-                        || (aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )]
-                                | aWPtr[indexWord( 4, 0 )]))
-        ) {
-            softfloat_propagateNaNF128M( aWPtr, 0, zWPtr );
+
+        if (!sigExtra && !(ui96 & 0x7FFFFFFF)) {
+            zWPtr[indexWordHi(4)] = ui96;
             return;
         }
-        zWPtr[indexWord( 4, 2 )] = aWPtr[indexWord( 4, 2 )];
-        zWPtr[indexWord( 4, 1 )] = aWPtr[indexWord( 4, 1 )];
-        zWPtr[indexWord( 4, 0 )] = aWPtr[indexWord( 4, 0 )];
-        goto ui96;
+
+        if (exact) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
+
+        sign = signF128UI96(ui96);
+
+        switch (roundingMode) {
+        case softfloat_round_near_even:
+            if (!fracF128UI96(ui96) && !sigExtra) {
+                break;
+            }
+
+        case softfloat_round_near_maxMag:
+            if (exp == 0x3FFE) {
+                zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x3FFF, 0);
+                return;
+            }
+
+            break;
+
+        case softfloat_round_min:
+            if (sign) {
+                zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x3FFF, 0);
+                return;
+            }
+
+            break;
+
+        case softfloat_round_max:
+            if (!sign) {
+                zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x3FFF, 0);
+                return;
+            }
+
+            break;
+        }
+
+        zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0, 0);
+        return;
     }
-    
-    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
-    bitPos = 0x406F - exp;
-    roundNear =
-           (roundingMode == softfloat_round_near_maxMag)
-        || (roundingMode == softfloat_round_near_even);
-    bitPos -= roundNear;
-    index = indexWordLo( 4 );
-    lastIndex = indexWordHi( 4 );
+
+    if (0x406F <= exp) {
+        if (0x7FFF == exp  && (fracF128UI96(ui96) || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]))) {
+            softfloat_propagateNaNF128M(aWPtr, 0, zWPtr);
+            return;
+        }
+
+        zWPtr[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
+        zWPtr[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
+        zWPtr[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
+        zWPtr[indexWordHi(4)] = ui96;
+        return;
+    }
+
+    /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
+    bool const roundNear =
+        softfloat_round_near_maxMag == roundingMode ||
+        softfloat_round_near_even == roundingMode;
+    auto bitPos = 0x406F - exp - !!roundNear;
+    index = indexWordLo(4);
+    lastIndex = indexWordHi(4);
     extra = 0;
+
     for (;;) {
         wordA = aWPtr[index];
-        if ( bitPos < 32 ) break;
-        if ( wordA ) extra = 1;
+
+        if (bitPos < 32) {
+            break;
+        }
+
+        if (wordA) {
+            extra = 1;
+        }
+
         zWPtr[index] = 0;
         index += wordIncr;
         bitPos -= 32;
     }
-    bit = (uint32_t) 1<<bitPos;
-    if ( roundNear ) {
+
+    uint32_t bit = UINT32_C(1) << bitPos;
+
+    bool carry;
+
+    if (roundNear) {
         wordZ = wordA + bit;
-        carry = (wordZ < wordA);
+        carry = wordZ < wordA;
         bit <<= 1;
         extrasMask = bit - 1;
-        if (
-            (roundingMode == softfloat_round_near_even)
-                && ! extra && ! (wordZ & extrasMask)
-        ) {
-            if ( ! bit ) {
+
+        if (softfloat_round_near_even == roundingMode &&
+                !extra &&
+                0 == (wordZ & extrasMask)) {
+            if (!bit) {
                 zWPtr[index] = wordZ;
                 index += wordIncr;
-                wordZ = aWPtr[index] + carry;
-                carry &= ! wordZ;
+                wordZ = aWPtr[index] + !!carry;
+                carry = carry && !wordZ;
                 zWPtr[index] = wordZ & ~1;
                 goto propagateCarry;
             }
+
             wordZ &= ~bit;
         }
     } else {
         extrasMask = bit - 1;
         wordZ = wordA;
-        carry = 0;
-        if (
-               (roundingMode != softfloat_round_minMag)
-            && (signF128UI96( ui96 ) ^ (roundingMode == softfloat_round_max))
-        ) {
-            if ( extra || (wordA & extrasMask) ) {
+        carry = false;
+
+        if (softfloat_round_minMag != roundingMode && (signF128UI96(ui96) ^ (roundingMode == softfloat_round_max))) {
+            if (extra || (wordA & extrasMask)) {
                 wordZ += bit;
-                carry = (wordZ < wordA);
+                carry = wordZ < wordA;
             }
         }
     }
+
     wordZ &= ~extrasMask;
     zWPtr[index] = wordZ;
- propagateCarry:
-    while ( index != lastIndex ) {
+
+propagateCarry:
+    while (index != lastIndex) {
         index += wordIncr;
-        wordZ = aWPtr[index] + carry;
+        wordZ = aWPtr[index] + !!carry;
         zWPtr[index] = wordZ;
-        carry &= ! wordZ;
+        carry = carry && !wordZ;
     }
-    
-    if ( exact && (softfloat_compare128M( aWPtr, zWPtr ) != 0) ) {
+
+    if (exact && (softfloat_compare128M(aWPtr, zWPtr) != 0)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    return;
-    
- ui96:
-    zWPtr[indexWordHi( 4 )] = ui96;
-
 }
 
 #endif

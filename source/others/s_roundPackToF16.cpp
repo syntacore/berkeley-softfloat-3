@@ -41,37 +41,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 softfloat_roundPackToF16(bool sign, int16_t exp, uint16_t sig)
 {
-    uint8_t roundBits;
-
     uint8_t const roundingMode = softfloat_roundingMode;
     bool const roundNearEven = roundingMode == softfloat_round_near_even;
     uint8_t roundIncrement = 0x8;
+
     if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
         roundIncrement =
             roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0xF : 0;
     }
-    roundBits = sig & 0xF;
+
+    uint8_t roundBits = sig & 0xF;
+
     if (0x1D <= (unsigned int)exp) {
         if (exp < 0) {
             bool const isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||
                 exp < -1 ||
                 sig + roundIncrement < 0x8000;
-            /** @todo  Warning	C4242	'=': conversion from 'uint32_t' to 'uint16_t', possible loss of data */
+            /** @todo  Warning  C4242   '=': conversion from 'uint32_t' to 'uint16_t', possible loss of data */
             sig = softfloat_shiftRightJam32(sig, -exp);
             exp = 0;
             roundBits = sig & 0xF;
+
             if (isTiny && roundBits) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
-        } else if ((0x1D < exp) || (0x8000 <= sig + roundIncrement)) {
+        } else if (0x1D < exp || 0x8000 <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
             return u_as_f_16(packToF16UI(sign, 0x1F, 0) - !roundIncrement);
         }
     }
+
     if (roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     sig = (sig + roundIncrement) >> 4;
     sig &= ~(uint16_t)(!(roundBits ^ 8) & roundNearEven);
     return u_as_f_16(packToF16UI(sign, sig ? exp : 0, sig));

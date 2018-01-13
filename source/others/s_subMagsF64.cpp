@@ -48,60 +48,67 @@ softfloat_subMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
     uint64_t const sigB = fracF64UI(uiB);
 
     int16_t const expDiff = expA - expB;
+
     if (0 == expDiff) {
         if (expA == 0x7FF) {
             if (0 != sigA || 0 != sigB) {
                 return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_64(defaultNaNF64UI);
             }
+
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_64(defaultNaNF64UI);
         }
-        int64_t sigDiff = sigA - sigB;
+
+        int64_t sigDiff = static_cast<int64_t>(sigA - sigB);
+
         if (0 == sigDiff) {
             return u_as_f_64(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
-        } else {
-            if (0 != expA) {
-                --expA;
-            }
-            if (sigDiff < 0) {
-                signZ = !signZ;
-                sigDiff = -sigDiff;
-            }
-            int8_t const shiftDist = softfloat_countLeadingZeros64(sigDiff) - 11;
-            int16_t const expZ = expA - shiftDist;
-            return
-                u_as_f_64(expZ < 0 ?
-                          packToF64UI(signZ, 0, sigDiff << expA) :
-                          packToF64UI(signZ, expZ, sigDiff << shiftDist));
         }
-    } else {
-        uint64_t sigA_shifted = sigA << 10;
-        uint64_t sigB_shifted = sigB << 10;
-        if (expDiff < 0) {
+
+        if (0 != expA) {
+            --expA;
+        }
+
+        if (sigDiff < 0) {
             signZ = !signZ;
-            if (0x7FF == expB) {
-                return
-                    u_as_f_64(0 != sigB_shifted ?
-                              softfloat_propagateNaNF64UI(uiA, uiB) :
-                              packToF64UI(signZ, 0x7FF, 0));
-            } else {
-                return
-                    softfloat_normRoundPackToF64(signZ,
-                                                 expB - 1,
-                                                 (sigB_shifted | UINT64_C(0x4000000000000000)) -
-                                                 softfloat_shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted), -expDiff));
-            }
-        } else {
-            if (0x7FF == expA) {
-                return u_as_f_64(0 == sigA_shifted ? uiA : softfloat_propagateNaNF64UI(uiA, uiB));
-            } else {
-                return
-                    softfloat_normRoundPackToF64(signZ,
-                                                 expA - 1,
-                                                 (sigA_shifted | UINT64_C(0x4000000000000000)) -
-                                                 softfloat_shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), expDiff));
-            }
+            sigDiff = -sigDiff;
         }
+
+        int8_t const shiftDist = softfloat_countLeadingZeros64(static_cast<uint64_t>(sigDiff)) - 11;
+        int16_t const expZ = expA - shiftDist;
+        return
+            u_as_f_64(expZ < 0 ?
+                      packToF64UI(signZ, 0, static_cast<uint64_t>(sigDiff << expA)) :
+                      packToF64UI(signZ, expZ, static_cast<uint64_t>(sigDiff << shiftDist)));
     }
+
+    uint64_t const sigA_shifted = sigA << 10;
+    uint64_t const sigB_shifted = sigB << 10;
+
+    if (expDiff < 0) {
+        signZ = !signZ;
+
+        if (0x7FF == expB) {
+            return
+                u_as_f_64(0 != sigB_shifted ?
+                          softfloat_propagateNaNF64UI(uiA, uiB) :
+                          packToF64UI(signZ, 0x7FF, 0));
+        }
+
+        return
+            softfloat_normRoundPackToF64(signZ,
+                                         expB - 1,
+                                         (sigB_shifted | UINT64_C(0x4000000000000000)) -
+                                         softfloat_shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted), -expDiff));
+    }
+
+    if (0x7FF == expA) {
+        return u_as_f_64(0 == sigA_shifted ? uiA : softfloat_propagateNaNF64UI(uiA, uiB));
+    }
+
+    return
+        softfloat_normRoundPackToF64(signZ,
+                                     expA - 1,
+                                     (sigA_shifted | UINT64_C(0x4000000000000000)) -
+                                     softfloat_shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), expDiff));
 }

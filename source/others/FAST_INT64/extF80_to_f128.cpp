@@ -41,26 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float128_t extF80_to_f128(extFloat80_t a)
 {
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s; extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    uint16_t exp;
-    uint64_t frac;
-    struct uint128 uiZ;
+    uint128 uiZ;
     bool sign;
     struct uint128 frac128;
-    union ui128_f128 uZ;
+    ui128_f128 uZ;
 
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0 = uA.s.signif;
-    exp = expExtF80UI64(uiA64);
-    frac = uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF);
-    if ((exp == 0x7FFF) && frac) {
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 = a.signif;
+    uint16_t const exp = expExtF80UI64(uiA64);
+    uint64_t const frac = uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF);
+    if (0x7FFF == exp  && 0 != frac) {
         uiZ = softfloat_commonNaNToF128UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0));
     } else {
         sign = signExtF80UI64(uiA64);
@@ -70,6 +60,4 @@ float128_t extF80_to_f128(extFloat80_t a)
     }
     uZ.ui = uiZ;
     return uZ.f;
-
 }
-

@@ -47,7 +47,7 @@ void i32_to_extF80M(int32_t a, extFloat80_t *zPtr)
     if (a) {
         bool const sign = a < 0;
         uint32_t absA = sign ? -a : a;
-        int8_t const shiftDist = softfloat_countLeadingZeros32(absA);
+        auto const shiftDist = softfloat_countLeadingZeros32(absA);
         uiZ64 = packToExtF80UI64(sign, 0x401E - shiftDist);
         sigZ = (uint64_t)(absA << shiftDist) << 32;
     }

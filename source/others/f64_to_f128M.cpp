@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void f64_to_f128M(float64_t a, float128_t *zPtr)
+void f64_to_f128M(float64_t a, float128_t* zPtr)
 {
 
     *zPtr = f64_to_f128(a);
@@ -52,46 +52,46 @@ void f64_to_f128M(float64_t a, float128_t *zPtr)
 #else
 
 void
-f64_to_f128M(float64_t a, float128_t *zPtr)
+f64_to_f128M(float64_t a, float128_t* zPtr)
 {
-    uint32_t *zWPtr = (uint32_t *)zPtr;
+    uint32_t* zWPtr = (uint32_t*)zPtr;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
     uint64_t frac = fracF64UI(uiA);
 
     zWPtr[indexWord(4, 0)] = 0;
-    if (exp == 0x7FF) {
+
+    if (0x7FF == exp) {
         if (frac) {
             softfloat_commonNaNToF128M(softfloat_f64UIToCommonNaN(uiA), zWPtr);
             return;
-        } else {
-            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+        }
+
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        return;
+    }
+
+    if (!exp) {
+        if (!frac) {
+            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
             zWPtr[indexWord(4, 2)] = 0;
             zWPtr[indexWord(4, 1)] = 0;
             return;
         }
-    } else {
-        if (!exp) {
-            if (!frac) {
-                zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
-                zWPtr[indexWord(4, 2)] = 0;
-                zWPtr[indexWord(4, 1)] = 0;
-                return;
-            } else {
-                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-                exp = normExpSig.exp - 1;
-                frac = normExpSig.sig;
-            }
-        }
 
-        zWPtr[indexWord(4, 1)] = (uint32_t)frac << 28;
-        frac >>= 4;
-        zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp + 0x3C00, frac >> 32);
-        /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-        zWPtr[indexWord(4, 2)] = frac;
-        return;
+        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+        exp = normExpSig.exp - 1;
+        frac = normExpSig.sig;
     }
+
+    zWPtr[indexWord(4, 1)] = (uint32_t)frac << 28;
+    frac >>= 4;
+    zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp + 0x3C00, frac >> 32);
+    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
+    zWPtr[indexWord(4, 2)] = frac;
 }
 
 #endif

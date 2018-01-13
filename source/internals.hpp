@@ -60,7 +60,15 @@ fracF16UI(uint16_t a)
     return a & 0x03FFu;
 }
 
-#define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
+inline uint16_t
+packToF16UI(bool sign, int8_t exp, uint16_t sig)
+{
+    return
+        static_cast<uint16_t>(
+            (static_cast<uint16_t>(!!sign) << 15) +
+            (static_cast<uint16_t>(exp) << 10) +
+            sig);
+}
 
 inline bool
 isNaNF16UI(uint16_t a)
@@ -230,9 +238,14 @@ signExtF80UI64(uint16_t a64)
     return 0 != (a64 >> 15);
 }
 
-#define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
 inline uint16_t
-packToExtF80UI64(bool sign, int32_t exp)
+expExtF80UI64(uint16_t a64)
+{
+    return a64 & 0x7FFFu;
+}
+
+inline uint16_t
+packToExtF80UI64(bool sign, uint16_t exp)
 {
     return static_cast<uint16_t>((!!sign << 15) | exp);
 }
@@ -532,11 +545,12 @@ signF128UI96(uint32_t a96)
     return 0 != (a96 >> 31);
 }
 
-inline int32_t
+inline constexpr uint16_t
 expF128UI96(uint32_t a96)
 {
-    return (int32_t)(a96 >> 16) & 0x7FFF;
+    return static_cast<uint16_t>((a96 >> 16) & UINT16_C(0x7FFF));
 }
+
 inline uint32_t
 fracF128UI96(uint32_t a96)
 {

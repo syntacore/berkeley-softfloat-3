@@ -42,7 +42,7 @@ float16_t
 i64_to_f16(int64_t a)
 {
     bool const sign = a < 0;
-    uint64_t const absA = sign ? -a : a;
+    uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
     int8_t shiftDist = softfloat_countLeadingZeros64(absA) - 53;
     if (0 <= shiftDist) {
         return u_as_f_16(a ? packToF16UI(sign, 0x18 - shiftDist, (uint16_t)absA << shiftDist) : 0);

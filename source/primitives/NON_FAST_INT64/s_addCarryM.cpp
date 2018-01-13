@@ -41,27 +41,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef softfloat_addCarryM
 
 uint8_t
- softfloat_addCarryM(
-     uint8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint8_t carry,
-     uint32_t *zPtr
- )
+softfloat_addCarryM(uint8_t size_words,
+                    uint32_t const * aPtr,
+                    uint32_t const * bPtr,
+                    uint8_t carry,
+                    uint32_t* zPtr)
 {
     unsigned int index, lastIndex;
     uint32_t wordA, wordZ;
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
+    index = indexWordLo(size_words);
+    lastIndex = indexWordHi(size_words);
+
     for (;;) {
         wordA = aPtr[index];
         wordZ = wordA + bPtr[index] + carry;
         zPtr[index] = wordZ;
-        if ( wordZ != wordA ) carry = (wordZ < wordA);
-        if ( index == lastIndex ) break;
+
+        if (wordZ != wordA) {
+            carry = (wordZ < wordA);
+        }
+
+        if (index == lastIndex) {
+            break;
+        }
+
         index += wordIncr;
     }
+
     return carry;
 
 }

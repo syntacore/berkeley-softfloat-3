@@ -57,7 +57,7 @@ void i64_to_f128M(int64_t a, float128_t *zPtr)
     if (a) {
         bool const sign = (a < 0);
         /** @bug INT64_MIN */
-        uint64_t absA = sign ? -a : a;
+        uint64_t absA = static_cast<uint64_t>(sign ? -a : a);
         uint8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 17;
         if (shiftDist < 32) {
             uint32_t *const ptr = zWPtr + indexMultiwordHi(4, 3);

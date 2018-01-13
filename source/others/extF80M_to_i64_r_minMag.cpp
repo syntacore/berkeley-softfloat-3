@@ -102,7 +102,7 @@ extF80M_to_i64_r_minMag(extFloat80_t const *aPtr,
                     exp == INT16_MAX && 0 != (sig & INT64_MAX) ? i64_fromNaN :
                     sign ? i64_fromNegOverflow : i64_fromPosOverflow;
             }
-            return sign ? -(int64_t)absZ : absZ;
+            return sign ? -static_cast<int64_t>(absZ) : static_cast<int64_t>(absZ);
         }
     }
 }

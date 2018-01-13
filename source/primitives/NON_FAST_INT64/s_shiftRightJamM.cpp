@@ -40,12 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 
 void
-softfloat_shiftRightJamM(
-    uint8_t size_words,
-    const uint32_t *aPtr,
-    uint32_t dist,
-    uint32_t *zPtr
-)
+softfloat_shiftRightJamM(uint8_t size_words,
+                         uint32_t const *aPtr,
+                         uint32_t dist,
+                         uint32_t *zPtr)
 {
     uint32_t *ptr = NULL;
 
@@ -55,11 +53,11 @@ softfloat_shiftRightJamM(
         if (size_words < wordDist) {
             wordDist = size_words;
         }
-        ptr = (uint32_t *)(aPtr + indexMultiwordLo(size_words, wordDist));
+        auto ptr1 = (uint32_t *)(aPtr + indexMultiwordLo(size_words, wordDist));
         {
-            int i = wordDist;
+            auto i = wordDist;
             do {
-                wordJam = *ptr++;
+                wordJam = *ptr1++;
                 if (wordJam) {
                     break;
                 }
@@ -78,7 +76,12 @@ softfloat_shiftRightJamM(
                 aPtr,
                 innerDist,
                 zPtr + indexMultiwordLoBut(size_words, wordDist));
-            if (!wordDist) goto wordJam;
+            if (!wordDist) {
+                if (wordJam) {
+                    zPtr[indexWordLo(size_words)] |= 1;
+                }
+                return;
+            }
         } else {
             aPtr += indexWordLo(size_words - wordDist);
             ptr = zPtr + indexWordLo(size_words);
@@ -91,8 +94,7 @@ softfloat_shiftRightJamM(
         ptr = zPtr + indexMultiwordHi(size_words, wordDist);
     }
     assert(ptr);
-    memset(ptr, 0, wordDist * (sizeof *ptr));
-wordJam:
+    memset(ptr, 0, wordDist * sizeof *ptr);
     if (wordJam) {
         zPtr[indexWordLo(size_words)] |= 1;
     }

@@ -16,15 +16,9 @@ set(SRC_PRIMITIVES
     ${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros8.cpp
     
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_eq128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_le128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_lt128.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_shiftRightJam32.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_shiftRightJam64.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftLeft64To96M.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_shortShiftRightJam64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_sub128.cpp
 PARENT_SCOPE)
 

@@ -58,7 +58,7 @@ f64_to_i64_r_minMag(float64_t a, bool exact)
                     sign ? i64_fromNegOverflow : i64_fromPosOverflow;
             }
         } else {
-            int64_t const absZ = (sig | UINT64_C(0x0010000000000000)) << -shiftDist;
+            int64_t const absZ = static_cast<int64_t>((sig | UINT64_C(0x0010000000000000)) << -shiftDist);
             return sign ? -absZ : absZ;
         }
     } else if (53 <= shiftDist) {

@@ -92,7 +92,7 @@ float16_t softfloat_subMagsF16(uint16_t uiA, uint16_t uiB)
             } else {
                 if (expDiff <= -13) {
                     uiZ = packToF16UI(signZ, expB, sigB);
-                    if (!(expA | sigA)) {
+                    if (0 == (expA | sigA)) {
                         return u_as_f_16(uiZ);
                     } else {
                         goto subEpsilon;
