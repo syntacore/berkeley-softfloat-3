@@ -174,7 +174,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                                 /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
                                 sigZ =
                                     shiftDist < 0 ? softfloat_shortShiftRightJam64(sig64Z, -shiftDist) :
-                                    (uint32_t)sig64Z << shiftDist;
+                                    static_cast<uint32_t>(sig64Z) << shiftDist;
                             }
                         }
                         return softfloat_roundPackToF32(signZ, expZ, sigZ);
