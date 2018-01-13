@@ -48,16 +48,25 @@ signF16UI(uint16_t a)
     return 0 != (a >> 15);
 }
 
-inline int8_t 
+inline int8_t
 expF16UI(uint16_t a)
 {
     return (int8_t)((a >> 10) & 0x1F);
 }
 
-#define fracF16UI( a ) ((a) & 0x03FF)
+inline uint16_t
+fracF16UI(uint16_t a)
+{
+    return a & 0x03FFu;
+}
+
 #define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
 
-#define isNaNF16UI( a ) (((~(a) & 0x7C00) == 0) && ((a) & 0x03FF))
+inline bool
+isNaNF16UI(uint16_t a)
+{
+    return 0 == (~a & 0x7C00) && 0 != (a & 0x03FF);
+}
 
 static inline uint16_t
 f_as_u_16(float16_t v)
@@ -222,13 +231,17 @@ signExtF80UI64(uint16_t a64)
 }
 
 #define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
-static __inline uint16_t
-packToExtF80UI64(bool sign, int32_t exp) 
+inline uint16_t
+packToExtF80UI64(bool sign, int32_t exp)
 {
-    return (uint16_t)!!sign << 15 | (uint16_t)exp;
+    return static_cast<uint16_t>((!!sign << 15) | exp);
 }
 
-#define isNaNExtF80UI( a64, a0 ) ((((a64) & 0x7FFF) == 0x7FFF) && ((a0) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
+inline bool
+isNaNExtF80UI(uint16_t a64, uint64_t a0)
+{
+    return 0x7FFFu == (a64 & 0x7FFFu) && 0 != (a0 & UINT64_C(0x7FFFFFFFFFFFFFFF));
+}
 
 #ifdef SOFTFLOAT_FAST_INT64
 /** @bug union of same type */
@@ -347,7 +360,7 @@ struct exp8_sig16
     uint16_t sig;
 };
 exp8_sig16
-    softfloat_normSubnormalF16Sig(uint16_t);
+softfloat_normSubnormalF16Sig(uint16_t);
 
 float16_t
 softfloat_roundPackToF16(bool,
@@ -376,7 +389,7 @@ struct exp16_sig32
     uint32_t sig;
 };
 exp16_sig32
-    softfloat_normSubnormalF32Sig(uint32_t);
+softfloat_normSubnormalF32Sig(uint32_t);
 
 float32_t
 softfloat_roundPackToF32(bool,
@@ -405,7 +418,7 @@ struct exp16_sig64
     uint64_t sig;
 };
 exp16_sig64
-    softfloat_normSubnormalF64Sig(uint64_t);
+softfloat_normSubnormalF64Sig(uint64_t);
 
 float64_t
 softfloat_roundPackToF64(bool,
@@ -479,8 +492,8 @@ struct exp32_sig128
 };
 
 exp32_sig128
-    softfloat_normSubnormalF128Sig(uint64_t,
-                                   uint64_t);
+softfloat_normSubnormalF128Sig(uint64_t,
+                               uint64_t);
 
 float128_t
 softfloat_roundPackToF128(bool,
@@ -518,8 +531,17 @@ signF128UI96(uint32_t a96)
 {
     return 0 != (a96 >> 31);
 }
-#define expF128UI96( a96 ) ((int32_t) ((a96)>>16) & 0x7FFF)
-#define fracF128UI96( a96 ) ((a96) & 0x0000FFFF)
+
+inline int32_t
+expF128UI96(uint32_t a96)
+{
+    return (int32_t)(a96 >> 16) & 0x7FFF;
+}
+inline uint32_t
+fracF128UI96(uint32_t a96)
+{
+    return a96 & 0x0000FFFF;
+}
 #define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
 
 bool
@@ -558,25 +580,25 @@ void
 softfloat_invalidF128M(uint32_t *);
 
 int
-softfloat_shiftNormSigF128M(uint32_t const *, 
-                            uint8_t, 
+softfloat_shiftNormSigF128M(uint32_t const *,
+                            uint8_t,
                             uint32_t *);
 
 void
-softfloat_roundPackMToF128M(bool, 
-                            int32_t, 
-                            uint32_t *, 
+softfloat_roundPackMToF128M(bool,
+                            int32_t,
+                            uint32_t *,
                             uint32_t *);
 void
-softfloat_normRoundPackMToF128M(bool, 
-                                int32_t, 
-                                uint32_t *, 
+softfloat_normRoundPackMToF128M(bool,
+                                int32_t,
+                                uint32_t *,
                                 uint32_t *);
 
 void
 softfloat_addF128M(uint32_t const*,
-                   uint32_t const *, 
-                   uint32_t *, 
+                   uint32_t const *,
+                   uint32_t *,
                    bool);
 void
 softfloat_mulAddF128M(uint32_t const*,
