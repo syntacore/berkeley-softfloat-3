@@ -42,8 +42,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-#define signF16UI( a ) ((bool) ((uint16_t) (a)>>15))
-#define expF16UI( a ) ((int8_t) ((a)>>10) & 0x1F)
+inline bool
+signF16UI(uint16_t a)
+{
+    return 0 != (a >> 15);
+}
+
+inline int8_t 
+expF16UI(uint16_t a)
+{
+    return (int8_t)((a >> 10) & 0x1F);
+}
+
 #define fracF16UI( a ) ((a) & 0x03FF)
 #define packToF16UI( sign, exp, sig ) (((uint16_t) (sign)<<15) + ((uint16_t) (exp)<<10) + (sig))
 
@@ -205,7 +215,12 @@ isZero64UI(uint64_t a)
     return 0 == (a << 1);
 }
 
-#define signExtF80UI64( a64 ) ((bool) ((uint16_t) (a64)>>15))
+inline bool
+signExtF80UI64(uint16_t a64)
+{
+    return 0 != (a64 >> 15);
+}
+
 #define expExtF80UI64( a64 ) ((a64) & 0x7FFF)
 static __inline uint16_t
 packToExtF80UI64(bool sign, int32_t exp) 
@@ -498,7 +513,11 @@ softfloat_mulAddF128(uint64_t,
 
 #else
 
-#define signF128UI96( a96 ) ((bool) ((uint32_t) (a96)>>31))
+inline bool
+signF128UI96(uint32_t a96)
+{
+    return 0 != (a96 >> 31);
+}
 #define expF128UI96( a96 ) ((int32_t) ((a96)>>16) & 0x7FFF)
 #define fracF128UI96( a96 ) ((a96) & 0x0000FFFF)
 #define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
