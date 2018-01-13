@@ -39,39 +39,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-uint32_t f16_to_ui32_r_minMag( float16_t a, bool exact )
+uint32_t
+f16_to_ui32_r_minMag(float16_t a, bool exact)
 {
-    int8_t exp;
-    uint16_t frac;
-    int8_t shiftDist;
-    bool sign;
-    uint32_t alignedSig;
-
     uint16_t const uiA = f_as_u_16(a);
-    exp  = expF16UI( uiA );
-    frac = fracF16UI( uiA );
-    
-    shiftDist = exp - 0x0F;
-    if ( shiftDist < 0 ) {
-        if ( exact && (exp | frac) ) {
+    int8_t const exp = expF16UI(uiA);
+    uint16_t const frac = fracF16UI(uiA);
+
+    int8_t const shiftDist = exp - 0x0F;
+    if (shiftDist < 0) {
+        if (exact && (exp | frac)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
         return 0;
     }
-    
-    sign = signF16UI( uiA );
-    if ( sign || (exp == 0x1F) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+
+    bool const sign = signF16UI(uiA);
+    if (sign || 0x1F == exp) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            (exp == 0x1F) && frac ? ui32_fromNaN
-                : sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+            exp == 0x1F &&
+            frac ? ui32_fromNaN :
+            sign ? ui32_fromNegOverflow :
+            ui32_fromPosOverflow;
     }
-    
-    alignedSig = (uint32_t) (frac | 0x0400)<<shiftDist;
-    if ( exact && (alignedSig & 0x3FF) ) {
+
+    uint32_t const alignedSig = (uint32_t)(frac | 0x0400) << shiftDist;
+    if (exact && (alignedSig & 0x3FF)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    return alignedSig>>10;
-
+    return alignedSig >> 10;
 }
 
