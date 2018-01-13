@@ -438,25 +438,15 @@ Converts the common NaN pointed to by `aPtr' into an 80-bit extended
 floating-point NaN, and stores this NaN at the location pointed to by
 `zSPtr'.
 */
-#if !defined(SOFTFLOAT_COMMONNANTOEXTF80M) && defined(INLINE)
 /** @bug use extFloat80_t */
-INLINE
-struct extFloat80M
-    softfloat_commonNaNToExtF80M(struct commonNaN a)
+inline extFloat80M
+    softfloat_commonNaNToExtF80M(commonNaN)
 {
-    (void)a;
-    {
-        struct extFloat80M z;
-        z.signExp = defaultNaNExtF80UI64;
-        z.signif = defaultNaNExtF80UI0;
-        return z;
-    }
+    struct extFloat80M z;
+    z.signExp = defaultNaNExtF80UI64;
+    z.signif = defaultNaNExtF80UI0;
+    return z;
 }
-#else
-/** @bug use extFloat80_t */
-struct extFloat80M
-    softfloat_commonNaNToExtF80M(struct commonNaN a);
-#endif
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values
@@ -478,23 +468,15 @@ NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
 `zWPtr' points to an array of four 32-bit elements that concatenate in the
 platform's normal endian order to form a 128-bit floating-point value.
 */
-#if !defined(SOFTFLOAT_COMMONNANTOF128M) && defined(INLINE)
-INLINE
-void
-softfloat_commonNaNToF128M(struct commonNaN a,
+inline void
+softfloat_commonNaNToF128M(commonNaN,
                            uint32_t *zWPtr)
 {
-    (void)a;
     zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
     zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
     zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
     zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
 }
-#else
-void
-softfloat_commonNaNToF128M(struct commonNaN a,
-                           uint32_t *zWPtr);
-#endif
 
 /**
 Assuming at least one of the two 128-bit floating-point values pointed to by

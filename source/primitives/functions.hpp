@@ -45,8 +45,8 @@ the range 1 to 63.  If any nonzero bits are shifted off, they are "jammed"
 into the least-significant bit of the shifted value by setting the least-
 significant bit to 1.  This shifted-and-jammed value is returned.
 */
-#if !defined(SOFTFLOAT_SHORTSHIFTRIGHTJAM64) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
-INLINE uint64_t
+#if 1
+inline uint64_t
 softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
 {
     uint8_t const shft = dist >= 63 ? 63 : dist;
@@ -55,7 +55,13 @@ softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
         (a >> shft);
 }
 #else
-uint64_t softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist);
+inline uint64_t
+softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
+{
+    return 
+        a >> dist | 
+        ((a & (((uint64_t)1 << dist) - 1)) != 0);
+}
 #endif
 
 /**
@@ -67,8 +73,8 @@ bit to 1.  This shifted-and-jammed value is returned.
 greater than 32, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
-#if !defined(SOFTFLOAT_SHIFTRIGHTJAM32) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
-INLINE uint32_t
+#if 1
+inline uint32_t
 softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
 {
     uint8_t const dist1 = dist >= 31 ? 31 : (uint8_t)dist;
@@ -77,7 +83,12 @@ softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
     return (a | jam_bits) >> dist1;
 }
 #else
-uint32_t softfloat_shiftRightJam32(uint32_t a, uint16_t dist);
+inline uint32_t
+softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
+{
+    return
+        dist >= 31 ? a != 0 : a >> dist | ((uint32_t)(a << (-(int16_t)dist & 31)) != 0);
+}
 #endif
 
 /**
@@ -89,8 +100,8 @@ bit to 1.  This shifted-and-jammed value is returned.
 greater than 64, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
-#if !defined(SOFTFLOAT_SHIFTRIGHTJAM64) && defined(INLINE_LEVEL) && (3 <= INLINE_LEVEL)
-INLINE uint64_t
+#if 1
+inline uint64_t
 softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
 {
     uint8_t const dist1 = dist >= 63 ? 63 : (uint8_t)dist;
@@ -99,7 +110,12 @@ softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
     return (a | jam_bits) >> dist1;
 }
 #else
-uint64_t softfloat_shiftRightJam64(uint64_t a, uint32_t dist);
+inline uint64_t
+softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
+{
+    return
+        dist >= 63 ? a != 0 : a >> dist | ((uint64_t)(a << (-(int32_t)dist & 63)) != 0);
+}
 #endif
 
 /**
@@ -112,26 +128,22 @@ extern const uint_least8_t softfloat_countLeadingZeros8[256];
 /**
 @returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, 16 is returned.
 */
-#if !defined(SOFTFLOAT_COUNTLEADINGZEROS16) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
-INLINE uint8_t softfloat_countLeadingZeros16(uint16_t a)
+inline uint8_t
+softfloat_countLeadingZeros16(uint16_t a)
 {
     uint8_t count = 8;
     if (0x100 <= a) {
         count = 0;
         a >>= 8;
     }
-    count += softfloat_countLeadingZeros8[a];
-    return count;
+    return count + softfloat_countLeadingZeros8[a];
 }
-#else
-uint8_t softfloat_countLeadingZeros16(uint16_t a);
-#endif
 
 /**
 @returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, 32 is returned.
 */
-#if !defined(SOFTFLOAT_COUNTLEADINGZEROS32) && defined(INLINE_LEVEL) && (3 <= INLINE_LEVEL)
-INLINE uint8_t softfloat_countLeadingZeros32(uint32_t a)
+inline uint8_t
+softfloat_countLeadingZeros32(uint32_t a)
 {
     uint8_t count = 0;
     if (a < 0x10000) {
@@ -142,12 +154,8 @@ INLINE uint8_t softfloat_countLeadingZeros32(uint32_t a)
         count += 8;
         a <<= 8;
     }
-    count += softfloat_countLeadingZeros8[a >> 24];
-    return count;
+    return count + softfloat_countLeadingZeros8[a >> 24];
 }
-#else
-uint8_t softfloat_countLeadingZeros32(uint32_t a);
-#endif
 
 /**
 Returns the number of leading 0 bits before the most-significant 1 bit of
@@ -593,22 +601,16 @@ location pointed to by `zPtr'.  Argument `zPtr' points to an array of three
 32-bit elements that concatenate in the platform's normal endian order to
 form a 96-bit integer.
 */
-#if !defined(SOFTFLOAT_SHORTSHIFTLEFT64TO96M) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
-INLINE
-void
-softfloat_shortShiftLeft64To96M(
-    uint64_t a, uint8_t dist, uint32_t *zPtr)
+inline void
+softfloat_shortShiftLeft64To96M(uint64_t a,
+                                uint8_t dist,
+                                uint32_t *zPtr)
 {
     zPtr[indexWord(3, 0)] = (uint32_t)a << dist;
     a >>= 32 - dist;
     zPtr[indexWord(3, 2)] = a >> 32;
     zPtr[indexWord(3, 1)] = (uint32_t)a;
 }
-#else
-void
-softfloat_shortShiftLeft64To96M(
-    uint64_t a, uint8_t dist, uint32_t *zPtr);
-#endif
 
 /**
 Shifts the N-bit unsigned integer pointed to by `aPtr' left by the number
