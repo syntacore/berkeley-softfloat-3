@@ -41,49 +41,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define softfloat_shiftRightM softfloat_shiftRightM
 
 void
- softfloat_shiftRightM(
-     uint8_t size_words,
-     const uint32_t *aPtr,
-     uint32_t dist,
-     uint32_t *zPtr
- )
+softfloat_shiftRightM(
+    uint8_t size_words,
+    const uint32_t* aPtr,
+    uint32_t dist,
+    uint32_t* zPtr
+)
 {
     uint32_t wordDist;
     uint8_t innerDist;
-    uint32_t *destPtr;
-    uint8_t i;
+    uint32_t* destPtr;
 
-    wordDist = dist>>5;
-    if ( wordDist < size_words ) {
-        aPtr += indexMultiwordHiBut( size_words, wordDist );
+    wordDist = dist >> 5;
+
+    if (wordDist < size_words) {
+        aPtr += indexMultiwordHiBut(size_words, wordDist);
         innerDist = dist & 31;
-        if ( innerDist ) {
-            /** @todo Warning	C4244	function': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
+
+        if (innerDist) {
+            /** @todo Warning   C4244   function': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
             softfloat_shortShiftRightM(
                 size_words - wordDist,
                 aPtr,
                 innerDist,
-                zPtr + indexMultiwordLoBut( size_words, wordDist )
-            );
-            if ( ! wordDist ) return;
+                zPtr + indexMultiwordLoBut(size_words, wordDist));
+
+            if (!wordDist) {
+                return;
+            }
         } else {
-            aPtr += indexWordLo( size_words - wordDist );
-            destPtr = zPtr + indexWordLo( size_words );
-            /** @todo Warning	C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
-            for ( i = size_words - wordDist; i; --i ) {
+            aPtr += indexWordLo(size_words - wordDist);
+            destPtr = zPtr + indexWordLo(size_words);
+
+            /** @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
+            for (uint8_t i = size_words - wordDist; i; --i) {
                 *destPtr = *aPtr;
                 aPtr += wordIncr;
                 destPtr += wordIncr;
             }
         }
-        zPtr += indexMultiwordHi( size_words, wordDist );
+
+        zPtr += indexMultiwordHi(size_words, wordDist);
     } else {
         wordDist = size_words;
     }
+
     do {
         *zPtr++ = 0;
         --wordDist;
-    } while ( wordDist );
+    } while (wordDist);
 
 }
 

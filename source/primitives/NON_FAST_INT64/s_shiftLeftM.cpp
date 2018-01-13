@@ -52,8 +52,7 @@ softfloat_shiftLeftM(uint8_t size_words,
             softfloat_shortShiftLeftM(size_words - wordDist,
                                       aPtr,
                                       innerDist,
-                                      zPtr + indexMultiwordHiBut(size_words, wordDist)
-            );
+                                      zPtr + indexMultiwordHiBut(size_words, wordDist));
             if (!wordDist) {
                 return;
             }

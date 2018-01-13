@@ -77,8 +77,7 @@ softfloat_shiftRightJamM(
                 size_words - wordDist,
                 aPtr,
                 innerDist,
-                zPtr + indexMultiwordLoBut(size_words, wordDist)
-            );
+                zPtr + indexMultiwordLoBut(size_words, wordDist));
             if (!wordDist) goto wordJam;
         } else {
             aPtr += indexWordLo(size_words - wordDist);
