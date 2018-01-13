@@ -251,16 +251,16 @@ number of bits given in `dist', which must be in the range 1 to 63.
 */
 #if !defined(SOFTFLOAT_SHORTSHIFTLEFT128) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
 INLINE
-struct uint128
+uint128
     softfloat_shortShiftLeft128(uint64_t a64, uint64_t a0, uint8_t dist)
 {
-    struct uint128 z;
+    uint128 z;
     z.v64 = a64 << dist | a0 >> (-dist & 63);
     z.v0 = a0 << dist;
     return z;
 }
 #else
-struct uint128
+uint128
     softfloat_shortShiftLeft128(uint64_t a64, uint64_t a0, uint8_t dist);
 #endif
 
@@ -270,16 +270,16 @@ number of bits given in `dist', which must be in the range 1 to 63.
 */
 #if !defined(SOFTFLOAT_SHORTSHIFTRIGHT128) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
 INLINE
-struct uint128
+uint128
     softfloat_shortShiftRight128(uint64_t a64, uint64_t a0, uint8_t dist)
 {
-    struct uint128 z;
+    uint128 z;
     z.v64 = a64 >> dist;
     z.v0 = a64 << (-dist & 63) | a0 >> dist;
     return z;
 }
 #else
-struct uint128
+uint128
     softfloat_shortShiftRight128(uint64_t a64, uint64_t a0, uint8_t dist);
 #endif
 
@@ -289,16 +289,16 @@ except that `dist' must be in the range 1 to 63.
 */
 #if !defined(SOFTFLOAT_SHORTSHIFTRIGHTJAM64EXTRA) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
 INLINE
-struct uint64_extra
+uint64_extra
     softfloat_shortShiftRightJam64Extra(uint64_t a, uint64_t extra, uint8_t dist)
 {
-    struct uint64_extra z;
+    uint64_extra z;
     z.v = a >> dist;
     z.extra = a << (-(int8_t)dist & 63) | (extra != 0);
     return z;
 }
 #else
-struct uint64_extra
+uint64_extra
     softfloat_shortShiftRightJam64Extra(uint64_t a, uint64_t extra, uint8_t dist);
 #endif
 
@@ -311,12 +311,12 @@ shifted-and-jammed value is returned.
 */
 #if !defined(SOFTFLOAT_SHORTSHIFTRIGHTJAM128) && defined(INLINE_LEVEL) && (3 <= INLINE_LEVEL)
 INLINE
-struct uint128
+uint128
     softfloat_shortShiftRightJam128(
         uint64_t a64, uint64_t a0, uint8_t dist)
 {
     uint8_t negDist = -(int8_t)dist;
-    struct uint128 z;
+    uint128 z;
     z.v64 = a64 >> dist;
     z.v0 =
         a64 << (negDist & 63) | a0 >> dist
@@ -324,7 +324,7 @@ struct uint128
     return z;
 }
 #else
-struct uint128
+uint128
     softfloat_shortShiftRightJam128(
         uint64_t a64, uint64_t a0, uint8_t dist);
 #endif
@@ -335,19 +335,19 @@ except that `dist' must be in the range 1 to 63.
 */
 #if !defined(SOFTFLOAT_SHORTSHIFTRIGHTJAM128EXTRA) && defined(INLINE_LEVEL) && (3 <= INLINE_LEVEL)
 INLINE
-struct uint128_extra
+uint128_extra
     softfloat_shortShiftRightJam128Extra(
         uint64_t a64, uint64_t a0, uint64_t extra, uint8_t dist)
 {
     uint8_t negDist = -dist;
-    struct uint128_extra z;
+    uint128_extra z;
     z.v.v64 = a64 >> dist;
     z.v.v0 = a64 << (negDist & 63) | a0 >> dist;
     z.extra = a0 << (negDist & 63) | (extra != 0);
     return z;
 }
 #else
-struct uint128_extra
+uint128_extra
     softfloat_shortShiftRightJam128Extra(
         uint64_t a64, uint64_t a0, uint64_t extra, uint8_t dist);
 #endif
@@ -370,10 +370,10 @@ as described above and returned in the `extra' field of the result.)
 */
 #if !defined(SOFTFLOAT_SHIFTRIGHTJAM64EXTRA) && defined(INLINE_LEVEL) && (4 <= INLINE_LEVEL)
 INLINE
-struct uint64_extra
+uint64_extra
     softfloat_shiftRightJam64Extra(uint64_t a, uint64_t extra, uint32_t dist)
 {
-    struct uint64_extra z;
+    uint64_extra z;
     if (dist < 64) {
         z.v = a >> dist;
         z.extra = a << (-(int32_t)dist & 63);
@@ -385,7 +385,7 @@ struct uint64_extra
     return z;
 }
 #else
-struct uint64_extra
+uint64_extra
     softfloat_shiftRightJam64Extra(uint64_t a, uint64_t extra, uint32_t dist);
 #endif
 
@@ -399,7 +399,7 @@ The value of `dist' can be arbitrarily large.  In particular, if `dist' is
 greater than 128, the result will be either 0 or 1, depending on whether the
 original 128 bits are all zeros.
 */
-struct uint128
+uint128
     softfloat_shiftRightJam128(uint64_t a64, uint64_t a0, uint32_t dist);
 
 /**
@@ -419,7 +419,7 @@ in the `v' field of the result.  The fractional part of the shifted value
 is modified as described above and returned in the `extra' field of the
 result.)
 */
-struct uint128_extra
+uint128_extra
     softfloat_shiftRightJam128Extra(
         uint64_t a64, uint64_t a0, uint64_t extra, uint32_t dist);
 
@@ -449,13 +449,13 @@ INLINE
 struct uint128
     softfloat_add128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
 {
-    struct uint128 z;
+    uint128 z;
     z.v0 = a0 + b0;
     z.v64 = a64 + b64 + (z.v0 < a0);
     return z;
 }
 #else
-struct uint128
+uint128
     softfloat_add128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0);
 #endif
 
@@ -478,17 +478,17 @@ The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 /// @todo out of line implementation
 #if !defined(SOFTFLOAT_SUB128) && defined(INLINE_LEVEL) && (2 <= INLINE_LEVEL)
 INLINE
-struct uint128
+uint128
     softfloat_sub128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
 {
-    struct uint128 z;
+    uint128 z;
     z.v0 = a0 - b0;
     z.v64 = a64 - b64;
     z.v64 -= (a0 < b0);
     return z;
 }
 #else
-struct uint128
+uint128
     softfloat_sub128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0);
 #endif
 
@@ -511,20 +511,20 @@ Returns the 128-bit product of `a', `b', and 2^32.
 INLINE struct uint128 softfloat_mul64ByShifted32To128(uint64_t a, uint32_t b)
 {
     uint64_t mid;
-    struct uint128 z;
+    uint128 z;
     mid = (uint64_t)(uint32_t)a * b;
     z.v0 = mid << 32;
     z.v64 = (uint64_t)(uint32_t)(a >> 32) * b + (mid >> 32);
     return z;
 }
 #else
-struct uint128 softfloat_mul64ByShifted32To128(uint64_t a, uint32_t b);
+uint128 softfloat_mul64ByShifted32To128(uint64_t a, uint32_t b);
 #endif
 
 /**
 Returns the 128-bit product of `a' and `b'.
 */
-struct uint128 softfloat_mul64To128(uint64_t a, uint64_t b);
+uint128 softfloat_mul64To128(uint64_t a, uint64_t b);
 
 /**
 @returns the product of the 128-bit integer formed by concatenating `a64' and
@@ -533,9 +533,9 @@ bits are discarded.
 */
 #if !defined(SOFTFLOAT_MUL128BY32) && defined(INLINE_LEVEL) && (4 <= INLINE_LEVEL)
 INLINE
-struct uint128 softfloat_mul128By32(uint64_t a64, uint64_t a0, uint32_t b)
+uint128 softfloat_mul128By32(uint64_t a64, uint64_t a0, uint32_t b)
 {
-    struct uint128 z;
+    uint128 z;
     uint64_t mid;
     uint32_t carry;
     z.v0 = a0 * b;
@@ -545,7 +545,7 @@ struct uint128 softfloat_mul128By32(uint64_t a64, uint64_t a0, uint32_t b)
     return z;
 }
 #else
-struct uint128 softfloat_mul128By32(uint64_t a64, uint64_t a0, uint32_t b);
+uint128 softfloat_mul128By32(uint64_t a64, uint64_t a0, uint32_t b);
 #endif
 
 /**

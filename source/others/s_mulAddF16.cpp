@@ -96,7 +96,7 @@ softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
             if (!sigA) {
                 return u_as_f_16(!(expC | sigC) && (signProd != signC) ? packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
             } else {
-                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }
@@ -105,7 +105,7 @@ softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
             if (!sigB) {
                 return u_as_f_16(!(expC | sigC) && (signProd != signC) ? packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
             } else {
-                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -130,7 +130,7 @@ softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
                 sigZ = sigProd >> 15 | ((sigProd & 0x7FFF) != 0);
                 return softfloat_roundPackToF16(signZ, expZ, sigZ);
             } else {
-                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigC);
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigC);
                 expC = normExpSig.exp;
                 sigC = normExpSig.sig;
             }

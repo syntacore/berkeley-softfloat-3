@@ -52,14 +52,11 @@ ui64_to_extF80M(uint64_t a, extFloat80_t *zPtr)
 void
 ui64_to_extF80M(uint64_t a, extFloat80_t *zPtr)
 {
-    int8_t shiftDist;
-
-    /** @bug cast to same type */
-    struct extFloat80M *const zSPtr = (struct extFloat80M *) zPtr;
+    extFloat80M *const zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
     if (0 != a) {
-        shiftDist = softfloat_countLeadingZeros64(a);
+        int8_t const shiftDist = softfloat_countLeadingZeros64(a);
         uiZ64 = packToExtF80UI64(0, 0x403E - shiftDist);
         sigZ = a << shiftDist;
     }

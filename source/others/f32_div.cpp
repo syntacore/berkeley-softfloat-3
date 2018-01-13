@@ -77,7 +77,7 @@ float32_t f32_div(float32_t a, float32_t b)
                     return signed_inf_F32(signZ);
                 }
             } else {
-                struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
+                exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -86,7 +86,7 @@ float32_t f32_div(float32_t a, float32_t b)
             if (!sigA) {
                 return signed_zero_F32(signZ);
             } else {
-                struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+                exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

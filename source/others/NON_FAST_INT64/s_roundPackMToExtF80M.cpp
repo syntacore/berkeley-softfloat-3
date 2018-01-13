@@ -49,7 +49,7 @@ softfloat_roundPackMToExtF80M(bool sign,
                               int32_t exp,
                               uint32_t *extSigPtr,
                               uint8_t roundingPrecision,
-                              /** @bug use extFloat80_t */struct extFloat80M *zSPtr)
+                              /** @bug use extFloat80_t */extFloat80M *zSPtr)
 {
     uint64_t roundIncrement;
     uint64_t roundMask;

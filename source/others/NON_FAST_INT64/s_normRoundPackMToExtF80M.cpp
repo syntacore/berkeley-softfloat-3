@@ -49,7 +49,7 @@ softfloat_normRoundPackMToExtF80M(bool sign,
                                   int32_t exp,
                                   uint32_t *extSigPtr,
                                   uint8_t roundingPrecision,
-                                  struct extFloat80M *zSPtr)
+                                  extFloat80M *zSPtr)
 {
     int16_t shiftDist = 0;
     uint32_t wordSig = extSigPtr[indexWord(3, 2)];

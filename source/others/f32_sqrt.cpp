@@ -68,7 +68,7 @@ float32_t f32_sqrt(float32_t a)
             if (!sigA) {
                 return a;
             }
-            struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
             expA = normExpSig.exp;
             sigA = normExpSig.sig;
         }

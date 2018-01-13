@@ -79,7 +79,7 @@ void f32_to_f128M(float32_t a, float128_t *zPtr)
                 zWPtr[indexWord(4, 0)] = 0;
                 return;
             } else {
-                struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+                exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
                 exp = normExpSig.exp - 1;
                 frac = normExpSig.sig;
             }

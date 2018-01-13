@@ -83,7 +83,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 if (!sigA) {
                     return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
                 }
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }
@@ -92,7 +92,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                 if (!sigB) {
                     return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
                 }
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -117,7 +117,7 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                         softfloat_roundPackToF64(signZ, expZ - 1,
                                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
                 } else {
-                    struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
+                    exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
                     expC = normExpSig.exp;
                     sigC = normExpSig.sig;
                 }

@@ -71,7 +71,7 @@ f32_mul(float32_t a, float32_t b)
                 if (0 == sigA) {
                     return signed_zero_F32(signZ);
                 } else {
-                    struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+                    exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                     expA = normExpSig.exp;
                     sigA = normExpSig.sig;
                 }
@@ -80,7 +80,7 @@ f32_mul(float32_t a, float32_t b)
                 if (0 == sigB) {
                     return signed_zero_F32(signZ);
                 } else {
-                    struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
+                    exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
                     expB = normExpSig.exp;
                     sigB = normExpSig.sig;
                 }

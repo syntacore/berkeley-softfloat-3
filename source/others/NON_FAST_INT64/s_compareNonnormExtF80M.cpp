@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @bug use extFloat80_t */
 int
- softfloat_compareNonnormExtF80M(
-     const struct extFloat80M *aSPtr, const struct extFloat80M *bSPtr )
+ softfloat_compareNonnormExtF80M(extFloat80M const *aSPtr,
+                                 extFloat80M const *bSPtr )
 {
     uint16_t uiA64, uiB64;
     uint64_t sigA;

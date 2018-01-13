@@ -53,7 +53,7 @@ f64_to_ui64(float64_t a, uint8_t roundingMode, bool exact)
     }
     int16_t const shiftDist = 0x433 - exp;
 #ifdef SOFTFLOAT_FAST_INT64
-    struct uint64_extra sigExtra;
+    uint64_extra sigExtra;
     if (shiftDist <= 0) {
         if (shiftDist < -11) {
             softfloat_raiseFlags(softfloat_flag_invalid);

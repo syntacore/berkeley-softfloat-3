@@ -46,7 +46,8 @@ void
  extF80M_sub(
      const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr )
 {
-    const struct extFloat80M *aSPtr, *bSPtr;
+    extFloat80M const *aSPtr;
+    extFloat80M const *bSPtr;
     uint16_t uiA64;
     uint64_t uiA0;
     bool signA;
@@ -59,10 +60,8 @@ void
             uint16_t, uint64_t, uint16_t, uint64_t, bool );
 #endif
 
-    /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    /** @bug cast to same type */
-    bSPtr = (const struct extFloat80M *) bPtr;
+    aSPtr = aPtr;
+    bSPtr = bPtr;
     uiA64 = aSPtr->signExp;
     uiA0  = aSPtr->signif;
     signA = signExtF80UI64( uiA64 );
@@ -86,20 +85,9 @@ void
 #else
 
 void
- extF80M_sub(
-     const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr )
+ extF80M_sub(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr )
 {
-
-    softfloat_addExtF80M(
-        /** @bug cast to same type */
-        (const struct extFloat80M *) aPtr,
-        /** @bug cast to same type */
-        (const struct extFloat80M *) bPtr,
-        /** @bug cast to same type */
-        (struct extFloat80M *) zPtr,
-        true
-    );
-
+    softfloat_addExtF80M(aPtr, bPtr, zPtr, true);
 }
 
 #endif

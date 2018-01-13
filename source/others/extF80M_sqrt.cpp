@@ -54,8 +54,8 @@ void extF80M_sqrt(const extFloat80_t *aPtr, extFloat80_t *zPtr)
 
 void extF80M_sqrt(const extFloat80_t *aPtr, extFloat80_t *zPtr)
 {
-    const struct extFloat80M *aSPtr;
-    struct extFloat80M *zSPtr;
+    extFloat80M const *aSPtr;
+    extFloat80M *zSPtr;
     uint16_t uiA64, signUI64;
     int32_t expA;
     uint64_t rem64;
@@ -64,10 +64,8 @@ void extF80M_sqrt(const extFloat80_t *aPtr, extFloat80_t *zPtr)
     uint64_t sig64Z, x64;
     uint32_t term[4], extSigZ[3];
 
-    /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
+    aSPtr = aPtr;
+    zSPtr = zPtr;
 
     uiA64 = aSPtr->signExp;
     signUI64 = uiA64 & packToExtF80UI64(1, 0);

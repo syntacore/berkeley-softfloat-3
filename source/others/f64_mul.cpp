@@ -82,7 +82,7 @@ f64_mul(float64_t a, float64_t b)
             if (!sigA) {
                 return u_as_f_64(packToF64UI(signZ, 0, 0));
             }
-            struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
             expA = normExpSig.exp;
             sigA = normExpSig.sig;
         }
@@ -90,7 +90,7 @@ f64_mul(float64_t a, float64_t b)
             if (!sigB) {
                 return u_as_f_64(packToF64UI(signZ, 0, 0));
             }
-            struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
             expB = normExpSig.exp;
             sigB = normExpSig.sig;
         }
@@ -99,7 +99,7 @@ f64_mul(float64_t a, float64_t b)
         sigA = (sigA | UINT64_C(0x0010000000000000)) << 10;
         sigB = (sigB | UINT64_C(0x0010000000000000)) << 11;
 #ifdef SOFTFLOAT_FAST_INT64
-        struct uint128 const sig128Z = softfloat_mul64To128(sigA, sigB);
+        uint128 const sig128Z = softfloat_mul64To128(sigA, sigB);
         uint64_t sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
 #else
         uint32_t sig128Z[4];

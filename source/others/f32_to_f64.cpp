@@ -56,7 +56,7 @@ float64_t f32_to_f64(float32_t a)
         if (!frac) {
             return u_as_f_64(packToF64UI(sign, 0, 0));
         } else {
-            struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
             exp = normExpSig.exp - 1;
             frac = normExpSig.sig;
         }

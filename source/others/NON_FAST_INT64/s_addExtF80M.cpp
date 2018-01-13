@@ -41,12 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @bug use extFloat80_t */
 void
-softfloat_addExtF80M(
-    const struct extFloat80M *aSPtr,
-    const struct extFloat80M *bSPtr,
-    struct extFloat80M *zSPtr,
-    bool negateB
-)
+softfloat_addExtF80M(extFloat80M const *aSPtr,
+                     extFloat80M const *bSPtr,
+                     extFloat80M *zSPtr,
+                     bool negateB)
 {
     uint16_t const uiA64 = aSPtr->signExp;
     int32_t expA = expExtF80UI64(uiA64);
@@ -77,7 +75,7 @@ softfloat_addExtF80M(
             signZ = signB;
             expA = expB;
             expB = expExtF80UI64(uiA64);
-            struct extFloat80M const *const tempSPtr = aSPtr;
+            extFloat80M const *const tempSPtr = aSPtr;
             aSPtr = bSPtr;
             bSPtr = tempSPtr;
         }
@@ -90,7 +88,7 @@ softfloat_addExtF80M(
         uint64_t sigZ = aSPtr->signif;
         uint64_t sigB = bSPtr->signif;
 
-        void(*roundPackRoutinePtr)(bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *) = softfloat_roundPackMToExtF80M;
+        void(*roundPackRoutinePtr)(bool, int32_t, uint32_t *, uint8_t, extFloat80M *) = softfloat_roundPackMToExtF80M;
         int32_t const expDiff = expA - expB;
         uint32_t sigZExtra;
         uint32_t extSigX[3];

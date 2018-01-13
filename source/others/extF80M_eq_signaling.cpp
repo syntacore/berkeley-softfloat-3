@@ -53,11 +53,8 @@ extF80M_eq_signaling(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 bool
 extF80M_eq_signaling(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
-    
-    /** @bug cast to same type */
-    struct extFloat80M const *aSPtr = (struct extFloat80M const *) aPtr;
-    /** @bug cast to same type */
-    struct extFloat80M const *bSPtr = (struct extFloat80M const*) bPtr;
+    extFloat80M const *aSPtr = aPtr;
+    extFloat80M const *bSPtr = bPtr;
 
     uint16_t const uiA64 = aSPtr->signExp;
     uint64_t const uiA0 = aSPtr->signif;

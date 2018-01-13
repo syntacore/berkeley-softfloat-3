@@ -39,12 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 /** @bug use extFloat80_t */
-void softfloat_invalidExtF80M( struct extFloat80M *zSPtr )
+void
+softfloat_invalidExtF80M(extFloat80M *zSPtr )
 {
-
     softfloat_raiseFlags( softfloat_flag_invalid );
     zSPtr->signExp = defaultNaNExtF80UI64;
     zSPtr->signif  = defaultNaNExtF80UI0;
-
 }
 

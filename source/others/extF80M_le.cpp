@@ -51,12 +51,10 @@ extF80M_le(extFloat80_t const *aPtr, extFloat80_t const *bPtr)
 #else
 
 bool
-extF80M_le(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
+extF80M_le(extFloat80_t const *aPtr, extFloat80_t const *bPtr)
 {
-    /** @bug cast to same type */
-    struct extFloat80M const *const aSPtr = (struct extFloat80M const *)aPtr;
-    /** @bug cast to same type */
-    struct extFloat80M const *const bSPtr = (struct extFloat80M const *)bPtr;
+    extFloat80M const *const aSPtr = aPtr;
+    extFloat80M const *const bSPtr = bPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     uint64_t const uiA0 = aSPtr->signif;
     uint16_t const uiB64 = bSPtr->signExp;

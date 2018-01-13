@@ -54,17 +54,16 @@ bool extF80M_lt_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 
 bool extF80M_lt_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
-    const struct extFloat80M *aSPtr, *bSPtr;
+    extFloat80M const *aSPtr;
+    extFloat80M const *bSPtr;
     uint16_t uiA64;
     uint64_t uiA0;
     uint16_t uiB64;
     uint64_t uiB0;
     bool signA, ltMags;
 
-    /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    /** @bug cast to same type */
-    bSPtr = (const struct extFloat80M *) bPtr;
+    aSPtr = aPtr;
+    bSPtr = bPtr;
 
     uiA64 = aSPtr->signExp;
     uiA0 = aSPtr->signif;

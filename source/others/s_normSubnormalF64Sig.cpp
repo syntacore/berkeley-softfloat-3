@@ -36,15 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-struct exp16_sig64 softfloat_normSubnormalF64Sig( uint64_t sig )
+exp16_sig64
+softfloat_normSubnormalF64Sig(uint64_t sig)
 {
-    int8_t shiftDist;
-    struct exp16_sig64 z;
-
-    shiftDist = softfloat_countLeadingZeros64( sig ) - 11;
+    int8_t shiftDist = softfloat_countLeadingZeros64(sig) - 11;
+    exp16_sig64 z;
     z.exp = 1 - shiftDist;
-    z.sig = sig<<shiftDist;
+    z.sig = sig << shiftDist;
     return z;
-
 }
-

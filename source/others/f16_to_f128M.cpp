@@ -70,7 +70,7 @@ void f16_to_f128M(float16_t a, float128_t *zPtr)
     } else {
         if (!exp) {
             if (frac) {
-                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
                 exp = normExpSig.exp - 1;
                 frac = normExpSig.sig;
             } else {

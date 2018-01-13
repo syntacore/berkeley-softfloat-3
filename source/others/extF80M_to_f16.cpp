@@ -52,8 +52,7 @@ extF80M_to_f16(const extFloat80_t *aPtr)
 
 float16_t extF80M_to_f16(const extFloat80_t *aPtr)
 {
-    /** @bug cast to same type */
-    struct extFloat80M const *const aSPtr = (struct extFloat80M const *)aPtr;
+    extFloat80M const *const aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = signExtF80UI64(uiA64);
     int32_t exp = expExtF80UI64(uiA64);

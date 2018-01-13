@@ -87,7 +87,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                     /* a is zero */
                     return 0 == (expC | sigC) && signProd != signC ? signed_zero_F32(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
                 } else {
-                    struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+                    exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                     expA = normExpSig.exp;
                     sigA = normExpSig.sig;
                 }
@@ -98,7 +98,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                     /* b is zero */
                     return 0 == (expC | sigC) && signProd != signC ? signed_zero_F32(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
                 } else {
-                    struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
+                    exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
                     expB = normExpSig.exp;
                     sigB = normExpSig.sig;
                 }
@@ -123,7 +123,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
                             sigZ = softfloat_shortShiftRightJam64(sigProd, 31);
                             return softfloat_roundPackToF32(signZ, expProd - 1, sigZ);
                         } else {
-                            struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigC);
+                            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigC);
                             expC = normExpSig.exp;
                             sigC = normExpSig.sig;
                         }

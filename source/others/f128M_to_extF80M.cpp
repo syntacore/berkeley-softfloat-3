@@ -54,7 +54,7 @@ void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
 void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
 {
     const uint32_t *aWPtr;
-    struct extFloat80M *zSPtr;
+    extFloat80M *zSPtr;
     uint32_t uiA96;
     bool sign;
     int32_t exp;
@@ -62,8 +62,7 @@ void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
 
 
     aWPtr = (const uint32_t *)aPtr;
-    /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
+    zSPtr = zPtr;
 
     uiA96 = aWPtr[indexWordHi(4)];
     sign = signF128UI96(uiA96);

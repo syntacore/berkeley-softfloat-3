@@ -78,7 +78,7 @@ f64_div(float64_t a, float64_t b)
                     return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
                 }
             } else {
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -87,7 +87,7 @@ f64_div(float64_t a, float64_t b)
             if (!sigA) {
                 return u_as_f_64(packToF64UI(signZ, 0, 0));
             } else {
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

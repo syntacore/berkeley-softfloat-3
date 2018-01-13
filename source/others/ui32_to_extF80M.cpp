@@ -52,9 +52,7 @@ ui32_to_extF80M(uint32_t a, extFloat80_t *zPtr)
 void
 ui32_to_extF80M(uint32_t a, extFloat80_t *zPtr)
 {
-
-    /** @bug cast to same type */
-    struct extFloat80M *const zSPtr = (struct extFloat80M *) zPtr;
+    extFloat80M *const zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
     if (0 != a) {

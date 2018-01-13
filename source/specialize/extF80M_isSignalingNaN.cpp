@@ -39,8 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 extF80M_isSignalingNaN(const extFloat80_t *aPtr)
 {
-    /** @bug cast to same type */
-    struct extFloat80M const *const aSPtr = (struct extFloat80M const *)aPtr;
+    extFloat80M const *const aSPtr = aPtr;
     if ((aSPtr->signExp & 0x7FFF) != 0x7FFF) {
         return false;
     } else {

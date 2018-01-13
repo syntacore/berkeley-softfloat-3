@@ -104,15 +104,14 @@ this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
-static __inline struct commonNaN
+inline commonNaN
 softfloat_f16UIToCommonNaN(uint16_t uiA)
 {
     if (0 == (uiA & 0x0200)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
     {
-        /** @todo initialize */
-		struct commonNaN z = {0,0,0};
+        commonNaN z = {0,0,0};
         return z;
     }
 }
@@ -422,7 +421,7 @@ four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
 static __inline struct commonNaN
-    softfloat_f128MToCommonNaN(uint32_t const *aWPtr)
+softfloat_f128MToCommonNaN(uint32_t const *aWPtr)
 {
     if (0 == (aWPtr[indexWordHi(4)] & UINT64_C(0x0000800000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);

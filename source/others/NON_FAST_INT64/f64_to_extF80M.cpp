@@ -52,8 +52,7 @@ void f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
 void
 f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
 {
-    /** @bug cast to same type */
-    struct extFloat80M *zSPtr = (struct extFloat80M *) zPtr;
+    extFloat80M *zSPtr = zPtr;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
@@ -74,7 +73,7 @@ f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
             zSPtr->signif = 0;
             return;
         } else {
-            struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
             exp = normExpSig.exp;
             frac = normExpSig.sig;
         }

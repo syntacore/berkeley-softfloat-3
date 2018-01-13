@@ -56,8 +56,9 @@ void
 extF80M_rem(
     const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
 {
-    const struct extFloat80M *aSPtr, *bSPtr;
-    struct extFloat80M *zSPtr;
+    extFloat80M const *aSPtr;
+    extFloat80M const *bSPtr;
+    extFloat80M *zSPtr;
     uint16_t uiA64;
     int32_t expA, expB;
     uint64_t x64;
@@ -67,12 +68,9 @@ extF80M_rem(
     uint32_t rem[3], x[3], sig32B, q, recip32, rem2[3], *remPtr, *altRemPtr;
     uint32_t *newRemPtr, wordMeanRem;
 
-    /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
-    /** @bug cast to same type */
-    bSPtr = (const struct extFloat80M *) bPtr;
-    /** @bug cast to same type */
-    zSPtr = (struct extFloat80M *) zPtr;
+    aSPtr = aPtr;
+    bSPtr = bPtr;
+    zSPtr = zPtr;
 
     uiA64 = aSPtr->signExp;
     expA = expExtF80UI64(uiA64);

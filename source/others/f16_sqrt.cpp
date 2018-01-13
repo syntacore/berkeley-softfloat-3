@@ -70,7 +70,7 @@ float16_t f16_sqrt(float16_t a)
             if (!sigA) {
                 return a;
             } else {
-                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

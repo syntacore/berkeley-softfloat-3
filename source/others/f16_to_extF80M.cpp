@@ -55,8 +55,7 @@ void f16_to_extF80M(float16_t a, extFloat80_t *zPtr)
     uint16_t uiZ64;
     uint32_t uiZ32;
 
-    /** @bug cast to same type */
-    struct extFloat80M *const zSPtr = (struct extFloat80M *) zPtr;
+    extFloat80M *const zSPtr = zPtr;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t exp = expF16UI(uiA);
@@ -78,7 +77,7 @@ void f16_to_extF80M(float16_t a, extFloat80_t *zPtr)
             uiZ32 = 0;
             goto uiZ;
         } else {
-            struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
             exp = normExpSig.exp;
             frac = normExpSig.sig;
         }

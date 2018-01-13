@@ -69,10 +69,8 @@ extF80M_roundToInt(extFloat80_t const *aPtr,
     uint64_t lastBitMask;
     uint64_t roundBitsMask;
 
-    /** @bug cast to same type */
-    struct extFloat80M const *aSPtr = (const struct extFloat80M *) aPtr;
-    /** @bug cast to same type */
-    struct extFloat80M *zSPtr = (struct extFloat80M *)zPtr;
+    extFloat80M const *aSPtr = aPtr;
+    extFloat80M *zSPtr = zPtr;
 
     uint16_t const uiA64 = aSPtr->signExp;
     uint16_t const signUI64 = uiA64 & packToExtF80UI64(1, 0);

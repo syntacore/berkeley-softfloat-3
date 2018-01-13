@@ -80,7 +80,7 @@ f16_mul(float16_t a, float16_t b)
         if (!sigA) {
             return u_as_f_16(packToF16UI(signZ, 0, 0));
         } else {
-            struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
             expA = normExpSig.exp;
             sigA = normExpSig.sig;
         }
@@ -89,7 +89,7 @@ f16_mul(float16_t a, float16_t b)
         if (!sigB) {
             return u_as_f_16(packToF16UI(signZ, 0, 0));
         } else {
-            struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
             expB = normExpSig.exp;
             sigB = normExpSig.sig;
         }

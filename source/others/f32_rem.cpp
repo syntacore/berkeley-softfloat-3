@@ -75,7 +75,7 @@ float32_t f32_rem(float32_t a, float32_t b)
                     softfloat_raiseFlags(softfloat_flag_invalid);
                     return u_as_f_32(defaultNaNF32UI);
                 } else {
-                    struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
+                    exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
                     expB = normExpSig.exp;
                     sigB = normExpSig.sig;
                 }
@@ -84,7 +84,7 @@ float32_t f32_rem(float32_t a, float32_t b)
                 if (!sigA) {
                     return a;
                 } else {
-                    struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+                    exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
                     expA = normExpSig.exp;
                     sigA = normExpSig.sig;
                 }

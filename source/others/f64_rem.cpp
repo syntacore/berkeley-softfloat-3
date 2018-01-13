@@ -66,7 +66,7 @@ float64_t f64_rem(float64_t a, float64_t b)
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return u_as_f_64(defaultNaNF64UI);
             } else {
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -75,7 +75,7 @@ float64_t f64_rem(float64_t a, float64_t b)
             if (!sigA) {
                 return a;
             } else {
-                struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

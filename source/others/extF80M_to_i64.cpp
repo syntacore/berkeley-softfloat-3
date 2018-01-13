@@ -58,7 +58,7 @@ int64_t
 extF80M_to_i64(
     const extFloat80_t *aPtr, uint8_t roundingMode, bool exact)
 {
-    const struct extFloat80M *aSPtr;
+    extFloat80M const *aSPtr;
     uint16_t uiA64;
     bool sign;
     int32_t exp;
@@ -68,7 +68,7 @@ extF80M_to_i64(
 
     
     /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
+    aSPtr = aPtr;
     uiA64 = aSPtr->signExp;
     sign = signExtF80UI64(uiA64);
     exp = expExtF80UI64(uiA64);

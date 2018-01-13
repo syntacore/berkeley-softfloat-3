@@ -52,9 +52,9 @@ int32_t extF80M_to_i32_r_minMag(const extFloat80_t *aPtr, bool exact)
 
 #else
 
-int32_t extF80M_to_i32_r_minMag(const extFloat80_t *aPtr, bool exact)
+int32_t extF80M_to_i32_r_minMag(extFloat80_t const *aPtr, bool exact)
 {
-    const struct extFloat80M *aSPtr;
+    extFloat80M const *aSPtr;
     uint16_t uiA64;
     int32_t exp;
     uint64_t sig;
@@ -69,8 +69,7 @@ int32_t extF80M_to_i32_r_minMag(const extFloat80_t *aPtr, bool exact)
     } u;
 
     
-    /** @bug cast to same type */
-    aSPtr = (const struct extFloat80M *) aPtr;
+    aSPtr = aPtr;
     uiA64 = aSPtr->signExp;
     exp = expExtF80UI64(uiA64);
     sig = aSPtr->signif;

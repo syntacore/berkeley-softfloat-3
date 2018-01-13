@@ -58,8 +58,7 @@ f16_to_f32(float16_t a)
             if (!frac) {
                 return signed_zero_F32(sign);
             } else {
-                struct exp8_sig16 normExpSig;
-                normExpSig = softfloat_normSubnormalF16Sig(frac);
+                exp8_sig16 normExpSig = softfloat_normSubnormalF16Sig(frac);
                 exp = normExpSig.exp - 1;
                 frac = normExpSig.sig;
             }

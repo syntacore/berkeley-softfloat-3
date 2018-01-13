@@ -219,13 +219,13 @@ packToExtF80UI64(bool sign, int32_t exp)
 /** @bug union of same type */
 union extF80M_extF80
 {
-    struct extFloat80M fM;
+    extFloat80M fM;
     extFloat80_t f;
 };
 /** @deprecated */
 union ui128_f128
 {
-    struct uint128 ui;
+    uint128 ui;
     float128_t f;
 };
 #endif
@@ -237,13 +237,13 @@ enum
 };
 
 #ifdef SOFTFLOAT_FAST_INT64
-static inline struct uint128
+static inline uint128
 f_as_u_128(float128_t v)
 {
-    return *(struct uint128 const*)&v;
+    return *(uint128 const*)&v;
 }
 static inline float128_t
-u_as_f_128(struct uint128 v)
+u_as_f_128(uint128 v)
 {
     return *(float128_t const*)&v;
 }
@@ -331,7 +331,7 @@ struct exp8_sig16
     int8_t exp;
     uint16_t sig;
 };
-struct exp8_sig16
+exp8_sig16
     softfloat_normSubnormalF16Sig(uint16_t);
 
 float16_t
@@ -360,7 +360,7 @@ struct exp16_sig32
     int16_t exp;
     uint32_t sig;
 };
-struct exp16_sig32
+exp16_sig32
     softfloat_normSubnormalF32Sig(uint32_t);
 
 float32_t
@@ -389,7 +389,7 @@ struct exp16_sig64
     int16_t exp;
     uint64_t sig;
 };
-struct exp16_sig64
+exp16_sig64
     softfloat_normSubnormalF64Sig(uint64_t);
 
 float64_t
@@ -429,7 +429,7 @@ struct exp32_sig64
     int32_t exp;
     uint64_t sig;
 };
-struct exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
+exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
 
 extFloat80_t
 softfloat_roundPackToExtF80(bool,
@@ -460,10 +460,10 @@ softfloat_subMagsExtF80(uint16_t,
 struct exp32_sig128
 {
     int32_t exp;
-    struct uint128 sig;
+    uint128 sig;
 };
 
-struct exp32_sig128
+exp32_sig128
     softfloat_normSubnormalF128Sig(uint64_t,
                                    uint64_t);
 
@@ -504,29 +504,29 @@ softfloat_mulAddF128(uint64_t,
 #define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
 
 bool
-softfloat_tryPropagateNaNExtF80M(struct extFloat80M const*,
-                                 struct extFloat80M const*,
-                                 struct extFloat80M*);
+softfloat_tryPropagateNaNExtF80M(extFloat80M const*,
+                                 extFloat80M const*,
+                                 extFloat80M*);
 void
-softfloat_invalidExtF80M(struct extFloat80M *);
+softfloat_invalidExtF80M(extFloat80M *);
 
 int
 softfloat_normExtF80SigM(uint64_t *);
 
 void
-softfloat_roundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *);
+softfloat_roundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, extFloat80M *);
 void
-softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, struct extFloat80M *);
+softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, extFloat80M *);
 
 void
-softfloat_addExtF80M(struct extFloat80M const*,
-                     struct extFloat80M const*,
-                     struct extFloat80M*,
+softfloat_addExtF80M(extFloat80M const*,
+                     extFloat80M const*,
+                     extFloat80M*,
                      bool);
 
 int
-softfloat_compareNonnormExtF80M(struct extFloat80M const*,
-                                struct extFloat80M const*);
+softfloat_compareNonnormExtF80M(extFloat80M const*,
+                                extFloat80M const*);
 
 bool softfloat_isNaNF128M(uint32_t const*);
 

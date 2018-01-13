@@ -67,7 +67,7 @@ float64_t f64_sqrt(float64_t a)
             if (!sigA) {
                 return a;
             }
-            struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
             expA = normExpSig.exp;
             sigA = normExpSig.sig;
         }

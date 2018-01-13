@@ -48,23 +48,14 @@ value is a signaling NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
 void
- softfloat_propagateNaNExtF80M(
-     const struct extFloat80M *aSPtr,
-     const struct extFloat80M *bSPtr,
-     struct extFloat80M *zSPtr
- )
+softfloat_propagateNaNExtF80M(extFloat80M const *aSPtr,
+                              extFloat80M const *bSPtr,
+                              extFloat80M *zSPtr)
 {
-    uint16_t ui64;
-    uint64_t ui0;
-
-    ui64 = aSPtr->signExp;
-    ui0  = aSPtr->signif;
-    if (
-        softfloat_isSigNaNExtF80UI( ui64, ui0 )
-            || (bSPtr
-                    && (ui64 = bSPtr->signExp,
-                        ui0  = bSPtr->signif,
-                        softfloat_isSigNaNExtF80UI( ui64, ui0 )))
+    uint16_t ui64 = aSPtr->signExp;
+    uint64_t ui0  = aSPtr->signif;
+    if (softfloat_isSigNaNExtF80UI( ui64, ui0 ) || 
+        (bSPtr && (ui64 = bSPtr->signExp, ui0  = bSPtr->signif, softfloat_isSigNaNExtF80UI( ui64, ui0 )))
     ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
     }
