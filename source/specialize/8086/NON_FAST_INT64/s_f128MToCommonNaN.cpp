@@ -48,16 +48,14 @@ If the NaN is a signaling NaN, the invalid exception is raised.
 @param[in] aWPtr points to an array of four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
-struct commonNaN
-softfloat_f128MToCommonNaN(uint32_t const *aWPtr)
+commonNaN
+softfloat_f128MToCommonNaN(uint32_t const *const aWPtr)
 {
     if (f128M_isSignalingNaN((float128_t const *)aWPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    {
-        struct commonNaN z;
-        z.sign = aWPtr[indexWordHi(4)] >> 31;
-        softfloat_shortShiftLeft128M(aWPtr, 16, (uint32_t *)&z.v0);
-        return z;
-    }
+    commonNaN z;
+    z.sign = 0 != (aWPtr[indexWordHi(4)] >> 31);
+    softfloat_shortShiftLeft128M(aWPtr, 16, (uint32_t *)&z.v0);
+    return z;
 }
