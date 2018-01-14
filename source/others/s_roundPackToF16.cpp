@@ -52,7 +52,7 @@ softfloat_roundPackToF16(bool sign, int16_t exp, uint16_t sig)
 
     uint8_t roundBits = sig & 0xF;
 
-    if (0x1D <= (unsigned int)exp) {
+    if (0x1D <= (unsigned)exp) {
         if (exp < 0) {
             bool const isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||
