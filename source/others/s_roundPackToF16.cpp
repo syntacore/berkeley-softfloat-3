@@ -39,36 +39,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 float16_t
-softfloat_roundPackToF16(bool sign, int16_t exp, uint16_t sig)
+softfloat_roundPackToF16(bool sign, 
+                         int16_t exp, 
+                         uint16_t sig)
 {
-    uint8_t const roundingMode = softfloat_roundingMode;
-    bool const roundNearEven = roundingMode == softfloat_round_near_even;
-    uint8_t roundIncrement = 0x8;
+    uint8_t const roundIncrement =
+        softfloat_round_near_even == softfloat_roundingMode || softfloat_round_near_maxMag == softfloat_roundingMode ? 0x8u :
+        (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode ? 0xFu :
+        0u;
 
-    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
-        roundIncrement =
-            roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0xF : 0;
-    }
+    uint8_t roundBits = sig & 0xFu;
 
-    uint8_t roundBits = sig & 0xF;
-
-    if (0x1D <= (unsigned)exp) {
+    if (0x1D <= static_cast<unsigned>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
+                softfloat_tininess_beforeRounding == softfloat_detectTininess ||
                 exp < -1 ||
-                sig + roundIncrement < 0x8000;
-            /** @todo  Warning  C4242   '=': conversion from 'uint32_t' to 'uint16_t', possible loss of data */
-            sig = softfloat_shiftRightJam32(sig, -exp);
+                sig + roundIncrement < 0x8000u;
+            sig = static_cast<uint16_t>(softfloat_shiftRightJam32(sig, static_cast<uint16_t>(-exp)));
             exp = 0;
-            roundBits = sig & 0xF;
+            roundBits = sig & 0xFu;
 
             if (isTiny && roundBits) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
         } else if (0x1D < exp || 0x8000 <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            return u_as_f_16(packToF16UI(sign, 0x1F, 0) - !roundIncrement);
+            return u_as_f_16(static_cast<uint16_t>(packToF16UI(sign, 0x1F, 0u) - !roundIncrement));
         }
     }
 
@@ -76,7 +73,7 @@ softfloat_roundPackToF16(bool sign, int16_t exp, uint16_t sig)
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    sig = (sig + roundIncrement) >> 4;
-    sig &= ~(uint16_t)(!(roundBits ^ 8) & roundNearEven);
-    return u_as_f_16(packToF16UI(sign, sig ? exp : 0, sig));
+    sig = static_cast<uint16_t>((sig + roundIncrement) >> 4);
+    sig &= ~static_cast<uint16_t>(!(roundBits ^ 8) & !!(softfloat_round_near_even == softfloat_roundingMode));
+    return u_as_f_16(packToF16UI(sign, static_cast<int8_t>(sig ? exp : 0), sig));
 }
