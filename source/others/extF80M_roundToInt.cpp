@@ -127,13 +127,13 @@ extF80M_roundToInt(extFloat80_t const *const aPtr,
             sigZ = sigA;
         }
         /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
-        zPtr->signExp = signUI64 | exp;
+        zPtr->signExp = static_cast<uint16_t>(signUI64 | exp);
         zPtr->signif = sigZ;
         return;
     }
 
     /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
-    uint16_t uiZ64 = signUI64 | exp;
+    uint16_t uiZ64 = static_cast<uint16_t>(signUI64 | exp);
     uint64_t const lastBitMask = (uint64_t)1 << (0x403E - exp);
     uint64_t const roundBitsMask = lastBitMask - 1;
     uint64_t sigZ = sigA;

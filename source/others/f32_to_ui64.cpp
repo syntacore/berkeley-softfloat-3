@@ -73,7 +73,7 @@ f32_to_ui64(float32_t a, uint8_t roundingMode, bool exact)
         extSig[indexWord(3, 1)] = 0;
         extSig[indexWord(3, 0)] = 0;
         if (shiftDist) {
-            softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
+            softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
         }
         return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
 #endif

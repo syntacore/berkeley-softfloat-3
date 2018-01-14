@@ -36,10 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/types.hpp"
 
-#include <cstdint>
-
-#ifndef softfloat_addCarryM
-
 uint8_t
 softfloat_addCarryM(uint8_t size_words,
                     uint32_t const * aPtr,
@@ -47,31 +43,21 @@ softfloat_addCarryM(uint8_t size_words,
                     uint8_t carry,
                     uint32_t* zPtr)
 {
-    unsigned int index, lastIndex;
-    uint32_t wordA, wordZ;
+    unsigned const lastIndex = indexWordHi(size_words);
 
-    index = indexWordLo(size_words);
-    lastIndex = indexWordHi(size_words);
-
-    for (;;) {
-        wordA = aPtr[index];
-        wordZ = wordA + bPtr[index] + carry;
+    for (unsigned index = indexWordLo(size_words);; index += wordIncr) {
+        uint32_t const wordA = aPtr[index];
+        uint32_t const wordZ = wordA + bPtr[index] + carry;
         zPtr[index] = wordZ;
 
         if (wordZ != wordA) {
             carry = (wordZ < wordA);
         }
 
-        if (index == lastIndex) {
+        if (lastIndex == index) {
             break;
         }
-
-        index += wordIncr;
     }
 
     return carry;
-
 }
-
-#endif
-

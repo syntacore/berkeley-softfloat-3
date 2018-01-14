@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
 extF80M_rem(
-    const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
+    const extFloat80_t* aPtr, const extFloat80_t* bPtr, extFloat80_t* zPtr)
 {
     *zPtr = extF80_rem(*aPtr, *bPtr);
 }
@@ -53,37 +53,32 @@ extF80M_rem(
 #else
 
 void
-extF80M_rem(
-    const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr)
+extF80M_rem(extFloat80_t const* const aPtr,
+            extFloat80_t const* const bPtr,
+            extFloat80_t* const zPtr)
 {
-    extFloat80M const *aSPtr;
-    extFloat80M const *bSPtr;
-    extFloat80M *zSPtr;
-    uint16_t uiA64;
-    int32_t expA, expB;
     uint64_t x64;
-    bool signRem;
-    uint64_t sigA;
-    int32_t expDiff;
-    uint32_t rem[3], x[3], sig32B, q, recip32, rem2[3], *remPtr, *altRemPtr;
-    uint32_t *newRemPtr, wordMeanRem;
+    uint32_t rem[3];
+    uint32_t x[3];
+    uint32_t q;
+    uint32_t rem2[3];
+    uint32_t* remPtr;
+    uint32_t* altRemPtr;
 
-    aSPtr = aPtr;
-    bSPtr = bPtr;
-    zSPtr = zPtr;
+    uint16_t const uiA64 = aPtr->signExp;
+    int32_t expA = expExtF80UI64(uiA64);
+    int32_t expB = expExtF80UI64(bPtr->signExp);
 
-    uiA64 = aSPtr->signExp;
-    expA = expExtF80UI64(uiA64);
-    expB = expExtF80UI64(bSPtr->signExp);
-
-    if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
-        if (softfloat_tryPropagateNaNExtF80M(aSPtr, bSPtr, zSPtr)) {
+    if (0x7FFF == expA || 0x7FFF == expB) {
+        if (softfloat_tryPropagateNaNExtF80M(aPtr, bPtr, zPtr)) {
             return;
         }
+
         if (expA == 0x7FFF) {
-            softfloat_invalidExtF80M(zSPtr);
+            softfloat_invalidExtF80M(zPtr);
             return;
         }
+
         /*
         If we get here, then argument b is an infinity and `expB' is 0x7FFF;
         Doubling `expB' is an easy way to ensure that `expDiff' later is
@@ -96,109 +91,141 @@ extF80M_rem(
     if (!expB) {
         expB = 1;
     }
-    x64 = bSPtr->signif;
+
+    x64 = bPtr->signif;
+
     if (!(x64 & UINT64_C(0x8000000000000000))) {
         if (!x64) {
-            softfloat_invalidExtF80M(zSPtr);
+            softfloat_invalidExtF80M(zPtr);
             return;
         }
+
         expB += softfloat_normExtF80SigM(&x64);
     }
-    signRem = signExtF80UI64(uiA64);
+
+    bool signRem = signExtF80UI64(uiA64);
+
     if (!expA) {
         expA = 1;
     }
-    sigA = aSPtr->signif;
+
+    uint64_t sigA = aPtr->signif;
+
     if (!(sigA & UINT64_C(0x8000000000000000))) {
         if (!sigA) {
             expA = 0;
             goto copyA;
         }
+
         expA += softfloat_normExtF80SigM(&sigA);
     }
 
 
-    expDiff = expA - expB;
-    if (expDiff < -1) {
-        goto copyA;
-    }
-    rem[indexWord(3, 2)] = sigA >> 34;
-    rem[indexWord(3, 1)] = (uint32_t)(sigA >> 2);
-    rem[indexWord(3, 0)] = (uint32_t)sigA << 30;
-    x[indexWord(3, 0)] = (uint32_t)x64 << 30;
-    sig32B = x64 >> 32;
-    x64 >>= 2;
-    x[indexWord(3, 2)] = x64 >> 32;
-    x[indexWord(3, 1)] = (uint32_t)x64;
-    if (expDiff < 1) {
-        if (expDiff) {
-            --expB;
-            softfloat_add96M(x, x, x);
-            q = 0;
-        } else {
-            q = (softfloat_compare96M(x, rem) <= 0);
-            if (q) {
-                softfloat_sub96M(rem, x, rem);
-            }
+    {
+        int32_t expDiff = expA - expB;
+
+        if (expDiff < -1) {
+            goto copyA;
         }
-    } else {
-        recip32 = softfloat_approxRecip32_1(sig32B);
-        expDiff -= 30;
-        for (;;) {
-            x64 = (uint64_t)rem[indexWordHi(3)] * recip32;
-            if (expDiff < 0) {
-                break;
+
+        {
+            rem[indexWord(3, 2)] = sigA >> 34;
+            rem[indexWord(3, 1)] = (uint32_t)(sigA >> 2);
+            rem[indexWord(3, 0)] = (uint32_t)sigA << 30;
+            x[indexWord(3, 0)] = (uint32_t)x64 << 30;
+            uint32_t const sig32B = x64 >> 32;
+            x64 >>= 2;
+            x[indexWord(3, 2)] = x64 >> 32;
+            x[indexWord(3, 1)] = (uint32_t)x64;
+
+            if (expDiff < 1) {
+                if (expDiff) {
+                    --expB;
+                    softfloat_add96M(x, x, x);
+                    q = 0;
+                } else {
+                    q = 0u + !!(softfloat_compare96M(x, rem) <= 0);
+
+                    if (q) {
+                        softfloat_sub96M(rem, x, rem);
+                    }
+                }
+            } else {
+                uint32_t const recip32 = softfloat_approxRecip32_1(sig32B);
+                expDiff -= 30;
+
+                for (;;) {
+                    x64 = static_cast<uint64_t>(rem[indexWordHi(3)]) * recip32;
+
+                    if (expDiff < 0) {
+                        break;
+                    }
+
+                    q = (x64 + 0x80000000) >> 32;
+                    softfloat_remStep96MBy32(rem, 29, x, q, rem);
+
+                    if (rem[indexWordHi(3)] & 0x80000000) {
+                        softfloat_add96M(rem, x, rem);
+                    }
+
+                    expDiff -= 29;
+                }
+
+                /* `expDiff' cannot be less than -29 here. */
+                q = static_cast<uint32_t>(x64 >> 32) >> (~expDiff & 31);
+                softfloat_remStep96MBy32(rem, static_cast<uint8_t>(expDiff + 30), x, q, rem);
+
+                if (rem[indexWordHi(3)] & 0x80000000) {
+                    remPtr = rem;
+                    altRemPtr = rem2;
+                    softfloat_add96M(remPtr, x, altRemPtr);
+                    goto selectRem;
+                }
             }
-            q = (x64 + 0x80000000) >> 32;
-            softfloat_remStep96MBy32(rem, 29, x, q, rem);
-            if (rem[indexWordHi(3)] & 0x80000000) {
-                softfloat_add96M(rem, x, rem);
-            }
-            expDiff -= 29;
-        }
-        /* `expDiff' cannot be less than -29 here. */
-        q = (uint32_t)(x64 >> 32) >> (~expDiff & 31);
-        /** @todo Warning	C4244	'=': conversion from 'int' to 'uint8_t', possible loss of data */
-        softfloat_remStep96MBy32(rem, expDiff + 30, x, q, rem);
-        if (rem[indexWordHi(3)] & 0x80000000) {
+
             remPtr = rem;
             altRemPtr = rem2;
-            softfloat_add96M(remPtr, x, altRemPtr);
-            goto selectRem;
+
+            do {
+                ++q;
+                uint32_t* newRemPtr = altRemPtr;
+                softfloat_sub96M(remPtr, x, newRemPtr);
+                altRemPtr = remPtr;
+                remPtr = newRemPtr;
+            } while (!(remPtr[indexWordHi(3)] & 0x80000000));
+
+selectRem:
+            {
+                softfloat_add96M(remPtr, altRemPtr, x);
+                uint32_t const wordMeanRem = x[indexWordHi(3)];
+
+                if (0 != (wordMeanRem & 0x80000000) || (0 == wordMeanRem && 0 != (q & 1) && !x[indexWord(3, 0)] && !x[indexWord(3, 1)])) {
+                    remPtr = altRemPtr;
+                }
+
+                if (remPtr[indexWordHi(3)] & 0x80000000) {
+                    signRem = !signRem;
+                    softfloat_negX96M(remPtr);
+                }
+
+                softfloat_normRoundPackMToExtF80M(signRem, expB + 2, remPtr, 80, zPtr);
+                return;
+            }
         }
     }
 
-    remPtr = rem;
-    altRemPtr = rem2;
-    do {
-        ++q;
-        newRemPtr = altRemPtr;
-        softfloat_sub96M(remPtr, x, newRemPtr);
-        altRemPtr = remPtr;
-        remPtr = newRemPtr;
-    } while (!(remPtr[indexWordHi(3)] & 0x80000000));
-selectRem:
-    softfloat_add96M(remPtr, altRemPtr, x);
-    wordMeanRem = x[indexWordHi(3)];
-    if ((wordMeanRem & 0x80000000) || (!wordMeanRem && (q & 1) && !x[indexWord(3, 0)] && !x[indexWord(3, 1)])) {
-        remPtr = altRemPtr;
-    }
-    if (remPtr[indexWordHi(3)] & 0x80000000) {
-        signRem = !signRem;
-        softfloat_negX96M(remPtr);
-    }
-    softfloat_normRoundPackMToExtF80M(signRem, expB + 2, remPtr, 80, zSPtr);
-    return;
-
 copyA:
-    if (expA < 1) {
-        sigA >>= 1 - expA;
-        expA = 0;
-    }
-    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
-    zSPtr->signExp = packToExtF80UI64(signRem, expA);
-    zSPtr->signif = sigA;
 
+    {
+        if (expA < 1) {
+            sigA >>= 1 - expA;
+            expA = 0;
+        }
+
+        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
+        zPtr->signExp = packToExtF80UI64(signRem, static_cast<uint16_t>(expA));
+        zPtr->signif = sigA;
+    }
 }
 
 #endif

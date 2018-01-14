@@ -78,7 +78,7 @@ float16_t extF80M_to_f16(const extFloat80_t *aPtr)
             exp = -0x40;
         }
         /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
-        return softfloat_roundPackToF16(sign, exp, sig16);
+        return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
     }
 }
 #endif

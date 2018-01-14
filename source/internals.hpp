@@ -42,26 +42,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-inline bool
+inline constexpr bool
 signF16UI(uint16_t a)
 {
-    return 0 != (a >> 15);
+    return static_cast<int16_t>(a) < 0;
 }
 
-inline int8_t
+inline constexpr int8_t
 expF16UI(uint16_t a)
 {
-    return (int8_t)((a >> 10) & 0x1F);
+    return static_cast<int8_t>((a >> 10) & 0x1F);
 }
 
-inline uint16_t
+inline constexpr uint16_t
 fracF16UI(uint16_t a)
 {
     return a & 0x03FFu;
 }
 
-inline uint16_t
-packToF16UI(bool sign, int8_t exp, uint16_t sig)
+inline constexpr uint16_t
+packToF16UI(bool sign,
+            int8_t exp,
+            uint16_t sig)
 {
     return
         static_cast<uint16_t>(
@@ -70,199 +72,210 @@ packToF16UI(bool sign, int8_t exp, uint16_t sig)
             sig);
 }
 
-inline bool
+inline constexpr bool
 isNaNF16UI(uint16_t a)
 {
-    return 0 == (~a & 0x7C00) && 0 != (a & 0x03FF);
+    return
+        0 == (~a & 0x7C00) && 
+        0 != (a & 0x03FF);
 }
 
-static inline uint16_t
+inline constexpr uint16_t
 f_as_u_16(float16_t v)
 {
-    return *(uint16_t const*)&v;
+    return v.v;
 }
-static inline float16_t
+
+inline constexpr float16_t
 u_as_f_16(uint16_t v)
 {
-    return *(float16_t const*)&v;
+    return float16_t{v};
 }
-static inline uint32_t
+
+inline constexpr uint32_t
 f_as_u_32(float32_t v)
 {
-    return *(uint32_t const*)&v;
+    return v.v;
 }
-static inline float32_t
+
+inline constexpr float32_t
 u_as_f_32(uint32_t v)
 {
-    return *(float32_t const*)&v;
+    return float32_t{v};
 }
 
-static inline uint64_t
+inline constexpr uint64_t
 f_as_u_64(float64_t v)
 {
-    return *(uint64_t const*)&v;
-}
-static inline float64_t
-u_as_f_64(uint64_t v)
-{
-    return *(float64_t const*)&v;
+    return v.v;
 }
 
-static inline bool
+inline constexpr float64_t
+u_as_f_64(uint64_t v)
+{
+    return float64_t{v};
+}
+
+inline constexpr bool
 signF32UI(uint32_t a)
 {
-    return (int32_t)a < 0;
+    return static_cast<int32_t>(a) < 0;
 }
 
 /** @bug return signed 16-bits value instead unsigned 8-bits value */
-static inline int16_t
+inline constexpr int16_t
 expF32UI(uint32_t a)
 {
-    return (int16_t)((a >> 23) & ~(~UINT32_C(0) << 8));
+    return static_cast<int16_t>((a >> 23) & ~(~UINT32_C(0) << 8));
 }
 
-static inline uint32_t
+inline constexpr uint32_t
 fracF32UI(uint32_t a)
 {
     return a & ~(~UINT32_C(0) << 23);
 }
 
-static inline uint32_t
-packToF32UI(bool sign, int16_t exp, uint32_t sgnf)
+inline constexpr uint32_t
+packToF32UI(bool sign,
+            int16_t exp,
+            uint32_t sgnf)
 {
-#if 0
-    assert(0 <= exp && exp <= 255);
-    assert(0 == (sgnf & (~UINT32_C(0) << 23)));
-#endif
-    uint32_t const u_res = ((uint32_t)exp << 23) + sgnf;
-    assert(0 == (u_res & (UINT32_C(1) << 31)));
-    return ((uint32_t)!!sign << 31) | u_res;
+    return
+        (static_cast<uint32_t>(!!sign) << 31) | 
+        ((static_cast<uint32_t>(exp) << 23) + sgnf);
 }
 
-static inline uint32_t
+inline constexpr uint32_t
 signed_zero_F32UI(bool sign)
 {
-    return packToF32UI(sign, 0, 0);
+    return packToF32UI(sign, 0, 0u);
 }
 
-static inline float32_t
+inline float32_t
 signed_zero_F32(bool sign)
 {
     return u_as_f_32(signed_zero_F32UI(sign));
 }
 
-static inline uint32_t
+inline constexpr uint32_t
 signed_inf_F32UI(bool sign)
 {
-    return packToF32UI(sign, 0xFF, 0);
+    return packToF32UI(sign, 0xFF, 0u);
 }
 
-static inline float32_t
+inline constexpr float32_t
 signed_inf_F32(bool sign)
 {
     return u_as_f_32(signed_inf_F32UI(sign));
 }
 
-static inline bool
+inline constexpr bool
 isNaNF32UI(uint32_t a)
 {
-    return 255 == expF32UI(a) && 0 != fracF32UI(a);
+    return
+        255 == expF32UI(a) &&
+        0 != fracF32UI(a);
 }
 
-static inline bool
+inline constexpr bool
 isInf32UI(uint32_t a)
 {
-    return 255 == expF32UI(a) && 0 == fracF32UI(a);
+    return
+        255 == expF32UI(a) &&
+        0 == fracF32UI(a);
 }
 
-static inline bool
+inline constexpr bool
 isZero32UI(uint32_t a)
 {
-    return 0 == expF32UI(a) && 0 == fracF32UI(a);
+    return
+        0 == expF32UI(a) &&
+        0 == fracF32UI(a);
 }
 
-static inline bool
+inline constexpr bool
 isSubnormal32UI(uint32_t a)
 {
-    return 0 == expF32UI(a) && 0 != fracF32UI(a);
+    return
+        0 == expF32UI(a) &&
+        0 != fracF32UI(a);
 }
 
-static inline bool
+inline constexpr bool
 signF64UI(uint64_t a)
 {
-    return (int64_t)a < 0;
+    return static_cast<int64_t>(a) < 0;
 }
-static int16_t
+
+inline constexpr int16_t
 expF64UI(uint64_t a)
 {
-    return (int16_t)((a >> 52) & ~(~UINT32_C(0) << 11));
+    return static_cast<int16_t>((a >> 52) & ~(~UINT32_C(0) << 11));
 }
-static inline uint64_t
+
+inline constexpr uint64_t
 fracF64UI(uint64_t a)
 {
     return a & ~(~UINT64_C(0) << 52);
 }
-static inline uint64_t
+
+inline constexpr uint64_t
 packToF64UI(bool sign, int16_t exp, uint64_t sgnf)
 {
-#if 0
-    assert(0 <= exp && exp <= 2047);
-    assert(0 == (sgnf & (~UINT32_C(0) << 52)));
-#endif
-    uint64_t const u_res = ((uint64_t)exp << 52) + sgnf;
-    assert(0 == (u_res & (UINT64_C(1) << 63)));
-    return ((uint64_t)!!sign << 63) | u_res;
+    return
+        (static_cast<uint64_t>(!!sign) << 63) | 
+        ((static_cast<uint64_t>(exp) << 52) + sgnf);
 }
 
-static inline bool
+inline constexpr bool
 isNaNF64UI(uint64_t a)
 {
-    return 2047 == expF64UI(a) && 0 != fracF64UI(a);
+    return
+        2047 == expF64UI(a) && 
+        0 != fracF64UI(a);
 }
 
-static inline bool
+inline constexpr bool
 isInf64UI(uint64_t a)
 {
-    return 2047 == expF64UI(a) && 0 == fracF64UI(a);
+    return
+        2047 == expF64UI(a) && 
+        0 == fracF64UI(a);
 }
 
-static inline bool
+inline constexpr bool
 isZero64UI(uint64_t a)
 {
     return 0 == (a << 1);
 }
 
-inline bool
+inline constexpr bool
 signExtF80UI64(uint16_t a64)
 {
     return 0 != (a64 >> 15);
 }
 
-inline uint16_t
+inline constexpr uint16_t
 expExtF80UI64(uint16_t a64)
 {
     return a64 & 0x7FFFu;
 }
 
-inline uint16_t
+inline constexpr uint16_t
 packToExtF80UI64(bool sign, uint16_t exp)
 {
     return static_cast<uint16_t>((!!sign << 15) | exp);
 }
 
-inline bool
+inline constexpr bool
 isNaNExtF80UI(uint16_t a64, uint64_t a0)
 {
-    return 0x7FFFu == (a64 & 0x7FFFu) && 0 != (a0 & UINT64_C(0x7FFFFFFFFFFFFFFF));
+    return
+        0x7FFFu == (a64 & 0x7FFFu) && 
+        0 != (a0 & UINT64_C(0x7FFFFFFFFFFFFFFF));
 }
 
 #ifdef SOFTFLOAT_FAST_INT64
-/** @bug union of same type */
-union extF80M_extF80
-{
-    extFloat80M fM;
-    extFloat80_t f;
-};
 /** @deprecated */
 union ui128_f128
 {
@@ -278,57 +291,54 @@ enum
 };
 
 #ifdef SOFTFLOAT_FAST_INT64
-static inline uint128
+
+inline constexpr uint128
 f_as_u_128(float128_t v)
 {
-    return *(uint128 const*)&v;
+    return reinterpret_cast<uint128 const&>(v);
 }
-static inline float128_t
+
+inline constexpr float128_t
 u_as_f_128(uint128 v)
 {
-    return *(float128_t const*)&v;
+    return reinterpret_cast<float128_t const&>(v);
 }
+
 #endif  /* SOFTFLOAT_FAST_INT64 */
 
 /**
 @returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point NaN.
 */
-static inline bool
+inline constexpr bool
 softfloat_isNaNF32UI(uint32_t uiA)
 {
-    static uint32_t exp_mask = ~(~UINT32_C(0) << 8) << 23;
-    static uint32_t sgnf_mask = ~(~UINT32_C(0) << 23);
     return
-        (uiA & exp_mask) == exp_mask &&
-        0 != (uiA & sgnf_mask);
+        (~(~UINT32_C(0) << 8) << 23) == (uiA & (~(~UINT32_C(0) << 8) << 23)) &&
+        0 != (uiA & (~(~UINT32_C(0) << 23)));
 }
+
 /**
 @returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
 64-bit floating-point NaN.
 */
-static inline bool
+inline constexpr bool
 softfloat_isNaNF64UI(uint64_t uiA)
 {
-    static uint64_t exp_mask = ~(~UINT64_C(0) << 11) << 52;
-    static uint64_t sgnf_mask = ~(~UINT64_C(0) << 52);
     return
-        (uiA & exp_mask) == exp_mask &&
-        0 != (uiA & sgnf_mask);
+        (~(~UINT64_C(0) << 11) << 52) == (uiA & (~(~UINT64_C(0) << 11) << 52)) &&
+        0 != (uiA & (~(~UINT64_C(0) << 52)));
 }
 /**
 Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point signaling NaN.
 */
-static inline bool
+inline constexpr bool
 softfloat_isSigNaNF32UI(uint32_t uiA)
 {
-    static uint32_t exp_mask = ~(~UINT32_C(0) << 8) << 23;
-    static uint32_t quite_mask = ~(~UINT32_C(0) << 1) << 22;
-    static uint32_t sgnf_mask = ~(~UINT32_C(0) << 23);
     return
-        (uiA & (exp_mask | quite_mask)) == exp_mask &&
-        0 != (uiA & sgnf_mask);
+        (~(~UINT32_C(0) << 8) << 23) == (uiA & ((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22))) &&
+        0 != (uiA & (~(~UINT32_C(0) << 23)));
 }
 
 uint32_t
@@ -401,6 +411,7 @@ struct exp16_sig32
     int16_t exp;
     uint32_t sig;
 };
+
 exp16_sig32
 softfloat_normSubnormalF32Sig(uint32_t);
 
@@ -430,6 +441,7 @@ struct exp16_sig64
     int16_t exp;
     uint64_t sig;
 };
+
 exp16_sig64
 softfloat_normSubnormalF64Sig(uint64_t);
 
@@ -461,7 +473,7 @@ softfloat_mulAddF64(uint64_t,
 inline constexpr bool
 signF128UI64(uint64_t a64)
 {
-    return 0 != (a64 >> 63);
+    return static_cast<int64_t>(a64) < 0;
 }
 
 #define expF128UI64( a64 ) ((int32_t) ((a64)>>48) & 0x7FFF)
@@ -551,10 +563,10 @@ softfloat_mulAddF128(uint64_t,
 
 #else
 
-inline bool
+inline constexpr bool
 signF128UI96(uint32_t a96)
 {
-    return 0 != (a96 >> 31);
+    return static_cast<int32_t>(a96) < 0;
 }
 
 inline constexpr uint16_t
@@ -563,11 +575,12 @@ expF128UI96(uint32_t a96)
     return static_cast<uint16_t>((a96 >> 16) & UINT16_C(0x7FFF));
 }
 
-inline uint32_t
+inline constexpr uint32_t
 fracF128UI96(uint32_t a96)
 {
     return a96 & 0x0000FFFF;
 }
+
 #define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
 
 bool

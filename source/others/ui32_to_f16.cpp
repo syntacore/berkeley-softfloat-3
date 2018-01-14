@@ -35,19 +35,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "softfloat/functions.h"
+
 #include "internals.hpp"
 
 float16_t
 ui32_to_f16(uint32_t a)
 {
-    int8_t shiftDist = softfloat_countLeadingZeros32(a) - 21;
+    int8_t const shiftDist = softfloat_countLeadingZeros32(a) - 21;
+
     if (0 <= shiftDist) {
-        return u_as_f_16(a ? packToF16UI(0, 0x18 - shiftDist, (uint16_t)a << shiftDist) : 0);
-    } else {
-        shiftDist += 4;
-        uint16_t const sig =
-            shiftDist < 0 ? a >> -shiftDist | ((uint32_t)(a << (shiftDist & 31)) != 0) :
-            (uint16_t)a << shiftDist;
-        return softfloat_roundPackToF16(0, 0x1C - shiftDist, sig);
+        return u_as_f_16(a ? packToF16UI(false, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : 0u);
     }
+
+    int8_t const shiftDist1 = shiftDist + 4;
+    uint16_t const sig =
+        shiftDist1 < 0 ? static_cast<uint16_t>(a >> -shiftDist1 | !!(0 != static_cast<uint32_t>(a << (shiftDist1 & 31)))) :
+        static_cast<uint16_t>(a << shiftDist1);
+    return softfloat_roundPackToF16(0, 0x1C - shiftDist1, sig);
 }

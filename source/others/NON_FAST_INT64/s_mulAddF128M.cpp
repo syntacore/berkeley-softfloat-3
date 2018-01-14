@@ -194,7 +194,7 @@ possibleInvalidProd:
         extSigPtr = &sigProd[indexMultiwordHi(8, 5)];
 
         if (expDiff) {
-            softfloat_shiftRightJam160M(extSigPtr, -expDiff, extSigPtr);
+            softfloat_shiftRightJam160M(extSigPtr, static_cast<uint8_t>(-expDiff), extSigPtr);
         }
 
         carry = 0;
@@ -202,7 +202,7 @@ possibleInvalidProd:
         if (doSub) {
             wordSig = extSigPtr[indexWordLo(5)];
             extSigPtr[indexWordLo(5)] = static_cast<uint32_t>(-static_cast<int32_t>(wordSig));
-            carry = 0 == wordSig;
+            carry = 0u + !!(0 == wordSig);
         }
 
         (*addCarryMRoutinePtr)(
@@ -239,14 +239,14 @@ possibleInvalidProd:
 
         if (0 <= expDiff) {
             if (expDiff) {
-                softfloat_shiftRightJam160M(sigX, expDiff, sigX);
+                softfloat_shiftRightJam160M(sigX, static_cast<uint8_t>(expDiff), sigX);
             }
 
             wordSig = sigX[indexWordLo(5)];
             carry = 0;
 
             if (doSub) {
-                carry = 0 == wordSig;
+                carry = 0u + !!(0 == wordSig);
                 wordSig = static_cast<uint32_t>(-static_cast<int32_t>(wordSig));
             }
 
@@ -269,7 +269,7 @@ possibleInvalidProd:
 
             expDiff >>= 5;
             extSigPtr = &sigProd[indexMultiwordLo(8, 5)] - wordIncr + expDiff * -wordIncr;
-            carry = (*addCarryMRoutinePtr)(5, extSigPtr, sigX, doSub, extSigPtr);
+            carry = 0u + !!(*addCarryMRoutinePtr)(5, extSigPtr, sigX, 0u + !!doSub, extSigPtr);
 
             if (expDiff == -4) {
                 wordSig = sigProd[indexWordHi(8)];

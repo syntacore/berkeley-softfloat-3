@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 #include "specialize.hpp"
+
 #include "softfloat/functions.h"
 
 float64_t
@@ -99,7 +100,8 @@ softfloat_subMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
             softfloat_normRoundPackToF64(signZ,
                                          expB - 1,
                                          (sigB_shifted | UINT64_C(0x4000000000000000)) -
-                                         softfloat_shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted), -expDiff));
+                                         softfloat_shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted),
+                                         static_cast<uint32_t>(-expDiff)));
     }
 
     if (0x7FF == expA) {
@@ -110,5 +112,6 @@ softfloat_subMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
         softfloat_normRoundPackToF64(signZ,
                                      expA - 1,
                                      (sigA_shifted | UINT64_C(0x4000000000000000)) -
-                                     softfloat_shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), expDiff));
+                                     softfloat_shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted),
+                                     static_cast<uint32_t>(expDiff)));
 }

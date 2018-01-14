@@ -43,19 +43,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 uint64_t
- f128M_to_ui64( const float128_t *aPtr, uint8_t roundingMode, bool exact )
+f128M_to_ui64(const float128_t* aPtr, uint8_t roundingMode, bool exact)
 {
 
-    return f128_to_ui64( *aPtr, roundingMode, exact );
+    return f128_to_ui64(*aPtr, roundingMode, exact);
 
 }
 
 #else
 
 uint64_t
- f128M_to_ui64( const float128_t *aPtr, uint8_t roundingMode, bool exact )
+f128M_to_ui64(const float128_t* aPtr, uint8_t roundingMode, bool exact)
 {
-    const uint32_t *aWPtr;
+    const uint32_t* aWPtr;
     uint32_t uiA96;
     bool sign;
     int32_t exp;
@@ -63,34 +63,38 @@ uint64_t
     int32_t shiftDist;
     uint32_t sig[4];
 
-    
-    aWPtr = (const uint32_t *) aPtr;
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    sign  = signF128UI96( uiA96 );
-    exp   = expF128UI96( uiA96 );
-    sig96 = fracF128UI96( uiA96 );
-    
+
+    aWPtr = (const uint32_t*)aPtr;
+    uiA96 = aWPtr[indexWordHi(4)];
+    sign = signF128UI96(uiA96);
+    exp = expF128UI96(uiA96);
+    sig96 = fracF128UI96(uiA96);
+
     shiftDist = 0x404F - exp;
-    if ( shiftDist < 17 ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+
+    if (shiftDist < 17) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return
             (exp == 0x7FFF)
-                && (sig96
-                        || (aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )]
-                                | aWPtr[indexWord( 4, 0 )]))
-                ? ui64_fromNaN
-                : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+            && (sig96
+                || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)]
+                | aWPtr[indexWord(4, 0)]))
+            ? ui64_fromNaN
+            : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
-    
-    if ( exp ) sig96 |= 0x00010000;
-    sig[indexWord( 4, 3 )] = sig96;
-    sig[indexWord( 4, 2 )] = aWPtr[indexWord( 4, 2 )];
-    sig[indexWord( 4, 1 )] = aWPtr[indexWord( 4, 1 )];
-    sig[indexWord( 4, 0 )] = aWPtr[indexWord( 4, 0 )];
-    softfloat_shiftRightJam128M( sig, shiftDist, sig );
+
+    if (exp) {
+        sig96 |= 0x00010000;
+    }
+
+    sig[indexWord(4, 3)] = sig96;
+    sig[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
+    sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
+    sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
+    softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist), sig);
     return
         softfloat_roundPackMToUI64(
-            sign, sig + indexMultiwordLo( 4, 3 ), roundingMode, exact );
+            sign, sig + indexMultiwordLo(4, 3), roundingMode, exact);
 
 }
 

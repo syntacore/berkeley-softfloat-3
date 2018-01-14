@@ -88,7 +88,7 @@ f64_to_i64(float64_t a, uint8_t roundingMode, bool exact)
         } else {
             extSig[indexWord(3, 2)] = sig >> 32;
             extSig[indexWord(3, 1)] = (uint32_t)sig;
-            softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
+            softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
         }
         return softfloat_roundPackMToI64(sign, extSig, roundingMode, exact);
     }

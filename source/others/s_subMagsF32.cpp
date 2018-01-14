@@ -48,47 +48,55 @@ softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
     uint32_t sigB = fracF32UI(uiB);
 
     int16_t expDiff = expA - expB;
+
     if (0 == expDiff) {
         if (0xFF == expA) {
             if (0 != sigA || 0 != sigB) {
                 return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_32(defaultNaNF32UI);
             }
-        } else {
-            int32_t sigDiff = sigA - sigB;
-            if (0 == sigDiff) {
-                return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
-            } else {
-                if (expA) {
-                    --expA;
-                }
-                bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
-                int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
-                int8_t const shiftDist = softfloat_countLeadingZeros32(sigAbsDiff) - 8;
-                int16_t const expZ = expA - shiftDist;
-                return u_as_f_32(expZ < 0 ? packToF32UI(signZ, 0, sigAbsDiff << expA) : packToF32UI(signZ, expZ, sigAbsDiff << shiftDist));
-            }
+
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_32(defaultNaNF32UI);
         }
-    } else {
-        bool const signZ = signF32UI(uiA);
-        sigA <<= 7;
-        sigB <<= 7;
-        if (expDiff < 0) {
-            return
-                0xFF == expB ? (0 != sigB ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB)) : signed_inf_F32(!signZ)) :
-                softfloat_normRoundPackToF32(!signZ,
-                                             expB - 1,
-                                             (sigB | 0x40000000) -
-                                             softfloat_shiftRightJam32(sigA + (expA ? 0x40000000 : sigA), -expDiff));
-        } else {
-            return
-                0xFF == expA ? u_as_f_32(0 != sigA ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA) :
-                softfloat_normRoundPackToF32(signZ,
-                                             expA - 1,
-                                             (sigA | 0x40000000) -
-                                             softfloat_shiftRightJam32(sigB + (expB ? 0x40000000 : sigB), expDiff));
+
+        int32_t sigDiff = static_cast<int32_t>(sigA - sigB);
+
+        if (0 == sigDiff) {
+            return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
         }
+
+        if (expA) {
+            --expA;
+        }
+
+        bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
+        int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
+        int8_t const shiftDist = softfloat_countLeadingZeros32(static_cast<uint32_t>(sigAbsDiff)) - 8;
+        int16_t const expZ = expA - shiftDist;
+        return
+            u_as_f_32(
+                expZ < 0 ? packToF32UI(signZ, 0, static_cast<uint32_t>(sigAbsDiff << expA)) :
+                packToF32UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
     }
+
+    bool const signZ = signF32UI(uiA);
+    sigA <<= 7;
+    sigB <<= 7;
+
+    if (expDiff < 0) {
+        return
+            0xFF != expB ? softfloat_normRoundPackToF32(!signZ,
+                    expB - 1,
+                    (sigB | 0x40000000) -
+                    softfloat_shiftRightJam32(sigA + (expA ? 0x40000000 : sigA), static_cast<uint16_t>(-expDiff))) :
+            0 == sigB ? signed_inf_F32(!signZ) :
+            u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+    }
+
+    return
+        0xFF == expA ? u_as_f_32(0 != sigA ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA) :
+        softfloat_normRoundPackToF32(signZ,
+                                     expA - 1,
+                                     (sigA | 0x40000000) -
+                                     softfloat_shiftRightJam32(sigB + (expB ? 0x40000000 : sigB), static_cast<uint16_t>(expDiff)));
 }

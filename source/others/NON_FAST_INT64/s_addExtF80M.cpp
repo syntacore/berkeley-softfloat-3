@@ -96,7 +96,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
             extSigX[indexWord(3, 2)] = sigB >> 32;
             extSigX[indexWord(3, 1)] = (uint32_t)sigB;
             extSigX[indexWord(3, 0)] = 0;
-            softfloat_shiftRightJam96M(extSigX, expDiff, extSigX);
+            softfloat_shiftRightJam96M(extSigX, static_cast<uint8_t>(expDiff), extSigX);
             sigB =
                 (uint64_t)extSigX[indexWord(3, 2)] << 32 |
                 extSigX[indexWord(3, 1)];

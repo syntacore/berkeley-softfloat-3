@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 float16_t
-f128M_to_f16(const float128_t *aPtr)
+f128M_to_f16(const float128_t* aPtr)
 {
     return f128_to_f16(*aPtr);
 }
@@ -51,9 +51,9 @@ f128M_to_f16(const float128_t *aPtr)
 #else
 
 float16_t
-f128M_to_f16(const float128_t *aPtr)
+f128M_to_f16(const float128_t* aPtr)
 {
-    uint32_t const *const aWPtr = (uint32_t const *)aPtr;
+    uint32_t const* const aWPtr = (uint32_t const*)aPtr;
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
@@ -65,22 +65,24 @@ f128M_to_f16(const float128_t *aPtr)
     if (exp == 0x7FFF) {
         if (frac32) {
             return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f128MToCommonNaN(aWPtr)));
-        } else {
-            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-    } else {
-        uint16_t const frac16 = frac32 >> 2 | (frac32 & 3);
-        if (!(exp | frac16)) {
-            return u_as_f_16(packToF16UI(sign, 0, 0));
-        } else {
-            exp -= 0x3FF1;
-            if (exp < -0x40) {
-                exp = -0x40;
-            }
-            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
-            return softfloat_roundPackToF16(sign, exp, frac16 | 0x4000);
-        }
+
+        return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
+
+    uint16_t const frac16 = static_cast<uint16_t>(frac32 >> 2 | (frac32 & 3));
+
+    if (0 == (exp | frac16)) {
+        return u_as_f_16(packToF16UI(sign, 0, 0));
+    }
+
+    exp -= 0x3FF1;
+
+    if (exp < -0x40) {
+        exp = -0x40;
+    }
+
+    return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
 }
 #endif
 

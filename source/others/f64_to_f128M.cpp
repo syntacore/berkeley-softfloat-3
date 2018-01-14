@@ -87,11 +87,11 @@ f64_to_f128M(float64_t a, float128_t* zPtr)
         frac = normExpSig.sig;
     }
 
-    zWPtr[indexWord(4, 1)] = (uint32_t)frac << 28;
+    zWPtr[indexWord(4, 1)] = static_cast<uint32_t>(frac) << 28;
     frac >>= 4;
     zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp + 0x3C00, frac >> 32);
     /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-    zWPtr[indexWord(4, 2)] = frac;
+    zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(frac);
 }
 
 #endif

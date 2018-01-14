@@ -40,145 +40,127 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
- softfloat_addF128M(
-     const uint32_t *aWPtr,
-     const uint32_t *bWPtr,
-     uint32_t *zWPtr,
-     bool negateB
- )
+softfloat_addF128M(uint32_t const* aWPtr,
+                   uint32_t const* bWPtr,
+                   uint32_t* zWPtr,
+                   bool negateB)
 {
-    uint32_t uiA96;
-    int32_t expA;
-    uint32_t uiB96;
-    int32_t expB;
-    uint32_t uiZ96;
-    bool signZ, signB;
-    const uint32_t *tempPtr;
-    uint32_t sig96A, sig96B;
+    const uint32_t* tempPtr;
     int32_t expDiff;
-    uint8_t
-     (*addCarryMRoutinePtr)(
-         uint8_t,
-         const uint32_t *,
-         const uint32_t *,
-         uint8_t,
-         uint32_t *
-     );
-    uint32_t extSigZ[5], wordSigZ;
-    uint8_t carry;
-    void (*roundPackRoutinePtr)( bool, int32_t, uint32_t *, uint32_t * );
+    uint32_t extSigZ[5];
+    uint32_t wordSigZ;
 
-    
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    expA = expF128UI96( uiA96 );
-    uiB96 = bWPtr[indexWordHi( 4 )];
-    expB = expF128UI96( uiB96 );
-    
-    if ( (expA == 0x7FFF) || (expB == 0x7FFF) ) {
-        if ( softfloat_tryPropagateNaNF128M( aWPtr, bWPtr, zWPtr ) ) return;
-        uiZ96 = uiA96;
-        if ( expB == 0x7FFF ) {
-            uiZ96 = uiB96 ^ packToF128UI96( negateB, 0, 0 );
-            if ( (expA == 0x7FFF) && (uiZ96 != uiA96) ) {
-                softfloat_invalidF128M( zWPtr );
+
+    uint32_t uiA96 = aWPtr[indexWordHi(4)];
+    int32_t expA = expF128UI96(uiA96);
+    uint32_t uiB96 = bWPtr[indexWordHi(4)];
+    int32_t expB = expF128UI96(uiB96);
+
+    if (0x7FFF == expA || 0x7FFF == expB) {
+        if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
+            return;
+        }
+
+        uint32_t uiZ96 = uiA96;
+
+        if (expB == 0x7FFF) {
+            uiZ96 = uiB96 ^ packToF128UI96(negateB, 0, 0);
+
+            if ((expA == 0x7FFF) && (uiZ96 != uiA96)) {
+                softfloat_invalidF128M(zWPtr);
                 return;
             }
         }
-        zWPtr[indexWordHi( 4 )] = uiZ96;
-        zWPtr[indexWord( 4, 2 )] = 0;
-        zWPtr[indexWord( 4, 1 )] = 0;
-        zWPtr[indexWord( 4, 0 )] = 0;
+
+        zWPtr[indexWordHi(4)] = uiZ96;
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
         return;
     }
-    
-    signZ = signF128UI96( uiA96 );
-    signB = signF128UI96( uiB96 ) ^ negateB;
+
+    bool signZ = signF128UI96(uiA96);
+    bool const signB = signF128UI96(uiB96) ^ negateB;
     negateB = (signZ != signB);
-    if ( (uint32_t) (uiA96<<1) < (uint32_t) (uiB96<<1) ) {
+
+    if ((uint32_t)(uiA96 << 1) < (uint32_t)(uiB96 << 1)) {
         signZ = signB;
         expA = expB;
-        expB = expF128UI96( uiA96 );
+        expB = expF128UI96(uiA96);
         tempPtr = aWPtr;
         aWPtr = bWPtr;
         bWPtr = tempPtr;
         uiA96 = uiB96;
-        uiB96 = bWPtr[indexWordHi( 4 )];
+        uiB96 = bWPtr[indexWordHi(4)];
     }
-    sig96A = fracF128UI96( uiA96 );
-    sig96B = fracF128UI96( uiB96 );
-    if ( expA ) {
+
+    uint32_t sig96A = fracF128UI96(uiA96);
+    uint32_t sig96B = fracF128UI96(uiB96);
+
+    if (expA) {
         --expA;
         sig96A |= 0x00010000;
-        if ( expB ) {
+
+        if (expB) {
             --expB;
             sig96B |= 0x00010000;
         }
     }
-    
-    addCarryMRoutinePtr =
-        negateB ? softfloat_addComplCarryM : softfloat_addCarryM;
+
+    auto addCarryMRoutinePtr = negateB ? softfloat_addComplCarryM : softfloat_addCarryM;
     expDiff = expA - expB;
-    if ( expDiff ) {
-        
-        extSigZ[indexWordHi( 5 )] = sig96B;
-        extSigZ[indexWord( 5, 3 )] = bWPtr[indexWord( 4, 2 )];
-        extSigZ[indexWord( 5, 2 )] = bWPtr[indexWord( 4, 1 )];
-        extSigZ[indexWord( 5, 1 )] = bWPtr[indexWord( 4, 0 )];
-        extSigZ[indexWord( 5, 0 )] = 0;
-        softfloat_shiftRightJam160M( extSigZ, expDiff, extSigZ );
-        sig96B = extSigZ[indexWordHi( 5 )];
+
+    uint8_t carry;
+
+    if (expDiff) {
+
+        extSigZ[indexWordHi(5)] = sig96B;
+        extSigZ[indexWord(5, 3)] = bWPtr[indexWord(4, 2)];
+        extSigZ[indexWord(5, 2)] = bWPtr[indexWord(4, 1)];
+        extSigZ[indexWord(5, 1)] = bWPtr[indexWord(4, 0)];
+        extSigZ[indexWord(5, 0)] = 0;
+        softfloat_shiftRightJam160M(extSigZ, static_cast<uint8_t>(expDiff), extSigZ);
+        sig96B = extSigZ[indexWordHi(5)];
         carry = 0;
-        if ( negateB ) {
+
+        if (negateB) {
             sig96B = ~sig96B;
-            wordSigZ = extSigZ[indexWordLo( 5 )];
-            extSigZ[indexWordLo( 5 )] = -(int32_t)wordSigZ;
-            carry = ! wordSigZ;
+            wordSigZ = extSigZ[indexWordLo(5)];
+            extSigZ[indexWordLo(5)] = static_cast<uint32_t>(-static_cast<int32_t>(wordSigZ));
+            carry = 0u + !wordSigZ;
         }
-        carry =
-            (*addCarryMRoutinePtr)(
-                3,
-                &aWPtr[indexMultiwordLo( 4, 3 )],
-                &extSigZ[indexMultiword( 5, 3, 1 )],
-                carry,
-                &extSigZ[indexMultiword( 5, 3, 1 )]
-            );
+
+        carry = (*addCarryMRoutinePtr)(3,
+                                       &aWPtr[indexMultiwordLo(4, 3)],
+                                       &extSigZ[indexMultiword(5, 3, 1)],
+                                       carry,
+                                       &extSigZ[indexMultiword(5, 3, 1)]);
         wordSigZ = sig96A + sig96B + carry;
     } else {
-        
-        extSigZ[indexWordLo( 5 )] = 0;
-        carry =
-            (*addCarryMRoutinePtr)(
-                3,
-                &aWPtr[indexMultiwordLo( 4, 3 )],
-                &bWPtr[indexMultiwordLo( 4, 3 )],
-                negateB,
-                &extSigZ[indexMultiword( 5, 3, 1 )]
-            );
-        if ( negateB ) {
+        extSigZ[indexWordLo(5)] = 0;
+        carry = (*addCarryMRoutinePtr)(3,
+                                       &aWPtr[indexMultiwordLo(4, 3)],
+                                       &bWPtr[indexMultiwordLo(4, 3)],
+                                       0u + !!negateB,
+                                       &extSigZ[indexMultiword(5, 3, 1)]);
+
+        if (negateB) {
             wordSigZ = sig96A + ~sig96B + carry;
-            if ( wordSigZ & 0x80000000 ) {
-                signZ = ! signZ;
-                carry =
-                    softfloat_addComplCarry96M(
-                        &bWPtr[indexMultiwordLo( 4, 3 )],
-                        &aWPtr[indexMultiwordLo( 4, 3 )],
-                        1,
-                        &extSigZ[indexMultiword( 5, 3, 1 )]
-                    );
+
+            if (wordSigZ & 0x80000000) {
+                signZ = !signZ;
+                carry = softfloat_addComplCarry96M(&bWPtr[indexMultiwordLo(4, 3)],
+                                                   &aWPtr[indexMultiwordLo(4, 3)],
+                                                   1,
+                                                   &extSigZ[indexMultiword(5, 3, 1)]);
                 wordSigZ = sig96B + ~sig96A + carry;
             } else {
-                if (
-                    ! wordSigZ && ! extSigZ[indexWord( 5, 3 )]
-                        && ! (  extSigZ[indexWord( 5, 2 )]
-                              | extSigZ[indexWord( 5, 1 )]
-                              | extSigZ[indexWord( 5, 0 )]
-                             )
-                ) {
-                    signZ = (softfloat_roundingMode == softfloat_round_min);
-                    zWPtr[indexWordHi( 4 )] = packToF128UI96( signZ, 0, 0 );
-                    zWPtr[indexWord( 4, 2 )] = 0;
-                    zWPtr[indexWord( 4, 1 )] = 0;
-                    zWPtr[indexWord( 4, 0 )] = 0;
+                if (0 == wordSigZ && 0 == extSigZ[indexWord(5, 3)] && 0 == (extSigZ[indexWord(5, 2)] | extSigZ[indexWord(5, 1)] | extSigZ[indexWord(5, 0)])) {
+                    signZ = softfloat_round_min == softfloat_roundingMode;
+                    zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
+                    zWPtr[indexWord(4, 2)] = 0;
+                    zWPtr[indexWord(4, 1)] = 0;
+                    zWPtr[indexWord(4, 0)] = 0;
                     return;
                 }
             }
@@ -186,17 +168,21 @@ void
             wordSigZ = sig96A + sig96B + carry;
         }
     }
-    extSigZ[indexWordHi( 5 )] = wordSigZ;
-    
-    roundPackRoutinePtr = softfloat_normRoundPackMToF128M;
-    if ( 0x00010000 <= wordSigZ ) {
-        if ( 0x00020000 <= wordSigZ ) {
+
+    extSigZ[indexWordHi(5)] = wordSigZ;
+
+    auto roundPackRoutinePtr = softfloat_normRoundPackMToF128M;
+
+    if (0x00010000 <= wordSigZ) {
+        if (0x00020000 <= wordSigZ) {
             ++expA;
-            softfloat_shortShiftRightJam160M( extSigZ, 1, extSigZ );
+            softfloat_shortShiftRightJam160M(extSigZ, 1, extSigZ);
         }
+
         roundPackRoutinePtr = softfloat_roundPackMToF128M;
     }
-    (*roundPackRoutinePtr)( signZ, expA, extSigZ, zWPtr );
+
+    (*roundPackRoutinePtr)(signZ, expA, extSigZ, zWPtr);
 
 }
 

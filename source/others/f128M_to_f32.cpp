@@ -44,30 +44,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-float32_t f128M_to_f32(const float128_t *aPtr)
+float32_t f128M_to_f32(const float128_t* aPtr)
 {
     return f128_to_f32(*aPtr);
 }
 
 #else
 
-float32_t f128M_to_f32(const float128_t *aPtr)
+float32_t f128M_to_f32(const float128_t* aPtr)
 {
-    uint32_t const * const aWPtr = (const uint32_t *)aPtr;
+    uint32_t const* const aWPtr = (const uint32_t*)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t exp = expF128UI96(uiA96);
     uint64_t const frac64 =
-        (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)] |
+        static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 |
+        aWPtr[indexWord(4, 2)] |
         (0 != (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]));
+
     if (exp != INT16_MAX) {
-        /** @todo Warning	C4242	'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
-        uint32_t const frac32 = softfloat_shortShiftRightJam64(frac64, 18);
+        uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac64, 18u));
+
         if (exp | frac32) {
             exp -= 0x3F81;
+
             if (exp < -0x1000) {
                 exp = -0x1000;
             }
+
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
         } else {

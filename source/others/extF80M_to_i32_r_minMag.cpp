@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-int32_t extF80M_to_i32_r_minMag(const extFloat80_t *aPtr, bool exact)
+int32_t extF80M_to_i32_r_minMag(const extFloat80_t* aPtr, bool exact)
 {
 
     return extF80_to_i32_r_minMag(*aPtr, exact);
@@ -52,86 +52,93 @@ int32_t extF80M_to_i32_r_minMag(const extFloat80_t *aPtr, bool exact)
 
 #else
 
-int32_t extF80M_to_i32_r_minMag(extFloat80_t const *aPtr, bool exact)
+static int32_t
+invalid(bool sign, int32_t exp, uint64_t sig)
 {
-    extFloat80M const *aSPtr;
-    uint16_t uiA64;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
-    bool sign, raiseInexact;
-    int32_t z;
-    uint64_t shiftedSig;
-    uint32_t absZ;
-    union
-    {
-        uint32_t ui; int32_t i;
-    } u;
-
-    
-    aSPtr = aPtr;
-    uiA64 = aSPtr->signExp;
-    exp = expExtF80UI64(uiA64);
-    sig = aSPtr->signif;
-    
-    if (!sig && (exp != 0x7FFF)) {
-        return 0;
-    }
-    shiftDist = 0x403E - exp;
-    if (64 <= shiftDist) {
-        raiseInexact = exact;
-        z = 0;
-    } else {
-        sign = signExtF80UI64(uiA64);
-        raiseInexact = false;
-        if (shiftDist < 0) {
-            if (sig >> 32 || (shiftDist <= -31)) {
-                goto invalid;
-            }
-            shiftedSig = (uint64_t)(uint32_t)sig << -shiftDist;
-            if (shiftedSig >> 32) {
-                goto invalid;
-            }
-            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-            absZ = shiftedSig;
-        } else {
-            shiftedSig = sig;
-            if (shiftDist) {
-                shiftedSig >>= shiftDist;
-            }
-            if (shiftedSig >> 32) {
-                goto invalid;
-            }
-            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-            absZ = shiftedSig;
-            if (exact && shiftDist) {
-                raiseInexact = (uint64_t)absZ << shiftDist != sig;
-            }
-        }
-        if (sign) {
-            if (0x80000000 < absZ) {
-                goto invalid;
-            }
-            u.ui = -(int32_t)absZ;
-            z = u.i;
-        } else {
-            if (0x80000000 <= absZ) {
-                goto invalid;
-            }
-            z = absZ;
-        }
-    }
-    if (raiseInexact) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-    return z;
-    
-invalid:
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
         exp == INT16_MAX && (sig & INT64_MAX) ? i32_fromNaN :
         sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+}
 
+int32_t
+extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
+                        bool exact)
+{
+    uint32_t absZ;
+    uint16_t const uiA64 = aPtr->signExp;
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = aPtr->signif;
+
+    if (0 == sig && 0x7FFF != exp) {
+        return 0;
+    }
+
+    int32_t shiftDist = 0x403E - exp;
+
+    if (64 <= shiftDist) {
+        if (exact) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
+
+        return 0;
+    }
+
+    bool const sign = signExtF80UI64(uiA64);
+    bool raiseInexact = false;
+    uint64_t shiftedSig;
+
+    if (shiftDist < 0) {
+        if (sig >> 32 || (shiftDist <= -31)) {
+            return invalid(sign, exp, sig);
+        }
+
+        shiftedSig = (uint64_t)(uint32_t)sig << -shiftDist;
+
+        if (shiftedSig >> 32) {
+            return invalid(sign, exp, sig);
+        }
+
+        absZ = static_cast<uint32_t>(shiftedSig);
+    } else {
+        shiftedSig = sig;
+
+        if (shiftDist) {
+            shiftedSig >>= shiftDist;
+        }
+
+        if (shiftedSig >> 32) {
+            return invalid(sign, exp, sig);
+        }
+
+        absZ = static_cast<uint32_t>(shiftedSig);
+
+        if (exact && shiftDist) {
+            raiseInexact = static_cast<uint64_t>(absZ) << shiftDist != sig;
+        }
+    }
+
+    if (sign) {
+        if (0x80000000 < absZ) {
+            return invalid(sign, exp, sig);
+        }
+
+        if (raiseInexact) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
+
+        return -static_cast<int32_t>(absZ);
+    }
+
+    if (0x80000000 <= absZ) {
+        return invalid(sign, exp, sig);
+    }
+
+    if (raiseInexact) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return static_cast<int32_t>(absZ);
 }
 
 #endif

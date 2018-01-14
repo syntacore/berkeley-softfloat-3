@@ -36,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
-uint32_t softfloat_approxRecipSqrt32_1(unsigned oddExpA, uint32_t a)
+uint32_t
+softfloat_approxRecipSqrt32_1(unsigned oddExpA, uint32_t a)
 {
-    int const index = (a >> 27 & 0xE) + oddExpA;
-    uint16_t const eps = a >> 12;
+    auto const index = (a >> 27 & 0xE) + oddExpA;
+    uint16_t const eps = static_cast<uint16_t>(a >> 12);
     uint16_t const r0 =
         softfloat_approxRecipSqrt_1k0s[index] -
         ((softfloat_approxRecipSqrt_1k1s[index] * (uint32_t)eps) >> 20);

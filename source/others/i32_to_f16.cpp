@@ -42,15 +42,16 @@ float16_t i32_to_f16(int32_t a)
 {
     bool const sign = a < 0;
     /** @bug INT32_MIN */
-    uint32_t absA = sign ? -a : a;
-    int8_t shiftDist = softfloat_countLeadingZeros32(absA) - 21;
+    uint32_t absA = static_cast<uint32_t>(sign ? -a : a);
+    int8_t const shiftDist = softfloat_countLeadingZeros32(absA) - 21;
+
     if (0 <= shiftDist) {
-        return u_as_f_16(a ? packToF16UI(sign, 0x18 - shiftDist, (uint16_t)absA << shiftDist) : 0);
-    } else {
-        shiftDist += 4;
-        uint16_t const sig =
-            shiftDist < 0 ? absA >> (-shiftDist) | ((uint32_t)(absA << (shiftDist & 31)) != 0) :
-            (uint16_t)absA << shiftDist;
-        return softfloat_roundPackToF16(sign, 0x1C - shiftDist, sig);
+        return u_as_f_16(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : 0u);
     }
+
+    int8_t const shiftDist1 = shiftDist + 4;
+    uint16_t const sig =
+        shiftDist1 < 0 ? absA >> -shiftDist1 | ((uint32_t)(absA << (shiftDist1 & 31)) != 0) :
+        static_cast<uint16_t>(absA << shiftDist1);
+    return softfloat_roundPackToF16(sign, 0x1C - shiftDist1, sig);
 }

@@ -41,13 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef softfloat_addComplCarryM
 
 uint8_t
- softfloat_addComplCarryM(
-     uint8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint8_t carry,
-     uint32_t *zPtr
- )
+ softfloat_addComplCarryM(uint8_t size_words,
+                          uint32_t const *aPtr,
+                          uint32_t const *bPtr,
+                          uint8_t carry,
+                          uint32_t *zPtr)
 {
     unsigned int index, lastIndex;
     uint32_t wordA, wordZ;

@@ -37,13 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 float16_t
-softfloat_normRoundPackToF16(bool sign, int16_t exp, uint16_t sig)
+softfloat_normRoundPackToF16(bool sign,
+                             int16_t exp,
+                             uint16_t sig)
 {
     int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 1;
     exp -= shiftDist;
-    if (4 <= shiftDist && (unsigned int)exp < 0x1D) {
-        return u_as_f_16(packToF16UI(sign, sig ? exp : 0, sig << (shiftDist - 4)));
-    } else {
-        return softfloat_roundPackToF16(sign, exp, sig << shiftDist);
+    exp = sig ? exp : 0;
+
+    if (4 <= shiftDist && static_cast<unsigned>(exp) < 0x1Du) {
+        return u_as_f_16(packToF16UI(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << (shiftDist - 4))));
     }
+
+    return softfloat_roundPackToF16(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << shiftDist));
 }

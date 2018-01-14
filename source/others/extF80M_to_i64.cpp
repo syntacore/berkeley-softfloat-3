@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int64_t
 extF80M_to_i64(
-    const extFloat80_t *aPtr, uint8_t roundingMode, bool exact)
+    const extFloat80_t* aPtr, uint8_t roundingMode, bool exact)
 {
 
     return extF80_to_i64(*aPtr, roundingMode, exact);
@@ -55,43 +55,34 @@ extF80M_to_i64(
 #else
 
 int64_t
-extF80M_to_i64(
-    const extFloat80_t *aPtr, uint8_t roundingMode, bool exact)
+extF80M_to_i64(const extFloat80_t* const aPtr,
+               uint8_t roundingMode,
+               bool exact)
 {
-    extFloat80M const *aSPtr;
-    uint16_t uiA64;
-    bool sign;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
-    uint32_t extSig[3];
+    uint16_t const uiA64 = aPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = aPtr->signif;
+    int32_t const shiftDist = 0x403E - exp;
 
-    
-    /** @bug cast to same type */
-    aSPtr = aPtr;
-    uiA64 = aSPtr->signExp;
-    sign = signExtF80UI64(uiA64);
-    exp = expExtF80UI64(uiA64);
-    sig = aSPtr->signif;
-    
-    shiftDist = 0x403E - exp;
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            (exp == INT16_MAX) && (sig & INT64_MAX)
-            ? i64_fromNaN
-            : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+            INT16_MAX == exp && 0 != (sig & INT64_MAX) ? i64_fromNaN :
+            sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    
+
+    uint32_t extSig[3];
     extSig[indexWord(3, 2)] = sig >> 32;
     extSig[indexWord(3, 1)] = (uint32_t)sig;
     extSig[indexWord(3, 0)] = 0;
+
     if (shiftDist) {
-        softfloat_shiftRightJam96M(extSig, shiftDist, extSig);
+        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
+
     return softfloat_roundPackMToI64(sign, extSig, roundingMode, exact);
 
 }
 
 #endif
-

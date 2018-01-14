@@ -104,7 +104,8 @@ is zero or nonzero.
 */
 #if 1
 inline uint64_t
-softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
+softfloat_shiftRightJam64(uint64_t a,
+                          uint32_t dist)
 {
     auto const dist1 = dist >= 63 ? 63 : dist;
     auto const mask = ~(~UINT64_C(0) << dist1);
@@ -296,39 +297,36 @@ softfloat_lt128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
 Shifts the 128 bits formed by concatenating `a64' and `a0' left by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
-inline uint128
-softfloat_shortShiftLeft128(uint64_t a64, uint64_t a0, uint8_t dist)
+inline constexpr uint128
+softfloat_shortShiftLeft128(uint64_t a64,
+                            uint64_t a0,
+                            uint8_t dist)
 {
-    struct uint128 z;
-    z.v64 = a64 << dist | a0 >> (-(int8_t)dist & 63);
-    z.v0 = a0 << dist;
-    return z;
+    return uint128{a0 << dist, a64 << dist | a0 >> (-(int8_t)dist & 63)};
 }
 
 /**
 Shifts the 128 bits formed by concatenating `a64' and `a0' right by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
-inline uint128
-softfloat_shortShiftRight128(uint64_t a64, uint64_t a0, uint8_t dist)
+inline constexpr uint128
+softfloat_shortShiftRight128(uint64_t a64,
+                             uint64_t a0,
+                             uint8_t dist)
 {
-    uint128 z;
-    z.v64 = a64 >> dist;
-    z.v0 = a64 << (-dist & 63) | a0 >> dist;
-    return z;
+    return uint128{a64 << (-dist & 63) | a0 >> dist, a64 >> dist};
 }
 
 /**
 This function is the same as `softfloat_shiftRightJam64Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
-inline uint64_extra
-softfloat_shortShiftRightJam64Extra(uint64_t a, uint64_t extra, uint8_t dist)
+inline constexpr uint64_extra
+softfloat_shortShiftRightJam64Extra(uint64_t a,
+                                    uint64_t extra,
+                                    uint8_t dist)
 {
-    uint64_extra z;
-    z.v = a >> dist;
-    z.extra = a << (-(int8_t)dist & 63) | (extra != 0);
-    return z;
+    return uint64_extra{a >> dist,a << (-(int8_t)dist & 63) | (extra != 0)};
 }
 
 /**
@@ -346,10 +344,7 @@ softfloat_shortShiftRightJam128(uint64_t a64,
     auto const negDist = 63 & -static_cast<int8_t>(dist);
     uint128 z;
     z.v64 = a64 >> dist;
-    z.v0 =
-        a64 << negDist |
-        a0 >> dist |
-        !!(0 != (a0 << negDist));
+    z.v0 = a64 << negDist | a0 >> dist | !!(0 != (a0 << negDist));
     return z;
 }
 
@@ -464,16 +459,13 @@ Returns the sum of the 128-bit integer formed by concatenating `a64' and
 `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.  The
 addition is modulo 2^128, so any carry out is lost.
 */
-inline uint128
+inline constexpr uint128
 softfloat_add128(uint64_t a64, 
                  uint64_t a0, 
                  uint64_t b64, 
                  uint64_t b0)
 {
-    uint128 z;
-    z.v0 = a0 + b0;
-    z.v64 = a64 + b64 + (z.v0 < a0);
-    return z;
+    return uint128{a0 + b0, a64 + b64 + !!(a0 + b0 < a0)};
 }
 
 /**
@@ -510,16 +502,13 @@ Returns the difference of the 128-bit integer formed by concatenating `a64'
 and `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.
 The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 */
-inline uint128
+inline constexpr uint128
 softfloat_sub128(uint64_t a64, 
                  uint64_t a0, 
                  uint64_t b64, 
                  uint64_t b0)
 {
-    uint128 z;
-    z.v0 = a0 - b0;
-    z.v64 = a64 - b64 - (a0 < b0);
-    return z;
+    return uint128{a0 - b0, a64 - b64 - (a0 < b0)};
 }
 
 /**
@@ -545,14 +534,16 @@ softfloat_mul64ByShifted32To128(uint64_t a,
     uint64_t const mid = (uint64_t)(uint32_t)a * b;
     uint128 z;
     z.v0 = mid << 32;
-    z.v64 = (uint64_t)(uint32_t)(a >> 32) * b + (mid >> 32);
+    z.v64 = static_cast<uint64_t>(static_cast<uint32_t>(a >> 32)) * b + (mid >> 32);
     return z;
 }
 
 /**
 Returns the 128-bit product of `a' and `b'.
 */
-uint128 softfloat_mul64To128(uint64_t a, uint64_t b);
+uint128
+softfloat_mul64To128(uint64_t a,
+                     uint64_t b);
 
 /**
 @returns the product of the 128-bit integer formed by concatenating `a64' and
@@ -581,7 +572,11 @@ Argument `zPtr' points to an array of four 64-bit elements that concatenate
 in the platform's normal endian order to form a 256-bit integer.
 */
 void
-softfloat_mul128To256M(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0, uint64_t* zPtr);
+softfloat_mul128To256M(uint64_t a64, 
+                       uint64_t a0, 
+                       uint64_t b64, 
+                       uint64_t b0, 
+                       uint64_t* zPtr);
 
 #else
 
@@ -598,7 +593,9 @@ is greater than the second (B).  (The result is thus the signum of A - B.)
 Each of `aPtr' and `bPtr' points to an array of three 32-bit elements that
 concatenate in the platform's normal endian order to form a 96-bit integer.
 */
-int8_t softfloat_compare96M(const uint32_t* aPtr, const uint32_t* bPtr);
+int8_t
+softfloat_compare96M(uint32_t const *aPtr,
+                     uint32_t const* bPtr);
 
 /**
 Compares the two 128-bit unsigned integers pointed to by `aPtr' and `bPtr'.
@@ -609,7 +606,8 @@ Each of `aPtr' and `bPtr' points to an array of four 32-bit elements that
 concatenate in the platform's normal endian order to form a 128-bit integer.
 */
 int8_t
-softfloat_compare128M(const uint32_t* aPtr, const uint32_t* bPtr);
+softfloat_compare128M(uint32_t const *aPtr,
+                      uint32_t const *bPtr);
 
 /**
 Extends `a' to 96 bits and shifts the value left by the number of bits given

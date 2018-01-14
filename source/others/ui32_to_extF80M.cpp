@@ -50,18 +50,18 @@ ui32_to_extF80M(uint32_t a, extFloat80_t *zPtr)
 #else
 
 void
-ui32_to_extF80M(uint32_t a, extFloat80_t *zPtr)
+ui32_to_extF80M(uint32_t a,
+                extFloat80_t *const zPtr)
 {
-    extFloat80M *const zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
     if (0 != a) {
         auto const shiftDist = softfloat_countLeadingZeros32(a);
-        uiZ64 = packToExtF80UI64(0, 0x401E - shiftDist);
+        uiZ64 = packToExtF80UI64(0, static_cast<uint16_t>(UINT16_C(0x401E) - shiftDist));
         sigZ = (uint64_t)(a << shiftDist) << 32;
     }
-    zSPtr->signExp = uiZ64;
-    zSPtr->signif = sigZ;
+    zPtr->signExp = uiZ64;
+    zPtr->signif = sigZ;
 }
 
 #endif
