@@ -67,7 +67,7 @@ f64_to_i32_r_minMag(float64_t a, bool exact)
             }
         }
         sig |= UINT64_C(0x0010000000000000);
-        int32_t const absZ = sig >> shiftDist;
+        int32_t const absZ = static_cast<int32_t>(sig >> shiftDist);
         if (exact && ((uint64_t)(uint32_t)absZ << shiftDist != sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
