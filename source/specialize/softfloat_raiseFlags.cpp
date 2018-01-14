@@ -45,7 +45,8 @@ defined here if desired.  It is currently not possible for such a trap
 to substitute a result value.  If traps are not implemented, this routine
 should be simply `softfloat_exceptionFlags |= flags;'.
 */
-void softfloat_raiseFlags( uint8_t flags )
+void
+softfloat_raiseFlags( uint8_t flags )
 {
     softfloat_exceptionFlags |= flags;
 }
@@ -56,7 +57,8 @@ softfloat_clearFlags(void)
     softfloat_exceptionFlags = 0;
 }
 
-uint8_t softfloat_getFlags(void)
+uint8_t
+softfloat_getFlags(void)
 {
     return softfloat_exceptionFlags;
 }
