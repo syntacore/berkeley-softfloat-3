@@ -153,7 +153,7 @@ softfloat_mulAddF32(uint32_t uiA, uint32_t uiB, uint32_t uiC, uint8_t op)
         } else {
             expZ = expProd;
             sig64Z = sigProd + softfloat_shiftRightJam64(static_cast<uint64_t>(sigC) << 32, static_cast<uint32_t>(expDiff));
-            sigZ = (uint32_t)softfloat_shortShiftRightJam64(sig64Z, 32);
+            sigZ = static_cast<uint32_t>(softfloat_shortShiftRightJam64(sig64Z, 32));
         }
 
         if (sigZ < 0x40000000) {
