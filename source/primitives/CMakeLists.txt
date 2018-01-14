@@ -9,17 +9,10 @@ set(INC_PRIMITIVES
 PARENT_SCOPE)
 
 set(SRC_PRIMITIVES
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecip32_1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecipSqrt32_1.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecipSqrt_1Ks.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecip_1Ks.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros8.cpp
-    
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_eq128.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_le128.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_lt128.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_sub128.cpp
 PARENT_SCOPE)
 
 set(SRC_PRIMITIVES_FAST_INT64

@@ -458,12 +458,24 @@ softfloat_mulAddF64(uint64_t,
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-#define signF128UI64( a64 ) ((bool) ((uint64_t) (a64)>>63))
+inline constexpr bool
+signF128UI64(uint64_t a64)
+{
+    return 0 != (a64 >> 63);
+}
+
 #define expF128UI64( a64 ) ((int32_t) ((a64)>>48) & 0x7FFF)
 #define fracF128UI64( a64 ) ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))
 #define packToF128UI64( sign, exp, sig64 ) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<48) + (sig64))
 
-#define isNaNF128UI( a64, a0 ) (((~(a64) & UINT64_C( 0x7FFF000000000000 )) == 0) && (a0 || ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))))
+inline constexpr bool
+isNaNF128UI(uint64_t a64, uint64_t a0)
+{
+    return
+        0 == (~a64 & UINT64_C(0x7FFF000000000000)) && 
+        (0 != a0 || 0 !=(a64 & UINT64_C(0x0000FFFFFFFFFFFF))
+        );
+}
 
 struct exp32_sig64
 {

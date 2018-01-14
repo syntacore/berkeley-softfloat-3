@@ -41,15 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-#ifdef LITTLEENDIAN
-struct uint128 { uint64_t v0, v64; };
-struct uint64_extra { uint64_t extra, v; };
-struct uint128_extra { uint64_t extra; struct uint128 v; };
-#else
-struct uint128 { uint64_t v64, v0; };
-struct uint64_extra { uint64_t v, extra; };
-struct uint128_extra { struct uint128 v; uint64_t extra; };
-#endif
+struct uint128
+{
+    uint64_t v0;
+    uint64_t v64;
+};
+struct uint64_extra
+{
+    uint64_t v;
+    uint64_t extra;
+};
+struct uint128_extra
+{
+    uint128 v;
+    uint64_t extra;
+};
 
 #endif
 
