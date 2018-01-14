@@ -44,65 +44,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
 extF80_rem(extFloat80_t a, extFloat80_t b)
 {
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s; extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    bool signA;
-    int32_t expA;
-    uint64_t sigA;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s; extFloat80_t f;
-    } uB;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    int32_t expB;
-    uint64_t sigB;
-    struct exp32_sig64 normExpSig;
+    exp32_sig64 normExpSig;
     int32_t expDiff;
     struct uint128 rem, shiftedSigB;
     uint32_t q, recip32;
-    uint64_t q64;
-    struct uint128 term, altRem, meanRem;
-    bool signRem;
-    struct uint128 uiZ;
+    uint128 altRem;
+    uint128 meanRem;
+    uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s; extFloat80_t f;
-    } uZ;
 
-
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0 = uA.s.signif;
-    signA = signExtF80UI64(uiA64);
-    expA = expExtF80UI64(uiA64);
-    sigA = uiA0;
-    uB.f = b;
-    uiB64 = uB.s.signExp;
-    uiB0 = uB.s.signif;
-    expB = expExtF80UI64(uiB64);
-    sigB = uiB0;
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 = a.signif;
+    bool const signA = signExtF80UI64(uiA64);
+    int32_t expA = expExtF80UI64(uiA64);
+    uint64_t sigA = uiA0;
+    uint16_t const uiB64 = b.signExp;
+    uint64_t const uiB0 = b.signif;
+    int32_t expB = expExtF80UI64(uiB64);
+    uint64_t sigB = uiB0;
 
     if (expA == 0x7FFF) {
-        if (
-            (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))
-            || ((expB == 0x7FFF) && (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))
-        ) {
+        if (0 != (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) || (0x7FFF == expB && 0 != (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))) {
             goto propagateNaN;
         }
+
         goto invalid;
     }
-    if (expB == 0x7FFF) {
-        if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) goto propagateNaN;
+
+    if (0x7FFF == expB) {
+        if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            goto propagateNaN;
+        }
+
         /*
         Argument b is an infinity.  Doubling `expB' is an easy way to ensure
         that `expDiff' later is less than -1, which will result in returning
@@ -111,67 +85,97 @@ extF80_rem(extFloat80_t a, extFloat80_t b)
         expB += expB;
     }
 
-    if (!expB) expB = 1;
+    if (!expB) {
+        expB = 1;
+    }
+
     if (!(sigB & UINT64_C(0x8000000000000000))) {
-        if (!sigB) goto invalid;
+        if (!sigB) {
+            goto invalid;
+        }
+
         normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if (!expA) expA = 1;
+
+    if (!expA) {
+        expA = 1;
+    }
+
     if (!(sigA & UINT64_C(0x8000000000000000))) {
         if (!sigA) {
             expA = 0;
             goto copyA;
         }
+
         normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
 
     expDiff = expA - expB;
-    if (expDiff < -1) goto copyA;
+
+    if (expDiff < -1) {
+        goto copyA;
+    }
+
     rem = softfloat_shortShiftLeft128(0, sigA, 32);
     shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 32);
+
     if (expDiff < 1) {
         if (expDiff) {
             --expB;
             shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 33);
             q = 0;
-        } else {
+        }
+        else {
             q = (sigB <= sigA);
+
             if (q) {
                 rem =
                     softfloat_sub128(
                         rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
             }
         }
-    } else {
+    }
+    else {
         recip32 = softfloat_approxRecip32_1(sigB >> 32);
         expDiff -= 30;
+
+        uint64_t q64;
+
         for (;;) {
             q64 = (uint64_t)(uint32_t)(rem.v64 >> 2) * recip32;
-            if (expDiff < 0) break;
+
+            if (expDiff < 0) {
+                break;
+            }
+
             q = (q64 + 0x80000000) >> 32;
             rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
-            term = softfloat_mul64ByShifted32To128(sigB, q);
+            uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
             rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+
             if (rem.v64 & UINT64_C(0x8000000000000000)) {
                 rem =
                     softfloat_add128(
                         rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
             }
+
             expDiff -= 29;
         }
+
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
         q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
-        /** @todo Warning	C4244	'=': conversion from 'int' to 'uint8_t', possible loss of data */
+        /** @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data */
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, expDiff + 30);
-        term = softfloat_mul64ByShifted32To128(sigB, q);
+        uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
-            altRem =softfloat_add128(rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
+            altRem = softfloat_add128(rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
             goto selectRem;
         }
     }
@@ -183,26 +187,27 @@ extF80_rem(extFloat80_t a, extFloat80_t b)
             softfloat_sub128(
                 rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
     } while (!(rem.v64 & UINT64_C(0x8000000000000000)));
+
 selectRem:
     meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
-    if (
-        (meanRem.v64 & UINT64_C(0x8000000000000000))
-            || (!(meanRem.v64 | meanRem.v0) && (q & 1))
-    ) {
+
+    if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
         rem = altRem;
     }
-    signRem = signA;
+
+    bool signRem = signA;
+
     if (rem.v64 & UINT64_C(0x8000000000000000)) {
         signRem = !signRem;
         rem = softfloat_sub128(0, 0, rem.v64, rem.v0);
     }
+
     return
-        softfloat_normRoundPackToExtF80(
-            signRem, expB + 32, rem.v64, rem.v0, 80);
+        softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
 
 propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
+    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
     uiZ64 = uiZ.v64;
     uiZ0 = uiZ.v0;
     goto uiZ;
@@ -214,15 +219,18 @@ invalid:
     goto uiZ;
 
 copyA:
+
     if (expA < 1) {
         sigA >>= 1 - expA;
         expA = 0;
     }
-    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
+
+    /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uiZ64 = packToExtF80UI64(signA, expA);
     uiZ0 = sigA;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = uiZ0;
-    return uZ.f;
+    extFloat80_t uZ;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 }
