@@ -40,30 +40,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 uint32_t
-softfloat_roundPackToUI32(bool sign, uint64_t sig, uint8_t roundingMode, bool exact)
+softfloat_roundPackToUI32(bool sign,
+                          uint64_t sig,
+                          uint8_t roundingMode,
+                          bool exact)
 {
     uint16_t const roundIncrement =
-        softfloat_round_near_even != roundingMode &&
-        softfloat_round_near_maxMag != roundingMode ?
-        ((sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0xFFF : 0) :
-        0x800;
+        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x800u :
+        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0xFFFu :
+        0;
     uint16_t const roundBits = sig & 0xFFF;
     sig += roundIncrement;
+
     if (0 != (sig & UINT64_C(0xFFFFF00000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-    } else {
-        uint32_t const z =
-            (sig >> 12) &
-            ~(uint32_t)!!(0 == (roundBits ^ 0x800) && softfloat_round_near_even == roundingMode);
-        if (sign && 0 != z) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-        } else {
-            if (exact && 0 != roundBits) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
-            }
-            return z;
-        }
     }
+
+    bool const low_bit =
+        0 == (roundBits ^ 0x800u) &&
+        softfloat_round_near_even == roundingMode;
+    uint32_t const z =
+        (sig >> 12) &
+        ~static_cast<uint32_t>(!!low_bit);
+
+    if (sign && 0 != z) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+    }
+
+    if (exact && 0 != roundBits) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return z;
 }
