@@ -48,60 +48,92 @@ value is a signaling NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
 void
- softfloat_propagateNaNExtF80M(
-     const struct extFloat80M *aSPtr,
-     const struct extFloat80M *bSPtr,
-     struct extFloat80M *zSPtr
- )
+softfloat_propagateNaNExtF80M(extFloat80M const* aSPtr,
+                              extFloat80M const* bSPtr,
+                              extFloat80M* zSPtr)
 {
-    bool isSigNaNA;
-    const struct extFloat80M *sPtr;
-    bool isSigNaNB;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    uint16_t uiMagA64, uiMagB64;
+    bool const isSigNaNA = extF80M_isSignalingNaN((const extFloat80_t*)aSPtr);
+    extFloat80M const* sPtr = aSPtr;
 
-    isSigNaNA = extF80M_isSignalingNaN( (const extFloat80_t *) aSPtr );
-    sPtr = aSPtr;
-    if ( ! bSPtr ) {
-        if ( isSigNaNA ) softfloat_raiseFlags( softfloat_flag_invalid );
+    if (!bSPtr) {
+        if (isSigNaNA) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+        }
+
         goto copy;
-    }
-    isSigNaNB = extF80M_isSignalingNaN( (const extFloat80_t *) bSPtr );
-    if ( isSigNaNA | isSigNaNB ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) {
-            uiB64 = bSPtr->signExp;
-            if ( isSigNaNB ) goto returnLargerUIMag;
-            uiB0 = bSPtr->signif;
-            if ( isNaNExtF80UI( uiB64, uiB0 ) ) goto copyB;
-            goto copy;
-        } else {
-            uiA64 = aSPtr->signExp;
-            uiA0 = aSPtr->signif;
-            if ( isNaNExtF80UI( uiA64, uiA0 ) ) goto copy;
+    } else {
+
+        bool const isSigNaNB = extF80M_isSignalingNaN((const extFloat80_t*)bSPtr);
+        uint64_t uiA0;
+        uint16_t uiA64;
+        uint64_t uiB0;
+        uint16_t uiB64;
+
+        if (isSigNaNA | isSigNaNB) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+
+            if (isSigNaNA) {
+                uiB64 = bSPtr->signExp;
+
+                if (isSigNaNB) {
+                    goto returnLargerUIMag;
+                }
+
+                uiB0 = bSPtr->signif;
+
+                if (isNaNExtF80UI(uiB64, uiB0)) {
+                    goto copyB;
+                }
+
+                goto copy;
+            } else {
+                uiA64 = aSPtr->signExp;
+                uiA0 = aSPtr->signif;
+
+                if (isNaNExtF80UI(uiA64, uiA0)) {
+                    goto copy;
+                }
+
+                goto copyB;
+            }
+        }
+
+        uiB64 = bSPtr->signExp;
+
+returnLargerUIMag:
+        uiA64 = aSPtr->signExp;
+        {
+            uint16_t const uiMagA64 = uiA64 & 0x7FFFu;
+            uint16_t const uiMagB64 = uiB64 & 0x7FFFu;
+
+            if (uiMagA64 < uiMagB64) {
+                goto copyB;
+            }
+
+            if (uiMagB64 < uiMagA64) {
+                goto copy;
+            }
+        }
+        uiA0 = aSPtr->signif;
+        uiB0 = bSPtr->signif;
+
+        if (uiA0 < uiB0) {
             goto copyB;
         }
+
+        if (uiB0 < uiA0) {
+            goto copy;
+        }
+
+        if (uiA64 < uiB64) {
+            goto copy;
+        }
+
+copyB:
+        sPtr = bSPtr;
     }
-    uiB64 = bSPtr->signExp;
- returnLargerUIMag:
-    uiA64 = aSPtr->signExp;
-    uiMagA64 = uiA64 & 0x7FFF;
-    uiMagB64 = uiB64 & 0x7FFF;
-    if ( uiMagA64 < uiMagB64 ) goto copyB;
-    if ( uiMagB64 < uiMagA64 ) goto copy;
-    uiA0 = aSPtr->signif;
-    uiB0 = bSPtr->signif;
-    if ( uiA0 < uiB0 ) goto copyB;
-    if ( uiB0 < uiA0 ) goto copy;
-    if ( uiA64 < uiB64 ) goto copy;
- copyB:
-    sPtr = bSPtr;
- copy:
+
+copy:
     zSPtr->signExp = sPtr->signExp;
-    zSPtr->signif = sPtr->signif | UINT64_C( 0xC000000000000000 );
-
+    zSPtr->signif = sPtr->signif | UINT64_C(0xC000000000000000);
 }
-
