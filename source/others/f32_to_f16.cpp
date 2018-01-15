@@ -44,20 +44,20 @@ f32_to_f16(float32_t a)
 {
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
-    int16_t exp = expF32UI(uiA);
+    int16_t const exp = expF32UI(uiA);
     uint32_t const frac = fracF32UI(uiA);
 
     if (exp == 0xFF) {
         if (frac) {
             return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f32UIToCommonNaN(uiA)));
-        } else {
-            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-    } else {
-        uint16_t const frac16 = frac >> 9 | ((frac & 0x1FF) != 0);
-        return
-            !(exp | frac16) ? u_as_f_16(packToF16UI(sign, 0, 0)) :
-            softfloat_roundPackToF16(sign, exp - 0x71, frac16 | 0x4000);
+
+        return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
+
+    uint16_t const frac16 = static_cast<uint16_t>(frac >> 9 | ((frac & 0x1FF) != 0));
+    return
+        !(exp | frac16) ? u_as_f_16(packToF16UI(sign, 0, 0)) :
+        softfloat_roundPackToF16(sign, exp - 0x71, frac16 | 0x4000u);
 }
 
