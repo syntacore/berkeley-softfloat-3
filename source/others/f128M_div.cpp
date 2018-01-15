@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
-f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
+f128M_div(const float128_t* aPtr, const float128_t* bPtr, float128_t* zPtr)
 {
 
     *zPtr = f128_div(*aPtr, *bPtr);
@@ -53,90 +53,109 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
 #else
 
 void
-f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
+f128M_div(float128_t const* const aPtr,
+          float128_t const* const bPtr,
+          float128_t* const zPtr)
 {
-    const uint32_t *aWPtr, *bWPtr;
-    uint32_t *zWPtr, uiA96;
-    bool signA;
-    int32_t expA;
-    uint32_t uiB96;
-    bool signB;
-    int32_t expB;
-    bool signZ;
-    uint32_t y[5], sigB[4];
-    int32_t expZ;
-    uint32_t recip32;
-    int ix;
-    uint64_t q64;
-    uint32_t q, qs[3], uiZ96;
+    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    uint32_t const* const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
+    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool const signA = signF128UI96(uiA96);
+    int32_t expA = expF128UI96(uiA96);
+    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    bool const signB = signF128UI96(uiB96);
+    int32_t expB = expF128UI96(uiB96);
+    bool const signZ = signA != signB;
 
-    aWPtr = (const uint32_t *)aPtr;
-    bWPtr = (const uint32_t *)bPtr;
-    zWPtr = (uint32_t *)zPtr;
-
-    uiA96 = aWPtr[indexWordHi(4)];
-    signA = signF128UI96(uiA96);
-    expA = expF128UI96(uiA96);
-    uiB96 = bWPtr[indexWordHi(4)];
-    signB = signF128UI96(uiB96);
-    expB = expF128UI96(uiB96);
-    signZ = signA ^ signB;
-
-    if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
+    if (0x7FFF == expA || 0x7FFF == expB) {
         if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
             return;
         }
+
         if (expA == 0x7FFF) {
             if (expB == 0x7FFF) {
-                goto invalid;
+                softfloat_invalidF128M(zWPtr);
+                return;
             }
-            goto infinity;
+
+            zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0x7FFF, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[indexWord(4, 0)] = 0;
+            return;
         }
-        goto zero;
+
+        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
     }
 
+    uint32_t y[5];
     expA = softfloat_shiftNormSigF128M(aWPtr, 13, y);
+    uint32_t sigB[4];
     expB = softfloat_shiftNormSigF128M(bWPtr, 13, sigB);
+
     if (expA == -128) {
         if (expB == -128) {
-            goto invalid;
+            softfloat_invalidF128M(zWPtr);
+            return;
         }
-        goto zero;
-    }
-    if (expB == -128) {
-        softfloat_raiseFlags(softfloat_flag_infinite);
-        goto infinity;
+
+        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
     }
 
-    expZ = expA - expB + 0x3FFE;
+    if (expB == -128) {
+        softfloat_raiseFlags(softfloat_flag_infinite);
+        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
+    }
+
+    int32_t expZ = expA - expB + 0x3FFE;
+
     if (softfloat_compare128M(y, sigB) < 0) {
         --expZ;
         softfloat_add128M(y, y, y);
     }
-    recip32 =
-        softfloat_approxRecip32_1(
-        ((uint64_t)sigB[indexWord(4, 3)] << 32 | sigB[indexWord(4, 2)])
-                >> 30
-        );
-    ix = 3;
+
+    uint32_t const recip32 = softfloat_approxRecip32_1((static_cast<uint64_t>(sigB[indexWord(4, 3)]) << 32 | sigB[indexWord(4, 2)]) >> 30);
+    int ix = 3;
+    uint64_t q64;
+    uint32_t qs[3];
+    uint32_t q;
+
     for (;;) {
         q64 = (uint64_t)y[indexWordHi(4)] * recip32;
         q = (q64 + 0x80000000) >> 32;
         --ix;
+
         if (ix < 0) {
             break;
         }
+
         softfloat_remStep128MBy32(y, 29, sigB, q, y);
+
         if (y[indexWordHi(4)] & 0x80000000) {
             --q;
             softfloat_add128M(y, sigB, y);
         }
+
         qs[ix] = q;
     }
 
     if (((q + 1) & 7) < 2) {
         softfloat_remStep128MBy32(y, 29, sigB, q, y);
+
         if (y[indexWordHi(4)] & 0x80000000) {
             --q;
             softfloat_add128M(y, sigB, y);
@@ -144,6 +163,7 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
             ++q;
             softfloat_sub128M(y, sigB, y);
         }
+
         if (y[indexWordLo(4)] || y[indexWord(4, 1)] || (y[indexWord(4, 2)] | y[indexWord(4, 3)])) {
             q |= 1;
         }
@@ -160,23 +180,6 @@ f128M_div(const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr)
     y[indexWord(5, 4)] = q64 >> 32;
     softfloat_roundPackMToF128M(signZ, expZ, y, zWPtr);
     return;
-
-invalid:
-    softfloat_invalidF128M(zWPtr);
-    return;
-
-infinity:
-    uiZ96 = packToF128UI96(signZ, 0x7FFF, 0);
-    goto uiZ96;
-zero:
-    uiZ96 = packToF128UI96(signZ, 0, 0);
-uiZ96:
-    zWPtr[indexWordHi(4)] = uiZ96;
-    zWPtr[indexWord(4, 2)] = 0;
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
-
 }
 
 #endif
-
