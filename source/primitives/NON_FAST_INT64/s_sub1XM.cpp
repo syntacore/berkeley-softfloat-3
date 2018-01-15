@@ -34,27 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
+#include "primitives/functions.hpp"
 
-#include <cstdint>
-
-#ifndef softfloat_sub1XM
-
-void softfloat_sub1XM( uint8_t size_words, uint32_t *zPtr )
+void
+softfloat_sub1XM(uint8_t size_words,
+                 uint32_t* zPtr)
 {
-    unsigned int index, lastIndex;
-    uint32_t wordA;
+    auto const lastIndex = indexWordHi(size_words);
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    for (;;) {
-        wordA = zPtr[index];
+    for (auto index = indexWordLo(size_words);; index += wordIncr) {
+        uint32_t const wordA = zPtr[index];
         zPtr[index] = wordA - 1;
-        if ( wordA || (index == lastIndex) ) break;
-        index += wordIncr;
+
+        if (0 != wordA || index == lastIndex) {
+            break;
+        }
     }
-
 }
-
-#endif
-
