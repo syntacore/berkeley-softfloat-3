@@ -239,7 +239,8 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint32_t
-softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
+softfloat_propagateNaNF32UI(uint32_t uiA,
+                            uint32_t uiB)
 {
     if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -276,7 +277,7 @@ this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
-inline commonNaN const&
+inline commonNaN
 softfloat_extF80UIToCommonNaN(uint64_t,
                               uint64_t uiA0)
 {
@@ -348,7 +349,7 @@ floating-point values is a NaN, returns the bit pattern of the combined NaN
 result.  If either original floating-point value is a signaling NaN, the
 invalid exception is raised.
 */
-inline uint128 const&
+inline uint128
 softfloat_propagateNaNExtF80UI(uint16_t uiA64,
                                uint64_t uiA0,
                                uint16_t uiB64,
@@ -367,7 +368,7 @@ Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
 #if 1
-inline uint128 const&
+inline uint128
 softfloat_commonNaNToF128UI(struct commonNaN)
 {
     static uint128 uiZ{defaultNaNF128UI0, defaultNaNF128UI64};
@@ -387,7 +388,7 @@ point values is a NaN, returns the bit pattern of the combined NaN result.
 If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
-uint128 const&
+inline uint128
 softfloat_propagateNaNF128UI(uint64_t uiA64,
                              uint64_t uiA0,
                              uint64_t uiB64,
@@ -416,7 +417,7 @@ a NaN, converts this NaN to the common NaN form, and stores the resulting
 common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
 NaN, the invalid exception is raised.
 */
-inline commonNaN const&
+inline commonNaN
 softfloat_extF80MToCommonNaN(extFloat80_t a)
 {
     if (0 == (a.signif & UINT64_C(0x4000000000000000))) {
@@ -434,7 +435,7 @@ the invalid exception is raised.  Argument `aWPtr' points to an array of
 four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
-inline commonNaN const&
+inline commonNaN
 softfloat_f128MToCommonNaN(uint32_t const *aWPtr)
 {
     if (0 == (aWPtr[indexWordHi(4)] & UINT64_C(0x0000800000000000))) {
