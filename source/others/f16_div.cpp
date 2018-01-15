@@ -42,7 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern const uint16_t softfloat_approxRecip_1k0s[];
 extern const uint16_t softfloat_approxRecip_1k1s[];
 
-float16_t f16_div(float16_t a, float16_t b)
+float16_t
+f16_div(float16_t const a,
+        float16_t const b)
 {
     uint16_t const uiA = f_as_u_16(a);
     bool const signA = signF16UI(uiA);
@@ -57,92 +59,106 @@ float16_t f16_div(float16_t a, float16_t b)
     if (expA == 0x1F) {
         if (sigA) {
             return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
-        } else if (expB == 0x1F) {
+        }
+
+        if (expB == 0x1F) {
             if (sigB) {
                 return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
-            } else {
+            }
+
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_16(defaultNaNF16UI);
+        }
+
+        return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
+    }
+
+    if (expB == 0x1F) {
+        if (sigB) {
+            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
+        }
+
+        return u_as_f_16(packToF16UI(signZ, 0, 0));
+    }
+
+    if (!expB) {
+        if (!sigB) {
+            if (!(expA | sigA)) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return u_as_f_16(defaultNaNF16UI);
             }
-        } else {
+
+            softfloat_raiseFlags(softfloat_flag_infinite);
             return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
         }
-    } else if (expB == 0x1F) {
-        if (sigB) {
-            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
-        } else {
+
+        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+        expB = normExpSig.exp;
+        sigB = normExpSig.sig;
+    }
+
+    if (!expA) {
+        if (!sigA) {
             return u_as_f_16(packToF16UI(signZ, 0, 0));
         }
-    } else {
-        if (!expB) {
-            if (!sigB) {
-                if (!(expA | sigA)) {
-                    softfloat_raiseFlags(softfloat_flag_invalid);
-                    return u_as_f_16(defaultNaNF16UI);
-                } else {
-                    softfloat_raiseFlags(softfloat_flag_infinite);
-                    return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
-                }
-            } else {
-                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
-                expB = normExpSig.exp;
-                sigB = normExpSig.sig;
-            }
-        }
-        if (!expA) {
-            if (!sigA) {
-                return u_as_f_16(packToF16UI(signZ, 0, 0));
-            } else {
-                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
-                expA = normExpSig.exp;
-                sigA = normExpSig.sig;
-            }
-        }
 
-        int8_t expZ = expA - expB + 0xE;
-        sigA |= 0x0400;
-        sigB |= 0x0400;
-#ifdef SOFTFLOAT_FAST_DIV32TO16
-        uint32_t sig32A;
-        if (sigA < sigB) {
-            --expZ;
-            sig32A = (uint32_t)sigA << 15;
-        } else {
-            sig32A = (uint32_t)sigA << 14;
-        }
-        uint16_t sigZ = static_cast<uint16_t>(sig32A / sigB);
-        if (!(sigZ & 7)) {
-            sigZ |= ((uint32_t)sigB * sigZ != sig32A);
-        }
-#else
-        if (sigA < sigB) {
-            --expZ;
-            sigA <<= 5;
-        } else {
-            sigA <<= 4;
-        }
-        int const index = sigB >> 6 & 0xF;
-        uint16_t const r0 = softfloat_approxRecip_1k0s[index]
-            - (((uint32_t)softfloat_approxRecip_1k1s[index]
-               * (sigB & 0x3F))
-                   >> 10);
-        uint16_t sigZ = ((uint32_t)sigA * r0) >> 16;
-        uint16_t rem = (sigA << 10) - sigZ * sigB;
-        sigZ += (rem * (uint32_t)r0) >> 26;
-
-        ++sigZ;
-        if (!(sigZ & 7)) {
-            sigZ &= ~1;
-            rem = (sigA << 10) - sigZ * sigB;
-            if (rem & 0x8000) {
-                sigZ -= 2;
-            } else {
-                if (rem) {
-                    sigZ |= 1;
-                }
-            }
-        }
-#endif
-        return softfloat_roundPackToF16(signZ, expZ, sigZ);
+        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
     }
+
+    int8_t expZ = expA - expB + 0xE;
+    sigA |= 0x0400;
+    sigB |= 0x0400;
+#ifdef SOFTFLOAT_FAST_DIV32TO16
+    uint32_t sig32A;
+
+    if (sigA < sigB) {
+        --expZ;
+        sig32A = static_cast<uint32_t>(sigA) << 15;
+    } else {
+        sig32A = static_cast<uint32_t>(sigA) << 14;
+    }
+
+    uint16_t sigZ = static_cast<uint16_t>(sig32A / sigB);
+
+    if (!(sigZ & 7)) {
+        sigZ |= ((uint32_t)sigB * sigZ != sig32A);
+    }
+
+#else
+
+    if (sigA < sigB) {
+        --expZ;
+        sigA <<= 5;
+    } else {
+        sigA <<= 4;
+    }
+
+    int const index = sigB >> 6 & 0xF;
+    uint16_t const r0 = softfloat_approxRecip_1k0s[index]
+        - (((uint32_t)softfloat_approxRecip_1k1s[index]
+           * (sigB & 0x3F))
+           >> 10);
+    uint16_t sigZ = ((uint32_t)sigA * r0) >> 16;
+    uint16_t rem = (sigA << 10) - sigZ * sigB;
+    sigZ += (rem * (uint32_t)r0) >> 26;
+
+    ++sigZ;
+
+    if (!(sigZ & 7)) {
+        sigZ &= ~1;
+        rem = (sigA << 10) - sigZ * sigB;
+
+        if (rem & 0x8000) {
+            sigZ -= 2;
+        } else {
+            if (rem) {
+                sigZ |= 1;
+            }
+        }
+    }
+
+#endif
+    return softfloat_roundPackToF16(signZ, expZ, sigZ);
 }
