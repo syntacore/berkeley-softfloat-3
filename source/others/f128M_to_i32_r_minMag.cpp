@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 int32_t
-f128M_to_i32_r_minMag(const float128_t *aPtr, bool exact)
+f128M_to_i32_r_minMag(const float128_t* aPtr, bool exact)
 {
     return f128_to_i32_r_minMag(*aPtr, exact);
 }
@@ -51,46 +51,51 @@ f128M_to_i32_r_minMag(const float128_t *aPtr, bool exact)
 #else
 
 int32_t
-f128M_to_i32_r_minMag(const float128_t *aPtr, bool exact)
+f128M_to_i32_r_minMag(const float128_t* aPtr, bool exact)
 {
-    uint32_t const *aWPtr = (const uint32_t *)aPtr;
+    uint32_t const* aWPtr = (const uint32_t*)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t const exp = expF128UI96(uiA96);
     uint64_t sig64 = (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)];
+
     if (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
         sig64 |= 1;
     }
+
     if (exp < 0x3FFF) {
         if (exact && (exp | sig64)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         return 0;
-    } else {
-        if (0x401F <= exp) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                exp == 0x7FFF && sig64 ? i32_fromNaN :
-                sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-        } else {
-            int32_t const shiftDist = 0x402F - exp;
-            sig64 |= UINT64_C(0x0001000000000000);
-            uint32_t const absZ = sig64 >> shiftDist;
-            uint32_t const uiZ = sign ? -(int32_t)absZ : absZ;
-            /**@todo */
-            if ((0 != (uiZ >> 31)) != sign) {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return
-                    exp == 0x7FFF && sig64 ? i32_fromNaN :
-                    sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-            } else {
-                if (exact && ((uint64_t)absZ << shiftDist != sig64)) {
-                    softfloat_raiseFlags(softfloat_flag_inexact);
-                }
-                return (int32_t)uiZ;
-            }
-        }
     }
+
+    if (0x401F <= exp) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == 0x7FFF && sig64 ? i32_fromNaN :
+            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    }
+
+    int32_t const shiftDist = 0x402F - exp;
+    sig64 |= UINT64_C(0x0001000000000000);
+    uint32_t const absZ = static_cast<uint32_t>(sig64 >> shiftDist);
+    uint32_t const uiZ = sign ? -static_cast<int32_t>(absZ) : absZ;
+
+    /**@todo */
+    if ((0 != (uiZ >> 31)) != sign) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == 0x7FFF && sig64 ? i32_fromNaN :
+            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    }
+
+    if (exact && ((uint64_t)absZ << shiftDist != sig64)) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return (int32_t)uiZ;
 }
 
 #endif
