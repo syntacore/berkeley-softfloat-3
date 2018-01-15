@@ -34,37 +34,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
-
-#include <cstdint>
-
-#ifndef softfloat_subM
+#include "primitives/functions.hpp"
 
 void
- softfloat_subM(
-     uint8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint32_t *zPtr
- )
+softfloat_subM(size_t const size_words,
+               uint32_t const* const aPtr,
+               uint32_t const* const bPtr,
+               uint32_t* const zPtr)
 {
-    unsigned int index, lastIndex;
-    uint8_t borrow;
-    uint32_t wordA, wordB;
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    borrow = 0;
-    for (;;) {
-        wordA = aPtr[index];
-        wordB = bPtr[index];
-        zPtr[index] = wordA - wordB - borrow;
-        if ( index == lastIndex ) break;
-        borrow = borrow ? (wordA <= wordB) : (wordA < wordB);
-        index += wordIncr;
+    auto const lastIndex = indexWordHi(size_words);
+    bool borrow = 0;
+
+    for (auto index = indexWordLo(size_words);; index += wordIncr) {
+        uint32_t const wordA = aPtr[index];
+        uint32_t const wordB = bPtr[index];
+        zPtr[index] = wordA - wordB - !!borrow;
+
+        if (index == lastIndex) {
+            break;
+        }
+
+        borrow = borrow ? wordA <= wordB : wordA < wordB;
     }
 
 }
-
-#endif
-
