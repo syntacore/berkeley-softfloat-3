@@ -43,51 +43,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 int32_t
- f128M_to_i32( const float128_t *aPtr, uint8_t roundingMode, bool exact )
+f128M_to_i32(const float128_t* aPtr, uint8_t roundingMode, bool exact)
 {
 
-    return f128_to_i32( *aPtr, roundingMode, exact );
+    return f128_to_i32(*aPtr, roundingMode, exact);
 
 }
 
 #else
 
 int32_t
- f128M_to_i32( const float128_t *aPtr, uint8_t roundingMode, bool exact )
+f128M_to_i32(float128_t const* const aPtr,
+             uint8_t const roundingMode,
+             bool const exact)
 {
-    const uint32_t *aWPtr;
-    uint32_t uiA96;
-    bool sign;
-    int32_t exp;
-    uint64_t sig64;
-    int32_t shiftDist;
+    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool sign = signF128UI96(uiA96);
+    int32_t const exp = expF128UI96(uiA96);
+    uint64_t sig64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];
 
-    
-    aWPtr = (const uint32_t *) aPtr;
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    sign = signF128UI96( uiA96 );
-    exp  = expF128UI96( uiA96 );
-    sig64 = (uint64_t) fracF128UI96( uiA96 )<<32 | aWPtr[indexWord( 4, 2 )];
-    if ( aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )] ) sig64 |= 1;
-    
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0x7FFF) && sig64 ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
-        sign = 0;
-#elif (i32_fromNaN == i32_fromNegOverflow)
-        sign = 1;
-#else
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return i32_fromNaN;
-#endif
+    if (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
+        sig64 |= 1;
     }
-#endif
-    
-    if ( exp ) sig64 |= UINT64_C( 0x0001000000000000 );
-    shiftDist = 0x4023 - exp;
-    if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
-    return softfloat_roundPackToI32( sign, sig64, roundingMode, exact );
 
+    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
+        if (0x7FFF == exp && 0 != sig64) {
+            if (i32_fromNaN == i32_fromPosOverflow) {
+                sign = 0;
+            } else if (i32_fromNaN == i32_fromNegOverflow) {
+                sign = 1;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return i32_fromNaN;
+            }
+        }
+    }
+
+    if (exp) {
+        sig64 |= UINT64_C(0x0001000000000000);
+    }
+
+    int32_t const shiftDist = 0x4023 - exp;
+
+    if (0 < shiftDist) {
+        sig64 = softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
+    }
+
+    return softfloat_roundPackToI32(sign, sig64, roundingMode, exact);
 }
 
 #endif
