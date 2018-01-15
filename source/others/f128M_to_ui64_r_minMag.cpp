@@ -81,7 +81,7 @@ f128M_to_ui64_r_minMag(float128_t const *aPtr,
         sig[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
         sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
         sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
-        softfloat_shiftRightJam128M(sig, shiftDist + 17, sig);
+        softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist + 17), sig);
         z = static_cast<uint64_t>(sig[indexWord(4, 2)] )<< 32 | sig[indexWord(4, 1)];
 
         if (sign && z) {
