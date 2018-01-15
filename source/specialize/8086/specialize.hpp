@@ -286,16 +286,16 @@ the common NaN form, and stores the resulting common NaN at the location
 pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid exception
 is raised.
 */
-struct commonNaN
-    softfloat_f128UIToCommonNaN(uint64_t uiA64,
-                                uint64_t uiA0);
+commonNaN
+softfloat_f128UIToCommonNaN(uint64_t uiA64,
+                            uint64_t uiA0);
 
 /**
 Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
-struct uint128
-    softfloat_commonNaNToF128UI(struct commonNaN);
+uint128
+softfloat_commonNaNToF128UI(struct commonNaN);
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
@@ -306,11 +306,11 @@ point values is a NaN, returns the bit pattern of the combined NaN result.
 If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
-struct uint128
-    softfloat_propagateNaNF128UI(uint64_t uiA64,
-                                 uint64_t uiA0,
-                                 uint64_t uiB64,
-                                 uint64_t uiB0);
+uint128
+softfloat_propagateNaNF128UI(uint64_t uiA64,
+                             uint64_t uiA0,
+                             uint64_t uiB64,
+                             uint64_t uiB0);
 
 #else
 
@@ -326,8 +326,8 @@ common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
 NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
-struct commonNaN
-    softfloat_extF80MToCommonNaN(struct extFloat80M aSPtr);
+commonNaN
+softfloat_extF80MToCommonNaN(struct extFloat80M aSPtr);
 
 /**
 Converts the common NaN pointed to by `aPtr' into an 80-bit extended
@@ -335,8 +335,8 @@ floating-point NaN, and stores this NaN at the location pointed to by
 `zSPtr'.
 */
 /** @bug use extFloat80_t */
-struct extFloat80M
-    softfloat_commonNaNToExtF80M(struct commonNaN a);
+extFloat80M
+softfloat_commonNaNToExtF80M(struct commonNaN a);
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values
@@ -346,9 +346,9 @@ value is a signaling NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
 void
-softfloat_propagateNaNExtF80M(struct extFloat80M const *aSPtr,
-                              struct extFloat80M const *bSPtr,
-                              struct extFloat80M *zSPtr);
+softfloat_propagateNaNExtF80M(struct extFloat80M const* aSPtr,
+                              struct extFloat80M const* bSPtr,
+                              struct extFloat80M* zSPtr);
 
 /**
 The bit pattern for a default generated 128-bit floating-point NaN.
@@ -366,8 +366,8 @@ the invalid exception is raised.  Argument `aWPtr' points to an array of
 four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
-struct commonNaN
-    softfloat_f128MToCommonNaN(uint32_t const *aWPtr);
+commonNaN
+softfloat_f128MToCommonNaN(uint32_t const* aWPtr);
 
 /**
 Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
@@ -377,7 +377,7 @@ platform's normal endian order to form a 128-bit floating-point value.
 */
 void
 softfloat_commonNaNToF128M(struct commonNaN a,
-                           uint32_t *zWPtr);
+                           uint32_t* zWPtr);
 
 /**
 Assuming at least one of the two 128-bit floating-point values pointed to by
@@ -388,9 +388,9 @@ and `zWPtr' points to an array of four 32-bit elements that concatenate in
 the platform's normal endian order to form a 128-bit floating-point value.
 */
 void
-softfloat_propagateNaNF128M(uint32_t const *aWPtr,
-                            uint32_t const *bWPtr,
-                            uint32_t *zWPtr);
+softfloat_propagateNaNF128M(uint32_t const* aWPtr,
+                            uint32_t const* bWPtr,
+                            uint32_t* zWPtr);
 
 #endif  /* SOFTFLOAT_FAST_INT64 */
 
