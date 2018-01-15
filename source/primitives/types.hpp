@@ -66,13 +66,13 @@ endian and little-endian platforms.
 #ifdef LITTLEENDIAN
 #define wordIncr 1
 #define indexWord( total, n ) (n)
-#define indexWordHi( total ) ((total) - 1)
-#define indexWordLo( total ) 0
+#define indexWordHi( total ) ((total) - 1u)
+#define indexWordLo( total ) 0u
 #define indexMultiword( total, m, n ) (n)
 #define indexMultiwordHi( total, n ) ((total) - (n))
-#define indexMultiwordLo( total, n ) 0
+#define indexMultiwordLo( total, n ) 0u
 #define indexMultiwordHiBut( total, n ) (n)
-#define indexMultiwordLoBut( total, n ) 0
+#define indexMultiwordLoBut( total, n ) 0u
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
 #else
 #define wordIncr -1
