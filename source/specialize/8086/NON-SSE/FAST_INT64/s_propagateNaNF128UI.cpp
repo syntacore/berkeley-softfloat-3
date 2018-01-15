@@ -39,13 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "softfloat/functions.h"
 
-struct uint128
-    softfloat_propagateNaNF128UI(
-        uint64_t uiA64,
-        uint64_t uiA0,
-        uint64_t uiB64,
-        uint64_t uiB0
-    )
+uint128
+softfloat_propagateNaNF128UI(uint64_t uiA64,
+                             uint64_t uiA0,
+                             uint64_t uiB64,
+                             uint64_t uiB0)
 {
     bool const isSigNaNA = softfloat_isSigNaNF128UI(uiA64, uiA0);
     bool const isSigNaNB = softfloat_isSigNaNF128UI(uiB64, uiB0);
@@ -55,35 +53,51 @@ struct uint128
 
     if (isSigNaNA | isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
+
         if (isSigNaNA) {
             if (isSigNaNB) {
                 goto returnLargerMag;
-            } else if (isNaNF128UI(uiB64, uiB0)) {
-                goto returnB;
-            } else {
-                goto returnA;
             }
-        } else if (isNaNF128UI(uiA64, uiA0)) {
+
+            if (isNaNF128UI(uiB64, uiB0)) {
+                goto returnB;
+            }
+
             goto returnA;
-        } else {
-            goto returnB;
         }
+
+        if (isNaNF128UI(uiA64, uiA0)) {
+            goto returnA;
+        }
+
+        goto returnB;
     }
+
 returnLargerMag:
     {
         uint64_t const uiMagA64 = uiNonsigA64 & UINT64_C(0x7FFFFFFFFFFFFFFF);
         uint64_t const uiMagB64 = uiNonsigB64 & UINT64_C(0x7FFFFFFFFFFFFFFF);
+
         if (uiMagA64 < uiMagB64) {
             goto returnB;
-        } else if (uiMagB64 < uiMagA64) {
-            goto returnA;
-        } else if (uiA0 < uiB0) {
-            goto returnB;
-        } else if (uiB0 < uiA0) {
-            goto returnA;
-        } else if (uiNonsigA64 < uiNonsigB64) {
+        }
+
+        if (uiMagB64 < uiMagA64) {
             goto returnA;
         }
+
+        if (uiA0 < uiB0) {
+            goto returnB;
+        }
+
+        if (uiB0 < uiA0) {
+            goto returnA;
+        }
+
+        if (uiNonsigA64 < uiNonsigB64) {
+            goto returnA;
+        }
+
 returnB:
         {
             struct uint128 uiZ;
