@@ -110,7 +110,7 @@ float16_t f16_div(float16_t a, float16_t b)
         } else {
             sig32A = (uint32_t)sigA << 14;
         }
-        uint16_t sigZ = sig32A / sigB;
+        uint16_t sigZ = static_cast<uint16_t>(sig32A / sigB);
         if (!(sigZ & 7)) {
             sigZ |= ((uint32_t)sigB * sigZ != sig32A);
         }
