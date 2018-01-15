@@ -581,7 +581,13 @@ fracF128UI96(uint32_t a96)
     return a96 & 0x0000FFFF;
 }
 
-#define packToF128UI96( sign, exp, sig96 ) (((uint32_t) (sign)<<31) + ((uint32_t) (exp)<<16) + (sig96))
+inline constexpr uint32_t
+packToF128UI96(bool sign,
+               unsigned exp,
+               uint32_t sig96)
+{
+    return (static_cast<uint32_t>(sign) << 31) + (static_cast<uint32_t>(exp) << 16) + sig96;
+}
 
 bool
 softfloat_tryPropagateNaNExtF80M(extFloat80M const*,
