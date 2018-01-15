@@ -47,22 +47,23 @@ point values is a NaN, returns the bit pattern of the combined NaN result.
 If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
-struct uint128
-    softfloat_propagateNaNF128UI(
-        uint64_t uiA64,
-        uint64_t uiA0,
-        uint64_t uiB64,
-        uint64_t uiB0
-    )
+uint128
+softfloat_propagateNaNF128UI(uint64_t uiA64,
+                             uint64_t uiA0,
+                             uint64_t uiB64,
+                             uint64_t uiB0)
 {
-    bool isSigNaNA;
-    struct uint128 uiZ;
+    bool const isSigNaNA = softfloat_isSigNaNF128UI(uiA64, uiA0);
 
-    isSigNaNA = softfloat_isSigNaNF128UI(uiA64, uiA0);
     if (isSigNaNA || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
-        if (isSigNaNA) goto returnNonsigA;
+
+        if (isSigNaNA) {
+            goto returnNonsigA;
+        }
     }
+
+    uint128 uiZ;
     if (isNaNF128UI(uiA64, uiA0)) {
 returnNonsigA:
         uiZ.v64 = uiA64;
@@ -71,6 +72,7 @@ returnNonsigA:
         uiZ.v64 = uiB64;
         uiZ.v0 = uiB0;
     }
+
     uiZ.v64 |= UINT64_C(0x0000800000000000);
     return uiZ;
 
