@@ -80,8 +80,7 @@ f128M_to_ui32_r_minMag(float128_t const *aPtr,
     }
 
     sig64 |= UINT64_C(0x0001000000000000);
-    /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-    uint32_t const z = sig64 >> shiftDist;
+    uint32_t const z = static_cast<uint32_t>(sig64 >> shiftDist);
     if (exact && ((uint64_t)z << shiftDist != sig64)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
