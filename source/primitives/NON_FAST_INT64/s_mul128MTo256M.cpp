@@ -34,26 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
-
-#include <cstdint>
-
-#ifndef softfloat_mul128MTo256M
+#include "primitives/functions.hpp"
 
 void
-softfloat_mul128MTo256M(
-    const uint32_t *aPtr, const uint32_t *bPtr, uint32_t *zPtr)
+softfloat_mul128MTo256M(uint32_t const *aPtr,
+                        uint32_t const *bPtr,
+                        uint32_t *zPtr)
 {
-    uint32_t *lastZPtr, wordB;
-    uint64_t dwordProd;
-    uint32_t wordZ;
-    uint8_t carry;
-
     bPtr += indexWordLo(4);
-    lastZPtr = zPtr + indexMultiwordHi(8, 5);
+    uint32_t *const lastZPtr = zPtr + indexMultiwordHi(8, 5);
     zPtr += indexMultiwordLo(8, 5);
-    wordB = *bPtr;
-    dwordProd = (uint64_t)aPtr[indexWord(4, 0)] * wordB;
+    uint32_t wordB = *bPtr;
+    uint64_t dwordProd = static_cast<uint64_t>(aPtr[indexWord(4, 0)]) * wordB;
     zPtr[indexWord(5, 0)] = (uint32_t)dwordProd;
     dwordProd = (uint64_t)aPtr[indexWord(4, 1)] * wordB + (dwordProd >> 32);
     zPtr[indexWord(5, 1)] = (uint32_t)dwordProd;
@@ -67,34 +59,30 @@ softfloat_mul128MTo256M(
         zPtr += wordIncr;
         wordB = *bPtr;
         dwordProd = (uint64_t)aPtr[indexWord(4, 0)] * wordB;
-        wordZ = zPtr[indexWord(5, 0)] + (uint32_t)dwordProd;
+        uint32_t wordZ = zPtr[indexWord(5, 0)] + (uint32_t)dwordProd;
         zPtr[indexWord(5, 0)] = wordZ;
-        carry = (wordZ < (uint32_t)dwordProd);
+        bool carry = wordZ < static_cast<uint32_t>(dwordProd);
         dwordProd =
             (uint64_t)aPtr[indexWord(4, 1)] * wordB + (dwordProd >> 32);
-        wordZ = zPtr[indexWord(5, 1)] + (uint32_t)dwordProd + carry;
+        wordZ = zPtr[indexWord(5, 1)] + static_cast<uint32_t>(dwordProd) + !!carry;
         zPtr[indexWord(5, 1)] = wordZ;
-        if (wordZ != (uint32_t)dwordProd) {
-            carry = (wordZ < (uint32_t)dwordProd);
+        if (wordZ != static_cast<uint32_t>(dwordProd)) {
+            carry = wordZ < static_cast<uint32_t>(dwordProd);
         }
         dwordProd =
             (uint64_t)aPtr[indexWord(4, 2)] * wordB + (dwordProd >> 32);
-        wordZ = zPtr[indexWord(5, 2)] + (uint32_t)dwordProd + carry;
+        wordZ = zPtr[indexWord(5, 2)] + static_cast<uint32_t>(dwordProd) + !!carry;
         zPtr[indexWord(5, 2)] = wordZ;
         if (wordZ != (uint32_t)dwordProd) {
-            carry = (wordZ < (uint32_t)dwordProd);
+            carry = wordZ < static_cast<uint32_t>(dwordProd);
         }
         dwordProd =
             (uint64_t)aPtr[indexWord(4, 3)] * wordB + (dwordProd >> 32);
-        wordZ = zPtr[indexWord(5, 3)] + (uint32_t)dwordProd + carry;
+        wordZ = zPtr[indexWord(5, 3)] + static_cast<uint32_t>(dwordProd) + !!carry;
         zPtr[indexWord(5, 3)] = wordZ;
         if (wordZ != (uint32_t)dwordProd) {
-            carry = (wordZ < (uint32_t)dwordProd);
+            carry = wordZ < static_cast<uint32_t>(dwordProd);
         }
-        zPtr[indexWord(5, 4)] = (dwordProd >> 32) + carry;
+        zPtr[indexWord(5, 4)] = (dwordProd >> 32) + !!carry;
     } while (zPtr != lastZPtr);
-
 }
-
-#endif
-

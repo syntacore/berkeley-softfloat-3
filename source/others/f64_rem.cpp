@@ -95,14 +95,14 @@ float64_t f64_rem(float64_t a, float64_t b)
                     q = 0;
                 } else {
                     rem <<= 9;
-                    q = (sigB <= rem);
+                    q = 0u + !!(sigB <= rem);
                     if (q) {
                         rem -= sigB;
                     }
                 }
             }
         } else {
-            uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 21);
+            uint32_t const recip32 = softfloat_approxRecip32_1(static_cast<uint32_t>(sigB >> 21));
             /*
             Changing the shift of `rem' here requires also changing the initial
             subtraction from `expDiff'.
@@ -156,7 +156,7 @@ selectRem:
             bool signRem = signA;
             if (rem & UINT64_C(0x8000000000000000)) {
                 signRem = !signRem;
-                rem = -(int64_t)rem;
+                rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
             }
             return softfloat_normRoundPackToF64(signRem, expB, rem);
         }

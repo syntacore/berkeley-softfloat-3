@@ -43,13 +43,15 @@ float32_t i64_to_f32(int64_t a)
     bool const sign = (a < 0);
     uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
     int8_t shiftDist = softfloat_countLeadingZeros64(absA) - 40;
+
     if (0 <= shiftDist) {
         return u_as_f_32(a ? packToF32UI(sign, 0x95 - shiftDist, (uint32_t)absA << shiftDist) : 0);
-    } else {
-        shiftDist += 7;
-        uint32_t const sig =
-            shiftDist < 0 ? softfloat_shortShiftRightJam64(absA, -shiftDist) :
-            (uint32_t)absA << shiftDist;
-        return softfloat_roundPackToF32(sign, 0x9C - shiftDist, sig);
     }
+
+    shiftDist += 7;
+    uint32_t const sig =
+        static_cast<uint32_t>(
+            shiftDist < 0 ? softfloat_shortShiftRightJam64(absA, static_cast<uint8_t>(-shiftDist)) :
+            absA << shiftDist);
+    return softfloat_roundPackToF32(sign, 0x9C - shiftDist, sig);
 }

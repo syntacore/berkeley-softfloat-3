@@ -87,7 +87,7 @@ extFloat80_t
             sigZ = sigA;
         }
         /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
-        uiZ64 = signUI64 | exp;
+        uiZ64 = static_cast<uint16_t>(signUI64 | exp);
         goto uiZ;
     }
     if ( exp <= 0x3FFE ) {
@@ -114,8 +114,7 @@ extFloat80_t
         goto uiZ;
     }
     
-    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
-    uiZ64 = signUI64 | exp;
+    uiZ64 = static_cast<uint16_t>(signUI64 | exp);
     lastBitMask = (uint64_t) 1<<(0x403E - exp);
     roundBitsMask = lastBitMask - 1;
     sigZ = sigA;

@@ -34,37 +34,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
-
-#include <cstdint>
-
-#ifndef softfloat_shortShiftRightM
+#include "primitives/functions.hpp"
 
 void
- softfloat_shortShiftRightM(
-     uint8_t size_words,
-     const uint32_t *aPtr,
-     uint8_t dist,
-     uint32_t *zPtr
- )
+softfloat_shortShiftRightM(size_t const size_words,
+                           uint32_t const* const aPtr,
+                           uint8_t const dist,
+                           uint32_t* const zPtr)
 {
-    uint8_t uNegDist;
-    unsigned int index, lastIndex;
-    uint32_t partWordZ, wordA;
 
-    uNegDist = -dist;
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    partWordZ = aPtr[index]>>dist;
-    while ( index != lastIndex ) {
-        wordA = aPtr[index + wordIncr];
-        zPtr[index] = wordA<<(uNegDist & 31) | partWordZ;
+    uint8_t uNegDist = 31u & -dist;
+    auto index = indexWordLo(size_words);
+    auto const lastIndex = indexWordHi(size_words);
+    uint32_t partWordZ = aPtr[index] >> dist;
+
+    while (index != lastIndex) {
+        uint32_t const wordA = aPtr[index + wordIncr];
+        zPtr[index] = wordA << uNegDist | partWordZ;
         index += wordIncr;
-        partWordZ = wordA>>dist;
+        partWordZ = wordA >> dist;
     }
+
     zPtr[index] = partWordZ;
-
 }
-
-#endif
-

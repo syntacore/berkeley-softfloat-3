@@ -40,41 +40,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void i64_to_f128M(int64_t a, float128_t *zPtr)
+void i64_to_f128M(int64_t a, float128_t* zPtr)
 {
     *zPtr = i64_to_f128(a);
 }
 
 #else
 
-void i64_to_f128M(int64_t a, float128_t *zPtr)
+void i64_to_f128M(int64_t const a,
+                  float128_t* const zPtr)
 {
-    uint32_t *zWPtr = (uint32_t *)zPtr;
+    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
     uint32_t uiZ96 = 0;
     uint32_t uiZ64 = 0;
+
     zWPtr[indexWord(4, 1)] = 0;
     zWPtr[indexWord(4, 0)] = 0;
-    if (a) {
+
+    if (0 != a) {
         bool const sign = (a < 0);
         /** @bug INT64_MIN */
         uint64_t absA = static_cast<uint64_t>(sign ? -a : a);
-        uint8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 17;
+        uint8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 17u;
+
         if (shiftDist < 32) {
-            uint32_t *const ptr = zWPtr + indexMultiwordHi(4, 3);
+            uint32_t* const ptr = zWPtr + indexMultiwordHi(4, 3);
             ptr[indexWord(3, 2)] = 0;
             ptr[indexWord(3, 1)] = absA >> 32;
             ptr[indexWord(3, 0)] = (uint32_t)absA;
             softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
-            ptr[indexWordHi(3)] =
-                packToF128UI96(sign, 0x404E - shiftDist, ptr[indexWordHi(3)]);
+            ptr[indexWordHi(3)] = packToF128UI96(sign, 0x404Eu - shiftDist, ptr[indexWordHi(3)]);
             return;
-        } else {
-            absA <<= shiftDist - 32;
-            uiZ96 = packToF128UI96(sign, 0x404E - shiftDist, absA >> 32);
-            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-            uiZ64 = absA;
         }
+
+        absA <<= shiftDist - 32;
+        uiZ96 = packToF128UI96(sign, 0x404Eu - shiftDist, absA >> 32);
+        uiZ64 = static_cast<uint32_t>(absA);
     }
+
     zWPtr[indexWord(4, 3)] = uiZ96;
     zWPtr[indexWord(4, 2)] = uiZ64;
 }

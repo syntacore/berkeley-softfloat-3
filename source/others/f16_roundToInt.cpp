@@ -51,7 +51,7 @@ float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
         if (exact) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
-        uint16_t const uiZ = uiA & packToF16UI(1, 0, 0);
+        uint16_t const uiZ = static_cast<uint16_t>(uiA & packToF16UI(1, 0, 0u));
         switch (roundingMode) {
         case softfloat_round_near_even:
             if (!fracF16UI(uiA)) {
@@ -59,7 +59,7 @@ float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
             }
         case softfloat_round_near_maxMag:
             if (exp == 0xE) {
-                return u_as_f_16(uiZ | packToF16UI(0, 0xF, 0));
+                return u_as_f_16(static_cast<uint16_t>(uiZ | packToF16UI(0, 0xF, 0u)));
             }
             break;
         case softfloat_round_min:
@@ -80,8 +80,8 @@ float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
             u_as_f_16(softfloat_propagateNaNF16UI(uiA, 0)) : a;
     } else {
         uint16_t uiZ = uiA;
-        uint16_t const lastBitMask = (uint16_t)1 << (0x19 - exp);
-        uint16_t const roundBitsMask = lastBitMask - 1;
+        uint16_t const lastBitMask = static_cast<uint16_t>(1 << (0x19 - exp));
+        uint16_t const roundBitsMask = lastBitMask - 1u;
         if (roundingMode == softfloat_round_near_maxMag) {
             uiZ += lastBitMask >> 1;
         } else if (roundingMode == softfloat_round_near_even) {

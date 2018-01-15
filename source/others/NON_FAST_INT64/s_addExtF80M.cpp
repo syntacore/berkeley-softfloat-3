@@ -57,7 +57,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
         } else {
             uint16_t uiZ64 = uiA64;
             if (expB == 0x7FFF) {
-                uiZ64 = uiB64 ^ packToExtF80UI64(negateB, 0);
+                uiZ64 = static_cast<uint16_t>(uiB64 ^ packToExtF80UI64(negateB, 0));
                 if (0x7FFF == expA && uiZ64 != uiA64) {
                     softfloat_invalidExtF80M(zSPtr);
                     return;
@@ -105,7 +105,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
                 sigZExtra = extSigX[indexWordLo(3)];
                 if (sigZExtra) {
                     --sigZ;
-                    sigZExtra = -(int32_t)sigZExtra;
+                    sigZExtra = static_cast<uint16_t>(-static_cast<int32_t>(sigZExtra));
                 }
                 if (0 == (sigZ & UINT64_C(0x8000000000000000))) {
                     if (sigZ & UINT64_C(0x4000000000000000)) {

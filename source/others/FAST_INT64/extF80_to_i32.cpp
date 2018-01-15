@@ -47,22 +47,21 @@ extF80_to_i32(extFloat80_t a, uint8_t roundingMode, bool exact)
     int32_t const exp = expExtF80UI64(uiA64);
     uint64_t sig = a.signif;
 
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
 
-    if (0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-#if (i32_fromNaN == i32_fromPosOverflow)
-        sign = false;
-#elif (i32_fromNaN == i32_fromNegOverflow)
-        sign = true;
-#else
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return i32_fromNaN;
-#endif
+        if (0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            if (i32_fromNaN == i32_fromPosOverflow) {
+                sign = false;
+            } else if (i32_fromNaN == i32_fromNegOverflow) {
+                sign = true;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return i32_fromNaN;
+            }
+        }
     }
 
-#endif
-
     auto const shiftDist = 0x4032 - exp;
-    uint32_t const shiftDist1 = shiftDist <= 0 ? 1 : shiftDist;
+    uint32_t const shiftDist1 = shiftDist <= 0 ? 1u : static_cast<uint32_t>(shiftDist);
     return softfloat_roundPackToI32(sign, softfloat_shiftRightJam64(sig, shiftDist1), roundingMode, exact);
 }

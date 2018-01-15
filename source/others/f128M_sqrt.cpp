@@ -116,7 +116,7 @@ f128M_sqrt(float128_t const* const aPtr,
         sig32A = static_cast<uint32_t>(rem64 >> 30);
     }
 
-    uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
+    uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     if (expA) {

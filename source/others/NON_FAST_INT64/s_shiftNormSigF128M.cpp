@@ -48,7 +48,7 @@ softfloat_shiftNormSigF128M(
     exp = expF128UI96(wordSig);
     if (exp) {
         softfloat_shortShiftLeft128M(wPtr, shiftDist, sigPtr);
-        leadingBit = 0x00010000 << shiftDist;
+        leadingBit = UINT32_C(0x00010000) << shiftDist;
         sigPtr[indexWordHi(4)] =
             (sigPtr[indexWordHi(4)] & (leadingBit - 1)) | leadingBit;
     } else {
@@ -68,7 +68,7 @@ softfloat_shiftNormSigF128M(
             }
         }
         exp -= softfloat_countLeadingZeros32(wordSig);
-        softfloat_shiftLeft128M(wPtr, 1 - exp + shiftDist, sigPtr);
+        softfloat_shiftLeft128M(wPtr, static_cast<uint32_t>(1 - exp + shiftDist), sigPtr);
     }
     return exp;
 

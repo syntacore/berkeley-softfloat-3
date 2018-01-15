@@ -39,8 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-#include <cassert>
-
 extFloat80_t
 extF80_rem(extFloat80_t a, extFloat80_t b)
 {
@@ -128,9 +126,8 @@ extF80_rem(extFloat80_t a, extFloat80_t b)
             --expB;
             shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 33);
             q = 0;
-        }
-        else {
-            q = (sigB <= sigA);
+        } else {
+            q = 0u + !!(sigB <= sigA);
 
             if (q) {
                 rem =
@@ -138,8 +135,7 @@ extF80_rem(extFloat80_t a, extFloat80_t b)
                         rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
             }
         }
-    }
-    else {
+    } else {
         recip32 = softfloat_approxRecip32_1(sigB >> 32);
         expDiff -= 30;
 
@@ -170,7 +166,7 @@ extF80_rem(extFloat80_t a, extFloat80_t b)
         assert(-29 <= expDiff);
         q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
         /** @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data */
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, expDiff + 30);
+        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, uint8_t(expDiff + 30));
         uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
@@ -207,8 +203,7 @@ selectRem:
 
 propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-    uiZ64 = uiZ.v64;
+    uiZ64 = static_cast<uint16_t>(uiZ.v64);
     uiZ0 = uiZ.v0;
     goto uiZ;
 
@@ -225,8 +220,7 @@ copyA:
         expA = 0;
     }
 
-    /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
-    uiZ64 = packToExtF80UI64(signA, expA);
+    uiZ64 = static_cast<uint16_t>(packToExtF80UI64(signA, static_cast<uint16_t>(expA)));
     uiZ0 = sigA;
 uiZ:
     extFloat80_t uZ;

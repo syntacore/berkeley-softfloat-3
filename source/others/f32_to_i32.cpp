@@ -46,26 +46,29 @@ int32_t f32_to_i32(float32_t a, uint8_t roundingMode, bool exact)
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);
 
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if (exp == 0xFF && sig) {
-#if (i32_fromNaN == i32_fromPosOverflow)
-        sign = 0;
-#elif (i32_fromNaN == i32_fromNegOverflow)
-        sign = 1;
-#else
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return i32_fromNaN;
-#endif
+    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
+        if (exp == 0xFF && sig) {
+            if (i32_fromNaN == i32_fromPosOverflow) {
+                sign = 0;
+            } else if (i32_fromNaN == i32_fromNegOverflow) {
+                sign = 1;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return i32_fromNaN;
+            }
+        }
     }
-#endif
 
     if (exp) {
         sig |= 0x00800000;
     }
+
     uint64_t sig64 = (uint64_t)sig << 32;
     int16_t const shiftDist = 0xAA - exp;
+
     if (0 < shiftDist) {
-        sig64 = softfloat_shiftRightJam64(sig64, shiftDist);
+        sig64 = softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
     }
+
     return softfloat_roundPackToI32(sign, sig64, roundingMode, exact);
 }

@@ -42,16 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 extF80_to_f16(extFloat80_t a)
 {
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-
-    uA.f = a;
-    uint16_t const uiA64 = uA.s.signExp;
-    uint64_t const uiA0 = uA.s.signif;
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 = a.signif;
     bool const sign = signExtF80UI64(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t const sig = uiA0;
@@ -59,20 +51,23 @@ extF80_to_f16(extFloat80_t a)
     if (exp == 0x7FFF) {
         if (sig & INT64_MAX) {
             return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
-        } else {
-            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-    } else {
-        uint16_t const sig16 = (uint16_t)softfloat_shortShiftRightJam64(sig, 49);
-        if (!(exp | sig16)) {
-            return u_as_f_16(packToF16UI(sign, 0, 0));
-        } else {
-            exp -= 0x3FF1;
-            if (exp < -0x40) {
-                exp = -0x40;
-            }
-            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
-            return softfloat_roundPackToF16(sign, exp, sig16);
-        }
+
+        return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
+
+    uint16_t const sig16 = (uint16_t)softfloat_shortShiftRightJam64(sig, 49);
+
+    if (!(exp | sig16)) {
+        return u_as_f_16(packToF16UI(sign, 0, 0));
+    }
+
+    exp -= 0x3FF1;
+
+    if (exp < -0x40) {
+        exp = -0x40;
+    }
+
+    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+    return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
 }

@@ -34,30 +34,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
+#include "primitives/functions.hpp"
 
-#include <cstdint>
-
-#ifndef softfloat_negXM
-
-void softfloat_negXM( uint8_t size_words, uint32_t *zPtr )
+void
+softfloat_negXM(uint8_t size_words,
+                uint32_t* zPtr)
 {
-    unsigned int index, lastIndex;
-    uint8_t carry;
-    uint32_t word;
+    auto const lastIndex = indexWordHi(size_words);
+    bool carry = 1;
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    carry = 1;
-    for (;;) {
-        word = ~zPtr[index] + carry;
+    for (auto index = indexWordLo(size_words);;) {
+        uint32_t const word = ~zPtr[index] + carry;
         zPtr[index] = word;
-        if ( index == lastIndex ) break;
+
+        if (index == lastIndex) {
+            break;
+        }
+
         index += wordIncr;
-        if ( word ) carry = 0;
+
+        if (0 != word) {
+            carry = 0;
+        }
     }
 
 }
-
-#endif
-

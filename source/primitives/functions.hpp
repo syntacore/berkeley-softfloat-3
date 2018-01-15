@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PRIMITIVES_H_
 
 #include "primitives/types.hpp"
+#include <cstddef>
 
 /**
 Shifts `a' right by the number of bits given in `dist', which must be in
@@ -46,15 +47,13 @@ into the least-significant bit of the shifted value by setting the least-
 significant bit to 1.  This shifted-and-jammed value is returned.
 */
 #if 1
-inline uint64_t
+inline constexpr uint64_t
 softfloat_shortShiftRightJam64(uint64_t a,
                                uint8_t dist)
 {
-    auto const shft = dist >= 63 ? 63 : dist;
-    auto const non_sign_mask = ~UINT64_C(0) >> 1;
-    auto const shifted_value = a >> shft;
-    auto const correction = (((a << (63 - shft)) >> 1) + non_sign_mask) >> 63;
-    return correction | shifted_value;
+    return
+        (a >> (dist >= 63 ? 63 : dist)) |
+        ((((a << (63 - (dist >= 63 ? 63 : dist))) >> 1) + (~UINT64_C(0) >> 1)) >> 63);
 }
 #else
 inline uint64_t
@@ -209,27 +208,23 @@ fraction bits.  The approximation returned is never greater than the true
 reciprocal 1/A, and it differs from the true reciprocal by at most 2.006 ulp
 (units in the last place).
 */
+inline uint32_t
+softfloat_approxRecip32_1(uint32_t a)
+{
 #ifdef SOFTFLOAT_FAST_DIV64TO32
-inline uint32_t
-softfloat_approxRecip32_1(uint32_t a)
-{
     return static_cast<uint32_t>(INT64_MAX / static_cast<uint32_t>(a));
-}
 #else
-inline uint32_t
-softfloat_approxRecip32_1(uint32_t a)
-{
     auto const index = a >> 27 & 0xF;
     uint16_t const eps = static_cast<uint16_t>(a >> 11);
     uint16_t const r0 =
         softfloat_approxRecip_1k0s[index] -
-        ((softfloat_approxRecip_1k1s[index] * (uint32_t)eps) >> 20);
-    uint32_t const sigma0 = ~(uint32_t)((r0 * (uint64_t)a) >> 7);
-    uint32_t r = ((uint32_t)r0 << 16) + ((r0 * (uint64_t)sigma0) >> 24);
+        ((softfloat_approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
+    uint32_t const sigma0 = ~static_cast<uint32_t>((r0 * static_cast<uint64_t>(a)) >> 7);
+    uint32_t r = (static_cast<uint32_t>(r0) << 16) + ((r0 * static_cast<uint64_t>(sigma0)) >> 24);
     uint32_t const sqrSigma0 = ((uint64_t)sigma0 * sigma0) >> 32;
-    return r + (((uint32_t)r * (uint64_t)sqrSigma0) >> 48);
-}
+    return r + ((static_cast<uint32_t>(r) * static_cast<uint64_t>(sqrSigma0)) >> 48);
 #endif
+}
 
 extern const uint16_t softfloat_approxRecipSqrt_1k0s[16];
 extern const uint16_t softfloat_approxRecipSqrt_1k1s[16];
@@ -252,7 +247,9 @@ reciprocal by at most 2.06 ulp (units in the last place).  The approximation
 returned is also always within the range 0.5 to 1; thus, the most-
 significant bit of the result is always set.
 */
-uint32_t softfloat_approxRecipSqrt32_1(unsigned oddExpA, uint32_t a);
+uint32_t
+softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
+                              uint32_t a);
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -302,7 +299,7 @@ softfloat_shortShiftLeft128(uint64_t a64,
                             uint64_t a0,
                             uint8_t dist)
 {
-    return uint128{a0 << dist, a64 << dist | a0 >> (-(int8_t)dist & 63)};
+    return uint128{a0 << dist, a64 << dist | a0 >> (63u & -static_cast<int8_t>(dist))};
 }
 
 /**
@@ -326,7 +323,7 @@ softfloat_shortShiftRightJam64Extra(uint64_t a,
                                     uint64_t extra,
                                     uint8_t dist)
 {
-    return uint64_extra{a >> dist,a << (-(int8_t)dist & 63) | (extra != 0)};
+    return uint64_extra{a >> dist, a << (-(int8_t)dist & 63) | (extra != 0)};
 }
 
 /**
@@ -432,9 +429,9 @@ is modified as described above and returned in the `extra' field of the
 result.)
 */
 uint128_extra
-softfloat_shiftRightJam128Extra(uint64_t a64, 
-                                uint64_t a0, 
-                                uint64_t extra, 
+softfloat_shiftRightJam128Extra(uint64_t a64,
+                                uint64_t a0,
+                                uint64_t extra,
                                 uint32_t dist);
 
 /**
@@ -450,8 +447,8 @@ is greater than 256, the stored result will be either 0 or 1, depending on
 whether the original 256 bits are all zeros.
 */
 void
-softfloat_shiftRightJam256M(uint64_t const *aPtr, 
-                            uint32_t dist, 
+softfloat_shiftRightJam256M(uint64_t const* aPtr,
+                            uint32_t dist,
                             uint64_t* zPtr);
 
 /**
@@ -460,9 +457,9 @@ Returns the sum of the 128-bit integer formed by concatenating `a64' and
 addition is modulo 2^128, so any carry out is lost.
 */
 inline constexpr uint128
-softfloat_add128(uint64_t a64, 
-                 uint64_t a0, 
-                 uint64_t b64, 
+softfloat_add128(uint64_t a64,
+                 uint64_t a0,
+                 uint64_t b64,
                  uint64_t b0)
 {
     return uint128{a0 + b0, a64 + b64 + !!(a0 + b0 < a0)};
@@ -503,9 +500,9 @@ and `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.
 The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 */
 inline constexpr uint128
-softfloat_sub128(uint64_t a64, 
-                 uint64_t a0, 
-                 uint64_t b64, 
+softfloat_sub128(uint64_t a64,
+                 uint64_t a0,
+                 uint64_t b64,
                  uint64_t b0)
 {
     return uint128{a0 - b0, a64 - b64 - (a0 < b0)};
@@ -520,15 +517,15 @@ by `zPtr'.  Each of `aPtr', `bPtr', and `zPtr' points to an array of four
 form a 256-bit integer.
 */
 void
-softfloat_sub256M(uint64_t const *aPtr,
-                  uint64_t const *bPtr, 
+softfloat_sub256M(uint64_t const* aPtr,
+                  uint64_t const* bPtr,
                   uint64_t* zPtr);
 
 /**
 @return the 128-bit product of `a', `b', and 2^32.
 */
 inline uint128
-softfloat_mul64ByShifted32To128(uint64_t a, 
+softfloat_mul64ByShifted32To128(uint64_t a,
                                 uint32_t b)
 {
     uint64_t const mid = (uint64_t)(uint32_t)a * b;
@@ -572,10 +569,10 @@ Argument `zPtr' points to an array of four 64-bit elements that concatenate
 in the platform's normal endian order to form a 256-bit integer.
 */
 void
-softfloat_mul128To256M(uint64_t a64, 
-                       uint64_t a0, 
-                       uint64_t b64, 
-                       uint64_t b0, 
+softfloat_mul128To256M(uint64_t a64,
+                       uint64_t a0,
+                       uint64_t b64,
+                       uint64_t b0,
                        uint64_t* zPtr);
 
 #else
@@ -593,8 +590,8 @@ is greater than the second (B).  (The result is thus the signum of A - B.)
 Each of `aPtr' and `bPtr' points to an array of three 32-bit elements that
 concatenate in the platform's normal endian order to form a 96-bit integer.
 */
-int8_t
-softfloat_compare96M(uint32_t const *aPtr,
+int
+softfloat_compare96M(uint32_t const* aPtr,
                      uint32_t const* bPtr);
 
 /**
@@ -605,9 +602,9 @@ is greater than the second (B).  (The result is thus the signum of A - B.)
 Each of `aPtr' and `bPtr' points to an array of four 32-bit elements that
 concatenate in the platform's normal endian order to form a 128-bit integer.
 */
-int8_t
-softfloat_compare128M(uint32_t const *aPtr,
-                      uint32_t const *bPtr);
+int
+softfloat_compare128M(uint32_t const* aPtr,
+                      uint32_t const* bPtr);
 
 /**
 Extends `a' to 96 bits and shifts the value left by the number of bits given
@@ -637,7 +634,7 @@ that concatenate in the platform's normal endian order to form an N-bit
 integer.
 */
 void
-softfloat_shortShiftLeftM(uint8_t size_words,
+softfloat_shortShiftLeftM(size_t size_words,
                           uint32_t const* aPtr,
                           uint8_t dist,
                           uint32_t* zPtr);
@@ -649,7 +646,7 @@ This function or macro is the same as `softfloat_shortShiftLeftM' with
 inline void
 softfloat_shortShiftLeft96M(uint32_t const* aPtr, uint8_t dist, uint32_t* zPtr)
 {
-    softfloat_shortShiftLeftM(3, aPtr, dist, zPtr);
+    softfloat_shortShiftLeftM(3u, aPtr, dist, zPtr);
 }
 
 /**
@@ -659,7 +656,7 @@ This function or macro is the same as `softfloat_shortShiftLeftM' with
 inline void
 softfloat_shortShiftLeft128M(uint32_t const* aPtr, uint8_t dist, uint32_t* zPtr)
 {
-    softfloat_shortShiftLeftM(4, aPtr, dist, zPtr);
+    softfloat_shortShiftLeftM(4u, aPtr, dist, zPtr);
 }
 
 /**
@@ -669,7 +666,7 @@ This function or macro is the same as `softfloat_shortShiftLeftM' with
 inline void
 softfloat_shortShiftLeft160M(uint32_t const* aPtr, uint8_t dist, uint32_t* zPtr)
 {
-    softfloat_shortShiftLeftM(5, aPtr, dist, zPtr);
+    softfloat_shortShiftLeftM(5u, aPtr, dist, zPtr);
 }
 
 /**
@@ -687,7 +684,7 @@ concatenate in the platform's normal endian order to form an N-bit integer.
 @param[out] zPtr pointer to store location for the shifted N-bit result.
 */
 void
-softfloat_shiftLeftM(uint8_t size_words,
+softfloat_shiftLeftM(size_t size_words,
                      uint32_t const* aPtr,
                      uint32_t dist,
                      uint32_t* zPtr);
@@ -700,7 +697,7 @@ softfloat_shiftLeft96M(uint32_t const* aPtr,
                        uint32_t dist,
                        uint32_t* zPtr)
 {
-    softfloat_shiftLeftM(3, aPtr, dist, zPtr);
+    softfloat_shiftLeftM(3u, aPtr, dist, zPtr);
 }
 
 /**
@@ -711,7 +708,7 @@ softfloat_shiftLeft128M(uint32_t const* aPtr,
                         uint32_t dist,
                         uint32_t* zPtr)
 {
-    softfloat_shiftLeftM(4, aPtr, dist, zPtr);
+    softfloat_shiftLeftM(4u, aPtr, dist, zPtr);
 }
 
 /**
@@ -722,7 +719,7 @@ softfloat_shiftLeft160M(uint32_t const* aPtr,
                         uint32_t dist,
                         uint32_t* zPtr)
 {
-    softfloat_shiftLeftM(5, aPtr, dist, zPtr);
+    softfloat_shiftLeftM(5u, aPtr, dist, zPtr);
 }
 
 /**
@@ -735,7 +732,7 @@ that concatenate in the platform's normal endian order to form an N-bit
 integer.
 */
 void
-softfloat_shortShiftRightM(uint8_t size_words,
+softfloat_shortShiftRightM(size_t size_words,
                            uint32_t const* aPtr,
                            uint8_t dist,
                            uint32_t* zPtr);
@@ -749,7 +746,7 @@ softfloat_shortShiftRight128M(uint32_t const* aPtr,
                               uint8_t dist,
                               uint32_t* zPtr)
 {
-    softfloat_shortShiftRightM(4, aPtr, dist, zPtr);
+    softfloat_shortShiftRightM(4u, aPtr, dist, zPtr);
 }
 
 /**
@@ -761,7 +758,7 @@ softfloat_shortShiftRight160M(uint32_t const* aPtr,
                               uint8_t dist,
                               uint32_t* zPtr)
 {
-    softfloat_shortShiftRightM(5, aPtr, dist, zPtr);
+    softfloat_shortShiftRightM(5u, aPtr, dist, zPtr);
 }
 
 /**
@@ -775,10 +772,10 @@ to a `size_words'-long array of 32-bit elements that concatenate in the
 platform's normal endian order to form an N-bit integer.
 */
 void
-softfloat_shortShiftRightJamM(uint8_t,
-                              uint32_t const*,
-                              uint8_t,
-                              uint32_t*);
+softfloat_shortShiftRightJamM(size_t size_words,
+                              uint32_t const* aPtr,
+                              uint8_t dist,
+                              uint32_t* zPtr);
 
 /**
 This function or macro is the same as `softfloat_shortShiftRightJamM' with
@@ -789,7 +786,7 @@ softfloat_shortShiftRightJam160M(uint32_t const* aPtr,
                                  uint8_t dist,
                                  uint32_t* zPtr)
 {
-    softfloat_shortShiftRightJamM(5, aPtr, dist, zPtr);
+    softfloat_shortShiftRightJamM(5u, aPtr, dist, zPtr);
 }
 
 /**
@@ -803,7 +800,7 @@ The value of `dist' can be arbitrarily large.  In particular, if `dist' is
 greater than N, the stored result will be 0.
 */
 void
-softfloat_shiftRightM(uint8_t size_words,
+softfloat_shiftRightM(size_t size_words,
                       uint32_t const* aPtr,
                       uint32_t dist,
                       uint32_t* zPtr);
@@ -817,7 +814,7 @@ softfloat_shiftRight96M(uint32_t const* aPtr,
                         uint8_t dist,
                         uint32_t* zPtr)
 {
-    softfloat_shiftRightM(3, aPtr, dist, zPtr);
+    softfloat_shiftRightM(3u, aPtr, dist, zPtr);
 }
 
 /**
@@ -834,7 +831,7 @@ is greater than N, the stored result will be either 0 or 1, depending on
 whether the original N bits are all zeros.
 */
 void
-softfloat_shiftRightJamM(uint8_t size_words,
+softfloat_shiftRightJamM(size_t size_words,
                          uint32_t const* aPtr,
                          uint32_t dist,
                          uint32_t* zPtr);
@@ -848,7 +845,7 @@ softfloat_shiftRightJam96M(uint32_t const* aPtr,
                            uint8_t dist,
                            uint32_t* zPtr)
 {
-    softfloat_shiftRightJamM(3, aPtr, dist, zPtr);
+    softfloat_shiftRightJamM(3u, aPtr, dist, zPtr);
 }
 
 /**
@@ -860,7 +857,7 @@ softfloat_shiftRightJam128M(uint32_t const* aPtr,
                             uint8_t dist,
                             uint32_t* zPtr)
 {
-    softfloat_shiftRightJamM(4, aPtr, dist, zPtr);
+    softfloat_shiftRightJamM(4u, aPtr, dist, zPtr);
 }
 
 /**
@@ -872,7 +869,7 @@ softfloat_shiftRightJam160M(uint32_t const* aPtr,
                             uint8_t dist,
                             uint32_t* zPtr)
 {
-    softfloat_shiftRightJamM(5, aPtr, dist, zPtr);
+    softfloat_shiftRightJamM(5u, aPtr, dist, zPtr);
 }
 
 /**
@@ -884,7 +881,7 @@ elements that concatenate in the platform's normal endian order to form an
 N-bit integer.
 */
 void
-softfloat_addM(uint8_t size_words,
+softfloat_addM(size_t size_words,
                uint32_t const* aPtr,
                uint32_t const* bPtr,
                uint32_t* zPtr);
@@ -898,7 +895,7 @@ softfloat_add96M(uint32_t const* aPtr,
                  uint32_t const* bPtr,
                  uint32_t* zPtr)
 {
-    softfloat_addM(3, aPtr, bPtr, zPtr);
+    softfloat_addM(3u, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -910,7 +907,7 @@ softfloat_add128M(uint32_t const* aPtr,
                   uint32_t const* bPtr,
                   uint32_t* zPtr)
 {
-    softfloat_addM(4, aPtr, bPtr, zPtr);
+    softfloat_addM(4u, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -922,7 +919,7 @@ softfloat_add160M(uint32_t const* aPtr,
                   uint32_t const* bPtr,
                   uint32_t* zPtr)
 {
-    softfloat_addM(5, aPtr, bPtr, zPtr);
+    softfloat_addM(5u, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -933,11 +930,11 @@ carry out is returned as the result.  Each of `aPtr', `bPtr', and `zPtr'
 points to a `size_words'-long array of 32-bit elements that concatenate in
 the platform's normal endian order to form an N-bit integer.
 */
-uint8_t
-softfloat_addCarryM(uint8_t size_words,
+bool
+softfloat_addCarryM(size_t size_words,
                     uint32_t const* aPtr,
                     uint32_t const* bPtr,
-                    uint8_t carry,
+                    bool carry,
                     uint32_t* zPtr);
 
 /**
@@ -945,24 +942,24 @@ This function or macro is the same as `softfloat_addCarryM', except that
 the value of the unsigned integer pointed to by `bPtr' is bit-wise completed
 before the addition.
 */
-uint8_t
-softfloat_addComplCarryM(uint8_t size_words,
+bool
+softfloat_addComplCarryM(size_t size_words,
                          uint32_t const* aPtr,
                          uint32_t const* bPtr,
-                         uint8_t carry,
+                         bool carry,
                          uint32_t* zPtr);
 
 /**
 This function or macro is the same as `softfloat_addComplCarryM' with
 `size_words' = 3 (N = 96).
 */
-inline uint8_t
+inline bool
 softfloat_addComplCarry96M(uint32_t const* aPtr,
                            uint32_t const* bPtr,
-                           uint8_t carry,
+                           bool carry,
                            uint32_t* zPtr)
 {
-    return softfloat_addComplCarryM(3, aPtr, bPtr, carry, zPtr);
+    return softfloat_addComplCarryM(3u, aPtr, bPtr, carry, zPtr);
 }
 
 /**
@@ -1021,7 +1018,7 @@ elements that concatenate in the platform's normal endian order to form an
 N-bit integer.
 */
 void
-softfloat_sub1XM(uint8_t size_words,
+softfloat_sub1XM(size_t size_words,
                  uint32_t* zPtr);
 
 /**
@@ -1030,7 +1027,7 @@ This function or macro is the same as `softfloat_sub1XM' with `size_words' = 3 (
 inline void
 softfloat_sub1X96M(uint32_t* zPtr)
 {
-    softfloat_sub1XM(3, zPtr);
+    softfloat_sub1XM(3u, zPtr);
 }
 
 /**
@@ -1039,7 +1036,7 @@ This function or macro is the same as `softfloat_sub1XM' with `size_words' = 5 (
 inline void
 softfloat_sub1X160M(uint32_t* zPtr)
 {
-    softfloat_sub1XM(5, zPtr);
+    softfloat_sub1XM(5u, zPtr);
 }
 
 /**
@@ -1051,7 +1048,7 @@ array of 32-bit elements that concatenate in the platform's normal endian
 order to form an N-bit integer.
 */
 void
-softfloat_subM(uint8_t size_words,
+softfloat_subM(size_t size_words,
                uint32_t const* aPtr,
                uint32_t const* bPtr,
                uint32_t* zPtr);
@@ -1064,7 +1061,7 @@ softfloat_sub96M(uint32_t const* aPtr,
                  uint32_t const* bPtr,
                  uint32_t* zPtr)
 {
-    softfloat_subM(3, aPtr, bPtr, zPtr);
+    softfloat_subM(3u, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -1075,7 +1072,7 @@ softfloat_sub128M(uint32_t const* aPtr,
                   uint32_t const* bPtr,
                   uint32_t* zPtr)
 {
-    softfloat_subM(4, aPtr, bPtr, zPtr);
+    softfloat_subM(4u, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -1086,7 +1083,7 @@ softfloat_sub160M(uint32_t const* aPtr,
                   uint32_t const* bPtr,
                   uint32_t* zPtr)
 {
-    softfloat_subM(5, aPtr, bPtr, zPtr);
+    softfloat_subM(5u, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -1095,7 +1092,10 @@ pointed to by `zPtr'.  Argument `zPtr' points to an array of four 32-bit
 elements that concatenate in the platform's normal endian order to form a
 128-bit integer.
 */
-void softfloat_mul64To128M(uint64_t a, uint64_t b, uint32_t* zPtr);
+void
+softfloat_mul64To128M(uint64_t a,
+                      uint64_t b,
+                      uint32_t* zPtr);
 
 /**
 Multiplies the two 128-bit unsigned integers pointed to by `aPtr' and
@@ -1106,8 +1106,9 @@ Argument `zPtr' points to an array of eight 32-bit elements that concatenate
 to form a 256-bit integer.
 */
 void
-softfloat_mul128MTo256M(
-    const uint32_t* aPtr, const uint32_t* bPtr, uint32_t* zPtr);
+softfloat_mul128MTo256M(uint32_t const* aPtr,
+                        uint32_t const* bPtr,
+                        uint32_t* zPtr);
 
 /**
 Performs a "remainder reduction step" as follows:  Arguments `remPtr' and

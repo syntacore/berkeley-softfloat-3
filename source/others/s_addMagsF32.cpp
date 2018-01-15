@@ -85,13 +85,13 @@ softfloat_addMagsF32(uint32_t uiA, uint32_t uiB)
                 /* magnitude b greater than magnitude a */
                 expZ = expB;
                 /* add hidden bit and shift */
-                sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), -expDiff);
+                sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
                 sigB_scaled += hidden_bit_scaled;
             } else {
                 /* magnitude a greater than magnitude b */
                 expZ = expA;
                 /* add hidden bit and shift */
-                sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), expDiff);
+                sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
                 sigA_scaled += hidden_bit_scaled;
             }
             {

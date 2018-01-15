@@ -78,7 +78,7 @@ f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
             frac = normExpSig.sig;
         }
     }
-    zSPtr->signExp = packToExtF80UI64(sign, exp + 0x3C00);
+    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
     zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }
 

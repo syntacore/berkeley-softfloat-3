@@ -59,5 +59,5 @@ f64_to_f16(float64_t a)
     if (0 == (exp | frac16)) {
         return u_as_f_16(packToF16UI(sign, 0, 0));
     }
-    return softfloat_roundPackToF16(sign, exp - 0x3F1, frac16 | 0x4000);
+    return softfloat_roundPackToF16(sign, exp - 0x3F1, frac16 | 0x4000u);
 }

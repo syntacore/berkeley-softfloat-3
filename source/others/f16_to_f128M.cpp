@@ -78,7 +78,7 @@ void f16_to_f128M(float16_t a, float128_t *zPtr)
                 goto uiZ;
             }
         }
-        uiZ96 = packToF128UI96(sign, exp + 0x3FF0, (uint32_t)frac << 6);
+        uiZ96 = packToF128UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
     }
 uiZ:
     zWPtr[indexWord(4, 3)] = uiZ96;

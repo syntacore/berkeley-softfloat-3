@@ -40,40 +40,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint32_t
- extF80_to_ui32( extFloat80_t a, uint8_t roundingMode, bool exact )
+extF80_to_ui32(extFloat80_t const a,
+               uint8_t const roundingMode,
+               bool const exact)
 {
-    /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
-    uint16_t uiA64;
-    bool sign;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
+    uint16_t const uiA64 = a.signExp;
+    bool sign = signExtF80UI64(uiA64);
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t sig = a.signif;
 
-    
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    sign = signExtF80UI64( uiA64 );
-    exp  = expExtF80UI64( uiA64 );
-    sig = uA.s.signif;
-    
-#if (ui32_fromNaN != ui32_fromPosOverflow) || (ui32_fromNaN != ui32_fromNegOverflow)
-    if ( (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
-#if (ui32_fromNaN == ui32_fromPosOverflow)
-        sign = 0;
-#elif (ui32_fromNaN == ui32_fromNegOverflow)
-        sign = 1;
-#else
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return ui32_fromNaN;
-#endif
+    if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {
+        if ((exp == 0x7FFF) && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            if (ui32_fromNaN == ui32_fromPosOverflow) {
+                sign = 0;
+            } else if (ui32_fromNaN == ui32_fromNegOverflow) {
+                sign = 1;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return ui32_fromNaN;
+            }
+        }
     }
-#endif
-    
-    shiftDist = 0x4032 - exp;
-    if ( shiftDist <= 0 ) shiftDist = 1;
-    sig = softfloat_shiftRightJam64( sig, shiftDist );
-    return softfloat_roundPackToUI32( sign, sig, roundingMode, exact );
 
+    int32_t shiftDist = 0x4032 - exp;
+
+    if (shiftDist <= 0) {
+        shiftDist = 1;
+    }
+
+    sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
+    return softfloat_roundPackToUI32(sign, sig, roundingMode, exact);
 }
-

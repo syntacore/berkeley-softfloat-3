@@ -60,8 +60,8 @@ f64_to_ui32_r_minMag(float64_t a, bool exact)
                 sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
         } else {
             sig |= UINT64_C(0x0010000000000000);
-            uint32_t const z = sig >> shiftDist;
-            if (exact && ((uint64_t)z << shiftDist != sig)) {
+            uint32_t const z = static_cast<uint32_t>(sig >> shiftDist);
+            if (exact && (static_cast<uint64_t>(z) << shiftDist != sig)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
             return z;

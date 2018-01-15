@@ -40,32 +40,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint32_t
-f64_to_ui32(float64_t a, uint8_t roundingMode, bool exact)
+f64_to_ui32(float64_t const a,
+            uint8_t const roundingMode,
+            bool const exact)
 {
     uint64_t const uiA = f_as_u_64(a);
     bool sign = signF64UI(uiA);
     int16_t const exp = expF64UI(uiA);
     uint64_t sig = fracF64UI(uiA);
 
-#if (ui32_fromNaN != ui32_fromPosOverflow) || (ui32_fromNaN != ui32_fromNegOverflow)
-    if (0x7FF == exp && sig) {
-#if (ui32_fromNaN == ui32_fromPosOverflow)
-        sign = 0;
-#elif (ui32_fromNaN == ui32_fromNegOverflow)
-        sign = 1;
-#else
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return ui32_fromNaN;
-#endif
+    if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {
+        if (0x7FF == exp && sig) {
+            if (ui32_fromNaN == ui32_fromPosOverflow) {
+                sign = 0;
+            }
+            else if (ui32_fromNaN == ui32_fromNegOverflow) {
+                sign = 1;
+            }
+            else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return ui32_fromNaN;
+            }
+        }
     }
-#endif
 
     if (exp) {
         sig |= UINT64_C(0x0010000000000000);
     }
+
     int16_t const shiftDist = 0x427 - exp;
+
     if (0 < shiftDist) {
-        sig = softfloat_shiftRightJam64(sig, shiftDist);
+        sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
     }
+
     return softfloat_roundPackToUI32(sign, sig, roundingMode, exact);
 }

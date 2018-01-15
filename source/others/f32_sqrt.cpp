@@ -76,7 +76,7 @@ float32_t f32_sqrt(float32_t a)
         int16_t expZ = ((expA - 0x7F) >> 1) + 0x7E;
         expA &= 1;
         sigA = (sigA | 0x00800000) << 8;
-        uint32_t sigZ = ((uint64_t)sigA * softfloat_approxRecipSqrt32_1(expA, sigA)) >> 32;
+        uint32_t sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sigA)) >> 32;
         if (expA) {
             sigZ >>= 1;
         }

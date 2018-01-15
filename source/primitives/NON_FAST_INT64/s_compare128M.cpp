@@ -34,29 +34,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
+#include "primitives/functions.hpp"
 
-#include <cstdint>
-
-#ifndef softfloat_compare128M
-
-int8_t softfloat_compare128M( const uint32_t *aPtr, const uint32_t *bPtr )
+int
+softfloat_compare128M(uint32_t const *const aPtr,
+                      uint32_t const *const bPtr)
 {
-    unsigned int index, lastIndex;
-    uint32_t wordA, wordB;
+    auto const lastIndex = indexWordLo(4);
+    for (auto index = indexWordHi(4);; index -= wordIncr) {
+        uint32_t const wordA = aPtr[index];
+        uint32_t const wordB = bPtr[index];
 
-    index = indexWordHi( 4 );
-    lastIndex = indexWordLo( 4 );
-    for (;;) {
-        wordA = aPtr[index];
-        wordB = bPtr[index];
-        if ( wordA != wordB ) return (wordA < wordB) ? -1 : 1;
-        if ( index == lastIndex ) break;
-        index -= wordIncr;
+        if (wordA != wordB) {
+            return (wordA < wordB) ? -1 : 1;
+        }
+
+        if (index == lastIndex) {
+            break;
+        }
     }
     return 0;
-
 }
-
-#endif
-

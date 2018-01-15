@@ -37,39 +37,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 void
-softfloat_shiftLeftM(uint8_t size_words,
-                      uint32_t const *aPtr,
-                      uint32_t dist,
-                      uint32_t *zPtr)
+softfloat_shiftLeftM(size_t size_words,
+                     uint32_t const* aPtr,
+                     uint32_t dist,
+                     uint32_t* zPtr)
 {
-    uint32_t *destPtr;
+    uint32_t* destPtr;
     uint32_t wordDist = dist >> 5;
+
     if (wordDist < size_words) {
         aPtr += indexMultiwordLoBut(size_words, wordDist);
         uint8_t const innerDist = dist & 31;
+
         if (innerDist) {
-            /** @todo Warning	C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
-            softfloat_shortShiftLeftM(size_words - wordDist,
+            softfloat_shortShiftLeftM(static_cast<uint8_t>(size_words - wordDist),
                                       aPtr,
                                       innerDist,
                                       zPtr + indexMultiwordHiBut(size_words, wordDist));
-            if (!wordDist) {
+
+            if (0 == wordDist) {
                 return;
             }
         } else {
             aPtr += indexWordHi(size_words - wordDist);
             destPtr = zPtr + indexWordHi(size_words);
-            /** @todo Warning	C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
-            for (uint8_t i = size_words - wordDist; i; --i) {
+
+            for (size_t i = size_words - wordDist; i; --i) {
                 *destPtr = *aPtr;
                 aPtr -= wordIncr;
                 destPtr -= wordIncr;
             }
         }
+
         zPtr += indexMultiwordLo(size_words, wordDist);
     } else {
         wordDist = size_words;
     }
+
     do {
         *zPtr++ = 0;
         --wordDist;

@@ -62,7 +62,7 @@ softfloat_normRoundPackMToF128M(
     shiftDist += softfloat_countLeadingZeros32(wordSig) - 15;
     if (shiftDist) {
         exp -= shiftDist;
-        softfloat_shiftLeft160M(extSigPtr, shiftDist, extSigPtr);
+        softfloat_shiftLeft160M(extSigPtr, static_cast<uint32_t>(shiftDist), extSigPtr);
     }
     softfloat_roundPackMToF128M(sign, exp, extSigPtr, zWPtr);
 

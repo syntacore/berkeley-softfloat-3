@@ -36,33 +36,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/types.hpp"
 
-#include <cstdint>
-
-#ifndef softfloat_addComplCarryM
-
-uint8_t
- softfloat_addComplCarryM(uint8_t size_words,
-                          uint32_t const *aPtr,
-                          uint32_t const *bPtr,
-                          uint8_t carry,
-                          uint32_t *zPtr)
+bool
+softfloat_addComplCarryM(size_t size_words,
+                         uint32_t const* aPtr,
+                         uint32_t const* bPtr,
+                         bool carry,
+                         uint32_t* zPtr)
 {
-    unsigned int index, lastIndex;
-    uint32_t wordA, wordZ;
+    auto const lastIndex = indexWordHi(size_words);
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    for (;;) {
-        wordA = aPtr[index];
-        wordZ = wordA + ~bPtr[index] + carry;
+    for (auto index = indexWordLo(size_words);;) {
+        uint32_t const wordA = aPtr[index];
+        uint32_t const wordZ = wordA + ~bPtr[index] + !!carry;
         zPtr[index] = wordZ;
-        if ( wordZ != wordA ) carry = (wordZ < wordA);
-        if ( index == lastIndex ) break;
+
+        if (wordZ != wordA) {
+            carry = wordZ < wordA;
+        }
+
+        if (index == lastIndex) {
+            break;
+        }
+
         index += wordIncr;
     }
     return carry;
-
 }
-
-#endif
-

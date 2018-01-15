@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 uint32_t
-softfloat_approxRecipSqrt32_1(unsigned oddExpA, uint32_t a)
+softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
+                              uint32_t a)
 {
     auto const index = (a >> 27 & 0xE) + oddExpA;
     uint16_t const eps = static_cast<uint16_t>(a >> 12);

@@ -79,8 +79,8 @@ float64_t f64_sqrt(float64_t a)
         int16_t expZ = ((expA - 0x3FF) >> 1) + 0x3FE;
         expA &= 1;
         sigA |= UINT64_C(0x0010000000000000);
-        uint32_t const sig32A = sigA >> 21;
-        uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
+        uint32_t const sig32A = static_cast<uint32_t>(sigA >> 21);
+        uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
         uint32_t sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;
         if (expA) {
             sigA <<= 8;

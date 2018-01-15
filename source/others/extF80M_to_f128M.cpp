@@ -103,7 +103,7 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
         sig = (uint64_t)zWPtr[indexWordHi(4)] << 32;
     }
 
-    zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp, sig >> 32);
+    zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), sig >> 32);
     return;
 }
 

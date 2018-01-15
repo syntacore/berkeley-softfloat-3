@@ -42,12 +42,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int32_t
 softfloat_roundPackToI32(bool sign, uint64_t sig, uint8_t roundingMode, bool exact)
 {
-    bool const roundNearEven = (roundingMode == softfloat_round_near_even);
-    uint16_t roundIncrement = 0x800;
-    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
-        roundIncrement = roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0xFFF : 0;
+    bool const roundNearEven = softfloat_round_near_even == roundingMode;
+    uint16_t roundIncrement = 0x800u;
+    if (!roundNearEven && (softfloat_round_near_maxMag != roundingMode)) {
+        roundIncrement = roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0xFFFu : 0u;
     }
-    uint16_t const roundBits = sig & 0xFFF;
+    uint16_t const roundBits = sig & 0xFFFu;
     sig += roundIncrement;
     if (sig & UINT64_C(0xFFFFF00000000000)) {
         softfloat_raiseFlags(softfloat_flag_invalid);

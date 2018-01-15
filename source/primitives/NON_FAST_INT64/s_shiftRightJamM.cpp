@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 
 void
-softfloat_shiftRightJamM(uint8_t size_words,
+softfloat_shiftRightJamM(size_t size_words,
                          uint32_t const *aPtr,
                          uint32_t dist,
                          uint32_t *zPtr)
@@ -85,7 +85,7 @@ softfloat_shiftRightJamM(uint8_t size_words,
         } else {
             aPtr += indexWordLo(size_words - wordDist);
             ptr = zPtr + indexWordLo(size_words);
-            for (int i = size_words - wordDist; i; --i) {
+            for (auto i = size_words - wordDist; i; --i) {
                 *ptr = *aPtr;
                 aPtr += wordIncr;
                 ptr += wordIncr;

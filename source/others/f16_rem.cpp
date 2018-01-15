@@ -39,8 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-#include <cassert>
-
 float16_t
 f16_rem(float16_t const a,
         float16_t const b)

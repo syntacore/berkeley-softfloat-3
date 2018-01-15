@@ -86,7 +86,7 @@ void f32_to_f128M(float32_t a, float128_t *zPtr)
         }
 
         uint64_t const frac64 = (uint64_t)frac << 25;
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3F80, frac64 >> 32);
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3F80u, frac64 >> 32);
         zWPtr[indexWord(4, 2)] = (uint32_t)frac64;
         zWPtr[indexWord(4, 1)] = 0;
         zWPtr[indexWord(4, 0)] = 0;

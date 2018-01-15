@@ -69,7 +69,7 @@ float64_t f128_to_f64(float128_t a)
             }
             /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
             return
-                softfloat_roundPackToF64(sign, exp, frac64 | UINT64_C(0x4000000000000000));
+                softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
         }
     }
 }

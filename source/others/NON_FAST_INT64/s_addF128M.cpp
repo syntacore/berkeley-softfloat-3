@@ -110,7 +110,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
     auto addCarryMRoutinePtr = negateB ? softfloat_addComplCarryM : softfloat_addCarryM;
     expDiff = expA - expB;
 
-    uint8_t carry;
+    bool carry;
 
     if (expDiff) {
 
@@ -127,7 +127,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
             sig96B = ~sig96B;
             wordSigZ = extSigZ[indexWordLo(5)];
             extSigZ[indexWordLo(5)] = static_cast<uint32_t>(-static_cast<int32_t>(wordSigZ));
-            carry = 0u + !wordSigZ;
+            carry = !wordSigZ;
         }
 
         carry = (*addCarryMRoutinePtr)(3,
@@ -141,11 +141,11 @@ softfloat_addF128M(uint32_t const* aWPtr,
         carry = (*addCarryMRoutinePtr)(3,
                                        &aWPtr[indexMultiwordLo(4, 3)],
                                        &bWPtr[indexMultiwordLo(4, 3)],
-                                       0u + !!negateB,
+                                       negateB,
                                        &extSigZ[indexMultiword(5, 3, 1)]);
 
         if (negateB) {
-            wordSigZ = sig96A + ~sig96B + carry;
+            wordSigZ = sig96A + ~sig96B + !!carry;
 
             if (wordSigZ & 0x80000000) {
                 signZ = !signZ;
@@ -153,7 +153,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
                                                    &aWPtr[indexMultiwordLo(4, 3)],
                                                    1,
                                                    &extSigZ[indexMultiword(5, 3, 1)]);
-                wordSigZ = sig96B + ~sig96A + carry;
+                wordSigZ = sig96B + ~sig96A + !!carry;
             } else {
                 if (0 == wordSigZ && 0 == extSigZ[indexWord(5, 3)] && 0 == (extSigZ[indexWord(5, 2)] | extSigZ[indexWord(5, 1)] | extSigZ[indexWord(5, 0)])) {
                     signZ = softfloat_round_min == softfloat_roundingMode;
@@ -165,7 +165,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
                 }
             }
         } else {
-            wordSigZ = sig96A + sig96B + carry;
+            wordSigZ = sig96A + sig96B + !!carry;
         }
     }
 

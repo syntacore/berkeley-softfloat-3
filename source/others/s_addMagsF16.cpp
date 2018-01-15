@@ -53,7 +53,7 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
 
     if (!expDiff) {
         if (!expA) {
-            return u_as_f_16(uiA + sigB);
+            return u_as_f_16(static_cast<uint16_t>(uiA + sigB));
         }
 
         if (expA == 0x1F) {
@@ -65,7 +65,7 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
         sigZ = 0x0800u + sigA + sigB;
 
         if (!(sigZ & 1) && (expZ < 0x1E)) {
-            return u_as_f_16(packToF16UI(signZ, expZ, sigZ >> 1));
+            return u_as_f_16(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
         }
 
         sigZ <<= 3;
@@ -105,7 +105,7 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
 
             expZ = expB;
             sigX = uint16_t(sigB | 0x0400u);
-            sigY = sigA + (expA ? 0x0400 : sigA);
+            sigY = sigA + (expA ? 0x0400u : sigA);
             shiftDist = 19 + expDiff;
         } else {
             uint16_t uiZ = uiA;
@@ -133,8 +133,8 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
                 return u_as_f_16(uiZ);
             } else {
                 expZ = expA;
-                sigX = sigA | 0x0400;
-                sigY = sigB + (expB ? 0x0400 : sigB);
+                sigX = sigA | 0x0400u;
+                sigY = sigB + (expB ? 0x0400u : sigB);
                 shiftDist = 19 - expDiff;
             }
         }
@@ -151,7 +151,7 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
         if (sig32Z & 0xFFFF) {
             sigZ |= 1;
         } else if (!(sigZ & 0xF) && (expZ < 0x1E)) {
-            return u_as_f_16(packToF16UI(signZ, expZ, sigZ >> 4));
+            return u_as_f_16(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 4)));
         }
     }
 

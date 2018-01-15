@@ -67,7 +67,7 @@ f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
     return
         softfloat_roundPackToUI32(sign,
                                   0 < shiftDist ?
-                                  softfloat_shiftRightJam64(sig64, shiftDist) :
+                                  softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) :
                                   sig64,
                                   roundingMode,
                                   exact);

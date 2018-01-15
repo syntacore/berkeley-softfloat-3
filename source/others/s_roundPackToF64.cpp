@@ -45,33 +45,39 @@ u64_as_f64(uint64_t v)
 }
 
 float64_t
-softfloat_roundPackToF64(bool sign, int16_t exp, uint64_t sig)
+softfloat_roundPackToF64(bool sign,
+                         int16_t exp,
+                         uint64_t sig)
 {
-    uint8_t const roundingMode = softfloat_roundingMode;
     uint16_t const roundIncrement =
-        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x200 :
-        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x3FF : 0;
+        softfloat_round_near_even == softfloat_roundingMode || softfloat_round_near_maxMag == softfloat_roundingMode ? 0x200u :
+        (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode ? 0x3FFu :
+        0u;
     uint16_t roundBits = sig & 0x3FF;
-    if (0x7FD <= (uint16_t)exp) {
+
+    if (0x7FDu <= static_cast<uint16_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||
                 exp < -1 ||
-                sig + roundIncrement < (uint64_t)INT64_MIN;
-            sig = softfloat_shiftRightJam64(sig, -exp);
+                sig + roundIncrement < uint64_t(INT64_MIN);
+            sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(-exp));
             exp = 0;
             roundBits = sig & 0x3FF;
+
             if (isTiny && roundBits) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
-        } else if (0x7FD < exp || (uint64_t)INT64_MIN <= sig + roundIncrement) {
+        } else if (0x7FD < exp || uint64_t(INT64_MIN) <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
             return u64_as_f64(packToF64UI(sign, 0x7FF, 0) - !roundIncrement);
         }
     }
+
     if (0 != roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    sig = ((sig + roundIncrement) >> 10) & (~(uint64_t)(!(roundBits ^ 0x200) && softfloat_round_near_even == roundingMode));
-    return u64_as_f64(packToF64UI(sign, sig ? exp : 0, sig));
+
+    sig = ((sig + roundIncrement) >> 10) & (~static_cast<uint64_t>(!(roundBits ^ 0x200) && softfloat_round_near_even == softfloat_roundingMode));
+    return u64_as_f64(packToF64UI(sign, 0 != sig ? exp : 0, sig));
 }

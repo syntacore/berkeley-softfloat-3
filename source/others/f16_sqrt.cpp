@@ -87,7 +87,7 @@ float16_t f16_sqrt(float16_t a)
         if (expA) {
             ESqrR0 >>= 1;
         }
-        uint16_t const sigma0 = ~(uint16_t)((ESqrR0 * sigA) >> 16);
+        uint16_t const sigma0 = static_cast<uint16_t>(~((ESqrR0 * sigA) >> 16));
         uint16_t recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
         if (!(recipSqrt16 & 0x8000)) {
             recipSqrt16 = 0x8000;
@@ -99,8 +99,8 @@ float16_t f16_sqrt(float16_t a)
 
         ++sigZ;
         if (!(sigZ & 7)) {
-            uint16_t const shiftedSigZ = sigZ >> 1;
-            uint16_t const negRem = shiftedSigZ * shiftedSigZ;
+            uint16_t const shiftedSigZ = static_cast<uint16_t>(sigZ >> 1);
+            uint16_t const negRem = static_cast<uint16_t>(shiftedSigZ * shiftedSigZ);
             sigZ &= ~1;
             if (negRem & 0x8000) {
                 sigZ |= 1;

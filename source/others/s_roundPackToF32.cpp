@@ -35,9 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "internals.hpp"
-#include "softfloat/functions.h"
 
-#include <cassert>
+#include "softfloat/functions.h"
 
 /**
 @param[in] sign sign bit
@@ -50,8 +49,8 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     assert(softfloat_round_near_even <= softfloat_roundingMode && softfloat_roundingMode <= softfloat_round_near_maxMag);
     enum softfloat_round_mode const roundingMode = (enum softfloat_round_mode)softfloat_roundingMode;
     uint8_t const roundIncrement =
-        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? /* one half */ 0x40 :
-        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x7F : 0;
+        softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? /* one half */ 0x40u :
+        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x7Fu : 0u;
     uint32_t roundBits = sig & ~(~UINT32_C(0) << 7);
     if (0xFD <= (uint16_t)exp) {
         if (exp < 0) {
@@ -59,7 +58,7 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||
                 exp < -1 ||
                 sig + roundIncrement < 0x80000000;
-            sig = softfloat_shiftRightJam32(sig, -exp);
+            sig = softfloat_shiftRightJam32(sig, static_cast<uint16_t>(-exp));
             exp = 0;
             roundBits = sig & ~(~UINT32_C(0) << 7);
             if (isTiny && 0 != roundBits) {

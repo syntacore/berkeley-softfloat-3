@@ -68,7 +68,7 @@ softfloat_addMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
                 } else {
                     sigA <<= 1;
                 }
-                sigA = softfloat_shiftRightJam64(sigA, -expDiff);
+                sigA = softfloat_shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
             }
         } else {
             if (expA == 0x7FF) {
@@ -80,7 +80,7 @@ softfloat_addMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
                 } else {
                     sigB <<= 1;
                 }
-                sigB = softfloat_shiftRightJam64(sigB, expDiff);
+                sigB = softfloat_shiftRightJam64(sigB, static_cast<uint32_t>(expDiff));
             }
         }
         uint64_t sigZ = UINT64_C(0x2000000000000000) + sigA + sigB;

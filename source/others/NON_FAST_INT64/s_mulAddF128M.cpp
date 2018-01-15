@@ -62,19 +62,11 @@ softfloat_mulAddF128M(
     int32_t expProd;
     uint32_t sigProd[8], wordSig;
     bool doSub;
-    uint8_t
-    (*addCarryMRoutinePtr)(
-        uint8_t,
-        const uint32_t*,
-        const uint32_t*,
-        uint8_t,
-        uint32_t*
-    );
     int32_t expDiff;
     bool signZ;
     int32_t expZ;
     uint32_t* extSigPtr;
-    uint8_t carry;
+    bool carry;
     void(*roundPackRoutinePtr)(bool, int32_t, uint32_t*, uint32_t*);
 
     uiA96 = aWPtr[indexWordHi(4)];
@@ -179,8 +171,8 @@ possibleInvalidProd:
     sigX[indexWord(5, 2)] = cWPtr[indexWord(4, 1)];
     sigX[indexWord(5, 1)] = cWPtr[indexWord(4, 0)];
 
-    doSub = (signProd != signC);
-    addCarryMRoutinePtr = doSub ? softfloat_addComplCarryM : softfloat_addCarryM;
+    doSub = signProd != signC;
+    auto const addCarryMRoutinePtr = doSub ? softfloat_addComplCarryM : softfloat_addCarryM;
     expDiff = expProd - expC;
 
     if (expDiff <= 0) {
@@ -197,16 +189,16 @@ possibleInvalidProd:
             softfloat_shiftRightJam160M(extSigPtr, static_cast<uint8_t>(-expDiff), extSigPtr);
         }
 
-        carry = 0;
+        carry = false;
 
         if (doSub) {
             wordSig = extSigPtr[indexWordLo(5)];
             extSigPtr[indexWordLo(5)] = static_cast<uint32_t>(-static_cast<int32_t>(wordSig));
-            carry = 0u + !!(0 == wordSig);
+            carry = 0 == wordSig;
         }
 
         (*addCarryMRoutinePtr)(
-            4,
+            4u,
             &sigX[indexMultiwordHi(5, 4)],
             extSigPtr + indexMultiwordHi(5, 4),
             carry,
@@ -246,7 +238,7 @@ possibleInvalidProd:
             carry = 0;
 
             if (doSub) {
-                carry = 0u + !!(0 == wordSig);
+                carry = 0 == wordSig;
                 wordSig = static_cast<uint32_t>(-static_cast<int32_t>(wordSig));
             }
 
@@ -269,7 +261,7 @@ possibleInvalidProd:
 
             expDiff >>= 5;
             extSigPtr = &sigProd[indexMultiwordLo(8, 5)] - wordIncr + expDiff * -wordIncr;
-            carry = 0u + !!(*addCarryMRoutinePtr)(5, extSigPtr, sigX, 0u + !!doSub, extSigPtr);
+            carry = (*addCarryMRoutinePtr)(5, extSigPtr, sigX, doSub, extSigPtr);
 
             if (expDiff == -4) {
                 wordSig = sigProd[indexWordHi(8)];
@@ -330,7 +322,7 @@ possibleInvalidProd:
             ptr = extSigPtr + indexWordHi(5) + wordIncr;
         }
 
-        if ((0 != carry) != doSub) {
+        if (carry != doSub) {
             if (doSub) {
                 do {
                     wordSig = *ptr;
@@ -414,8 +406,7 @@ checkCancellation:
 
 completeCancellation:
     uiZ96 =
-        packToF128UI96(
-        (softfloat_roundingMode == softfloat_round_min), 0, 0);
+        packToF128UI96(softfloat_round_min == softfloat_roundingMode, 0u, 0u);
 uiZ:
     zWPtr[indexWordHi(4)] = uiZ96;
     zWPtr[indexWord(4, 2)] = 0;

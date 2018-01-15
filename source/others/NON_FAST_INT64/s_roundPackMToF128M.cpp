@@ -40,23 +40,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
 softfloat_roundPackMToF128M(
-    bool sign, int32_t exp, uint32_t *extSigPtr, uint32_t *zWPtr)
+    bool sign, int32_t exp, uint32_t* extSigPtr, uint32_t* zWPtr)
 {
-    uint32_t sigExtra;
-    bool doIncrement;
-    static const uint32_t maxSig[4] =
-        INIT_UINTM4(0x0001FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
-    uint32_t ui, uj;
+    static const uint32_t maxSig[4] = INIT_UINTM4(0x0001FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
 
-    softfloat_round_mode const roundingMode = softfloat_roundingMode;
-    bool roundNearEven = roundingMode == softfloat_round_near_even;
-    sigExtra = extSigPtr[indexWordLo(5)];
-    doIncrement = (0x80000000 <= sigExtra);
-    if (!roundNearEven && softfloat_round_near_maxMag != roundingMode) {
+    bool roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
+    uint32_t sigExtra = extSigPtr[indexWordLo(5)];
+    bool doIncrement = (0x80000000 <= sigExtra);
+
+    if (!roundNearEven && softfloat_round_near_maxMag != softfloat_roundingMode) {
         doIncrement =
-            (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && 
+            (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode &&
             sigExtra;
     }
+
     if (0x7FFD <= (uint32_t)exp) {
         if (exp < 0) {
             bool const isTiny =
@@ -64,53 +61,55 @@ softfloat_roundPackMToF128M(
                 exp < -1 ||
                 !doIncrement ||
                 softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig) < 0;
-            softfloat_shiftRightJam160M(extSigPtr, -exp, extSigPtr);
+            softfloat_shiftRightJam160M(extSigPtr, static_cast<uint8_t>(-exp), extSigPtr);
             exp = 0;
             sigExtra = extSigPtr[indexWordLo(5)];
+
             if (isTiny && sigExtra) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
+
             doIncrement = 0x80000000 <= sigExtra;
-            if (!roundNearEven && softfloat_round_near_maxMag != roundingMode) {
+
+            if (!roundNearEven && softfloat_round_near_maxMag != softfloat_roundingMode) {
                 doIncrement =
-                    (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && 
+                    ((sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) &&
                     sigExtra;
             }
-        } else if (
-                0x7FFD < exp ||
-                (
-            exp == 0x7FFD &&
-            doIncrement &&
-            softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig) == 0
-            )
-            ) {
+        } else if (0x7FFD < exp || (0x7FFD == exp && doIncrement && 0 == softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig))) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            if (
-                roundNearEven ||
-                roundingMode == softfloat_round_near_maxMag ||
-                roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
-            ) {
-                ui = packToF128UI96(sign, 0x7FFF, 0);
-                uj = 0;
-            } else {
-                ui = packToF128UI96(sign, 0x7FFE, 0x0000FFFF);
-                uj = 0xFFFFFFFF;
+
+            if (roundNearEven || softfloat_round_near_maxMag == softfloat_roundingMode || (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
+                zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x7FFF, 0);
+                zWPtr[indexWord(4, 2)] = 0;
+                zWPtr[indexWord(4, 1)] = 0;
+                zWPtr[indexWord(4, 0)] = 0;
+                return;
             }
-            zWPtr[indexWordHi(4)] = ui;
-            zWPtr[indexWord(4, 2)] = uj;
-            zWPtr[indexWord(4, 1)] = uj;
-            zWPtr[indexWord(4, 0)] = uj;
+
+            zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x7FFE, 0x0000FFFF);
+            zWPtr[indexWord(4, 2)] = 0xFFFFFFFF;
+            zWPtr[indexWord(4, 1)] = 0xFFFFFFFF;
+            zWPtr[indexWord(4, 0)] = 0xFFFFFFFF;
             return;
         }
     }
+
     if (sigExtra) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-    uj = extSigPtr[indexWord(5, 1)];
+
+    uint32_t uj = extSigPtr[indexWord(5, 1)];
+
     if (doIncrement) {
+        uint32_t ui;
         ++uj;
+
         if (uj) {
-            if (!(sigExtra & 0x7FFFFFFF) && roundNearEven) uj &= ~1;
+            if (!(sigExtra & 0x7FFFFFFF) && roundNearEven) {
+                uj &= ~1;
+            }
+
             zWPtr[indexWord(4, 2)] = extSigPtr[indexWord(5, 3)];
             zWPtr[indexWord(4, 1)] = extSigPtr[indexWord(5, 2)];
             zWPtr[indexWord(4, 0)] = uj;
@@ -120,6 +119,7 @@ softfloat_roundPackMToF128M(
             ui = extSigPtr[indexWord(5, 2)] + 1;
             zWPtr[indexWord(4, 1)] = ui;
             uj = extSigPtr[indexWord(5, 3)];
+
             if (ui) {
                 zWPtr[indexWord(4, 2)] = uj;
                 ui = extSigPtr[indexWordHi(5)];
@@ -127,12 +127,17 @@ softfloat_roundPackMToF128M(
                 ++uj;
                 zWPtr[indexWord(4, 2)] = uj;
                 ui = extSigPtr[indexWordHi(5)];
-                if (!uj) ++ui;
+
+                if (!uj) {
+                    ++ui;
+                }
             }
         }
+
+        zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), ui);
     } else {
         zWPtr[indexWord(4, 0)] = uj;
-        ui = extSigPtr[indexWord(5, 2)];
+        uint32_t ui = extSigPtr[indexWord(5, 2)];
         zWPtr[indexWord(4, 1)] = ui;
         uj |= ui;
         ui = extSigPtr[indexWord(5, 3)];
@@ -140,9 +145,11 @@ softfloat_roundPackMToF128M(
         uj |= ui;
         ui = extSigPtr[indexWordHi(5)];
         uj |= ui;
-        if (!uj) exp = 0;
+
+        if (!uj) {
+            exp = 0;
+        }
+
+        zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), ui);
     }
-    zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp, ui);
-
 }
-

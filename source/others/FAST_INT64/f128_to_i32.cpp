@@ -39,42 +39,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-int32_t f128_to_i32( float128_t a, uint8_t roundingMode, bool exact )
+int32_t
+f128_to_i32(float128_t const a,
+            uint8_t const roundingMode,
+            bool const exact)
 {
-    union ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    bool sign;
-    int32_t exp;
-    uint64_t sig64, sig0;
-    int32_t shiftDist;
-
-    
+    ui128_f128 uA;
     uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
-    sign  = signF128UI64( uiA64 );
-    exp   = expF128UI64( uiA64 );
-    sig64 = fracF128UI64( uiA64 );
-    sig0  = uiA0;
-    
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0x7FFF) && (sig64 | sig0) ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
-        sign = 0;
-#elif (i32_fromNaN == i32_fromNegOverflow)
-        sign = 1;
-#else
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return i32_fromNaN;
-#endif
-    }
-#endif
-    
-    if ( exp ) sig64 |= UINT64_C( 0x0001000000000000 );
-    sig64 |= (sig0 != 0);
-    shiftDist = 0x4023 - exp;
-    if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
-    return softfloat_roundPackToI32( sign, sig64, roundingMode, exact );
+    uint64_t const uiA64 = uA.ui.v64;
+    uint64_t const uiA0 = uA.ui.v0;
+    bool sign = signF128UI64(uiA64);
+    int32_t const exp = expF128UI64(uiA64);
+    uint64_t sig64 = fracF128UI64(uiA64);
+    uint64_t const sig0 = uiA0;
 
+    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
+        if ((exp == 0x7FFF) && (sig64 | sig0)) {
+            if (i32_fromNaN == i32_fromPosOverflow) {
+                sign = 0;
+            } else if (i32_fromNaN == i32_fromNegOverflow) {
+                sign = 1;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return i32_fromNaN;
+            }
+        }
+    }
+
+    if (exp) {
+        sig64 |= UINT64_C(0x0001000000000000);
+    }
+
+    sig64 |= (sig0 != 0);
+    int32_t const shiftDist = 0x4023 - exp;
+
+    if (0 < shiftDist) {
+        sig64 = softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
+    }
+
+    return softfloat_roundPackToI32(sign, sig64, roundingMode, exact);
 }
 

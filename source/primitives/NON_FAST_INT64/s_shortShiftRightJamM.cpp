@@ -34,39 +34,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
-
-#include <cstdint>
-
-#ifndef softfloat_shortShiftRightJamM
+#include "primitives/functions.hpp"
 
 void
- softfloat_shortShiftRightJamM(
-     uint8_t size_words,
-     const uint32_t *aPtr,
-     uint8_t dist,
-     uint32_t *zPtr
- )
+softfloat_shortShiftRightJamM(size_t const size_words,
+                              uint32_t const* const aPtr,
+                              uint8_t const dist,
+                              uint32_t* const zPtr)
 {
-    uint8_t uNegDist;
-    unsigned int index, lastIndex;
-    uint32_t partWordZ, wordA;
+    uint8_t const uNegDist = 31u & -dist;
+    auto index = indexWordLo(size_words);
+    uint32_t wordA = aPtr[index];
+    uint32_t partWordZ = wordA >> dist;
 
-    uNegDist = -dist;
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    wordA = aPtr[index];
-    partWordZ = wordA>>dist;
-    if ( partWordZ<<dist != wordA ) partWordZ |= 1;
-    while ( index != lastIndex ) {
-        wordA = aPtr[index + wordIncr];
-        zPtr[index] = wordA<<(uNegDist & 31) | partWordZ;
-        index += wordIncr;
-        partWordZ = wordA>>dist;
+    if (partWordZ << dist != wordA) {
+        partWordZ |= 1;
     }
+
+    auto const lastIndex = indexWordHi(size_words);
+
+    while (index != lastIndex) {
+        wordA = aPtr[index + wordIncr];
+        zPtr[index] = wordA << uNegDist | partWordZ;
+        index += wordIncr;
+        partWordZ = wordA >> dist;
+    }
+
     zPtr[index] = partWordZ;
-
 }
-
-#endif
-
