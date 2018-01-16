@@ -40,97 +40,77 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
-softfloat_mulAddF128M(
-    const uint32_t* aWPtr,
-    const uint32_t* bWPtr,
-    const uint32_t* cWPtr,
-    uint32_t* zWPtr,
-    uint8_t op
-)
+softfloat_mulAddF128M(uint32_t const* const aWPtr,
+                      uint32_t const* const bWPtr,
+                      uint32_t const* const cWPtr,
+                      uint32_t* const zWPtr,
+                      uint8_t op)
 {
-    uint32_t uiA96;
-    int32_t expA;
-    uint32_t uiB96;
-    int32_t expB;
-    uint32_t uiC96;
-    bool signC;
-    int32_t expC;
-    bool signProd, prodIsInfinite;
-    uint32_t* ptr, uiZ96, sigA[4];
-    uint8_t shiftDist;
-    uint32_t sigX[5];
-    int32_t expProd;
-    uint32_t sigProd[8], wordSig;
-    bool doSub;
-    int32_t expDiff;
-    bool signZ;
-    int32_t expZ;
-    uint32_t* extSigPtr;
-    bool carry;
-    void(*roundPackRoutinePtr)(bool, int32_t, uint32_t*, uint32_t*);
 
-    uiA96 = aWPtr[indexWordHi(4)];
-    expA = expF128UI96(uiA96);
-    uiB96 = bWPtr[indexWordHi(4)];
-    expB = expF128UI96(uiB96);
-    uiC96 = cWPtr[indexWordHi(4)];
-    signC = signF128UI96(uiC96) ^ (op == softfloat_mulAdd_subC);
-    expC = expF128UI96(uiC96);
-    signProd =
-        signF128UI96(uiA96) ^ signF128UI96(uiB96)
-        ^ (op == softfloat_mulAdd_subProd);
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    int32_t expA = expF128UI96(uiA96);
+    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    int32_t expB = expF128UI96(uiB96);
+    uint32_t const uiC96 = cWPtr[indexWordHi(4)];
+    bool const signC = signF128UI96(uiC96) ^ (op == softfloat_mulAdd_subC);
+    int32_t expC = expF128UI96(uiC96);
+    bool signProd = signF128UI96(uiA96) ^ signF128UI96(uiB96) ^ (softfloat_mulAdd_subProd == op);
 
-    prodIsInfinite = false;
+    bool prodIsInfinite = false;
 
-    if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
+    if (0x7FFF == expA || 0x7FFF == expB) {
         if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
-            goto propagateNaN_ZC;
+            softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+            return;
         }
 
-        ptr = (uint32_t*)aWPtr;
-
-        if (!(uint32_t)(uiA96 << 1)) {
-            goto possibleInvalidProd;
-        }
-
-        if (!(uint32_t)(uiB96 << 1)) {
-            ptr = (uint32_t*)bWPtr;
-possibleInvalidProd:
-
-            if (
-                !(ptr[indexWord(4, 2)] | ptr[indexWord(4, 1)]
-                | ptr[indexWord(4, 0)])
-            ) {
-                goto invalid;
+        if (0 == (uiA96 << 1)) {
+            if (!(aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) {
+                softfloat_invalidF128M(zWPtr);
+                softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+                return;
+            }
+        } else if (0 == (uiB96 << 1)) {
+            if (0 == (bWPtr[indexWord(4, 2)] | bWPtr[indexWord(4, 1)] | bWPtr[indexWord(4, 0)])) {
+                softfloat_invalidF128M(zWPtr);
+                softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+                return;
             }
         }
 
         prodIsInfinite = true;
     }
 
-    if (expC == 0x7FFF) {
-        if (
-            fracF128UI96(uiC96)
-            || (cWPtr[indexWord(4, 2)] | cWPtr[indexWord(4, 1)]
-            | cWPtr[indexWord(4, 0)])
-        ) {
+    if (0x7FFF == expC) {
+        if (fracF128UI96(uiC96) || (cWPtr[indexWord(4, 2)] | cWPtr[indexWord(4, 1)] | cWPtr[indexWord(4, 0)])) {
             zWPtr[indexWordHi(4)] = 0;
-            goto propagateNaN_ZC;
+            softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+            return;
         }
 
         if (prodIsInfinite && (signProd != signC)) {
-            goto invalid;
+            softfloat_invalidF128M(zWPtr);
+            softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+            return;
         }
 
-        goto copyC;
+        zWPtr[indexWordHi(4)] = uiC96;
+        zWPtr[indexWord(4, 2)] = cWPtr[indexWord(4, 2)];
+        zWPtr[indexWord(4, 1)] = cWPtr[indexWord(4, 1)];
+        zWPtr[indexWord(4, 0)] = cWPtr[indexWord(4, 0)];
+        return;
     }
 
     if (prodIsInfinite) {
-        uiZ96 = packToF128UI96(signProd, 0x7FFF, 0);
-        goto uiZ;
+        zWPtr[indexWordHi(4)] = packToF128UI96(signProd, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
     }
 
-    if (expA) {
+    uint32_t sigA[4];
+    if (0 == expA) {
         sigA[indexWordHi(4)] = fracF128UI96(uiA96) | 0x00010000;
         sigA[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
         sigA[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
@@ -139,10 +119,23 @@ possibleInvalidProd:
         expA = softfloat_shiftNormSigF128M(aWPtr, 0, sigA);
 
         if (expA == -128) {
-            goto zeroProd;
+            if (!static_cast<uint32_t>(uiC96 << 1) && (signProd != signC) && !cWPtr[indexWord(4, 2)] && !(cWPtr[indexWord(4, 1)] | cWPtr[indexWord(4, 0)])) {
+                zWPtr[indexWordHi(4)] = packToF128UI96(softfloat_round_min == softfloat_roundingMode, 0u, 0u);
+                zWPtr[indexWord(4, 2)] = 0;
+                zWPtr[indexWord(4, 1)] = 0;
+                zWPtr[indexWord(4, 0)] = 0;
+                return;
+            }
+
+            zWPtr[indexWordHi(4)] = uiC96;
+            zWPtr[indexWord(4, 2)] = cWPtr[indexWord(4, 2)];
+            zWPtr[indexWord(4, 1)] = cWPtr[indexWord(4, 1)];
+            zWPtr[indexWord(4, 0)] = cWPtr[indexWord(4, 0)];
+            return;
         }
     }
 
+    uint32_t sigX[5];
     if (expB) {
         sigX[indexWordHi(4)] = fracF128UI96(uiB96) | 0x00010000;
         sigX[indexWord(4, 2)] = bWPtr[indexWord(4, 2)];
@@ -152,14 +145,27 @@ possibleInvalidProd:
         expB = softfloat_shiftNormSigF128M(bWPtr, 0, sigX);
 
         if (expB == -128) {
-            goto zeroProd;
+            if (!static_cast<uint32_t>(uiC96 << 1) && (signProd != signC) && !cWPtr[indexWord(4, 2)] && !(cWPtr[indexWord(4, 1)] | cWPtr[indexWord(4, 0)])) {
+                zWPtr[indexWordHi(4)] = packToF128UI96(softfloat_round_min == softfloat_roundingMode, 0u, 0u);
+                zWPtr[indexWord(4, 2)] = 0;
+                zWPtr[indexWord(4, 1)] = 0;
+                zWPtr[indexWord(4, 0)] = 0;
+                return;
+            }
+
+            zWPtr[indexWordHi(4)] = uiC96;
+            zWPtr[indexWord(4, 2)] = cWPtr[indexWord(4, 2)];
+            zWPtr[indexWord(4, 1)] = cWPtr[indexWord(4, 1)];
+            zWPtr[indexWord(4, 0)] = cWPtr[indexWord(4, 0)];
+            return;
         }
     }
 
-    expProd = expA + expB - 0x3FF0;
+    int32_t const expProd = expA + expB - 0x3FF0;
+    uint32_t sigProd[8];
     softfloat_mul128MTo256M(sigA, sigX, sigProd);
 
-    wordSig = fracF128UI96(uiC96);
+    uint32_t wordSig = fracF128UI96(uiC96);
 
     if (expC) {
         --expC;
@@ -171,9 +177,14 @@ possibleInvalidProd:
     sigX[indexWord(5, 2)] = cWPtr[indexWord(4, 1)];
     sigX[indexWord(5, 1)] = cWPtr[indexWord(4, 0)];
 
-    doSub = signProd != signC;
+    bool doSub = signProd != signC;
     auto const addCarryMRoutinePtr = doSub ? softfloat_addComplCarryM : softfloat_addCarryM;
-    expDiff = expProd - expC;
+    int32_t expDiff = expProd - expC;
+    uint32_t* extSigPtr;
+
+    bool signZ;
+    bool carry;
+    int32_t expZ;
 
     if (expDiff <= 0) {
         signZ = signC;
@@ -213,21 +224,49 @@ possibleInvalidProd:
                 wordSig = extSigPtr[indexWordHi(5)];
             }
 
-            goto checkCancellation;
+            if (wordSig || (extSigPtr[indexWord(5, 3)] | extSigPtr[indexWord(5, 2)]) || (extSigPtr[indexWord(5, 1)] | extSigPtr[indexWord(5, 0)])) {
+                if (wordSig < 0x00010000) {
+                    softfloat_normRoundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                    return;
+                }
+
+                if (0x00020000 <= wordSig) {
+                    ++expZ;
+                    softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
+                }
+
+                softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                return;
+            }
+
+            zWPtr[indexWordHi(4)] = packToF128UI96(softfloat_round_min == softfloat_roundingMode, 0u, 0u);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[indexWord(4, 0)] = 0;
+            return;
         }
 
         if (wordSig < 0x00010000) {
             --expZ;
             softfloat_add160M(extSigPtr, extSigPtr, extSigPtr);
-            goto roundPack;
+            softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+            return;
         }
 
-        goto extSigReady_noCancellation;
+        if (0x00020000 <= wordSig) {
+            ++expZ;
+            softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
+        }
+
+        softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+        return;
     } else {
         signZ = signProd;
         expZ = expProd;
         sigX[indexWordLo(5)] = 0;
         expDiff -= 128;
+
+        uint32_t* ptr;
 
         if (0 <= expDiff) {
             if (expDiff) {
@@ -253,7 +292,7 @@ possibleInvalidProd:
             sigProd[indexWord(8, 2)] |= wordSig;
             ptr = &sigProd[indexWord(8, 4)];
         } else {
-            shiftDist = static_cast<uint8_t>(expDiff & 31);
+            uint8_t const shiftDist = static_cast<uint8_t>(expDiff & 31);
 
             if (shiftDist) {
                 softfloat_shortShiftRight160M(sigX, shiftDist, sigX);
@@ -273,13 +312,49 @@ possibleInvalidProd:
                 }
 
                 if (wordSig) {
-                    goto expProdBigger_noWordShift;
+                    if (sigProd[indexWord(8, 2)] || (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])) {
+                        sigProd[indexWord(8, 3)] |= 1;
+                    }
+
+                    extSigPtr = &sigProd[indexMultiwordHi(8, 5)];
+                    wordSig = extSigPtr[indexWordHi(5)];
+
+                    if (wordSig < 0x00010000) {
+                        softfloat_normRoundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                        return;
+                    }
+
+                    if (0x00020000 <= wordSig) {
+                        ++expZ;
+                        softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
+                    }
+
+                    softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                    return;
                 }
 
                 wordSig = sigProd[indexWord(8, 6)];
 
                 if (0x00040000 <= wordSig) {
-                    goto expProdBigger_noWordShift;
+                    if (sigProd[indexWord(8, 2)] || (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])) {
+                        sigProd[indexWord(8, 3)] |= 1;
+                    }
+
+                    extSigPtr = &sigProd[indexMultiwordHi(8, 5)];
+                    wordSig = extSigPtr[indexWordHi(5)];
+
+                    if (wordSig < 0x00010000) {
+                        softfloat_normRoundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                        return;
+                    }
+
+                    if (0x00020000 <= wordSig) {
+                        ++expZ;
+                        softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
+                    }
+
+                    softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                    return;
                 }
 
                 expZ -= 32;
@@ -300,7 +375,26 @@ possibleInvalidProd:
                     extSigPtr -= wordIncr;
 
                     if (extSigPtr == &sigProd[indexMultiwordLo(8, 5)]) {
-                        goto checkCancellation;
+                        if (wordSig || (extSigPtr[indexWord(5, 3)] | extSigPtr[indexWord(5, 2)]) || (extSigPtr[indexWord(5, 1)] | extSigPtr[indexWord(5, 0)])) {
+                            if (wordSig < 0x00010000) {
+                                softfloat_normRoundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                                return;
+                            }
+
+                            if (0x00020000 <= wordSig) {
+                                ++expZ;
+                                softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
+                            }
+
+                            softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                            return;
+                        }
+
+                        zWPtr[indexWordHi(4)] = packToF128UI96(softfloat_round_min == softfloat_roundingMode, 0u, 0u);
+                        zWPtr[indexWord(4, 2)] = 0;
+                        zWPtr[indexWord(4, 1)] = 0;
+                        zWPtr[indexWord(4, 0)] = 0;
+                        return;
                     }
                 }
 
@@ -316,7 +410,19 @@ possibleInvalidProd:
                 } while (ptr != &sigProd[indexWordLo(8)]);
 
                 wordSig = extSigPtr[indexWordHi(5)];
-                goto extSigReady;
+
+                if (wordSig < 0x00010000) {
+                    softfloat_normRoundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                    return;
+                }
+
+                if (0x00020000 <= wordSig) {
+                    ++expZ;
+                    softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
+                }
+
+                softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+                return;
             }
 
             ptr = extSigPtr + indexWordHi(5) + wordIncr;
@@ -338,12 +444,7 @@ possibleInvalidProd:
             }
         }
 
-expProdBigger_noWordShift:
-
-        if (
-            sigProd[indexWord(8, 2)]
-            || (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])
-        ) {
+        if (sigProd[indexWord(8, 2)] || (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])) {
             sigProd[indexWord(8, 3)] |= 1;
         }
 
@@ -351,66 +452,16 @@ expProdBigger_noWordShift:
         wordSig = extSigPtr[indexWordHi(5)];
     }
 
-extSigReady:
-    roundPackRoutinePtr = softfloat_normRoundPackMToF128M;
-
     if (wordSig < 0x00010000) {
-        goto doRoundPack;
+        softfloat_normRoundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
+        return;
     }
-
-extSigReady_noCancellation:
 
     if (0x00020000 <= wordSig) {
         ++expZ;
         softfloat_shortShiftRightJam160M(extSigPtr, 1, extSigPtr);
     }
 
-roundPack:
-    roundPackRoutinePtr = softfloat_roundPackMToF128M;
-doRoundPack:
-    (*roundPackRoutinePtr)(signZ, expZ, extSigPtr, zWPtr);
+    softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
     return;
-
-invalid:
-    softfloat_invalidF128M(zWPtr);
-propagateNaN_ZC:
-    softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
-    return;
-
-zeroProd:
-
-    if (
-        !(uint32_t)(uiC96 << 1) && (signProd != signC)
-        && !cWPtr[indexWord(4, 2)]
-        && !(cWPtr[indexWord(4, 1)] | cWPtr[indexWord(4, 0)])
-    ) {
-        goto completeCancellation;
-    }
-
-copyC:
-    zWPtr[indexWordHi(4)] = uiC96;
-    zWPtr[indexWord(4, 2)] = cWPtr[indexWord(4, 2)];
-    zWPtr[indexWord(4, 1)] = cWPtr[indexWord(4, 1)];
-    zWPtr[indexWord(4, 0)] = cWPtr[indexWord(4, 0)];
-    return;
-
-checkCancellation:
-
-    if (
-        wordSig
-        || (extSigPtr[indexWord(5, 3)] | extSigPtr[indexWord(5, 2)])
-        || (extSigPtr[indexWord(5, 1)] | extSigPtr[indexWord(5, 0)])
-    ) {
-        goto extSigReady;
-    }
-
-completeCancellation:
-    uiZ96 =
-        packToF128UI96(softfloat_round_min == softfloat_roundingMode, 0u, 0u);
-uiZ:
-    zWPtr[indexWordHi(4)] = uiZ96;
-    zWPtr[indexWord(4, 2)] = 0;
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
-
 }
