@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
+#include "primitives/functions.hpp"
 
-struct uint128
-    softfloat_mul64To128(uint64_t a, uint64_t b)
+uint128
+softfloat_mul64To128(uint64_t a,
+                     uint64_t b)
 {
     uint32_t const a32 = a >> 32;
     uint32_t const a0 = (uint32_t)a;
@@ -54,5 +55,4 @@ struct uint128
     z.v0 += mid;
     z.v64 += (z.v0 < mid);
     return z;
-
 }

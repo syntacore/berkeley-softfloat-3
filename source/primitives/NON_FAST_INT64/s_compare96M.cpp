@@ -34,13 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
+#include "primitives/functions.hpp"
 
 int
 softfloat_compare96M(uint32_t const* const aPtr,
                      uint32_t const* const bPtr)
 {
-
     auto const lastIndex = indexWordLo(3);
 
     for (auto index = indexWordHi(3);; index -= wordIncr) {
@@ -57,6 +56,4 @@ softfloat_compare96M(uint32_t const* const aPtr,
     }
 
     return 0;
-
 }
-

@@ -34,17 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/types.hpp"
+#include "primitives/functions.hpp"
 
 void
-softfloat_sub256M(
-    const uint64_t *aPtr, const uint64_t *bPtr, uint64_t *zPtr)
+softfloat_sub256M(uint64_t const *const aPtr,
+                  uint64_t const *const bPtr,
+                  uint64_t *const zPtr)
 {
-    uint8_t borrow = 0;
+    bool borrow = false;
     for (unsigned index = indexWordLo(4);;) {
         uint64_t const wordA = aPtr[index];
         uint64_t const wordB = bPtr[index];
-        zPtr[index] = wordA - wordB - borrow;
+        zPtr[index] = wordA - wordB - !!borrow;
         if (index == indexWordHi(4)) {
             break;
         }
