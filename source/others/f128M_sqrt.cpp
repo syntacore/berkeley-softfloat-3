@@ -55,6 +55,7 @@ void
 f128M_sqrt(float128_t const* const aPtr,
            float128_t* const zPtr)
 {
+    using namespace softfloat;
     uint32_t const* aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
@@ -210,4 +211,3 @@ f128M_sqrt(float128_t const* const aPtr,
 }
 
 #endif
-

@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Assuming the unsigned integer formed from concatenating `uiA64' and `uiA0'
 has the bit pattern of a 128-bit floating-point NaN, converts this NaN to
@@ -59,3 +62,6 @@ softfloat_f128UIToCommonNaN(uint64_t uiA64,
     z.v0 = NaNSig.v0;
     return z;
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

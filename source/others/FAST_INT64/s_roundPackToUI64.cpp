@@ -39,43 +39,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 uint64_t
- softfloat_roundPackToUI64(
-     bool sign,
-     uint64_t sig,
-     uint64_t sigExtra,
-     uint8_t roundingMode,
-     bool exact
- )
+softfloat_roundPackToUI64(bool sign,
+                          uint64_t sig,
+                          uint64_t sigExtra,
+                          uint8_t roundingMode,
+                          bool exact)
 {
     bool roundNearEven, doIncrement;
 
-    
+
     roundNearEven = (roundingMode == softfloat_round_near_even);
-    doIncrement = (UINT64_C( 0x8000000000000000 ) <= sigExtra);
-    if ( ! roundNearEven && (roundingMode != softfloat_round_near_maxMag) ) {
+    doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+
+    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
         doIncrement =
             (roundingMode
-                 == (sign ? softfloat_round_min : softfloat_round_max))
-                && sigExtra;
+             == (sign ? softfloat_round_min : softfloat_round_max))
+            && sigExtra;
     }
-    if ( doIncrement ) {
+
+    if (doIncrement) {
         ++sig;
-        if ( ! sig ) goto invalid;
+
+        if (!sig) {
+            goto invalid;
+        }
+
         sig &=
             ~(uint64_t)
-                 (! (sigExtra & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-                      & roundNearEven);
+            (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
+             & roundNearEven);
     }
-    if ( sign && sig ) goto invalid;
-    if ( exact && sigExtra ) {
+
+    if (sign && sig) {
+        goto invalid;
+    }
+
+    if (exact && sigExtra) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     return sig;
-    
- invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
+
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
     return sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
 
 }
 
+}  // namespace softfloat

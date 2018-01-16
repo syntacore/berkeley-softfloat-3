@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 extF80_to_f16(extFloat80_t a)
 {
+    using namespace softfloat;
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     bool const sign = signExtF80UI64(uiA64);

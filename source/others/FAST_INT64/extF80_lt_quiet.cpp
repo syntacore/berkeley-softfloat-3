@@ -39,40 +39,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-bool extF80_lt_quiet( extFloat80_t a, extFloat80_t b )
+bool
+extF80_lt_quiet(extFloat80_t a,
+                extFloat80_t b)
 {
+    using namespace softfloat;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uA;
     uint16_t uiA64;
     uint64_t uiA0;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uB;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uB;
     uint16_t uiB64;
     uint64_t uiB0;
     bool signA, signB;
 
     uA.f = a;
     uiA64 = uA.s.signExp;
-    uiA0  = uA.s.signif;
+    uiA0 = uA.s.signif;
     uB.f = b;
     uiB64 = uB.s.signExp;
-    uiB0  = uB.s.signif;
-    if ( isNaNExtF80UI( uiA64, uiA0 ) || isNaNExtF80UI( uiB64, uiB0 ) ) {
+    uiB0 = uB.s.signif;
+
+    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         if (
-               softfloat_isSigNaNExtF80UI( uiA64, uiA0 )
-            || softfloat_isSigNaNExtF80UI( uiB64, uiB0 )
+            softfloat_isSigNaNExtF80UI(uiA64, uiA0)
+            || softfloat_isSigNaNExtF80UI(uiB64, uiB0)
         ) {
-            softfloat_raiseFlags( softfloat_flag_invalid );
+            softfloat_raiseFlags(softfloat_flag_invalid);
         }
+
         return false;
     }
-    signA = signExtF80UI64( uiA64 );
-    signB = signExtF80UI64( uiB64 );
-    return
-        (signA != signB)
-            ? signA && (((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0)
-            : ((uiA64 != uiB64) || (uiA0 != uiB0))
-                  && (signA ^ softfloat_lt128( uiA64, uiA0, uiB64, uiB0 ));
 
+    signA = signExtF80UI64(uiA64);
+    signB = signExtF80UI64(uiB64);
+    return
+        signA != signB ? signA && (((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) : 
+        (uiA64 != uiB64 || uiA0 != uiB0) && (signA ^ softfloat_lt128(uiA64, uiA0, uiB64, uiB0));
 }
 

@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
-bool f128M_isSignalingNaN(const float128_t *aPtr)
+bool
+f128M_isSignalingNaN(const float128_t *aPtr)
 {
+    using namespace softfloat;
     const uint32_t *aWPtr = (const uint32_t *)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     if ((uiA96 & 0x7FFF8000) != 0x7FFF0000) {

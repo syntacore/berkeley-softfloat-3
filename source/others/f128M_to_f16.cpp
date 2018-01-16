@@ -53,6 +53,7 @@ f128M_to_f16(const float128_t* aPtr)
 float16_t
 f128M_to_f16(const float128_t* aPtr)
 {
+    using namespace softfloat;
     uint32_t const* const aWPtr = (uint32_t const*)aPtr;
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
@@ -85,4 +86,3 @@ f128M_to_f16(const float128_t* aPtr)
     return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
 }
 #endif
-

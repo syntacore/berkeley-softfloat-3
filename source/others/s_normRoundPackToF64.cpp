@@ -36,14 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 float64_t
 softfloat_normRoundPackToF64(bool sign, int16_t exp, uint64_t sig)
 {
     int8_t const shiftDist = softfloat_countLeadingZeros64(sig) - 1;
     exp -= shiftDist;
+
     if ((10 <= shiftDist) && ((unsigned int)exp < 0x7FD)) {
         return u_as_f_64(packToF64UI(sign, sig ? exp : 0, sig << (shiftDist - 10)));
-    } else {
-        return softfloat_roundPackToF64(sign, exp, sig << shiftDist);
     }
+
+    return softfloat_roundPackToF64(sign, exp, sig << shiftDist);
 }
+}  // namespace softfloat

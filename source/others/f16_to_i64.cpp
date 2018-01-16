@@ -42,33 +42,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int64_t
 f16_to_i64(float16_t a, uint8_t roundingMode, bool exact)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t const exp = expF16UI(uiA);
     uint16_t const frac = fracF16UI(uiA);
-    
+
     if (exp == 0x1F) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            frac ? i64_fromNaN : 
+            frac ? i64_fromNaN :
             sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-    } else {
-        int32_t sig32 = frac;
-        if (exp) {
-            sig32 |= 0x0400;
-            {
-                int8_t const shiftDist = exp - 0x19;
-                if (0 <= shiftDist) {
-                    sig32 <<= shiftDist;
-                    return sign ? -sig32 : sig32;
-                }
-            }
-            int8_t const shiftDist = exp - 0x0D;
-            if (0 < shiftDist) {
+    }
+
+    int32_t sig32 = frac;
+
+    if (exp) {
+        sig32 |= 0x0400;
+        {
+            int8_t const shiftDist = exp - 0x19;
+
+            if (0 <= shiftDist) {
                 sig32 <<= shiftDist;
+                return sign ? -sig32 : sig32;
             }
         }
-        return
-            softfloat_roundPackToI32(sign, (uint32_t)sig32, roundingMode, exact);
+        int8_t const shiftDist = exp - 0x0D;
+
+        if (0 < shiftDist) {
+            sig32 <<= shiftDist;
+        }
     }
+
+    return
+        softfloat_roundPackToI32(sign, (uint32_t)sig32, roundingMode, exact);
 }

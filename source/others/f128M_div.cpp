@@ -57,6 +57,7 @@ f128M_div(float128_t const* const aPtr,
           float128_t const* const bPtr,
           float128_t* const zPtr)
 {
+    using namespace softfloat;
     uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const* const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
     uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);

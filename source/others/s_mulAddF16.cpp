@@ -39,9 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 float16_t
-softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
+softfloat_mulAddF16(uint16_t uiA,
+                    uint16_t uiB,
+                    uint16_t uiC,
+                    uint8_t op)
 {
+    using namespace softfloat;
     bool const signA = signF16UI(uiA);
     int8_t expA = expF16UI(uiA);
     uint16_t sigA = fracF16UI(uiA);
@@ -215,3 +221,5 @@ softfloat_mulAddF16(uint16_t uiA, uint16_t uiB, uint16_t uiC, uint8_t op)
 
     return softfloat_roundPackToF16(signZ, expZ, sigZ);
 }
+
+}  // namespace softfloat

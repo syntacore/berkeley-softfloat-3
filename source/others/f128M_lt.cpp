@@ -41,50 +41,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-bool f128M_lt( const float128_t *aPtr, const float128_t *bPtr )
+bool f128M_lt(const float128_t* aPtr, const float128_t* bPtr)
 {
 
-    return f128_lt( *aPtr, *bPtr );
+    return f128_lt(*aPtr, *bPtr);
 
 }
 
 #else
 
-bool f128M_lt( const float128_t *aPtr, const float128_t *bPtr )
+bool
+f128M_lt(const float128_t* aPtr,
+         const float128_t* bPtr)
 {
-    const uint32_t *aWPtr, *bWPtr;
+    using namespace softfloat;
+    const uint32_t* aWPtr, *bWPtr;
     uint32_t uiA96, uiB96;
     bool signA, signB;
     uint32_t wordA, wordB;
 
-    aWPtr = (const uint32_t *) aPtr;
-    bWPtr = (const uint32_t *) bPtr;
-    if ( softfloat_isNaNF128M( aWPtr ) || softfloat_isNaNF128M( bWPtr ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    aWPtr = (const uint32_t*)aPtr;
+    bWPtr = (const uint32_t*)bPtr;
+
+    if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    uiB96 = bWPtr[indexWordHi( 4 )];
-    signA = signF128UI96( uiA96 );
-    signB = signF128UI96( uiB96 );
-    if ( signA != signB ) {
-        if ( signB ) return false;
-        if ( (uiA96 | uiB96) & 0x7FFFFFFF ) return true;
-        wordA = aWPtr[indexWord( 4, 2 )];
-        wordB = bWPtr[indexWord( 4, 2 )];
-        if ( wordA | wordB ) return true;
-        wordA = aWPtr[indexWord( 4, 1 )];
-        wordB = bWPtr[indexWord( 4, 1 )];
-        if ( wordA | wordB ) return true;
-        wordA = aWPtr[indexWord( 4, 0 )];
-        wordB = bWPtr[indexWord( 4, 0 )];
+
+    uiA96 = aWPtr[indexWordHi(4)];
+    uiB96 = bWPtr[indexWordHi(4)];
+    signA = signF128UI96(uiA96);
+    signB = signF128UI96(uiB96);
+
+    if (signA != signB) {
+        if (signB) {
+            return false;
+        }
+
+        if ((uiA96 | uiB96) & 0x7FFFFFFF) {
+            return true;
+        }
+
+        wordA = aWPtr[indexWord(4, 2)];
+        wordB = bWPtr[indexWord(4, 2)];
+
+        if (wordA | wordB) {
+            return true;
+        }
+
+        wordA = aWPtr[indexWord(4, 1)];
+        wordB = bWPtr[indexWord(4, 1)];
+
+        if (wordA | wordB) {
+            return true;
+        }
+
+        wordA = aWPtr[indexWord(4, 0)];
+        wordB = bWPtr[indexWord(4, 0)];
         return ((wordA | wordB) != 0);
     }
-    if ( signA ) {
-        aWPtr = (const uint32_t *) bPtr;
-        bWPtr = (const uint32_t *) aPtr;
+
+    if (signA) {
+        aWPtr = (const uint32_t*)bPtr;
+        bWPtr = (const uint32_t*)aPtr;
     }
-    return (softfloat_compare128M( aWPtr, bWPtr ) < 0);
+
+    return (softfloat_compare128M(aWPtr, bWPtr) < 0);
 
 }
 

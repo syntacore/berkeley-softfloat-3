@@ -39,7 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
-float16_t softfloat_subMagsF16(uint16_t uiA, uint16_t uiB)
+namespace softfloat {
+
+float16_t
+softfloat_subMagsF16(uint16_t uiA,
+                     uint16_t uiB)
 {
     uint16_t uiZ;
     int8_t expZ;
@@ -152,7 +156,8 @@ float16_t softfloat_subMagsF16(uint16_t uiA, uint16_t uiB)
         return softfloat_roundPackToF16(signZ, expZ, sigZ);
     }
 
-subEpsilon: {
+subEpsilon:
+    {
         if (
             softfloat_round_near_even != softfloat_roundingMode &&
             (softfloat_round_minMag == softfloat_roundingMode || (signF16UI(uiZ) ? softfloat_round_max : softfloat_round_min) == softfloat_roundingMode)
@@ -164,3 +169,5 @@ subEpsilon: {
         return u_as_f_16(uiZ);
     }
 }
+
+}  // namespace softfloat

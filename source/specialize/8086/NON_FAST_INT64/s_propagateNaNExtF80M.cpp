@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
-#include <cstdint>
+namespace softfloat {
+namespace Intel_8086 {
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values
@@ -137,3 +138,6 @@ copy:
     zSPtr->signExp = sPtr->signExp;
     zSPtr->signif = sPtr->signif | UINT64_C(0xC000000000000000);
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

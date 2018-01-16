@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <cstring>
 
+namespace softfloat {
+
 void
 softfloat_shiftRightJamM(size_t size_words,
                          uint32_t const *aPtr,
@@ -99,3 +101,5 @@ softfloat_shiftRightJamM(size_t size_words,
         zPtr[indexWordLo(size_words)] |= 1;
     }
 }
+
+}  // namespace softfloat

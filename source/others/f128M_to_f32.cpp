@@ -49,8 +49,10 @@ float32_t f128M_to_f32(const float128_t* aPtr)
 
 #else
 
-float32_t f128M_to_f32(const float128_t* aPtr)
+float32_t
+f128M_to_f32(const float128_t* aPtr)
 {
+    using namespace softfloat;
     uint32_t const* const aWPtr = (const uint32_t*)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
@@ -72,16 +74,16 @@ float32_t f128M_to_f32(const float128_t* aPtr)
 
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
             return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
-        } else {
-            return signed_zero_F32(sign);
         }
-    } else {
-        if (frac64) {
-            return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f128MToCommonNaN(aWPtr)));
-        } else {
-            return signed_inf_F32(sign);
-        }
+
+        return signed_zero_F32(sign);
     }
+
+    if (frac64) {
+        return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f128MToCommonNaN(aWPtr)));
+    }
+
+    return signed_inf_F32(sign);
 }
 
 #endif

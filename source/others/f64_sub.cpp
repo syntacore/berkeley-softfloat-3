@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 f64_sub(float64_t a, float64_t b)
 {
+    using namespace softfloat;
     uint64_t const uiA = f_as_u_64(a);
     bool const signA = signF64UI(uiA);
     uint64_t const uiB = f_as_u_64(b);

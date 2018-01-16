@@ -39,13 +39,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-bool extF80_isSignalingNaN( extFloat80_t a )
+bool
+extF80_isSignalingNaN(extFloat80_t a)
 {
+    using namespace softfloat;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uA;
 
     uA.f = a;
-    return softfloat_isSigNaNExtF80UI( uA.s.signExp, uA.s.signif );
+    return softfloat_isSigNaNExtF80UI(uA.s.signExp, uA.s.signif);
 
 }
 

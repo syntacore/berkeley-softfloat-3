@@ -38,22 +38,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-extFloat80_t ui32_to_extF80( uint32_t a )
+extFloat80_t
+ui32_to_extF80(uint32_t a)
 {
+    using namespace softfloat;
     uint16_t uiZ64;
     int8_t shiftDist;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uZ;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uZ;
 
     uiZ64 = 0;
-    if ( a ) {
-        shiftDist = softfloat_countLeadingZeros32( a );
+
+    if (a) {
+        shiftDist = softfloat_countLeadingZeros32(a);
         uiZ64 = 0x401E - shiftDist;
         a <<= shiftDist;
     }
+
     uZ.s.signExp = uiZ64;
-    uZ.s.signif = (uint64_t) a<<32;
+    uZ.s.signif = (uint64_t)a << 32;
     return uZ.f;
 
 }
-

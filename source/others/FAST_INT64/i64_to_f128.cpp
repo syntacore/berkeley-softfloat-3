@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float128_t i64_to_f128(int64_t a)
+float128_t
+i64_to_f128(int64_t a)
 {
+    using namespace softfloat;
     uint64_t uiZ64, uiZ0;
     union ui128_f128 uZ;
 

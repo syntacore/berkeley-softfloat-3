@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
 point values, at least one of which is a NaN, returns the bit pattern of
@@ -58,3 +61,6 @@ softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
     }
     return (isNaNF16UI(uiA) ? uiA : uiB) | 0x0200;
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

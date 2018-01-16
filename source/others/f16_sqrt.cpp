@@ -39,11 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-extern const uint16_t softfloat_approxRecipSqrt_1k0s[];
-extern const uint16_t softfloat_approxRecipSqrt_1k1s[];
-
-float16_t f16_sqrt(float16_t a)
+float16_t
+f16_sqrt(float16_t a)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const signA = signF16UI(uiA);
     int8_t expA = expF16UI(uiA);
@@ -52,64 +51,76 @@ float16_t f16_sqrt(float16_t a)
     if (expA == 0x1F) {
         if (sigA) {
             return u_as_f_16(softfloat_propagateNaNF16UI(uiA, 0));
-        } else if (!signA) {
-            return a;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_16(defaultNaNF16UI);
         }
-    } else if (signA) {
+
+        if (!signA) {
+            return a;
+        }
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_16(defaultNaNF16UI);
+    }
+
+    if (signA) {
         if (!(expA | sigA)) {
             return a;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_16(defaultNaNF16UI);
-        }
-    } else {
-        if (!expA) {
-            if (!sigA) {
-                return a;
-            } else {
-                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
-                expA = normExpSig.exp;
-                sigA = normExpSig.sig;
-            }
         }
 
-        int8_t expZ = ((expA - 0xF) >> 1) + 0xE;
-        expA &= 1;
-        sigA |= 0x0400;
-        int const index = (sigA >> 6 & 0xE) + expA;
-        uint16_t const r0 =
-            softfloat_approxRecipSqrt_1k0s[index] - 
-            (((uint32_t)softfloat_approxRecipSqrt_1k1s[index] * (sigA & 0x7F)) >> 11);
-        uint32_t ESqrR0 = ((uint32_t)r0 * r0) >> 1;
-        if (expA) {
-            ESqrR0 >>= 1;
-        }
-        uint16_t const sigma0 = static_cast<uint16_t>(~((ESqrR0 * sigA) >> 16));
-        uint16_t recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
-        if (!(recipSqrt16 & 0x8000)) {
-            recipSqrt16 = 0x8000;
-        }
-        uint16_t sigZ = ((uint32_t)(sigA << 5) * recipSqrt16) >> 16;
-        if (expA) {
-            sigZ >>= 1;
-        }
-
-        ++sigZ;
-        if (!(sigZ & 7)) {
-            uint16_t const shiftedSigZ = static_cast<uint16_t>(sigZ >> 1);
-            uint16_t const negRem = static_cast<uint16_t>(shiftedSigZ * shiftedSigZ);
-            sigZ &= ~1;
-            if (negRem & 0x8000) {
-                sigZ |= 1;
-            } else {
-                if (negRem) {
-                    --sigZ;
-                }
-            }
-        }
-        return softfloat_roundPackToF16(0, expZ, sigZ);
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_16(defaultNaNF16UI);
     }
+
+    if (!expA) {
+        if (!sigA) {
+            return a;
+        }
+
+        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
+    }
+
+    int8_t expZ = ((expA - 0xF) >> 1) + 0xE;
+    expA &= 1;
+    sigA |= 0x0400;
+    int const index = (sigA >> 6 & 0xE) + expA;
+    uint16_t const r0 =
+        softfloat_approxRecipSqrt_1k0s[index] -
+        (((uint32_t)softfloat_approxRecipSqrt_1k1s[index] * (sigA & 0x7F)) >> 11);
+    uint32_t ESqrR0 = ((uint32_t)r0 * r0) >> 1;
+
+    if (expA) {
+        ESqrR0 >>= 1;
+    }
+
+    uint16_t const sigma0 = static_cast<uint16_t>(~((ESqrR0 * sigA) >> 16));
+    uint16_t recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
+
+    if (!(recipSqrt16 & 0x8000)) {
+        recipSqrt16 = 0x8000;
+    }
+
+    uint16_t sigZ = ((uint32_t)(sigA << 5) * recipSqrt16) >> 16;
+
+    if (expA) {
+        sigZ >>= 1;
+    }
+
+    ++sigZ;
+
+    if (!(sigZ & 7)) {
+        uint16_t const shiftedSigZ = static_cast<uint16_t>(sigZ >> 1);
+        uint16_t const negRem = static_cast<uint16_t>(shiftedSigZ * shiftedSigZ);
+        sigZ &= ~1;
+
+        if (negRem & 0x8000) {
+            sigZ |= 1;
+        } else {
+            if (negRem) {
+                --sigZ;
+            }
+        }
+    }
+
+    return softfloat_roundPackToF16(0, expZ, sigZ);
 }

@@ -53,6 +53,7 @@ void
 ui32_to_extF80M(uint32_t a,
                 extFloat80_t *const zPtr)
 {
+    using namespace softfloat;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
     if (0 != a) {

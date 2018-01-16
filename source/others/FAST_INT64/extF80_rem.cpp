@@ -40,8 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 extFloat80_t
-extF80_rem(extFloat80_t a, extFloat80_t b)
+extF80_rem(extFloat80_t a,
+           extFloat80_t b)
 {
+    using namespace softfloat;
     exp32_sig64 normExpSig;
     int32_t expDiff;
     struct uint128 rem, shiftedSigB;

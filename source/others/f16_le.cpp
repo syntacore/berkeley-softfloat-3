@@ -39,18 +39,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 bool
-f16_le( float16_t a, float16_t b )
+f16_le(float16_t a,
+       float16_t b)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     uint16_t const uiB = f_as_u_16(b);
-    if ( isNaNF16UI( uiA ) || isNaNF16UI( uiB ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+
+    if (isNaNF16UI(uiA) || isNaNF16UI(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        bool const signA = signF16UI(uiA);
-        bool const signB = signF16UI(uiB);
-        return
-            signA != signB ? signA || !(uint16_t)((uiA | uiB) << 1) : 
-            uiA == uiB || (signA ^ (uiA < uiB));
     }
+
+    bool const signA = signF16UI(uiA);
+    bool const signB = signF16UI(uiB);
+    return
+        signA != signB ? signA || !(uint16_t)((uiA | uiB) << 1) :
+        uiA == uiB || (signA ^ (uiA < uiB));
 }

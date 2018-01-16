@@ -44,6 +44,7 @@ f64_to_i32(float64_t const a,
            uint8_t const roundingMode,
            bool const exact)
 {
+    using namespace softfloat;
     uint64_t const uiA = f_as_u_64(a);
     bool sign = signF64UI(uiA);
     int16_t const exp = expF64UI(uiA);
@@ -53,11 +54,9 @@ f64_to_i32(float64_t const a,
         if ((exp == 0x7FF) && sig) {
             if (i32_fromNaN == i32_fromPosOverflow) {
                 sign = 0;
-            }
-            else if (i32_fromNaN == i32_fromNegOverflow) {
+            } else if (i32_fromNaN == i32_fromNegOverflow) {
                 sign = 1;
-            }
-            else {
+            } else {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return i32_fromNaN;
             }
@@ -75,6 +74,4 @@ f64_to_i32(float64_t const a,
     }
 
     return softfloat_roundPackToI32(sign, sig, roundingMode, exact);
-
 }
-

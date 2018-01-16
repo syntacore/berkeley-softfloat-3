@@ -39,13 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-extern const uint16_t softfloat_approxRecip_1k0s[];
-extern const uint16_t softfloat_approxRecip_1k1s[];
-
 float16_t
 f16_div(float16_t const a,
         float16_t const b)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const signA = signF16UI(uiA);
     int8_t expA = expF16UI(uiA);

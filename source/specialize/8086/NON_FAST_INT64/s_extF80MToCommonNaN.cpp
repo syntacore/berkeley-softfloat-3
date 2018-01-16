@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
-#include <cstdint>
+namespace softfloat {
+namespace Intel_8086 {
 
 /**
 Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is
@@ -47,19 +48,20 @@ common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
 NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
-struct commonNaN
-    softfloat_extF80MToCommonNaN(struct extFloat80M a)
+commonNaN
+softfloat_extF80MToCommonNaN(struct extFloat80M a)
 {
 
     if (extF80M_isSignalingNaN(&a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    {
-        struct commonNaN z;
-        z.sign = signExtF80UI64(a.signExp);
-        z.v64 = a.signif << 1;
-        z.v0 = 0;
-        return z;
-    }
+
+    commonNaN z;
+    z.sign = signExtF80UI64(a.signExp);
+    z.v64 = a.signif << 1;
+    z.v0 = 0;
+    return z;
 }
 
+}  // namespace Intel_8086
+}  // namespace softfloat

@@ -38,11 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/types.hpp"
 #include "softfloat/functions.h"
 
-#include <cstdint>
-
 void
 softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr)
 {
+    using namespace softfloat;
     if (f128M_isSignalingNaN((const float128_t *)aWPtr) || (bWPtr && f128M_isSignalingNaN((const float128_t *)bWPtr))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
@@ -50,6 +49,5 @@ softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32
     zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
     zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
     zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
-
 }
 

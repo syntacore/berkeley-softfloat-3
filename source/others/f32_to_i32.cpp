@@ -39,8 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-int32_t f32_to_i32(float32_t a, uint8_t roundingMode, bool exact)
+int32_t
+f32_to_i32(float32_t a,
+           uint8_t roundingMode,
+           bool exact)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     bool sign = signF32UI(uiA);
     int16_t const exp = expF32UI(uiA);

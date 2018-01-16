@@ -38,9 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 void
 softfloat_commonNaNToF128M(struct commonNaN a, uint32_t *zWPtr)
 {
     softfloat_shortShiftRight128M((const uint32_t *)&a.v0, 16, zWPtr);
     zWPtr[indexWordHi(4)] |= (uint32_t)a.sign << 31 | 0x7FFF8000;
 }
+}  // namespace Intel_8086
+}  // namespace softfloat

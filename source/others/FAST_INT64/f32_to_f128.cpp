@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 f32_to_f128(float32_t a)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t exp = expF32UI(uiA);
@@ -50,29 +51,30 @@ f32_to_f128(float32_t a)
     if (exp == 0xFF) {
         if (frac) {
             return u_as_f_128(softfloat_commonNaNToF128UI(softfloat_f32UIToCommonNaN(uiA)));
-        } else {
-            struct uint128 uiZ;
-            uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
-            uiZ.v0 = 0;
-            return u_as_f_128(uiZ);
         }
-    } else if (0 == exp) {
+
+        uint128 uiZ;
+        uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
+        uiZ.v0 = 0;
+        return u_as_f_128(uiZ);
+    }
+
+    if (0 == exp) {
         if (0 == frac) {
             struct uint128 uiZ;
             uiZ.v64 = packToF128UI64(sign, 0, 0);
             uiZ.v0 = 0;
             return u_as_f_128(uiZ);
-        } else {
-            struct exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
-            exp = normExpSig.exp - 1;
-            frac = normExpSig.sig;
         }
+
+        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+        exp = normExpSig.exp - 1;
+        frac = normExpSig.sig;
     }
-    {
-        struct uint128 uiZ;
-        uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
-        uiZ.v0 = 0;
-        return u_as_f_128(uiZ);
-    }
+
+    uint128 uiZ;
+    uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
+    uiZ.v0 = 0;
+    return u_as_f_128(uiZ);
 }
 

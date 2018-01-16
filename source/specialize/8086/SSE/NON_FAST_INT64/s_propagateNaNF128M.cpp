@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 
+namespace softfloat {
+namespace Intel_8086 {
 /**
 Assuming at least one of the two 128-bit floating-point values pointed to by
 `aWPtr' and `bWPtr' is a NaN, stores the combined NaN result at the location
@@ -49,25 +51,37 @@ and `zWPtr' points to an array of four 32-bit elements that concatenate in
 the platform's normal endian order to form a 128-bit floating-point value.
 */
 void
- softfloat_propagateNaNF128M(
-     const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr )
+softfloat_propagateNaNF128M(const uint32_t* aWPtr,
+                            const uint32_t* bWPtr,
+                            uint32_t* zWPtr)
 {
     bool isSigNaNA;
-    const uint32_t *ptr;
+    const uint32_t* ptr;
 
     ptr = aWPtr;
-    isSigNaNA = f128M_isSignalingNaN( (const float128_t *) aWPtr );
+    isSigNaNA = f128M_isSignalingNaN((const float128_t*)aWPtr);
+
     if (
         isSigNaNA
-            || (bWPtr && f128M_isSignalingNaN( (const float128_t *) bWPtr ))
+        || (bWPtr && f128M_isSignalingNaN((const float128_t*)bWPtr))
     ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        if ( isSigNaNA ) goto copy;
+        softfloat_raiseFlags(softfloat_flag_invalid);
+
+        if (isSigNaNA) {
+            goto copy;
+        }
     }
-    if ( ! softfloat_isNaNF128M( aWPtr ) ) ptr = bWPtr;
- copy:
-    zWPtr[indexWordHi( 4 )] = ptr[indexWordHi( 4 )] | 0x00008000;
-    zWPtr[indexWord( 4, 2 )] = ptr[indexWord( 4, 2 )];
-    zWPtr[indexWord( 4, 1 )] = ptr[indexWord( 4, 1 )];
-    zWPtr[indexWord( 4, 0 )] = ptr[indexWord( 4, 0 )];
+
+    if (!softfloat_isNaNF128M(aWPtr)) {
+        ptr = bWPtr;
+    }
+
+copy:
+    zWPtr[indexWordHi(4)] = ptr[indexWordHi(4)] | 0x00008000;
+    zWPtr[indexWord(4, 2)] = ptr[indexWord(4, 2)];
+    zWPtr[indexWord(4, 1)] = ptr[indexWord(4, 1)];
+    zWPtr[indexWord(4, 0)] = ptr[indexWord(4, 0)];
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

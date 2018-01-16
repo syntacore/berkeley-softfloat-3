@@ -47,9 +47,11 @@ void i64_to_f128M(int64_t a, float128_t* zPtr)
 
 #else
 
-void i64_to_f128M(int64_t const a,
-                  float128_t* const zPtr)
+void
+i64_to_f128M(int64_t const a,
+             float128_t* const zPtr)
 {
+    using namespace softfloat;
     uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
     uint32_t uiZ96 = 0;
     uint32_t uiZ64 = 0;

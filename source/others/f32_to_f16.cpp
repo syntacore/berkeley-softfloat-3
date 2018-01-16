@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 f32_to_f16(float32_t a)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t const exp = expF32UI(uiA);

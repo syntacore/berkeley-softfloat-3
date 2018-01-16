@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "softfloat/functions.h"
 
-float128_t ui64_to_f128( uint64_t a )
+float128_t
+ui64_to_f128( uint64_t a )
 {
+    using namespace softfloat;
     uint64_t uiZ64, uiZ0;
     int8_t shiftDist;
     struct uint128 zSig;

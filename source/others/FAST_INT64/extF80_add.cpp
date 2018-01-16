@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-extFloat80_t extF80_add( extFloat80_t a, extFloat80_t b )
+extFloat80_t
+extF80_add( extFloat80_t a, extFloat80_t b )
 {
+    using namespace softfloat;
     /** @bug union of same type */
     union { struct extFloat80M s; extFloat80_t f; } uA;
     uint16_t uiA64;
@@ -75,6 +77,5 @@ extFloat80_t extF80_add( extFloat80_t a, extFloat80_t b )
         (signA == signB) ? softfloat_addMagsExtF80 : softfloat_subMagsExtF80;
     return (*magsFuncPtr)( uiA64, uiA0, uiB64, uiB0, signA );
 #endif
-
 }
 

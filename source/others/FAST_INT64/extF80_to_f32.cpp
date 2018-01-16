@@ -44,28 +44,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 extF80_to_f32(extFloat80_t a)
 {
+    using namespace softfloat;
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     bool const sign = signExtF80UI64(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t const sig = uiA0;
+
     if (exp == INT16_MAX) {
         if (sig & INT64_MAX) {
             return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
-        } else {
-            return signed_inf_F32(sign);
         }
-    } else {
-        uint32_t const sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
-        if (exp | sig32) {
-            exp -= 0x3F81;
-            if (exp < -0x1000) {
-                exp = -0x1000;
-            }
-            assert(INT16_MIN <= exp && exp <= INT16_MAX);
-            return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
-        } else {
-            return signed_zero_F32(sign);
-        }
+
+        return signed_inf_F32(sign);
     }
+
+    uint32_t const sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
+
+    if (exp | sig32) {
+        exp -= 0x3F81;
+
+        if (exp < -0x1000) {
+            exp = -0x1000;
+        }
+
+        assert(INT16_MIN <= exp && exp <= INT16_MAX);
+        return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
+    }
+
+    return signed_zero_F32(sign);
 }

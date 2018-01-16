@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
-f128M_roundToInt(float128_t const * aPtr,
+f128M_roundToInt(float128_t const* aPtr,
                  uint8_t roundingMode,
                  bool exact,
                  float128_t* zPtr)
@@ -54,11 +54,12 @@ f128M_roundToInt(float128_t const * aPtr,
 #else
 
 void
-f128M_roundToInt(float128_t const *aPtr,
+f128M_roundToInt(float128_t const* aPtr,
                  uint8_t roundingMode,
                  bool exact,
                  float128_t* zPtr)
 {
+    using namespace softfloat;
     uint32_t sigExtra;
     bool sign;
     unsigned int index, lastIndex;
@@ -67,11 +68,11 @@ f128M_roundToInt(float128_t const *aPtr,
     uint32_t extrasMask;
 
 
-    uint32_t const * const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
     uint32_t const ui96 = aWPtr[indexWordHi(4)];
-    auto const exp= expF128UI96(ui96);
+    auto const exp = expF128UI96(ui96);
 
     if (exp < 0x3FFF) {
         zWPtr[indexWord(4, 2)] = 0;
@@ -130,7 +131,7 @@ f128M_roundToInt(float128_t const *aPtr,
     }
 
     if (0x406F <= exp) {
-        if (0x7FFF == exp  && (fracF128UI96(ui96) || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]))) {
+        if (0x7FFF == exp && (fracF128UI96(ui96) || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]))) {
             softfloat_propagateNaNF128M(aWPtr, 0, zWPtr);
             return;
         }
@@ -208,6 +209,7 @@ f128M_roundToInt(float128_t const *aPtr,
     zWPtr[index] = wordZ;
 
 propagateCarry:
+
     while (index != lastIndex) {
         index += wordIncr;
         wordZ = aWPtr[index] + !!carry;
@@ -221,4 +223,3 @@ propagateCarry:
 }
 
 #endif
-

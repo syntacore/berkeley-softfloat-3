@@ -42,50 +42,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
- f128M_mulAdd(
-     const float128_t *aPtr,
-     const float128_t *bPtr,
-     const float128_t *cPtr,
-     float128_t *zPtr
- )
+f128M_mulAdd(
+    const float128_t* aPtr,
+    const float128_t* bPtr,
+    const float128_t* cPtr,
+    float128_t* zPtr
+)
 {
-    const uint64_t *aWPtr, *bWPtr, *cWPtr;
+    using namespace softfloat;
+    const uint64_t* aWPtr, *bWPtr, *cWPtr;
     uint64_t uiA64, uiA0;
     uint64_t uiB64, uiB0;
     uint64_t uiC64, uiC0;
 
-    aWPtr = (const uint64_t *) aPtr;
-    bWPtr = (const uint64_t *) bPtr;
-    cWPtr = (const uint64_t *) cPtr;
-    uiA64 = aWPtr[indexWord( 2, 1 )];
-    uiA0  = aWPtr[indexWord( 2, 0 )];
-    uiB64 = bWPtr[indexWord( 2, 1 )];
-    uiB0  = bWPtr[indexWord( 2, 0 )];
-    uiC64 = cWPtr[indexWord( 2, 1 )];
-    uiC0  = cWPtr[indexWord( 2, 0 )];
-    *zPtr = softfloat_mulAddF128( uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, 0 );
+    aWPtr = (const uint64_t*)aPtr;
+    bWPtr = (const uint64_t*)bPtr;
+    cWPtr = (const uint64_t*)cPtr;
+    uiA64 = aWPtr[indexWord(2, 1)];
+    uiA0 = aWPtr[indexWord(2, 0)];
+    uiB64 = bWPtr[indexWord(2, 1)];
+    uiB0 = bWPtr[indexWord(2, 0)];
+    uiC64 = cWPtr[indexWord(2, 1)];
+    uiC0 = cWPtr[indexWord(2, 0)];
+    *zPtr = softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, 0);
 
 }
 
 #else
 
 void
- f128M_mulAdd(
-     const float128_t *aPtr,
-     const float128_t *bPtr,
-     const float128_t *cPtr,
-     float128_t *zPtr
- )
+f128M_mulAdd(const float128_t* aPtr,
+             const float128_t* bPtr,
+             const float128_t* cPtr,
+             float128_t* zPtr)
 {
-
-    softfloat_mulAddF128M(
-        (const uint32_t *) aPtr,
-        (const uint32_t *) bPtr,
-        (const uint32_t *) cPtr,
-        (uint32_t *) zPtr,
-        0
-    );
-
+    using namespace softfloat;
+    softfloat_mulAddF128M((const uint32_t*)aPtr, (const uint32_t*)bPtr, (const uint32_t*)cPtr, (uint32_t*)zPtr, 0);
 }
 
 #endif

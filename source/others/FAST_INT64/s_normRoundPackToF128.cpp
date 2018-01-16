@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 float128_t
 softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t sig0)
 {
@@ -70,3 +72,5 @@ softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t s
     }
     return softfloat_roundPackToF128(sign, exp, sig64, sig0, sigExtra);
 }
+
+}  // namespace softfloat

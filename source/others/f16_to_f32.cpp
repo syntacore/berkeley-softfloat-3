@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 f16_to_f32(float16_t a)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t exp = expF16UI(uiA);
@@ -50,19 +51,20 @@ f16_to_f32(float16_t a)
     if (exp == 0x1F) {
         if (frac) {
             return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f16UIToCommonNaN(uiA)));
-        } else {
-            return signed_inf_F32(sign);
         }
-    } else {
-        if (!exp) {
-            if (!frac) {
-                return signed_zero_F32(sign);
-            } else {
-                exp8_sig16 normExpSig = softfloat_normSubnormalF16Sig(frac);
-                exp = normExpSig.exp - 1;
-                frac = normExpSig.sig;
-            }
-        }
-        return u_as_f_32(packToF32UI(sign, exp + 0x70, (uint32_t)frac << 13));
+
+        return signed_inf_F32(sign);
     }
+
+    if (!exp) {
+        if (!frac) {
+            return signed_zero_F32(sign);
+        }
+
+        exp8_sig16 normExpSig = softfloat_normSubnormalF16Sig(frac);
+        exp = normExpSig.exp - 1;
+        frac = normExpSig.sig;
+    }
+
+    return u_as_f_32(packToF32UI(sign, exp + 0x70, (uint32_t)frac << 13));
 }

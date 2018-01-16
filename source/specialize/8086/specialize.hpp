@@ -37,12 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SPECIALIZE_H_
 #define SPECIALIZE_H_
 
-#include "softfloat/types.h"
+#include "softfloat/functions.h"
+#include "primitives/types.hpp"
+#include "internals.hpp"
+
+namespace softfloat {
+
+inline namespace Intel_8086 {
 
 /**
 Default value for `softfloat_detectTininess'.
 */
-#define init_detectTininess softfloat_tininess_afterRounding
+static softfloat_tininess const init_detectTininess = softfloat_tininess_afterRounding;
 
 /**
 The values to return on conversions to 32-bit integer formats that raise an
@@ -393,5 +399,8 @@ softfloat_propagateNaNF128M(uint32_t const* aWPtr,
                             uint32_t* zWPtr);
 
 #endif  /* SOFTFLOAT_FAST_INT64 */
+}  // namespace Intel_8086
+
+}  // namespace softfloat
 
 #endif  /* SPECIALIZE_H_ */

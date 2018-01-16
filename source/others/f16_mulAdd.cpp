@@ -39,7 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 float16_t
-f16_mulAdd(float16_t a, float16_t b, float16_t c)
+f16_mulAdd(float16_t a,
+           float16_t b,
+           float16_t c)
 {
+    using namespace softfloat;
     return softfloat_mulAddF16(f_as_u_16(a), f_as_u_16(b), f_as_u_16(c), 0);
 }

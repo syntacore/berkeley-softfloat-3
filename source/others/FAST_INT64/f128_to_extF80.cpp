@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extFloat80_t f128_to_extF80( float128_t a )
 {
+    using namespace softfloat;
     union ui128_f128 uA;
     uint64_t uiA64, uiA0;
     bool sign;

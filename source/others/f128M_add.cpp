@@ -42,37 +42,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
- f128M_add( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
+f128M_add(const float128_t* aPtr,
+          const float128_t* bPtr,
+          float128_t* zPtr)
 {
-    const uint64_t *aWPtr, *bWPtr;
+    using namespace softfloat;
+    const uint64_t* aWPtr, *bWPtr;
     uint64_t uiA64, uiA0;
     bool signA;
     uint64_t uiB64, uiB0;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     float128_t
-        (*magsFuncPtr)(
-            uint64_t, uint64_t, uint64_t, uint64_t, bool );
+    (*magsFuncPtr)(
+        uint64_t, uint64_t, uint64_t, uint64_t, bool);
 #endif
 
-    aWPtr = (const uint64_t *) aPtr;
-    bWPtr = (const uint64_t *) bPtr;
-    uiA64 = aWPtr[indexWord( 2, 1 )];
-    uiA0  = aWPtr[indexWord( 2, 0 )];
-    signA = signF128UI64( uiA64 );
-    uiB64 = bWPtr[indexWord( 2, 1 )];
-    uiB0  = bWPtr[indexWord( 2, 0 )];
-    signB = signF128UI64( uiB64 );
+    aWPtr = (const uint64_t*)aPtr;
+    bWPtr = (const uint64_t*)bPtr;
+    uiA64 = aWPtr[indexWord(2, 1)];
+    uiA0 = aWPtr[indexWord(2, 0)];
+    signA = signF128UI64(uiA64);
+    uiB64 = bWPtr[indexWord(2, 1)];
+    uiB0 = bWPtr[indexWord(2, 0)];
+    signB = signF128UI64(uiB64);
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
-    if ( signA == signB ) {
-        *zPtr = softfloat_addMagsF128( uiA64, uiA0, uiB64, uiB0, signA );
-    } else {
-        *zPtr = softfloat_subMagsF128( uiA64, uiA0, uiB64, uiB0, signA );
+
+    if (signA == signB) {
+        *zPtr = softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
     }
+    else {
+        *zPtr = softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
+    }
+
 #else
     magsFuncPtr =
         (signA == signB) ? softfloat_addMagsF128 : softfloat_subMagsF128;
-    *zPtr = (*magsFuncPtr)( uiA64, uiA0, uiB64, uiB0, signA );
+    *zPtr = (*magsFuncPtr)(uiA64, uiA0, uiB64, uiB0, signA);
 #endif
 
 }
@@ -80,16 +86,12 @@ void
 #else
 
 void
- f128M_add( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
+f128M_add(float128_t const* aPtr,
+          float128_t const* bPtr,
+          float128_t* zPtr)
 {
-
-    softfloat_addF128M(
-        (const uint32_t *) aPtr,
-        (const uint32_t *) bPtr,
-        (uint32_t *) zPtr,
-        false
-    );
-
+    using namespace softfloat;
+    softfloat_addF128M((const uint32_t*)aPtr, (const uint32_t*)bPtr, (uint32_t*)zPtr, false);
 }
 
 #endif

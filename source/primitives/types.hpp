@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 
+namespace softfloat {
+
 #ifdef SOFTFLOAT_FAST_INT64
 
 struct uint128
@@ -86,5 +88,7 @@ endian and little-endian platforms.
 #define indexMultiwordLoBut( total, n ) (n)
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v3, v2, v1, v0 }
 #endif
+
+}  // namespace softfloat
 
 #endif  /* PRIMITIVETYPES_H_ */

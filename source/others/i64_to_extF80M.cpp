@@ -50,6 +50,7 @@ i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
 void
 i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
 {
+    using namespace softfloat;
     extFloat80M *const zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;

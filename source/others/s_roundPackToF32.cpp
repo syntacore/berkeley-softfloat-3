@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 /**
 @param[in] sign sign bit
 @param[in] exp exponent 8-bit field
@@ -77,3 +79,5 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     uint32_t const sig1 = ((sig + roundIncrement) >> 7) & ~(uint32_t)to_even;
     return u_as_f_32(packToF32UI(sign, 0 != sig1 ? exp : 0, sig1));
 }
+
+}  // namespace softfloat

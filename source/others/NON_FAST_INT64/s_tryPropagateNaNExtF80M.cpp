@@ -37,24 +37,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
+namespace softfloat {
+
 bool
 softfloat_tryPropagateNaNExtF80M(
-   /** @bug use extFloat80_t */
-   extFloat80M const *aSPtr,
-   /** @bug use extFloat80_t */
-   extFloat80M const *bSPtr,
-   /** @bug use extFloat80_t */
-   extFloat80M *zSPtr)
+    /** @bug use extFloat80_t */
+    extFloat80M const* aSPtr,
+    /** @bug use extFloat80_t */
+    extFloat80M const* bSPtr,
+    /** @bug use extFloat80_t */
+    extFloat80M* zSPtr)
 {
     uint16_t ui64;
     uint64_t ui0;
 
     ui64 = aSPtr->signExp;
     ui0 = aSPtr->signif;
-    if (isNaNExtF80UI(ui64, ui0)) goto propagateNaN;
+
+    if (isNaNExtF80UI(ui64, ui0)) {
+        goto propagateNaN;
+    }
+
     ui64 = bSPtr->signExp;
     ui0 = bSPtr->signif;
-    if (isNaNExtF80UI(ui64, ui0)) goto propagateNaN;
+
+    if (isNaNExtF80UI(ui64, ui0)) {
+        goto propagateNaN;
+    }
+
     return false;
 propagateNaN:
     softfloat_propagateNaNExtF80M(aSPtr, bSPtr, zSPtr);
@@ -62,3 +72,4 @@ propagateNaN:
 
 }
 
+}  // namespace softfloat

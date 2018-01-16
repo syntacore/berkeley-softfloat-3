@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
-i32_to_f128M(int32_t a, float128_t *zPtr)
+i32_to_f128M(int32_t a, float128_t* zPtr)
 {
     *zPtr = i32_to_f128(a);
 }
@@ -53,15 +53,17 @@ i32_to_f128M(int32_t a, float128_t *zPtr)
 #else
 
 void
-i32_to_f128M(int32_t a, float128_t *zPtr)
+i32_to_f128M(int32_t a,
+             float128_t* zPtr)
 {
-    uint32_t *const zWPtr = (uint32_t *)zPtr;
+    using namespace softfloat;
+    uint32_t* const zWPtr = (uint32_t*)zPtr;
     zWPtr[indexWord(4, 0)] = 0;
     zWPtr[indexWord(4, 1)] = 0;
+
     if (0 == a) {
         zWPtr[indexWord(4, 2)] = 0;
         zWPtr[indexWord(4, 3)] = 0;
-
     } else {
         bool const sign = a < 0;
         uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);

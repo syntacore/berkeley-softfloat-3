@@ -40,10 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint64_t
- extF80_to_ui64( extFloat80_t a, uint8_t roundingMode, bool exact )
+extF80_to_ui64(extFloat80_t a,
+               uint8_t roundingMode,
+               bool exact)
 {
+    using namespace softfloat;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uA;
     uint16_t uiA64;
     bool sign;
     int32_t exp;
@@ -52,30 +59,30 @@ uint64_t
     uint64_t sigExtra;
     struct uint64_extra sig64Extra;
 
-    
+
     uA.f = a;
     uiA64 = uA.s.signExp;
-    sign = signExtF80UI64( uiA64 );
-    exp  = expExtF80UI64( uiA64 );
+    sign = signExtF80UI64(uiA64);
+    exp = expExtF80UI64(uiA64);
     sig = uA.s.signif;
-    
+
     shiftDist = 0x403E - exp;
-    if ( shiftDist < 0 ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+
+    if (shiftDist < 0) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-                ? ui64_fromNaN
-                : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+            exp == 0x7FFF && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? ui64_fromNaN :
+            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
-    
+
     sigExtra = 0;
-    if ( shiftDist ) {
-        sig64Extra = softfloat_shiftRightJam64Extra( sig, 0, shiftDist );
+
+    if (shiftDist) {
+        sig64Extra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
         sig = sig64Extra.v;
         sigExtra = sig64Extra.extra;
     }
-    return
-        softfloat_roundPackToUI64( sign, sig, sigExtra, roundingMode, exact );
 
+    return softfloat_roundPackToUI64(sign, sig, sigExtra, roundingMode, exact);
 }
 

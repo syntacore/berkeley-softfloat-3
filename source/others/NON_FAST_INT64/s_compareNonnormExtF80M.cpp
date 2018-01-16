@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/types.h"
 
+namespace softfloat {
+
 /** @bug use extFloat80_t */
 int
- softfloat_compareNonnormExtF80M(extFloat80M const *aSPtr,
-                                 extFloat80M const *bSPtr )
+softfloat_compareNonnormExtF80M(extFloat80M const* aSPtr,
+                                extFloat80M const* bSPtr)
 {
     uint16_t uiA64, uiB64;
     uint64_t sigA;
@@ -49,57 +51,84 @@ int
     uint64_t sigB;
     int32_t expA, expB;
 
-    
+
     uiA64 = aSPtr->signExp;
     uiB64 = bSPtr->signExp;
     sigA = aSPtr->signif;
-    signB = signExtF80UI64( uiB64 );
+    signB = signExtF80UI64(uiB64);
     sigB = bSPtr->signif;
-    
-    if ( (uiA64 ^ uiB64) & 0x8000 ) {
-        if ( ! (sigA | sigB) ) return 0;
+
+    if ((uiA64 ^ uiB64) & 0x8000) {
+        if (!(sigA | sigB)) {
+            return 0;
+        }
+
         goto resultFromSignB;
     }
-    
-    expA = expExtF80UI64( uiA64 );
-    expB = expExtF80UI64( uiB64 );
-    if ( expA == 0x7FFF ) {
-        if (expB == 0x7FFF) return 0;
-        signB = ! signB;
+
+    expA = expExtF80UI64(uiA64);
+    expB = expExtF80UI64(uiB64);
+
+    if (expA == 0x7FFF) {
+        if (expB == 0x7FFF) {
+            return 0;
+        }
+
+        signB = !signB;
         goto resultFromSignB;
     }
-    if ( expB == 0x7FFF ) {
+
+    if (expB == 0x7FFF) {
         goto resultFromSignB;
     }
-    
-    if ( ! expA ) expA = 1;
-    if ( ! (sigA & UINT64_C( 0x8000000000000000 )) ) {
-        if ( sigA ) {
-            expA += softfloat_normExtF80SigM( &sigA );
+
+    if (!expA) {
+        expA = 1;
+    }
+
+    if (!(sigA & UINT64_C(0x8000000000000000))) {
+        if (sigA) {
+            expA += softfloat_normExtF80SigM(&sigA);
         } else {
             expA = -128;
         }
     }
-    if ( ! expB ) expB = 1;
-    if ( ! (sigB & UINT64_C( 0x8000000000000000 )) ) {
-        if ( sigB ) {
-            expB += softfloat_normExtF80SigM( &sigB );
+
+    if (!expB) {
+        expB = 1;
+    }
+
+    if (!(sigB & UINT64_C(0x8000000000000000))) {
+        if (sigB) {
+            expB += softfloat_normExtF80SigM(&sigB);
         } else {
             expB = -128;
         }
     }
-    
-    if ( signB ) {
-        if ( expA < expB ) return 1;
-        if ( (expB < expA) || (sigB < sigA) ) return -1;
+
+    if (signB) {
+        if (expA < expB) {
+            return 1;
+        }
+
+        if ((expB < expA) || (sigB < sigA)) {
+            return -1;
+        }
     } else {
-        if ( expB < expA ) return 1;
-        if ( (expA < expB) || (sigA < sigB) ) return -1;
+        if (expB < expA) {
+            return 1;
+        }
+
+        if ((expA < expB) || (sigA < sigB)) {
+            return -1;
+        }
     }
+
     return (sigA != sigB);
-    
- resultFromSignB:
+
+resultFromSignB:
     return signB ? 1 : -1;
 
 }
 
+}  // namespace softfloat

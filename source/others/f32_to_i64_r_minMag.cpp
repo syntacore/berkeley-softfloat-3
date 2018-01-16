@@ -40,8 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 int64_t
-f32_to_i64_r_minMag(float32_t a, bool exact)
+f32_to_i64_r_minMag(float32_t a,
+                    bool exact)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);

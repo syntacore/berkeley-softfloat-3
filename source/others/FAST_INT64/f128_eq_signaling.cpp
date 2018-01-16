@@ -38,27 +38,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-bool f128_eq_signaling( float128_t a, float128_t b )
+bool
+f128_eq_signaling(float128_t a,
+                  float128_t b)
 {
-    union ui128_f128 uA;
+    using namespace softfloat;
+    ui128_f128 uA;
     uint64_t uiA64, uiA0;
-    union ui128_f128 uB;
+    ui128_f128 uB;
     uint64_t uiB64, uiB0;
 
     uA.f = a;
     uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
+    uiA0 = uA.ui.v0;
     uB.f = b;
     uiB64 = uB.ui.v64;
-    uiB0  = uB.ui.v0;
-    if ( isNaNF128UI( uiA64, uiA0 ) || isNaNF128UI( uiB64, uiB0 ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    uiB0 = uB.ui.v0;
+
+    if (isNaNF128UI(uiA64, uiA0) || isNaNF128UI(uiB64, uiB0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
+
     return
-           (uiA0 == uiB0)
-        && (   (uiA64 == uiB64)
-            || (! uiA0 && ! ((uiA64 | uiB64) & UINT64_C( 0x7FFFFFFFFFFFFFFF )))
+        (uiA0 == uiB0)
+        && ((uiA64 == uiB64)
+            || (!uiA0 && !((uiA64 | uiB64) & UINT64_C(0x7FFFFFFFFFFFFFFF)))
            );
 
 }

@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 /**
 @param[in] sign
 @param[in] exp
@@ -47,18 +49,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 softfloat_normRoundPackMToExtF80M(bool sign,
                                   int32_t exp,
-                                  uint32_t *extSigPtr,
+                                  uint32_t* extSigPtr,
                                   uint8_t roundingPrecision,
-                                  extFloat80M *zSPtr)
+                                  extFloat80M* zSPtr)
 {
     int16_t shiftDist = 0;
     uint32_t wordSig = extSigPtr[indexWord(3, 2)];
+
     if (!wordSig) {
         shiftDist = 32;
         wordSig = extSigPtr[indexWord(3, 1)];
+
         if (!wordSig) {
             shiftDist = 64;
             wordSig = extSigPtr[indexWord(3, 0)];
+
             if (!wordSig) {
                 zSPtr->signExp = packToExtF80UI64(sign, 0);
                 zSPtr->signif = 0;
@@ -66,13 +71,16 @@ softfloat_normRoundPackMToExtF80M(bool sign,
             }
         }
     }
+
     shiftDist += softfloat_countLeadingZeros32(wordSig);
+
     if (shiftDist) {
         exp -= shiftDist;
         softfloat_shiftLeft96M(extSigPtr, static_cast<uint32_t>(shiftDist), extSigPtr);
     }
-    softfloat_roundPackMToExtF80M(
-        sign, exp, extSigPtr, roundingPrecision, zSPtr);
+
+    softfloat_roundPackMToExtF80M(sign, exp, extSigPtr, roundingPrecision, zSPtr);
 
 }
 
+}  // namespace softfloat

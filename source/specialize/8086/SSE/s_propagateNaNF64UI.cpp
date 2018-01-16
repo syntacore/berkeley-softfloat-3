@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 uint64_t
 softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
 {
@@ -51,3 +54,5 @@ softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
     }
     return (isNaNF64UI(uiA) ? uiA : uiB) | UINT64_C(0x0008000000000000);
 }
+}  // namespace Intel_8086
+}  // namespace softfloat

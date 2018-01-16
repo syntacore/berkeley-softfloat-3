@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
+namespace softfloat {
+
 void
 softfloat_mulAddF128M(uint32_t const* const aWPtr,
                       uint32_t const* const bWPtr,
@@ -110,6 +112,7 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
     }
 
     uint32_t sigA[4];
+
     if (0 == expA) {
         sigA[indexWordHi(4)] = fracF128UI96(uiA96) | 0x00010000;
         sigA[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
@@ -136,6 +139,7 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
     }
 
     uint32_t sigX[5];
+
     if (expB) {
         sigX[indexWordHi(4)] = fracF128UI96(uiB96) | 0x00010000;
         sigX[indexWord(4, 2)] = bWPtr[indexWord(4, 2)];
@@ -463,5 +467,6 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
     }
 
     softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
-    return;
 }
+
+}  // namespace softfloat

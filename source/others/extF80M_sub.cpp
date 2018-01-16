@@ -42,12 +42,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
+namespace softfloat {
+
 void
- extF80M_sub(
-     const extFloat80_t *aPtr, const extFloat80_t *bPtr, extFloat80_t *zPtr )
+extF80M_sub(const extFloat80_t* aPtr,
+            const extFloat80_t* bPtr,
+            extFloat80_t* zPtr)
 {
-    extFloat80M const *aSPtr;
-    extFloat80M const *bSPtr;
+    extFloat80M const* aSPtr;
+    extFloat80M const* bSPtr;
     uint16_t uiA64;
     uint64_t uiA0;
     bool signA;
@@ -56,37 +59,42 @@ void
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
     extFloat80_t
-        (*magsFuncPtr)(
-            uint16_t, uint64_t, uint16_t, uint64_t, bool );
+    (*magsFuncPtr)(
+        uint16_t, uint64_t, uint16_t, uint64_t, bool);
 #endif
 
     aSPtr = aPtr;
     bSPtr = bPtr;
     uiA64 = aSPtr->signExp;
-    uiA0  = aSPtr->signif;
-    signA = signExtF80UI64( uiA64 );
+    uiA0 = aSPtr->signif;
+    signA = signExtF80UI64(uiA64);
     uiB64 = bSPtr->signExp;
-    uiB0  = bSPtr->signif;
-    signB = signExtF80UI64( uiB64 );
+    uiB0 = bSPtr->signif;
+    signB = signExtF80UI64(uiB64);
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
-    if ( signA == signB ) {
-        *zPtr = softfloat_subMagsExtF80( uiA64, uiA0, uiB64, uiB0, signA );
+
+    if (signA == signB) {
+        *zPtr = softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
     } else {
-        *zPtr = softfloat_addMagsExtF80( uiA64, uiA0, uiB64, uiB0, signA );
+        *zPtr = softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
     }
+
 #else
     magsFuncPtr =
         (signA == signB) ? softfloat_subMagsExtF80 : softfloat_addMagsExtF80;
-    *zPtr = (*magsFuncPtr)( uiA64, uiA0, uiB64, uiB0, signA );
+    *zPtr = (*magsFuncPtr)(uiA64, uiA0, uiB64, uiB0, signA);
 #endif
 
 }
 
+}  // namespace softfloat
+
 #else
 
 void
- extF80M_sub(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr )
+extF80M_sub(extFloat80_t const* aPtr, extFloat80_t const* bPtr, extFloat80_t* zPtr)
 {
+    using namespace softfloat;
     softfloat_addExtF80M(aPtr, bPtr, zPtr, true);
 }
 

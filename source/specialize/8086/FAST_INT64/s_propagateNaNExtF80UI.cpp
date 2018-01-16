@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
 `uiA0' as an 80-bit extended floating-point value, and likewise interpreting
@@ -47,13 +50,11 @@ floating-point values is a NaN, returns the bit pattern of the combined NaN
 result.  If either original floating-point value is a signaling NaN, the
 invalid exception is raised.
 */
-struct uint128
-    softfloat_propagateNaNExtF80UI(
-        uint16_t uiA64,
-        uint64_t uiA0,
-        uint16_t uiB64,
-        uint64_t uiB0
-    )
+uint128
+softfloat_propagateNaNExtF80UI(uint16_t uiA64,
+                               uint64_t uiA0,
+                               uint16_t uiB64,
+                               uint64_t uiB0)
 {
     bool const isSigNaNA = softfloat_isSigNaNExtF80UI(uiA64, uiA0);
     bool const isSigNaNB = softfloat_isSigNaNExtF80UI(uiB64, uiB0);
@@ -63,53 +64,64 @@ struct uint128
 
     if (isSigNaNA | isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
+
         if (isSigNaNA) {
             if (isSigNaNB) {
                 goto returnLargerMag;
             }
+
             if (isNaNExtF80UI(uiB64, uiB0)) {
                 goto returnB;
             }
+
             goto returnA;
-        } else {
+        }
+        else {
             if (isNaNExtF80UI(uiA64, uiA0)) {
                 goto returnA;
             }
+
             goto returnB;
         }
     }
-returnLargerMag:
-    {
+
+returnLargerMag: {
         uint16_t const uiMagA64 = uiA64 & 0x7FFF;
         uint16_t const uiMagB64 = uiB64 & 0x7FFF;
+
         if (uiMagA64 < uiMagB64) {
             goto returnB;
         }
+
         if (uiMagB64 < uiMagA64) {
             goto returnA;
         }
+
         if (uiNonsigA0 < uiNonsigB0) {
             goto returnB;
         }
+
         if (uiNonsigB0 < uiNonsigA0) {
             goto returnA;
         }
+
         if (uiA64 < uiB64) {
             goto returnA;
         }
     }
-returnB:
-    {
+returnB: {
         struct uint128 uiZ;
         uiZ.v64 = uiB64;
         uiZ.v0 = uiNonsigB0;
         return uiZ;
     }
-returnA:
-    {
+returnA: {
         struct uint128 uiZ;
         uiZ.v64 = uiA64;
         uiZ.v0 = uiNonsigA0;
         return uiZ;
     }
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

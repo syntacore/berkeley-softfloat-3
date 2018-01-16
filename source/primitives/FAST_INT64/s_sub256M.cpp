@@ -36,20 +36,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
+namespace softfloat {
 void
-softfloat_sub256M(uint64_t const *const aPtr,
-                  uint64_t const *const bPtr,
-                  uint64_t *const zPtr)
+softfloat_sub256M(uint64_t const* const aPtr,
+                  uint64_t const* const bPtr,
+                  uint64_t* const zPtr)
 {
     bool borrow = false;
+
     for (unsigned index = indexWordLo(4);;) {
         uint64_t const wordA = aPtr[index];
         uint64_t const wordB = bPtr[index];
         zPtr[index] = wordA - wordB - !!borrow;
+
         if (index == indexWordHi(4)) {
             break;
         }
+
         borrow = borrow ? wordA <= wordB : wordA < wordB;
         index += wordIncr;
     }
 }
+}  // namespace softfloat

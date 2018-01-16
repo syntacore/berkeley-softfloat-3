@@ -38,9 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 int64_t
-softfloat_roundPackMToI64(
-    bool sign, uint32_t *extSigPtr, uint8_t roundingMode, bool exact)
+softfloat_roundPackMToI64(bool sign,
+                          uint32_t* extSigPtr,
+                          uint8_t roundingMode,
+                          bool exact)
 {
     bool roundNearEven;
     uint32_t sigExtra;
@@ -48,39 +52,56 @@ softfloat_roundPackMToI64(
     uint64_t sig;
     union
     {
-        uint64_t ui; int64_t i;
+        uint64_t ui;
+        int64_t i;
     } uZ;
     int64_t z;
 
-    
+
     roundNearEven = (roundingMode == softfloat_round_near_even);
     sigExtra = extSigPtr[indexWordLo(3)];
     doIncrement = (0x80000000 <= sigExtra);
+
     if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
         doIncrement =
             (roundingMode
-                 == (sign ? softfloat_round_min : softfloat_round_max))
+             == (sign ? softfloat_round_min : softfloat_round_max))
             && sigExtra;
     }
+
     sig =
         (uint64_t)extSigPtr[indexWord(3, 2)] << 32
         | extSigPtr[indexWord(3, 1)];
+
     if (doIncrement) {
         ++sig;
-        if (!sig) goto invalid;
-        if (!(sigExtra & 0x7FFFFFFF) && roundNearEven) sig &= ~1;
+
+        if (!sig) {
+            goto invalid;
+        }
+
+        if (!(sigExtra & 0x7FFFFFFF) && roundNearEven) {
+            sig &= ~1;
+        }
     }
+
     uZ.ui = sign ? -(int64_t)sig : sig;
     z = uZ.i;
-    if (z && ((z < 0) ^ sign)) goto invalid;
+
+    if (z && ((z < 0) ^ sign)) {
+        goto invalid;
+    }
+
     if (exact && sigExtra) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     return z;
-    
+
 invalid:
     softfloat_raiseFlags(softfloat_flag_invalid);
     return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
 }
 
+}  // namespace softfloat

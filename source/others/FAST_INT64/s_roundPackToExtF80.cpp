@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 extFloat80_t
 softfloat_roundPackToExtF80(bool sign,
                             int32_t exp,
@@ -245,3 +247,4 @@ packReturn:
 
 }
 
+}  // namespace softfloat

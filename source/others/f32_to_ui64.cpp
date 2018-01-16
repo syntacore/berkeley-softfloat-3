@@ -41,42 +41,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @todo split to different implementations */
 uint64_t
-f32_to_ui64(float32_t a, uint8_t roundingMode, bool exact)
+f32_to_ui64(float32_t a,
+            uint8_t roundingMode,
+            bool exact)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);
     int16_t const shiftDist = 0xBE - exp;
+
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0xFF && sig ? ui64_fromNaN : 
+            exp == 0xFF && sig ? ui64_fromNaN :
             sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-    } else {
-        if (exp) {
-            sig |= 0x00800000;
-        }
-#ifdef SOFTFLOAT_FAST_INT64
-        uint64_t sig64 = (uint64_t)sig << 40;
-        uint64_t extra = 0;
-        if (shiftDist) {
-            uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0, shiftDist);
-            sig64 = sig64Extra.v;
-            extra = sig64Extra.extra;
-        }
-        return
-            softfloat_roundPackToUI64(sign, sig64, extra, roundingMode, exact);
-#else
-        uint32_t extSig[3];
-        extSig[indexWord(3, 2)] = sig << 8;
-        extSig[indexWord(3, 1)] = 0;
-        extSig[indexWord(3, 0)] = 0;
-        if (shiftDist) {
-            softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
-        }
-        return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
-#endif
     }
+
+    if (exp) {
+        sig |= 0x00800000;
+    }
+
+#ifdef SOFTFLOAT_FAST_INT64
+    uint64_t sig64 = (uint64_t)sig << 40;
+    uint64_t extra = 0;
+
+    if (shiftDist) {
+        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0, shiftDist);
+        sig64 = sig64Extra.v;
+        extra = sig64Extra.extra;
+    }
+
+    return
+        softfloat_roundPackToUI64(sign, sig64, extra, roundingMode, exact);
+#else
+    uint32_t extSig[3];
+    extSig[indexWord(3, 2)] = sig << 8;
+    extSig[indexWord(3, 1)] = 0;
+    extSig[indexWord(3, 0)] = 0;
+
+    if (shiftDist) {
+        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+    }
+
+    return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
+#endif
 }
 

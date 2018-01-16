@@ -37,18 +37,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-#include <cstdint>
+namespace softfloat {
 
 bool
- softfloat_tryPropagateNaNF128M(
-     const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr )
+softfloat_tryPropagateNaNF128M(const uint32_t* aWPtr,
+                               const uint32_t* bWPtr,
+                               uint32_t* zWPtr)
 {
 
-    if ( softfloat_isNaNF128M( aWPtr ) || softfloat_isNaNF128M( bWPtr ) ) {
-        softfloat_propagateNaNF128M( aWPtr, bWPtr, zWPtr );
+    if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
+        softfloat_propagateNaNF128M(aWPtr, bWPtr, zWPtr);
         return true;
     }
+
     return false;
 
 }
 
+}  // namespace softfloat

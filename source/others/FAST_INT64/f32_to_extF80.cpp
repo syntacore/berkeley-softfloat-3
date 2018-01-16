@@ -39,12 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-extFloat80_t f32_to_extF80(float32_t a)
+extFloat80_t
+f32_to_extF80(float32_t a)
 {
-    struct uint128 uiZ;
+    using namespace softfloat;
+    uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    struct exp16_sig32 normExpSig;
+    exp16_sig32 normExpSig;
     /** @bug union of same type */
     union
     {

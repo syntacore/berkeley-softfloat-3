@@ -38,8 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float32_t f32_add(float32_t a, float32_t b)
+float32_t
+f32_add(float32_t a,
+        float32_t b)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
     return

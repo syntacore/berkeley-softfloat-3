@@ -37,11 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 #include "specialize.hpp"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
-struct uint128
+uint128
     softfloat_commonNaNToF128UI(struct commonNaN a)
 {
     struct uint128 uiZ;
@@ -50,3 +53,5 @@ struct uint128
     return uiZ;
 }
 
+}  // namespace Intel_8086
+}  // namespace softfloat

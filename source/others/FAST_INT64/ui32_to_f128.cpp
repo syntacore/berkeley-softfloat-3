@@ -38,22 +38,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-float128_t ui32_to_f128( uint32_t a )
+float128_t
+ui32_to_f128(uint32_t a)
 {
+    using namespace softfloat;
     uint64_t uiZ64;
     int8_t shiftDist;
     union ui128_f128 uZ;
 
     uiZ64 = 0;
-    if ( a ) {
-        shiftDist = softfloat_countLeadingZeros32( a ) + 17;
+
+    if (a) {
+        shiftDist = softfloat_countLeadingZeros32(a) + 17;
         uiZ64 =
             packToF128UI64(
-                0, 0x402E - shiftDist, (uint64_t) a<<shiftDist );
+                0, 0x402E - shiftDist, (uint64_t)a << shiftDist);
     }
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0  = 0;
-    return uZ.f;
 
+    uZ.ui.v64 = uiZ64;
+    uZ.ui.v0 = 0;
+    return uZ.f;
 }
 

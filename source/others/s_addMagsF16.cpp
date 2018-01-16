@@ -39,8 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.hpp"
 
+namespace softfloat {
+
 float16_t
-softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
+softfloat_addMagsF16(uint16_t uiA,
+                     uint16_t uiB)
 {
     int8_t const expA = expF16UI(uiA);
     uint16_t const sigA = fracF16UI(uiA);
@@ -113,10 +116,12 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
             if (expA == 0x1F) {
                 return u_as_f_16(sigA ? softfloat_propagateNaNF16UI(uiA, uiB) : uiZ);
             }
+
             if (13 <= expDiff) {
                 if (!(expB | sigB)) {
                     return u_as_f_16(uiZ);
                 }
+
                 softfloat_round_mode const roundingMode = softfloat_roundingMode;
 
                 if (roundingMode != softfloat_round_near_even) {
@@ -157,3 +162,5 @@ softfloat_addMagsF16(uint16_t uiA, uint16_t uiB)
 
     return softfloat_roundPackToF16(signZ, expZ, sigZ);
 }
+
+}  // namespace softfloat

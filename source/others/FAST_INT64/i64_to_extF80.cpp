@@ -38,23 +38,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-extFloat80_t i64_to_extF80( int64_t a )
+extFloat80_t
+i64_to_extF80(int64_t a)
 {
+    using namespace softfloat;
     int8_t shiftDist;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uZ;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uZ;
 
     uint16_t uiZ64 = 0;
     uint64_t absA = 0;
-    if ( a ) {
+
+    if (a) {
         bool const sign = (a < 0);
         /** @bug for INT64_MIN */
         absA = sign ? -a : a;
-        shiftDist = softfloat_countLeadingZeros64( absA );
-        uiZ64 = packToExtF80UI64( sign, 0x403E - shiftDist );
+        shiftDist = softfloat_countLeadingZeros64(absA);
+        uiZ64 = packToExtF80UI64(sign, 0x403E - shiftDist);
         absA <<= shiftDist;
     }
+
     uZ.s.signExp = uiZ64;
-    uZ.s.signif  = absA;
+    uZ.s.signif = absA;
     return uZ.f;
 }

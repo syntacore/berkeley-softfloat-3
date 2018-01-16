@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Assuming the unsigned integer formed from concatenating `uiA64' and `uiA0'
 has the bit pattern of an 80-bit extended floating-point NaN, converts
@@ -44,18 +47,20 @@ this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
-struct commonNaN
-softfloat_extF80UIToCommonNaN(uint16_t uiA64, 
+commonNaN
+softfloat_extF80UIToCommonNaN(uint16_t uiA64,
                               uint64_t uiA0)
 {
     if (softfloat_isSigNaNExtF80UI(uiA64, uiA0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    {
-        struct commonNaN z;
-        z.sign = uiA64 >> 15;
-        z.v64 = uiA0 << 1;
-        z.v0 = 0;
-        return z;
-    }
+
+    commonNaN z;
+    z.sign = 0 != (uiA64 >> 15);
+    z.v64 = uiA0 << 1;
+    z.v0 = 0;
+    return z;
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

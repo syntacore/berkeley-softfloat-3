@@ -39,18 +39,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-struct commonNaN
+namespace softfloat {
+namespace Intel_8086 {
+
+commonNaN
 softfloat_f64UIToCommonNaN(uint64_t uiA)
 {
     if ( softfloat_isSigNaNF64UI( uiA ) ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
     }
     {
-        struct commonNaN z;
-        z.sign = uiA >> 63;
+        commonNaN z;
+        z.sign = 0 != (uiA >> 63);
         z.v64 = uiA << 12;
         z.v0 = 0;
         return z;
     }
 }
 
+}  // namespace Intel_8086
+}  // namespace softfloat

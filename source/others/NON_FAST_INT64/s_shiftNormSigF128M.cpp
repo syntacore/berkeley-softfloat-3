@@ -36,9 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 int
 softfloat_shiftNormSigF128M(
-    const uint32_t *wPtr, uint8_t shiftDist, uint32_t *sigPtr)
+    const uint32_t* wPtr, uint8_t shiftDist, uint32_t* sigPtr)
 {
     uint32_t wordSig;
     int32_t exp;
@@ -46,6 +48,7 @@ softfloat_shiftNormSigF128M(
 
     wordSig = wPtr[indexWordHi(4)];
     exp = expF128UI96(wordSig);
+
     if (exp) {
         softfloat_shortShiftLeft128M(wPtr, shiftDist, sigPtr);
         leadingBit = UINT32_C(0x00010000) << shiftDist;
@@ -54,23 +57,33 @@ softfloat_shiftNormSigF128M(
     } else {
         exp = 16;
         wordSig &= 0x7FFFFFFF;
+
         if (!wordSig) {
             exp = -16;
             wordSig = wPtr[indexWord(4, 2)];
+
             if (!wordSig) {
                 exp = -48;
                 wordSig = wPtr[indexWord(4, 1)];
+
                 if (!wordSig) {
                     wordSig = wPtr[indexWord(4, 0)];
-                    if (!wordSig) return -128;
+
+                    if (!wordSig) {
+                        return -128;
+                    }
+
                     exp = -80;
                 }
             }
         }
+
         exp -= softfloat_countLeadingZeros32(wordSig);
         softfloat_shiftLeft128M(wPtr, static_cast<uint32_t>(1 - exp + shiftDist), sigPtr);
     }
+
     return exp;
 
 }
 
+}  // namespace softfloat

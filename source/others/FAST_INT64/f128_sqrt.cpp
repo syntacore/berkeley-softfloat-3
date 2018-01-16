@@ -42,48 +42,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 f128_sqrt(float128_t a)
 {
-    union ui128_f128 uA;
+    using namespace softfloat;
+    ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;
     uint64_t const uiA0 = uA.ui.v0;
     bool const signA = signF128UI64(uiA64);
     int32_t expA = expF128UI64(uiA64);
-    struct uint128 sigA;
+    uint128 sigA;
     sigA.v64 = fracF128UI64(uiA64);
     sigA.v0 = uiA0;
 
     if (expA == 0x7FFF) {
         if (sigA.v64 | sigA.v0) {
             return u_as_f_128(softfloat_propagateNaNF128UI(uiA64, uiA0, 0, 0));
-        } else if (!signA) {
-            return a;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            struct uint128 uiZ;
-            uiZ.v64 = defaultNaNF128UI64;
-            uiZ.v0 = defaultNaNF128UI0;
-            return u_as_f_128(uiZ);
         }
-    } else if (signA) {
+
+        if (!signA) {
+            return a;
+        }
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        struct uint128 uiZ;
+        uiZ.v64 = defaultNaNF128UI64;
+        uiZ.v0 = defaultNaNF128UI0;
+        return u_as_f_128(uiZ);
+    }
+
+    if (signA) {
         if (!(expA | sigA.v64 | sigA.v0)) {
             return a;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            struct uint128 uiZ;
-            uiZ.v64 = defaultNaNF128UI64;
-            uiZ.v0 = defaultNaNF128UI0;
-            return u_as_f_128(uiZ);
         }
-    } else {
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        struct uint128 uiZ;
+        uiZ.v64 = defaultNaNF128UI64;
+        uiZ.v0 = defaultNaNF128UI0;
+        return u_as_f_128(uiZ);
+    }
+    else {
         if (!expA) {
             if (!(sigA.v64 | sigA.v0)) {
                 return a;
-            } else {
+            }
                 struct exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
-            }
         }
+
         /*
         `sig32Z' is guaranteed to be a lower bound on the square root of
         `sig32A', which makes `sig32Z' also a lower bound on the square root of
@@ -96,12 +102,15 @@ f128_sqrt(float128_t a)
         uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
         uint32_t sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;
         struct uint128 rem;
+
         if (expA) {
             sig32Z >>= 1;
             rem = softfloat_shortShiftLeft128(sigA.v64, sigA.v0, 12);
-        } else {
+        }
+        else {
             rem = softfloat_shortShiftLeft128(sigA.v64, sigA.v0, 13);
         }
+
         uint32_t qs[3];
         qs[2] = sig32Z;
         rem.v64 -= (uint64_t)sig32Z * sig32Z;
@@ -118,17 +127,21 @@ f128_sqrt(float128_t a)
         q = ((uint32_t)(rem.v64 >> 2) * (uint64_t)recipSqrt32) >> 32;
         struct uint128 y = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
         sig64Z <<= 1;
+
         /* Repeating this loop is a rare occurrence.*/
         for (;;) {
             term = softfloat_shortShiftLeft128(0, sig64Z, 32);
             term = softfloat_add128(term.v64, term.v0, 0, (uint64_t)q << 6);
             term = softfloat_mul128By32(term.v64, term.v0, q);
             rem = softfloat_sub128(y.v64, y.v0, term.v64, term.v0);
+
             if (!(rem.v64 & UINT64_C(0x8000000000000000))) {
                 break;
             }
+
             --q;
         }
+
         qs[0] = q;
 
         q = (((uint32_t)(rem.v64 >> 2) * (uint64_t)recipSqrt32) >> 32) + 2;
@@ -147,22 +160,26 @@ f128_sqrt(float128_t a)
             term = softfloat_add128(term.v64, term.v0, 0, y.v64);
             rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 20);
             term = softfloat_sub128(term.v64, term.v0, rem.v64, rem.v0);
+
             /* The concatenation of `term' and `y.v0' is now the negative remainder
             (3 words altogether).
             */
             if (term.v64 & UINT64_C(0x8000000000000000)) {
                 sigZExtra |= 1;
-            } else {
+            }
+            else {
                 if (term.v64 | term.v0 | y.v0) {
                     if (sigZExtra) {
                         --sigZExtra;
-                    } else {
+                    }
+                    else {
                         sigZ = softfloat_sub128(sigZ.v64, sigZ.v0, 0, 1);
                         sigZExtra = ~UINT64_C(0);
                     }
                 }
             }
         }
+
         return softfloat_roundPackToF128(0, expZ, sigZ.v64, sigZ.v0, sigZExtra);
     }
 }

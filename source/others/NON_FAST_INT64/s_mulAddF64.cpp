@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 float64_t
 softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
 {
@@ -265,3 +267,5 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
         softfloat_roundPackToF64(signZ, expZ - 1,
                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
 }
+
+}  // namespace softfloat

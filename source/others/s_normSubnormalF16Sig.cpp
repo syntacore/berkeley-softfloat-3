@@ -36,9 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 exp8_sig16
 softfloat_normSubnormalF16Sig(uint16_t sig)
 {
+    using namespace softfloat;
     int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 5;
     exp8_sig16 z;
     z.exp = 1 - shiftDist;
@@ -46,3 +49,4 @@ softfloat_normSubnormalF16Sig(uint16_t sig)
     return z;
 }
 
+}  // namespace softfloat

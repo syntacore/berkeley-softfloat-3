@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr)
 {
+    using namespace softfloat;
     const extFloat80M *aSPtr, *bSPtr;
     uint16_t uiA64;
     uint64_t uiA0;
@@ -87,6 +88,7 @@ extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zP
 void
 extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr)
 {
+    using namespace softfloat;
     softfloat_addExtF80M(aPtr, bPtr, zPtr, false);
 }
 

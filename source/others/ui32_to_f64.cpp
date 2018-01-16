@@ -40,10 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 ui32_to_f64(uint32_t a)
 {
+    using namespace softfloat;
+
     if (!a) {
         return u_as_f_64(0);
-    } else {
-        int8_t const shiftDist = softfloat_countLeadingZeros32(a) + 21;
-        return u_as_f_64(packToF64UI(0, 0x432 - shiftDist, (uint64_t)a << shiftDist));
     }
+
+    int8_t const shiftDist = softfloat_countLeadingZeros32(a) + 21;
+    return u_as_f_64(packToF64UI(0, 0x432 - shiftDist, (uint64_t)a << shiftDist));
 }

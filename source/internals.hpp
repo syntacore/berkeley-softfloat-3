@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
+namespace softfloat {
+
 inline constexpr bool
 signF16UI(uint16_t a)
 {
@@ -67,8 +69,8 @@ packToF16UI(bool sign,
 {
     return
         static_cast<uint16_t>(
-            (static_cast<uint16_t>(!!sign) << 15) +
-            (static_cast<uint16_t>(exp) << 10) +
+        (static_cast<uint16_t>(!!sign) << 15) +
+        (static_cast<uint16_t>(exp) << 10) +
             sig);
 }
 
@@ -76,7 +78,7 @@ inline constexpr bool
 isNaNF16UI(uint16_t a)
 {
     return
-        0 == (~a & 0x7C00) && 
+        0 == (~a & 0x7C00) &&
         0 != (a & 0x03FF);
 }
 
@@ -141,7 +143,7 @@ packToF32UI(bool sign,
             uint32_t sgnf)
 {
     return
-        (static_cast<uint32_t>(!!sign) << 31) | 
+        (static_cast<uint32_t>(!!sign) << 31) |
         ((static_cast<uint32_t>(exp) << 23) + sgnf);
 }
 
@@ -223,7 +225,7 @@ inline constexpr uint64_t
 packToF64UI(bool sign, int16_t exp, uint64_t sgnf)
 {
     return
-        (static_cast<uint64_t>(!!sign) << 63) | 
+        (static_cast<uint64_t>(!!sign) << 63) |
         ((static_cast<uint64_t>(exp) << 52) + sgnf);
 }
 
@@ -231,7 +233,7 @@ inline constexpr bool
 isNaNF64UI(uint64_t a)
 {
     return
-        2047 == expF64UI(a) && 
+        2047 == expF64UI(a) &&
         0 != fracF64UI(a);
 }
 
@@ -239,7 +241,7 @@ inline constexpr bool
 isInf64UI(uint64_t a)
 {
     return
-        2047 == expF64UI(a) && 
+        2047 == expF64UI(a) &&
         0 == fracF64UI(a);
 }
 
@@ -271,7 +273,7 @@ inline constexpr bool
 isNaNExtF80UI(uint16_t a64, uint64_t a0)
 {
     return
-        0x7FFFu == (a64 & 0x7FFFu) && 
+        0x7FFFu == (a64 & 0x7FFFu) &&
         0 != (a0 & UINT64_C(0x7FFFFFFFFFFFFFFF));
 }
 
@@ -354,7 +356,7 @@ softfloat_roundPackToUI64(bool,
 #else
 uint64_t
 softfloat_roundPackMToUI64(bool,
-                           uint32_t *,
+                           uint32_t*,
                            uint8_t,
                            bool);
 #endif
@@ -372,7 +374,7 @@ softfloat_roundPackToI64(bool,
 #else
 int64_t
 softfloat_roundPackMToI64(bool,
-                          uint32_t *,
+                          uint32_t*,
                           uint8_t,
                           bool);
 #endif
@@ -484,8 +486,8 @@ inline constexpr bool
 isNaNF128UI(uint64_t a64, uint64_t a0)
 {
     return
-        0 == (~a64 & UINT64_C(0x7FFF000000000000)) && 
-        (0 != a0 || 0 !=(a64 & UINT64_C(0x0000FFFFFFFFFFFF))
+        0 == (~a64 & UINT64_C(0x7FFF000000000000)) &&
+        (0 != a0 || 0 != (a64 & UINT64_C(0x0000FFFFFFFFFFFF))
         );
 }
 
@@ -594,15 +596,15 @@ softfloat_tryPropagateNaNExtF80M(extFloat80M const*,
                                  extFloat80M const*,
                                  extFloat80M*);
 void
-softfloat_invalidExtF80M(extFloat80M *);
+softfloat_invalidExtF80M(extFloat80M*);
 
 int
-softfloat_normExtF80SigM(uint64_t *);
+softfloat_normExtF80SigM(uint64_t*);
 
 void
-softfloat_roundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, extFloat80M *);
+softfloat_roundPackMToExtF80M(bool, int32_t, uint32_t*, uint8_t, extFloat80M*);
 void
-softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t *, uint8_t, extFloat80M *);
+softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t*, uint8_t, extFloat80M*);
 
 void
 softfloat_addExtF80M(extFloat80M const*,
@@ -619,31 +621,31 @@ bool softfloat_isNaNF128M(uint32_t const*);
 bool
 softfloat_tryPropagateNaNF128M(uint32_t const*,
                                uint32_t const*,
-                               uint32_t *);
+                               uint32_t*);
 
 void
-softfloat_invalidF128M(uint32_t *);
+softfloat_invalidF128M(uint32_t*);
 
 int
-softfloat_shiftNormSigF128M(uint32_t const *,
+softfloat_shiftNormSigF128M(uint32_t const*,
                             uint8_t,
-                            uint32_t *);
+                            uint32_t*);
 
 void
 softfloat_roundPackMToF128M(bool,
                             int32_t,
-                            uint32_t *,
-                            uint32_t *);
+                            uint32_t*,
+                            uint32_t*);
 void
 softfloat_normRoundPackMToF128M(bool,
                                 int32_t,
-                                uint32_t *,
-                                uint32_t *);
+                                uint32_t*,
+                                uint32_t*);
 
 void
 softfloat_addF128M(uint32_t const*,
-                   uint32_t const *,
-                   uint32_t *,
+                   uint32_t const*,
+                   uint32_t*,
                    bool);
 void
 softfloat_mulAddF128M(uint32_t const*,
@@ -653,5 +655,7 @@ softfloat_mulAddF128M(uint32_t const*,
                       uint8_t);
 
 #endif
+
+}  // namespace softfloat
 
 #endif  /* SOFTFLOAT_INTERNALS_H_ */

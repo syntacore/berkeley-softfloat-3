@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 static uint32_t const quietNaN_bit = 0x00400000u;
 
 uint32_t
@@ -55,3 +58,5 @@ softfloat_propagateNaNF32UI(uint32_t uiA, uint32_t uiB)
 
 }
 
+}  // namespace Intel_8086
+}  // namespace softfloat

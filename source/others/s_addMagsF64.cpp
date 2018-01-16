@@ -38,56 +38,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.hpp"
 
+namespace softfloat {
+
 float64_t
 softfloat_addMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
 {
+    using namespace softfloat;
     int16_t const expA = expF64UI(uiA);
     uint64_t sigA = fracF64UI(uiA);
     int16_t const expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
     int16_t const expDiff = expA - expB;
+
     if (!expDiff) {
         if (!expA) {
             return u_as_f_64(uiA + sigB);
-        } else if (expA == 0x7FF) {
+        }
+
+        if (expA == 0x7FF) {
             return u_as_f_64(sigA | sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
-        } else {
-            return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
         }
-    } else {
-        int16_t expZ;
-        sigA <<= 9;
-        sigB <<= 9;
-        if (expDiff < 0) {
-            if (expB == 0x7FF) {
-                return u_as_f_64(sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
-            } else {
-                expZ = expB;
-                if (expA) {
-                    sigA += UINT64_C(0x2000000000000000);
-                } else {
-                    sigA <<= 1;
-                }
-                sigA = softfloat_shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
-            }
-        } else {
-            if (expA == 0x7FF) {
-                return u_as_f_64(sigA ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
-            } else {
-                expZ = expA;
-                if (expB) {
-                    sigB += UINT64_C(0x2000000000000000);
-                } else {
-                    sigB <<= 1;
-                }
-                sigB = softfloat_shiftRightJam64(sigB, static_cast<uint32_t>(expDiff));
-            }
-        }
-        uint64_t sigZ = UINT64_C(0x2000000000000000) + sigA + sigB;
-        if (sigZ < UINT64_C(0x4000000000000000)) {
-            --expZ;
-            sigZ <<= 1;
-        }
-        return softfloat_roundPackToF64(signZ, expZ, sigZ);
+
+        return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
     }
+
+    int16_t expZ;
+    sigA <<= 9;
+    sigB <<= 9;
+
+    if (expDiff < 0) {
+        if (expB == 0x7FF) {
+            return u_as_f_64(sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
+        }
+
+        expZ = expB;
+
+        if (expA) {
+            sigA += UINT64_C(0x2000000000000000);
+        } else {
+            sigA <<= 1;
+        }
+
+        sigA = softfloat_shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
+    } else {
+        if (expA == 0x7FF) {
+            return u_as_f_64(sigA ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
+        }
+
+        expZ = expA;
+
+        if (expB) {
+            sigB += UINT64_C(0x2000000000000000);
+        } else {
+            sigB <<= 1;
+        }
+
+        sigB = softfloat_shiftRightJam64(sigB, static_cast<uint32_t>(expDiff));
+    }
+
+    uint64_t sigZ = UINT64_C(0x2000000000000000) + sigA + sigB;
+
+    if (sigZ < UINT64_C(0x4000000000000000)) {
+        --expZ;
+        sigZ <<= 1;
+    }
+
+    return softfloat_roundPackToF64(signZ, expZ, sigZ);
 }
+
+}  // namespace softfloat

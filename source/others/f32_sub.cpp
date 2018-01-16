@@ -39,8 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 float32_t
-f32_sub(float32_t a, float32_t b)
+f32_sub(float32_t a,
+        float32_t b)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
     return signF32UI(uiA) == signF32UI(uiB) ? softfloat_subMagsF32(uiA, uiB) : softfloat_addMagsF32(uiA, uiB);

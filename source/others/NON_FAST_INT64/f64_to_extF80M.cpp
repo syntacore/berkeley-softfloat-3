@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
+void f64_to_extF80M(float64_t a, extFloat80_t* zPtr)
 {
     *zPtr = f64_to_extF80(a);
 }
@@ -50,9 +50,11 @@ void f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
 #else
 
 void
-f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
+f64_to_extF80M(float64_t a,
+               extFloat80_t* zPtr)
 {
-    extFloat80M *zSPtr = zPtr;
+    using namespace softfloat;
+    extFloat80M* zSPtr = zPtr;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
@@ -62,22 +64,25 @@ f64_to_extF80M(float64_t a, extFloat80_t *zPtr)
         if (frac) {
             *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
             return;
-        } else {
-            zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-            zSPtr->signif = UINT64_C(0x8000000000000000);
-            return;
         }
-    } else if (!exp) {
+
+        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
+        zSPtr->signif = UINT64_C(0x8000000000000000);
+        return;
+    }
+
+    if (!exp) {
         if (!frac) {
             zSPtr->signExp = packToExtF80UI64(sign, 0);
             zSPtr->signif = 0;
             return;
-        } else {
-            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-            exp = normExpSig.exp;
-            frac = normExpSig.sig;
         }
+
+        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+        exp = normExpSig.exp;
+        frac = normExpSig.sig;
     }
+
     zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
     zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }

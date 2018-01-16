@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 uint128
 softfloat_propagateNaNF128UI(uint64_t uiA64,
                              uint64_t uiA0,
@@ -114,3 +117,5 @@ returnA:
         }
     }
 }
+}  // namespace Intel_8086
+}  // namespace softfloat

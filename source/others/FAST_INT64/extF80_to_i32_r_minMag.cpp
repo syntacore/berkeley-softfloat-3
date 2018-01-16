@@ -39,10 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-int32_t extF80_to_i32_r_minMag( extFloat80_t a, bool exact )
+int32_t
+extF80_to_i32_r_minMag(extFloat80_t a,
+                       bool exact)
 {
+    using namespace softfloat;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
+    union {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uA;
     uint16_t uiA64;
     int32_t exp;
     uint64_t sig;
@@ -50,44 +56,50 @@ int32_t extF80_to_i32_r_minMag( extFloat80_t a, bool exact )
     bool sign;
     int32_t absZ;
 
-    
+
     uA.f = a;
     uiA64 = uA.s.signExp;
-    exp = expExtF80UI64( uiA64 );
+    exp = expExtF80UI64(uiA64);
     sig = uA.s.signif;
-    
+
     shiftDist = 0x403E - exp;
-    if ( 64 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+
+    if (64 <= shiftDist) {
+        if (exact && (exp | sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         return 0;
     }
-    
-    sign = signExtF80UI64( uiA64 );
-    if ( shiftDist < 33 ) {
+
+    sign = signExtF80UI64(uiA64);
+
+    if (shiftDist < 33) {
         if (
-            (uiA64 == packToExtF80UI64( 1, 0x401E ))
-                && (sig < UINT64_C( 0x8000000100000000 ))
+            (uiA64 == packToExtF80UI64(1, 0x401E))
+            && (sig < UINT64_C(0x8000000100000000))
         ) {
-            if ( exact && (sig & UINT64_C( 0x00000000FFFFFFFF )) ) {
+            if (exact && (sig & UINT64_C(0x00000000FFFFFFFF))) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
+
             return -0x7FFFFFFF - 1;
         }
-        softfloat_raiseFlags( softfloat_flag_invalid );
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            (exp == 0x7FFF) && (sig & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
-                ? i32_fromNaN
-                : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+            (exp == 0x7FFF) && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))
+            ? i32_fromNaN
+            : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
-    
-    /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'int32_t', possible loss of data */
-    absZ = sig>>shiftDist;
-    if ( exact && ((uint64_t) (uint32_t) absZ<<shiftDist != sig) ) {
+
+    /** @todo Warning   C4244   '=': conversion from 'uint64_t' to 'int32_t', possible loss of data */
+    absZ = sig >> shiftDist;
+
+    if (exact && ((uint64_t)(uint32_t) absZ << shiftDist != sig)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     return sign ? -absZ : absZ;
 
 }
-

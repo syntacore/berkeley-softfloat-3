@@ -39,8 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 float32_t
-softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
+softfloat_subMagsF32(uint32_t uiA,
+                     uint32_t uiB)
 {
     int16_t expA = expF32UI(uiA);
     uint32_t sigA = fracF32UI(uiA);
@@ -100,3 +103,5 @@ softfloat_subMagsF32(uint32_t uiA, uint32_t uiB)
                                      (sigA | 0x40000000) -
                                      softfloat_shiftRightJam32(sigB + (expB ? 0x40000000 : sigB), static_cast<uint16_t>(expDiff)));
 }
+
+}  // namespace softfloat

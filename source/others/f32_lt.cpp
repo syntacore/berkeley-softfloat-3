@@ -39,18 +39,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 bool
-f32_lt(float32_t a, float32_t b)
+f32_lt(float32_t a,
+       float32_t b)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
+
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        bool const signA = signF32UI(uiA);
-        bool const signB = signF32UI(uiB);
-        return
-            signA != signB ? signA && ((uint32_t)((uiA | uiB) << 1) != 0) :
-            uiA != uiB && (signA ^ (uiA < uiB));
     }
+
+    bool const signA = signF32UI(uiA);
+    bool const signB = signF32UI(uiB);
+    return
+        signA != signB ? signA && ((uint32_t)((uiA | uiB) << 1) != 0) :
+        uiA != uiB && (signA ^ (uiA < uiB));
 }

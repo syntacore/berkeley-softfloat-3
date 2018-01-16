@@ -38,12 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-void i32_to_extF80M(int32_t a, extFloat80_t *zPtr)
-{
+namespace softfloat {
 
-    extFloat80_t *zSPtr = zPtr;
+void
+i32_to_extF80M(int32_t a,
+               extFloat80_t* zPtr)
+{
+    using namespace softfloat;
+    extFloat80_t* zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
+
     if (a) {
         bool const sign = a < 0;
         uint32_t absA = static_cast<uint32_t>(sign ? -a : a);
@@ -51,6 +56,9 @@ void i32_to_extF80M(int32_t a, extFloat80_t *zPtr)
         uiZ64 = packToExtF80UI64(sign, 0x401Eu - shiftDist);
         sigZ = (uint64_t)(absA << shiftDist) << 32;
     }
+
     zSPtr->signExp = uiZ64;
     zSPtr->signif = sigZ;
 }
+
+}  // namespace softfloat

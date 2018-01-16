@@ -38,9 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 void
-softfloat_roundPackMToF128M(
-    bool sign, int32_t exp, uint32_t* extSigPtr, uint32_t* zWPtr)
+softfloat_roundPackMToF128M(bool sign,
+                            int32_t exp,
+                            uint32_t* extSigPtr,
+                            uint32_t* zWPtr)
 {
     static const uint32_t maxSig[4] = INIT_UINTM4(0x0001FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
 
@@ -153,3 +157,5 @@ softfloat_roundPackMToF128M(
         zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), ui);
     }
 }
+
+}  // namespace softfloat

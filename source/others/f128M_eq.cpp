@@ -51,8 +51,11 @@ bool f128M_eq(const float128_t *aPtr, const float128_t *bPtr)
 
 #else
 
-bool f128M_eq(const float128_t *aPtr, const float128_t *bPtr)
+bool
+f128M_eq(const float128_t *aPtr,
+         const float128_t *bPtr)
 {
+    using namespace softfloat;
     const uint32_t *aWPtr, *bWPtr;
     uint32_t wordA, wordB, uiA96, uiB96;
     bool possibleOppositeZeros;
@@ -101,4 +104,3 @@ false_checkSigNaNs:
 }
 
 #endif
-

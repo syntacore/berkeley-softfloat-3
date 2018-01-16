@@ -37,23 +37,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 #include "internals.hpp"
 
-extFloat80_t i32_to_extF80( int32_t a )
+extFloat80_t
+i32_to_extF80(int32_t a)
 {
+    using namespace softfloat;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uZ;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uZ;
 
     uint16_t uiZ64 = 0;
     uint32_t absA = 0;
-    if ( a ) {
+
+    if (a) {
         bool const sign = (a < 0);
         int8_t shiftDist;
         absA = sign ? -a : a;
-        shiftDist = softfloat_countLeadingZeros32( absA );
-        uiZ64 = packToExtF80UI64( sign, 0x401E - shiftDist );
+        shiftDist = softfloat_countLeadingZeros32(absA);
+        uiZ64 = packToExtF80UI64(sign, 0x401E - shiftDist);
         absA <<= shiftDist;
     }
+
     uZ.s.signExp = uiZ64;
-    uZ.s.signif = (uint64_t) absA<<32;
+    uZ.s.signif = (uint64_t)absA << 32;
     return uZ.f;
 }
 

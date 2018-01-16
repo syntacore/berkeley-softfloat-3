@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 uint64_t
 softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
 {
@@ -69,3 +72,6 @@ returnLargerMag:
             uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
     }
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

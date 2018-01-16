@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
+void f128M_to_extF80M(const float128_t* aPtr, extFloat80_t* zPtr)
 {
 
     *zPtr = f128_to_extF80(*aPtr);
@@ -51,17 +51,20 @@ void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
 
 #else
 
-void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
+void
+f128M_to_extF80M(const float128_t* aPtr,
+                 extFloat80_t* zPtr)
 {
-    const uint32_t *aWPtr;
-    extFloat80M *zSPtr;
+    using namespace softfloat;
+    const uint32_t* aWPtr;
+    extFloat80M* zSPtr;
     uint32_t uiA96;
     bool sign;
     int32_t exp;
     uint32_t sig[4];
 
 
-    aWPtr = (const uint32_t *)aPtr;
+    aWPtr = (const uint32_t*)aPtr;
     zSPtr = zPtr;
 
     uiA96 = aWPtr[indexWordHi(4)];
@@ -73,22 +76,27 @@ void f128M_to_extF80M(const float128_t *aPtr, extFloat80_t *zPtr)
             *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f128MToCommonNaN(aWPtr));
             return;
         }
+
         zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
         zSPtr->signif = UINT64_C(0x8000000000000000);
         return;
     }
 
     exp = softfloat_shiftNormSigF128M(aWPtr, 15, sig);
+
     if (exp == -128) {
         zSPtr->signExp = packToExtF80UI64(sign, 0);
         zSPtr->signif = 0;
         return;
     }
-    if (sig[indexWord(4, 0)]) sig[indexWord(4, 1)] |= 1;
+
+    if (sig[indexWord(4, 0)]) {
+        sig[indexWord(4, 1)] |= 1;
+    }
+
     softfloat_roundPackMToExtF80M(
         sign, exp, &sig[indexMultiwordHi(4, 3)], 80, zSPtr);
 
 }
 
 #endif
-

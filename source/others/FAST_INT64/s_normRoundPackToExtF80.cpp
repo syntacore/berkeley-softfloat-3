@@ -36,33 +36,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 extFloat80_t
- softfloat_normRoundPackToExtF80(
-     bool sign,
-     int32_t exp,
-     uint64_t sig,
-     uint64_t sigExtra,
-     uint8_t roundingPrecision
- )
+softfloat_normRoundPackToExtF80(bool sign,
+                                int32_t exp,
+                                uint64_t sig,
+                                uint64_t sigExtra,
+                                uint8_t roundingPrecision)
 {
     int8_t shiftDist;
     struct uint128 sig128;
 
-    if ( ! sig ) {
+    if (! sig) {
         exp -= 64;
         sig = sigExtra;
         sigExtra = 0;
     }
-    shiftDist = softfloat_countLeadingZeros64( sig );
+
+    shiftDist = softfloat_countLeadingZeros64(sig);
     exp -= shiftDist;
-    if ( shiftDist ) {
-        sig128 = softfloat_shortShiftLeft128( sig, sigExtra, shiftDist );
+
+    if (shiftDist) {
+        sig128 = softfloat_shortShiftLeft128(sig, sigExtra, shiftDist);
         sig = sig128.v64;
         sigExtra = sig128.v0;
     }
+
     return
         softfloat_roundPackToExtF80(
-            sign, exp, sig, sigExtra, roundingPrecision );
+            sign, exp, sig, sigExtra, roundingPrecision);
 
 }
-
+}  // namespace softfloat

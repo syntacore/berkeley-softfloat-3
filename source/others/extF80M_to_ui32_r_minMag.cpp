@@ -54,6 +54,7 @@ uint32_t
 extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
                          bool const exact)
 {
+    using namespace softfloat;
     uint16_t uiA64 = aPtr->signExp;
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = aPtr->signif;

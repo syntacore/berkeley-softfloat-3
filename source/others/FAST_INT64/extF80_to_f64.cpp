@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 extF80_to_f64(extFloat80_t a)
 {
+    using namespace softfloat;
     /** @bug union of same type */
     union
     {
@@ -58,19 +59,23 @@ extF80_to_f64(extFloat80_t a)
 
     if (0 == (exp | sig)) {
         return u_as_f_64(packToF64UI(sign, 0, 0));
-    } else if (exp == 0x7FFF) {
+    }
+
+    if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
             return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
-        } else {
-            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-    } else {
-        sig = softfloat_shortShiftRightJam64(sig, 1);
-        exp -= 0x3C01;
-        if (exp < -0x1000) {
-            exp = -0x1000;
-        }
-        /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
-        return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
+
+        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
     }
+
+    sig = softfloat_shortShiftRightJam64(sig, 1);
+    exp -= 0x3C01;
+
+    if (exp < -0x1000) {
+        exp = -0x1000;
+    }
+
+    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+    return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
 }

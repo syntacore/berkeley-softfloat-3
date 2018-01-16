@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 /**
 Converts the common NaN pointed to by `aPtr' into an 80-bit extended
 floating-point NaN, and stores this NaN at the location pointed to by
@@ -52,3 +54,4 @@ softfloat_commonNaNToExtF80M(struct commonNaN a)
     z.signif = UINT64_C(0xC000000000000000) | a.v64 >> 1;
     return z;
 }
+}  // namespace softfloat

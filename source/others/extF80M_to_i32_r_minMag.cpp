@@ -52,14 +52,19 @@ int32_t extF80M_to_i32_r_minMag(const extFloat80_t* aPtr, bool exact)
 
 #else
 
-static int32_t
-invalid(bool sign, int32_t exp, uint64_t sig)
-{
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    return
-        exp == INT16_MAX && (sig & INT64_MAX) ? i32_fromNaN :
-        sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-}
+namespace softfloat {
+
+namespace {
+    static int32_t
+        invalid(bool sign, int32_t exp, uint64_t sig)
+    {
+        using namespace softfloat;
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == INT16_MAX && (sig & INT64_MAX) ? i32_fromNaN :
+            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    }
+}  // namespace
 
 int32_t
 extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
@@ -140,6 +145,8 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
 
     return static_cast<int32_t>(absZ);
 }
+
+}  // namespace softfloat
 
 #endif
 

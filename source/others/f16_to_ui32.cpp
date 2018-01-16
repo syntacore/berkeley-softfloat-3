@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 uint32_t
 f16_to_ui32(float16_t a, uint8_t roundingMode, bool exact)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t const exp = expF16UI(uiA);
@@ -53,21 +54,25 @@ f16_to_ui32(float16_t a, uint8_t roundingMode, bool exact)
         return
             frac ? ui32_fromNaN :
             sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-    } else {
-        uint32_t sig32 = frac;
-        if (exp) {
-            sig32 |= 0x0400;
-            {
-                int8_t shiftDist = exp - 0x19;
-                if (0 <= shiftDist && !sign) {
-                    return sig32 << shiftDist;
-                }
-            }
-            int8_t const shiftDist = exp - 0x0D;
-            if (0 < shiftDist) {
-                sig32 <<= shiftDist;
+    }
+
+    uint32_t sig32 = frac;
+
+    if (exp) {
+        sig32 |= 0x0400;
+        {
+            int8_t shiftDist = exp - 0x19;
+
+            if (0 <= shiftDist && !sign) {
+                return sig32 << shiftDist;
             }
         }
-        return softfloat_roundPackToUI32(sign, sig32, roundingMode, exact);
+        int8_t const shiftDist = exp - 0x0D;
+
+        if (0 < shiftDist) {
+            sig32 <<= shiftDist;
+        }
     }
+
+    return softfloat_roundPackToUI32(sign, sig32, roundingMode, exact);
 }

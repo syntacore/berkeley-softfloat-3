@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float32_t i64_to_f32(int64_t a)
+float32_t
+i64_to_f32(int64_t a)
 {
+    using namespace softfloat;
     bool const sign = (a < 0);
     uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
     int8_t shiftDist = softfloat_countLeadingZeros64(absA) - 40;

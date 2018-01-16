@@ -38,8 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
+float32_t
+f32_mulAdd(float32_t a,
+           float32_t b,
+           float32_t c)
 {
-    return softfloat_mulAddF32(f_as_u_32(a), f_as_u_32(b), f_as_u_32(c), 0 );
+    using namespace softfloat;
+    return softfloat_mulAddF32(f_as_u_32(a), f_as_u_32(b), f_as_u_32(c), 0);
 }
 

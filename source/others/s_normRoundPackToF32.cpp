@@ -36,14 +36,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 float32_t
-softfloat_normRoundPackToF32(bool sign, int16_t exp, uint32_t sig)
+softfloat_normRoundPackToF32(bool sign,
+                             int16_t exp,
+                             uint32_t sig)
 {
+    using namespace softfloat;
     int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 1;
     exp -= shiftDist;
+
     if (7 <= shiftDist && (uint16_t)exp < 0xFD) {
         return u_as_f_32(packToF32UI(sign, sig ? exp : 0, sig << (shiftDist - 7)));
-    } else {
-        return softfloat_roundPackToF32(sign, exp, sig << shiftDist);
     }
+
+    return softfloat_roundPackToF32(sign, exp, sig << shiftDist);
 }
+
+}  // namespace softfloat

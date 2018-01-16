@@ -51,8 +51,10 @@ uint64_t extF80M_to_ui64_r_minMag(const extFloat80_t *aPtr, bool exact)
 
 #else
 
-uint64_t extF80M_to_ui64_r_minMag(const extFloat80_t *aPtr, bool exact)
+uint64_t
+extF80M_to_ui64_r_minMag(const extFloat80_t *aPtr, bool exact)
 {
+    using namespace softfloat;
     extFloat80M const *aSPtr;
     uint16_t uiA64;
     int32_t exp;

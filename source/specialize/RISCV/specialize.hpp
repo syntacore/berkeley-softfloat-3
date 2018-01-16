@@ -41,6 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/types.hpp"
 #include "internals.hpp"
 
+namespace softfloat {
+
+inline namespace riscv {
+
 /**
 Default value for `softfloat_detectTininess'.
 */
@@ -82,7 +86,7 @@ inline constexpr bool
 softfloat_isSigNaNF16UI(uint16_t uiA)
 {
     return
-        0x7C00 == (uiA & 0x7E00) && 
+        0x7C00 == (uiA & 0x7E00) &&
         0 != (uiA & 0x01FF);
 }
 
@@ -134,7 +138,7 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint16_t
-softfloat_propagateNaNF16UI(uint16_t uiA, 
+softfloat_propagateNaNF16UI(uint16_t uiA,
                             uint16_t uiB)
 {
     if (softfloat_isSigNaNF16UI(uiA) || softfloat_isSigNaNF16UI(uiB)) {
@@ -227,8 +231,8 @@ inline constexpr bool
 softfloat_isSigNaNExtF80UI(uint16_t uiA64, uint64_t uiA0)
 {
     return
-        0x7FFFu == (uiA64 & 0x7FFFu) && 
-        0 == (uiA0 & UINT64_C(0x4000000000000000)) && 
+        0x7FFFu == (uiA64 & 0x7FFFu) &&
+        0 == (uiA0 & UINT64_C(0x4000000000000000)) &&
         0 != (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
 }
 
@@ -300,10 +304,10 @@ point signaling NaN.
 Note:  This macro evaluates its arguments more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNF128UI(uint64_t uiA64, 
+softfloat_isSigNaNF128UI(uint64_t uiA64,
                          uint64_t uiA0)
 {
-    return 
+    return
         UINT64_C(0x7FFF000000000000) == (uiA64 & UINT64_C(0x7FFF800000000000)) &&
         (0 != uiA0 || 0 != (uiA64 & UINT64_C(0x00007FFFFFFFFFFF)));
 }
@@ -331,13 +335,13 @@ integer.
 */
 #if 1
 inline constexpr uint128
-    softfloat_commonNaNToExtF80UI(commonNaN)
+softfloat_commonNaNToExtF80UI(commonNaN)
 {
     return uint128{defaultNaNExtF80UI0, defaultNaNExtF80UI64};
 }
 #else
 uint128
-    softfloat_commonNaNToExtF80UI(struct commonNaN a);
+softfloat_commonNaNToExtF80UI(struct commonNaN a);
 #endif
 
 /**
@@ -500,5 +504,7 @@ void
 softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr);
 
 #endif
+}  // namespace riscv
+}  // namespace softfloat
 
 #endif  /* SPECIALIZE_H_ */

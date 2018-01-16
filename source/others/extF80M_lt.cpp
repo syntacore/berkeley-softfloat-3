@@ -53,6 +53,7 @@ bool extF80M_lt(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 
 bool extF80M_lt(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
+    using namespace softfloat;
     extFloat80M const *aSPtr;
     extFloat80M const *bSPtr;
     uint16_t uiA64;

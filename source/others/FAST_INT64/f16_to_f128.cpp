@@ -42,12 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 f16_to_f128(float16_t a)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t exp = expF16UI(uiA);
     uint16_t frac = fracF16UI(uiA);
 
     struct uint128 uiZ;
+
     if (exp == 0x1F) {
         if (frac) {
             uiZ = softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA));
@@ -67,9 +69,11 @@ f16_to_f128(float16_t a)
                 goto uiZ;
             }
         }
+
         uiZ.v64 = packToF128UI64(sign, exp + 0x3FF0, (uint64_t)frac << 38);
         uiZ.v0 = 0;
     }
+
 uiZ:
     {
         union ui128_f128 uZ;

@@ -40,8 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 int32_t
-extF80_to_i32(extFloat80_t a, uint8_t roundingMode, bool exact)
+extF80_to_i32(extFloat80_t a,
+              uint8_t roundingMode,
+              bool exact)
 {
+    using namespace softfloat;
     uint16_t const uiA64 = a.signExp;
     bool sign = signExtF80UI64(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);

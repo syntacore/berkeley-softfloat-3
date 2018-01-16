@@ -52,15 +52,16 @@ uint64_t f128M_to_ui64_r_minMag(const float128_t* aPtr, bool exact)
 #else
 
 uint64_t
-f128M_to_ui64_r_minMag(float128_t const *aPtr,
+f128M_to_ui64_r_minMag(float128_t const* aPtr,
                        bool exact)
 {
+    using namespace softfloat;
     int32_t shiftDist;
     uint32_t sig[4];
     uint64_t z;
 
 
-    uint32_t const *aWPtr = reinterpret_cast<uint32_t const *>(aPtr);
+    uint32_t const* aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t const exp = expF128UI96(uiA96);
@@ -82,7 +83,7 @@ f128M_to_ui64_r_minMag(float128_t const *aPtr,
         sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
         sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
         softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist + 17), sig);
-        z = static_cast<uint64_t>(sig[indexWord(4, 2)] )<< 32 | sig[indexWord(4, 1)];
+        z = static_cast<uint64_t>(sig[indexWord(4, 2)]) << 32 | sig[indexWord(4, 1)];
 
         if (sign && z) {
             goto invalid;
@@ -122,4 +123,3 @@ invalid:
 }
 
 #endif
-

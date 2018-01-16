@@ -39,14 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
+namespace softfloat {
+
 extFloat80_t
- softfloat_addMagsExtF80(
-     uint16_t uiA64,
-     uint64_t uiA0,
-     uint16_t uiB64,
-     uint64_t uiB0,
-     bool signZ
- )
+ softfloat_addMagsExtF80(uint16_t uiA64,
+                         uint64_t uiA0,
+                         uint16_t uiB64,
+                         uint64_t uiB0,
+                         bool signZ)
 {
     int32_t expA;
     uint64_t sigA;
@@ -146,6 +146,7 @@ extFloat80_t
     uZ.s.signExp = uiZ64;
     uZ.s.signif  = uiZ0;
     return uZ.f;
-
 }
+
+}  // namespace softfloat
 

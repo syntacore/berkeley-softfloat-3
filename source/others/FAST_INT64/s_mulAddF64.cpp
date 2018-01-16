@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 float64_t
 softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
 {
@@ -60,20 +62,25 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
             /* a or b is inf, product is inf or undefined, check other operand for zero */
             bool const is_product_undefined =
                 isInf64UI(uiA) ? isZero64UI(uiB) : isZero64UI(uiA);
+
             if (!is_product_undefined) {
                 /* product is inf */
                 uint64_t const uiZ = packToF64UI(signZ, 0x7FF, 0);
+
                 if (expC != 0x7FF) {
                     /* summand c is finite, return product as result */
                     return u_as_f_64(uiZ);
                 }
+
                 /* summand is inf, check for same sign */
                 if (signZ == signC) {
                     /* summands are same sign inf */
                     return u_as_f_64(uiZ);
                 }
+
                 /* summands are different sign inf, undefined sum */
             }
+
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
         } else if (expC == 0x7FF) {
@@ -83,26 +90,36 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
             struct uint128 sig128Z;
             int16_t expDiff;
             struct uint128 sig128C;
+
             if (0 == expA) {
                 if (0 == sigA) {
                     if (isZero64UI(uiC) && signZ != signC) {
                         return u_as_f_64(packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
                     }
+
                     return u_as_f_64(uiC);
                 }
+
                 struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+
                 expA = normExpSig.exp;
+
                 sigA = normExpSig.sig;
             }
+
             if (!expB) {
                 if (!sigB) {
                     if (!(expC | sigC) && (signZ != signC)) {
                         return u_as_f_64(packToF64UI((softfloat_roundingMode == softfloat_round_min), 0, 0));
                     }
+
                     return u_as_f_64(uiC);
                 }
+
                 struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+
                 expB = normExpSig.exp;
+
                 sigB = normExpSig.sig;
             }
 
@@ -110,24 +127,32 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
             sigA = (sigA | UINT64_C(0x0010000000000000)) << 10;
             sigB = (sigB | UINT64_C(0x0010000000000000)) << 10;
             sig128Z = softfloat_mul64To128(sigA, sigB);
+
             if (sig128Z.v64 < UINT64_C(0x2000000000000000)) {
                 --expZ;
                 sig128Z = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
             }
+
             if (!expC) {
                 if (!sigC) {
                     --expZ;
                     return softfloat_roundPackToF64(signZ, expZ, sig128Z.v64 << 1 | (sig128Z.v0 != 0));
                 }
+
                 struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
+
                 expC = normExpSig.exp;
+
                 sigC = normExpSig.sig;
             }
+
             sigC = (sigC | UINT64_C(0x0010000000000000)) << 9;
 
             expDiff = expZ - expC;
+
             if (expDiff < 0) {
                 expZ = expC;
+
                 if (signZ == signC || expDiff < -1) {
                     sig128Z.v64 = softfloat_shiftRightJam64(sig128Z.v64, -expDiff);
                 } else {
@@ -139,16 +164,19 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
 
             if (signZ == signC) {
                 uint64_t sigZ;
+
                 if (expDiff <= 0) {
                     sigZ = (sigC + sig128Z.v64) | (sig128Z.v0 != 0);
                 } else {
                     sig128Z = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0);
                     sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
                 }
+
                 if (sigZ < UINT64_C(0x4000000000000000)) {
                     --expZ;
                     sigZ <<= 1;
                 }
+
                 return softfloat_roundPackToF64(signZ, expZ, sigZ);
             } else {
                 if (expDiff < 0) {
@@ -156,9 +184,11 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                     sig128Z = softfloat_sub128(sigC, 0, sig128Z.v64, sig128Z.v0);
                 } else if (!expDiff) {
                     sig128Z.v64 = sig128Z.v64 - sigC;
+
                     if (!(sig128Z.v64 | sig128Z.v0)) {
                         return u_as_f_64(packToF64UI((softfloat_roundingMode == softfloat_round_min), 0, 0));
                     }
+
                     if (sig128Z.v64 & UINT64_C(0x8000000000000000)) {
                         signZ = !signZ;
                         sig128Z = softfloat_sub128(0, 0, sig128Z.v64, sig128Z.v0);
@@ -172,19 +202,23 @@ softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
                     sig128Z.v64 = sig128Z.v0;
                     sig128Z.v0 = 0;
                 }
+
                 {
                     int8_t const shiftDist = softfloat_countLeadingZeros64(sig128Z.v64) - 1;
                     expZ -= shiftDist;
                     uint64_t sigZ;
+
                     if (shiftDist < 0) {
                         sigZ = softfloat_shortShiftRightJam64(sig128Z.v64, -shiftDist);
                     } else {
                         sig128Z = softfloat_shortShiftLeft128(sig128Z.v64, sig128Z.v0, shiftDist);
                         sigZ = sig128Z.v64;
                     }
+
                     return softfloat_roundPackToF64(signZ, expZ, sigZ | (0 != sig128Z.v0));
                 }
             }
         }
     }
 }
+}  // namespace softfloat

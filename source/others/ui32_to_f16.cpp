@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 ui32_to_f16(uint32_t a)
 {
+    using namespace softfloat;
     int8_t const shiftDist = softfloat_countLeadingZeros32(a) - 21;
 
     if (0 <= shiftDist) {

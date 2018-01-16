@@ -43,18 +43,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 bool
-extF80M_le(extFloat80_t const *aPtr, extFloat80_t const *bPtr)
+extF80M_le(extFloat80_t const* aPtr, extFloat80_t const* bPtr)
 {
+    using namespace softfloat;
     return extF80_le(*aPtr, *bPtr);
 }
 
 #else
 
 bool
-extF80M_le(extFloat80_t const *aPtr, extFloat80_t const *bPtr)
+extF80M_le(extFloat80_t const* aPtr,
+           extFloat80_t const* bPtr)
 {
-    extFloat80M const *const aSPtr = aPtr;
-    extFloat80M const *const bSPtr = bPtr;
+    using namespace softfloat;
+    extFloat80M const* const aSPtr = aPtr;
+    extFloat80M const* const bSPtr = bPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     uint64_t const uiA0 = aSPtr->signif;
     uint16_t const uiB64 = bSPtr->signExp;
@@ -63,22 +66,25 @@ extF80M_le(extFloat80_t const *aPtr, extFloat80_t const *bPtr)
     if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        bool const signA = signExtF80UI64(uiA64);
-        if ((uiA64 ^ uiB64) & 0x8000) {
-            /* Signs are different. */
-            return signA || !(uiA0 | uiB0);
-        } else if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
-            /* Signs are the same. */
-            return (softfloat_compareNonnormExtF80M(aSPtr, bSPtr) <= 0);
-        } else {
-            if (uiA64 == uiB64) {
-                return uiA0 == uiB0 || signA != (uiA0 < uiB0);
-            } else {
-                return signA != (uiA64 < uiB64);
-            }
-        }
     }
+
+    bool const signA = signExtF80UI64(uiA64);
+
+    if ((uiA64 ^ uiB64) & 0x8000) {
+        /* Signs are different. */
+        return signA || !(uiA0 | uiB0);
+    }
+
+    if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+        /* Signs are the same. */
+        return (softfloat_compareNonnormExtF80M(aSPtr, bSPtr) <= 0);
+    }
+
+    if (uiA64 == uiB64) {
+        return uiA0 == uiB0 || signA != (uiA0 < uiB0);
+    }
+
+    return signA != (uiA64 < uiB64);
 }
 
 #endif

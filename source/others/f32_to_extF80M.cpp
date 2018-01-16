@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-void f32_to_extF80M(float32_t a, extFloat80_t *zPtr)
+void f32_to_extF80M(float32_t a, extFloat80_t* zPtr)
 {
     *zPtr = f32_to_extF80(a);
 }
@@ -50,9 +50,11 @@ void f32_to_extF80M(float32_t a, extFloat80_t *zPtr)
 #else
 
 void
-f32_to_extF80M(float32_t a, extFloat80_t *zPtr)
+f32_to_extF80M(float32_t a,
+               extFloat80_t* zPtr)
 {
-    extFloat80M *const zSPtr = zPtr;
+    using namespace softfloat;
+    extFloat80M* const zSPtr = zPtr;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t exp = expF32UI(uiA);
@@ -62,26 +64,27 @@ f32_to_extF80M(float32_t a, extFloat80_t *zPtr)
         if (frac) {
             *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f32UIToCommonNaN(uiA));
             return;
-        } else {
-            zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-            zSPtr->signif = (uint64_t)0x80000000 << 32;
+        }
+
+        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
+        zSPtr->signif = (uint64_t)0x80000000 << 32;
+        return;
+    }
+
+    if (!exp) {
+        if (!frac) {
+            zSPtr->signExp = packToExtF80UI64(sign, 0);
+            zSPtr->signif = 0;
             return;
         }
-    } else {
-        if (!exp) {
-            if (!frac) {
-                zSPtr->signExp = packToExtF80UI64(sign, 0);
-                zSPtr->signif = 0;
-                return;
-            } else {
-                exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
-                exp = normExpSig.exp;
-                frac = normExpSig.sig;
-            }
-        }
-        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3F80));
-        zSPtr->signif = (uint64_t)(0x80000000 | (uint32_t)frac << 8) << 32;
+
+        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+        exp = normExpSig.exp;
+        frac = normExpSig.sig;
     }
+
+    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3F80));
+    zSPtr->signif = (uint64_t)(0x80000000 | (uint32_t)frac << 8) << 32;
 }
 
 #endif

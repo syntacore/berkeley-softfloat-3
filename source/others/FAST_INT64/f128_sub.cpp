@@ -38,9 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float128_t f128_sub( float128_t a, float128_t b )
+float128_t
+f128_sub( float128_t a, 
+         float128_t b )
 {
-    union ui128_f128 uA;
+    using namespace softfloat;
+    ui128_f128 uA;
     uint64_t uiA64, uiA0;
     bool signA;
     union ui128_f128 uB;

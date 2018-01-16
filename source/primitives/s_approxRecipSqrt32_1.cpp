@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
+
+namespace softfloat {
+
 uint32_t
 softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
                               uint32_t a)
@@ -54,3 +57,5 @@ softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
     r += ((uint32_t)((r >> 1) + (r >> 3) - ((uint32_t)r0 << 14)) * (uint64_t)sqrSigma0) >> 48;
     return !(r & 0x80000000) ? 0x80000000 : r;
 }
+
+}  // namespace softfloat

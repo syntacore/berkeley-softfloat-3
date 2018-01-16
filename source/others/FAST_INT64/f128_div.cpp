@@ -39,31 +39,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-float128_t f128_div( float128_t a, float128_t b )
+float128_t
+f128_div( float128_t a, 
+         float128_t b )
 {
-    union ui128_f128 uA;
+    using namespace softfloat;
+    ui128_f128 uA;
     uint64_t uiA64, uiA0;
     bool signA;
     int32_t expA;
-    struct uint128 sigA;
-    union ui128_f128 uB;
+    uint128 sigA;
+    ui128_f128 uB;
     uint64_t uiB64, uiB0;
     bool signB;
     int32_t expB;
-    struct uint128 sigB;
+    uint128 sigB;
     bool signZ;
-    struct exp32_sig128 normExpSig;
+    exp32_sig128 normExpSig;
     int32_t expZ;
-    struct uint128 rem;
+    uint128 rem;
     uint32_t recip32;
     int ix;
     uint64_t q64;
     uint32_t q;
-    struct uint128 term;
+    uint128 term;
     uint32_t qs[3];
     uint64_t sigZExtra;
-    struct uint128 sigZ, uiZ;
-    union ui128_f128 uZ;
+    uint128 sigZ, uiZ;
+    ui128_f128 uZ;
 
     
     uA.f = a;

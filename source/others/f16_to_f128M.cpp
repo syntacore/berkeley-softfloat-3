@@ -43,43 +43,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
-f16_to_f128M(float16_t a, float128_t *zPtr)
+f16_to_f128M(float16_t a, float128_t* zPtr)
 {
     *zPtr = f16_to_f128(a);
 }
 
 #else
 
-void f16_to_f128M(float16_t a, float128_t *zPtr)
+void
+f16_to_f128M(float16_t a,
+             float128_t* zPtr)
 {
-    uint32_t *const zWPtr = (uint32_t *)zPtr;
+    using namespace softfloat;
+    uint32_t* const zWPtr = (uint32_t*)zPtr;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t exp = expF16UI(uiA);
     uint16_t frac = fracF16UI(uiA);
 
     uint32_t uiZ96;
+
     if (exp == 0x1F) {
         if (frac) {
             softfloat_commonNaNToF128M(softfloat_f16UIToCommonNaN(uiA), zWPtr);
             return;
+        }
+
+        uiZ96 = packToF128UI96(sign, 0x7FFF, 0);
+        goto uiZ;
+    }
+
+    if (!exp) {
+        if (frac) {
+            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+            exp = normExpSig.exp - 1;
+            frac = normExpSig.sig;
         } else {
-            uiZ96 = packToF128UI96(sign, 0x7FFF, 0);
+            uiZ96 = packToF128UI96(sign, 0, 0);
             goto uiZ;
         }
-    } else {
-        if (!exp) {
-            if (frac) {
-                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
-                exp = normExpSig.exp - 1;
-                frac = normExpSig.sig;
-            } else {
-                uiZ96 = packToF128UI96(sign, 0, 0);
-                goto uiZ;
-            }
-        }
-        uiZ96 = packToF128UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
     }
+
+    uiZ96 = packToF128UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
 uiZ:
     zWPtr[indexWord(4, 3)] = uiZ96;
     zWPtr[indexWord(4, 2)] = 0;

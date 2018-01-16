@@ -40,10 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 int64_t
- extF80_to_i64( extFloat80_t a, uint8_t roundingMode, bool exact )
+extF80_to_i64(extFloat80_t a,
+              uint8_t roundingMode,
+              bool exact)
 {
+    using namespace softfloat;
     /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uA;
+    union
+    {
+        struct extFloat80M s;
+        extFloat80_t f;
+    } uA;
     uint16_t uiA64;
     bool sign;
     int32_t exp;
@@ -52,33 +59,33 @@ int64_t
     uint64_t sigExtra;
     struct uint64_extra sig64Extra;
 
-    
+
     uA.f = a;
     uiA64 = uA.s.signExp;
-    sign = signExtF80UI64( uiA64 );
-    exp  = expExtF80UI64( uiA64 );
+    sign = signExtF80UI64(uiA64);
+    exp = expExtF80UI64(uiA64);
     sig = uA.s.signif;
-    
+
     shiftDist = 0x403E - exp;
-    if ( shiftDist <= 0 ) {
-        
-        if ( shiftDist ) {
-            softfloat_raiseFlags( softfloat_flag_invalid );
+
+    if (shiftDist <= 0) {
+
+        if (shiftDist) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                (exp == INT16_MAX) && (sig & INT64_MAX)
-                    ? i64_fromNaN
-                    : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+                (exp == INT16_MAX) && (sig & INT64_MAX) ? i64_fromNaN :
+                sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
-        
+
         sigExtra = 0;
     } else {
-        
-        sig64Extra = softfloat_shiftRightJam64Extra( sig, 0, shiftDist );
+        sig64Extra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
         sig = sig64Extra.v;
         sigExtra = sig64Extra.extra;
     }
+
     return
-        softfloat_roundPackToI64( sign, sig, sigExtra, roundingMode, exact );
+        softfloat_roundPackToI64(sign, sig, sigExtra, roundingMode, exact);
 
 }
 

@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
+namespace softfloat {
+
 void
 softfloat_mul128MTo256M(uint32_t const *aPtr,
                         uint32_t const *bPtr,
@@ -86,3 +88,5 @@ softfloat_mul128MTo256M(uint32_t const *aPtr,
         zPtr[indexWord(5, 4)] = (dwordProd >> 32) + !!carry;
     } while (zPtr != lastZPtr);
 }
+
+}  // namespace softfloat

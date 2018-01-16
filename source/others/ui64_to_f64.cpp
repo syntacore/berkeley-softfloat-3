@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 ui64_to_f64(uint64_t a)
 {
+    using namespace softfloat;
     return
         0 == a ? u_as_f_64(0) :
         0 != (a & INT64_MIN) ? softfloat_roundPackToF64(0, 0x43D, softfloat_shortShiftRightJam64(a, 1)) :

@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/types.hpp"
 #include <cstddef>
 
+namespace softfloat {
+
 /**
 Shifts `a' right by the number of bits given in `dist', which must be in
 the range 1 to 63.  If any nonzero bits are shifted off, they are "jammed"
@@ -1170,5 +1172,7 @@ softfloat_remStep160MBy32(uint32_t const* remPtr,
 }
 
 #endif
+
+}  // namespace softfloat
 
 #endif  /* PRIMITIVES_H_ */

@@ -52,8 +52,10 @@ void f64_to_f128M(float64_t a, float128_t* zPtr)
 #else
 
 void
-f64_to_f128M(float64_t a, float128_t* zPtr)
+f64_to_f128M(float64_t a,
+             float128_t* zPtr)
 {
+    using namespace softfloat;
     uint32_t* zWPtr = (uint32_t*)zPtr;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
@@ -95,4 +97,3 @@ f64_to_f128M(float64_t a, float128_t* zPtr)
 }
 
 #endif
-

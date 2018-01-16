@@ -39,33 +39,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-uint32_t f32_to_ui32_r_minMag(float32_t a, bool exact)
+uint32_t
+f32_to_ui32_r_minMag(float32_t a,
+                     bool exact)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);
 
     int16_t shiftDist = 0x9E - exp;
+
     if (32 <= shiftDist) {
         if (exact && (exp | sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
-        return 0;
-    } else {
-        uint32_t z;
-        bool const sign = signF32UI(uiA);
-        if (sign || (shiftDist < 0)) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                exp == 0xFF && sig ? ui32_fromNaN : 
-                sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-        }
 
-        sig = (sig | 0x00800000) << 8;
-        z = sig >> shiftDist;
-        if (exact && (z << shiftDist != sig)) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-        return z;
+        return 0;
     }
+
+    uint32_t z;
+    bool const sign = signF32UI(uiA);
+
+    if (sign || (shiftDist < 0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == 0xFF && sig ? ui32_fromNaN :
+            sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+    }
+
+    sig = (sig | 0x00800000) << 8;
+    z = sig >> shiftDist;
+
+    if (exact && (z << shiftDist != sig)) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return z;
 }

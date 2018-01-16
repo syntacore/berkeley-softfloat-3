@@ -38,14 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.hpp"
 
+namespace softfloat {
+
 float128_t
- softfloat_addMagsF128(
-     uint64_t uiA64,
-     uint64_t uiA0,
-     uint64_t uiB64,
-     uint64_t uiB0,
-     bool signZ
- )
+ softfloat_addMagsF128(uint64_t uiA64,
+                       uint64_t uiA0,
+                       uint64_t uiB64,
+                       uint64_t uiB0,
+                       bool signZ)
 {
     int32_t expA;
     struct uint128 sigA;
@@ -150,3 +150,4 @@ float128_t
 
 }
 
+}  // namespace softfloat

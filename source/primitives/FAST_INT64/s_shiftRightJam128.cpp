@@ -36,24 +36,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
-struct uint128
-    softfloat_shiftRightJam128(uint64_t a64, uint64_t a0, uint32_t dist)
+namespace softfloat {
+
+uint128
+softfloat_shiftRightJam128(uint64_t a64,
+                           uint64_t a0,
+                           uint32_t dist)
 {
     if (dist < 64) {
-        /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
+        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
         uint8_t const u8NegDist = -(int32_t)dist;
         uint128 z;
         z.v64 = a64 >> dist;
         z.v0 =
-            a64 << (u8NegDist & 63) | a0 >> dist | 
+            a64 << (u8NegDist & 63) | a0 >> dist |
             ((uint64_t)(a0 << (u8NegDist & 63)) != 0);
         return z;
-    } else {
-        uint128 z;
-        z.v64 = 0;
-        z.v0 =
-            dist < 127 ? a64 >> (dist & 63) | (((a64 & (((uint64_t)1 << (dist & 63)) - 1)) | a0) != 0) : 
-            (a64 | a0) != 0;
-        return z;
     }
+
+    uint128 z;
+    z.v64 = 0;
+    z.v0 =
+        dist < 127 ? a64 >> (dist & 63) | (((a64 & (((uint64_t)1 << (dist & 63)) - 1)) | a0) != 0) :
+        (a64 | a0) != 0;
+    return z;
 }
+
+}  // namespace softfloat

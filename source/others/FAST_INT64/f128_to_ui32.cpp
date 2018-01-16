@@ -40,8 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint32_t
-f128_to_ui32(float128_t a, uint8_t roundingMode, bool exact)
+f128_to_ui32(float128_t a,
+             uint8_t roundingMode,
+             bool exact)
 {
+    using namespace softfloat;
     ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;

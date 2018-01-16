@@ -42,7 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 #ifdef SOFTFLOAT_FAST_INT64
 
-bool extF80M_le_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
+bool
+extF80M_le_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
     return extF80_le_quiet(*aPtr, *bPtr);
 }
@@ -52,6 +53,8 @@ bool extF80M_le_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 bool
 extF80M_le_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
+    using namespace softfloat;
+
     extFloat80M const *aSPtr;
     extFloat80M const *bSPtr;
     uint16_t uiA64;

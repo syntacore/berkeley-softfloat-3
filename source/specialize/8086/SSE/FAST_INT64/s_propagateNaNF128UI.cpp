@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
 `uiA0' as a 128-bit floating-point value, and likewise interpreting the
@@ -78,3 +81,5 @@ returnNonsigA:
 
 }
 
+}  // namespace Intel_8086
+}  // namespace softfloat

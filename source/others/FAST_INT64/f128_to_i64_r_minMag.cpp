@@ -40,8 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 int64_t
-f128_to_i64_r_minMag(float128_t a, bool exact)
+f128_to_i64_r_minMag(float128_t a,
+                     bool exact)
 {
+    using namespace softfloat;
     union ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;
@@ -52,12 +54,14 @@ f128_to_i64_r_minMag(float128_t a, bool exact)
     uint64_t const sig0 = uiA0;
 
     int32_t const shiftDist = 0x402F - exp;
+
     if (shiftDist < 0) {
         if (shiftDist < -14) {
             if (UINT64_C(0xC03E000000000000) == uiA64 && (sig0 < UINT64_C(0x0002000000000000))) {
                 if (exact && sig0) {
                     softfloat_raiseFlags(softfloat_flag_inexact);
                 }
+
                 return INT64_MIN;
             } else {
                 softfloat_raiseFlags(softfloat_flag_invalid);
@@ -67,12 +71,14 @@ f128_to_i64_r_minMag(float128_t a, bool exact)
             }
         } else {
             sig64 |= UINT64_C(0x0001000000000000);
-            /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'int8_t', possible loss of data */
+            /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data */
             int8_t const negShiftDist = -shiftDist;
             int64_t const absZ = sig64 << negShiftDist | sig0 >> (shiftDist & 63);
+
             if (exact && (uint64_t)(sig0 << negShiftDist)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
+
             return sign ? -absZ : absZ;
         }
     } else {
@@ -80,13 +86,16 @@ f128_to_i64_r_minMag(float128_t a, bool exact)
             if (exact && (exp | sig64 | sig0)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
+
             return 0;
         } else {
             sig64 |= UINT64_C(0x0001000000000000);
             int64_t const absZ = sig64 >> shiftDist;
+
             if (exact && (sig0 || (absZ << shiftDist != sig64))) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
+
             return sign ? -absZ : absZ;
         }
     }

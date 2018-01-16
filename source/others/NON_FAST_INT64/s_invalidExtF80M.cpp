@@ -38,12 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 /** @bug use extFloat80_t */
 void
-softfloat_invalidExtF80M(extFloat80M *zSPtr )
+softfloat_invalidExtF80M(extFloat80M* zSPtr)
 {
-    softfloat_raiseFlags( softfloat_flag_invalid );
+    softfloat_raiseFlags(softfloat_flag_invalid);
     zSPtr->signExp = defaultNaNExtF80UI64;
-    zSPtr->signif  = defaultNaNExtF80UI0;
+    zSPtr->signif = defaultNaNExtF80UI0;
 }
 
+}  // namespace softfloat

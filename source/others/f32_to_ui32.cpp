@@ -40,8 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint32_t
-f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
+f32_to_ui32(float32_t a,
+            uint8_t roundingMode,
+            bool exact)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     bool sign = signF32UI(uiA);
     int16_t const exp = expF32UI(uiA);
@@ -51,9 +54,11 @@ f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
         softfloat_raiseFlags(softfloat_flag_invalid);
         return ui32_fromNaN;
     }
+
     if (isZero32UI(uiA)) {
         return 0u;
     }
+
     if (isInf32UI(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
@@ -62,6 +67,7 @@ f32_to_ui32(float32_t a, uint8_t roundingMode, bool exact)
     if (0 != exp) {
         sig |= 0x00800000;
     }
+
     uint64_t const sig64 = (uint64_t)sig << 32;
     int16_t const shiftDist = 0xAA - exp;
     return

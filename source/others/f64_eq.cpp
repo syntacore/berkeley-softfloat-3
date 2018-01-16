@@ -40,17 +40,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 bool
-f64_eq(float64_t a, float64_t b)
+f64_eq(float64_t a,
+       float64_t b)
 {
+    using namespace softfloat;
     uint64_t const uiA = f_as_u_64(a);
     uint64_t const uiB = f_as_u_64(b);
+
     if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
         if (softfloat_isSigNaNF64UI(uiA) || softfloat_isSigNaNF64UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
+
         return false;
-    } else {
-        return uiA == uiB || !((uiA | uiB) & (uint64_t)INT64_MAX);
     }
+
+    return uiA == uiB || !((uiA | uiB) & (uint64_t)INT64_MAX);
 }
 

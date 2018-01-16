@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+namespace Intel_8086 {
+
 /**
 Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,
 converts this NaN to the common NaN form, and stores.
@@ -59,3 +62,6 @@ softfloat_f128MToCommonNaN(uint32_t const *const aWPtr)
     softfloat_shortShiftLeft128M(aWPtr, 16, (uint32_t *)&z.v0);
     return z;
 }
+
+}  // namespace Intel_8086
+}  // namespace softfloat

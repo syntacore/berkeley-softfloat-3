@@ -39,22 +39,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-bool f32_le_quiet(float32_t a, float32_t b)
+bool
+f32_le_quiet(float32_t a,
+             float32_t b)
 {
-
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
+
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
+
         return false;
-    } else {
-        bool const signA = signF32UI(uiA);
-        bool const signB = signF32UI(uiB);
-        return
-            signA != signB ? signA || 0 == ((uiA | uiB) << 1) :
-            uiA == uiB || (signA ^ (uiA < uiB));
     }
+
+    bool const signA = signF32UI(uiA);
+    bool const signB = signF32UI(uiB);
+    return
+        signA != signB ? signA || 0 == ((uiA | uiB) << 1) :
+        uiA == uiB || (signA ^ (uiA < uiB));
 }
 

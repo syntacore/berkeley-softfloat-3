@@ -38,7 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-void i32_to_extF80M(int32_t a, extFloat80_t *zPtr)
+void
+i32_to_extF80M(int32_t a,
+               extFloat80_t *zPtr)
 {
+    using namespace softfloat;
     *zPtr = i32_to_extF80(a);
 }

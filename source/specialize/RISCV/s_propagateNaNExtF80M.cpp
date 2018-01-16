@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
-#include <cstdint>
+namespace softfloat {
+namespace riscv {
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values
@@ -48,17 +49,20 @@ value is a signaling NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
 void
-softfloat_propagateNaNExtF80M(extFloat80M const *aSPtr,
-                              extFloat80M const *bSPtr,
-                              extFloat80M *zSPtr)
+softfloat_propagateNaNExtF80M(extFloat80M const* aSPtr,
+                              extFloat80M const* bSPtr,
+                              extFloat80M* zSPtr)
 {
     uint16_t ui64 = aSPtr->signExp;
-    uint64_t ui0  = aSPtr->signif;
-    if (softfloat_isSigNaNExtF80UI( ui64, ui0 ) || 
-        (bSPtr && (ui64 = bSPtr->signExp, ui0  = bSPtr->signif, softfloat_isSigNaNExtF80UI( ui64, ui0 )))
-    ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
+    uint64_t ui0 = aSPtr->signif;
+
+    if (softfloat_isSigNaNExtF80UI(ui64, ui0) || (bSPtr && (ui64 = bSPtr->signExp, ui0 = bSPtr->signif, softfloat_isSigNaNExtF80UI(ui64, ui0)))) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
     }
+
     zSPtr->signExp = defaultNaNExtF80UI64;
-    zSPtr->signif  = defaultNaNExtF80UI0;
+    zSPtr->signif = defaultNaNExtF80UI0;
 }
+
+}  // namespace riscv 
+}  // namespace softfloat

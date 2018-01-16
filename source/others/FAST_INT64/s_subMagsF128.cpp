@@ -39,14 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
 float128_t
-softfloat_subMagsF128(
-    uint64_t uiA64,
-    uint64_t uiA0,
-    uint64_t uiB64,
-    uint64_t uiB0,
-    bool signZ
-)
+softfloat_subMagsF128(uint64_t uiA64,
+                      uint64_t uiA0,
+                      uint64_t uiB64,
+                      uint64_t uiB0,
+                      bool signZ)
 {
     struct uint128 sigA;
     int32_t expB;
@@ -64,19 +63,32 @@ softfloat_subMagsF128(
     sigA = softfloat_shortShiftLeft128(sigA.v64, sigA.v0, 4);
     sigB = softfloat_shortShiftLeft128(sigB.v64, sigB.v0, 4);
     expDiff = expA - expB;
-    if (0 < expDiff) goto expABigger;
-    if (expDiff < 0) goto expBBigger;
+
+    if (0 < expDiff) {
+        goto expABigger;
+    }
+
+    if (expDiff < 0) {
+        goto expBBigger;
+    }
+
     if (expA == 0x7FFF) {
-        if (sigA.v64 | sigA.v0 | sigB.v64 | sigB.v0) goto propagateNaN;
+        if (sigA.v64 | sigA.v0 | sigB.v64 | sigB.v0) {
+            goto propagateNaN;
+        }
+
         softfloat_raiseFlags(softfloat_flag_invalid);
         uiZ.v64 = defaultNaNF128UI64;
         uiZ.v0 = defaultNaNF128UI0;
         goto uiZ;
     }
+
     expZ = expA;
+
     if (!expZ) {
         expZ = 1;
     }
+
     if (sigB.v64 < sigA.v64) {
         goto aBigger;
     } else if (sigA.v64 < sigB.v64) {
@@ -90,23 +102,29 @@ softfloat_subMagsF128(
         uiZ.v0 = 0;
         goto uiZ;
     }
+
 expBBigger:
+
     if (expB == 0x7FFF) {
         if (sigB.v64 | sigB.v0) {
             goto propagateNaN;
         }
+
         uiZ.v64 = packToF128UI64(signZ ^ 1, 0x7FFF, 0);
         uiZ.v0 = 0;
         goto uiZ;
     }
+
     if (expA) {
         sigA.v64 |= UINT64_C(0x0010000000000000);
     } else {
         ++expDiff;
+
         if (!expDiff) {
             goto newlyAlignedBBigger;
         }
     }
+
     sigA = softfloat_shiftRightJam128(sigA.v64, sigA.v0, -expDiff);
 newlyAlignedBBigger:
     expZ = expB;
@@ -116,22 +134,27 @@ bBigger:
     sigZ = softfloat_sub128(sigB.v64, sigB.v0, sigA.v64, sigA.v0);
     goto normRoundPack;
 expABigger:
+
     if (expA == 0x7FFF) {
         if (sigA.v64 | sigA.v0) {
             goto propagateNaN;
         }
+
         uiZ.v64 = uiA64;
         uiZ.v0 = uiA0;
         goto uiZ;
     }
+
     if (expB) {
         sigB.v64 |= UINT64_C(0x0010000000000000);
     } else {
         --expDiff;
+
         if (!expDiff) {
             goto newlyAlignedABigger;
         }
     }
+
     sigB = softfloat_shiftRightJam128(sigB.v64, sigB.v0, expDiff);
 newlyAlignedABigger:
     expZ = expA;
@@ -146,3 +169,4 @@ uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 }
+}  // namespace softfloat

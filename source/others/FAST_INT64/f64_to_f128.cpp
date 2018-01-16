@@ -42,8 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 f64_to_f128(float64_t a)
 {
-    struct uint128 uiZ;
-    union ui128_f128 uZ;
+    using namespace softfloat;
+    uint128 uiZ;
+    ui128_f128 uZ;
 
 
     uint64_t const uiA = f_as_u_64(a);
@@ -58,6 +59,7 @@ f64_to_f128(float64_t a)
             uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
             uiZ.v0 = 0;
         }
+
         goto uiZ;
     }
 
@@ -67,16 +69,23 @@ f64_to_f128(float64_t a)
             uiZ.v0 = 0;
             goto uiZ;
         }
+
         struct exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+
         exp = normExpSig.exp - 1;
+
         frac = normExpSig.sig;
     }
 
     struct uint128 const frac128 = softfloat_shortShiftLeft128(0, frac, 60);
+
     uiZ.v64 = packToF128UI64(sign, exp + 0x3C00, frac128.v64);
+
     uiZ.v0 = frac128.v0;
+
 uiZ:
     uZ.ui = uiZ;
+
     return uZ.f;
 
 }

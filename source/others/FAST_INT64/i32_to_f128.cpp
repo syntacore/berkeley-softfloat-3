@@ -38,17 +38,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float128_t i32_to_f128(int32_t a)
+float128_t
+i32_to_f128(int32_t a)
 {
-    union ui128_f128 uZ;
+    using namespace softfloat;
+    ui128_f128 uZ;
 
     uint64_t uiZ64 = 0;
+
     if (a) {
         bool const sign = (a < 0);
         uint32_t const absA = sign ? -a : a;
         int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 17;
         uiZ64 = packToF128UI64(sign, 0x402E - shiftDist, (uint64_t)absA << shiftDist);
     }
+
     uZ.ui.v64 = uiZ64;
     uZ.ui.v0 = 0;
     return uZ.f;

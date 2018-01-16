@@ -38,74 +38,86 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "specialize.hpp"
 
+namespace softfloat {
+
 float32_t
-softfloat_addMagsF32(uint32_t uiA, uint32_t uiB)
+softfloat_addMagsF32(uint32_t uiA,
+                     uint32_t uiB)
 {
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
         return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-    } if (isInf32UI(uiA) || isInf32UI(uiB)) {
+    }
+
+    if (isInf32UI(uiA) || isInf32UI(uiB)) {
         /** propagate infinity if operand(s) is infinity */
         return signed_inf_F32(signF32UI(uiA));
-    } else {
-        static uint32_t const hidden_bit = UINT32_C(1) << 23;
-        int16_t const expA = expF32UI(uiA);
-        uint32_t const sigA = fracF32UI(uiA);
-        int16_t const expB = expF32UI(uiB);
-        uint32_t const sigB = fracF32UI(uiB);
-        int16_t const expDiff = expA - expB;
-        if (0 == expDiff) {
-            /* if same exponent, fractional are aligned */
-            if (0 == expA) {
-                /** if a and b are subnormal(s) or zero(s), result is simple sum, possible carry of high sum bit to exponent is valid */
-                return u_as_f_32(uiA + sigB);
-            } else {
-                /** add hidden bits to operands if fractional are normal aligned */
-                uint32_t const sigZ = (sigA + hidden_bit) + (sigB + hidden_bit);
-                bool const signA = signF32UI(uiA);
-                if (0 == (sigZ & 1) && expA < 0xFE) {
-                    /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
-                    return u_as_f_32(packToF32UI(signA, expA, sigZ >> 1));
-                } else {
-                    /** in coommon case */
-                    return softfloat_roundPackToF32(signA, expA, sigZ << 6);
-                }
-            }
-        } else {
-            /* unaligned fractional */
-            int16_t expZ;
-            /* fractional bits before shift are [22..0] and after shift are [28..6] */
-            assert(0 == ((sigA | sigB) & (~UINT32_C(0) << 23)));
-            uint32_t sigA_scaled = sigA << 6;
-            uint32_t sigB_scaled = sigB << 6;
-            /* bit before point is [29] */
-            uint32_t const hidden_bit_scaled = hidden_bit << 6;
-            assert(0 == ((sigA_scaled | sigB_scaled) & (~UINT32_C(0) << 29)));
-            if (expDiff < 0) {
-                /* magnitude b greater than magnitude a */
-                expZ = expB;
-                /* add hidden bit and shift */
-                sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
-                sigB_scaled += hidden_bit_scaled;
-            } else {
-                /* magnitude a greater than magnitude b */
-                expZ = expA;
-                /* add hidden bit and shift */
-                sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
-                sigA_scaled += hidden_bit_scaled;
-            }
-            {
-                /* mantissa bits are [29..0] with 1 digit before point */
-                uint32_t sigZ = sigA_scaled + sigB_scaled;
-                /* mantissa bits are [30..0] with up to 2 digits before point */
-                if (sigZ < 2 * hidden_bit_scaled) {
-                    /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
-                    --expZ;
-                    sigZ <<= 1;
-                }
-                return softfloat_roundPackToF32(signF32UI(uiA), expZ, sigZ);
-            }
+    }
+
+    static uint32_t const hidden_bit = UINT32_C(1) << 23;
+    int16_t const expA = expF32UI(uiA);
+    uint32_t const sigA = fracF32UI(uiA);
+    int16_t const expB = expF32UI(uiB);
+    uint32_t const sigB = fracF32UI(uiB);
+    int16_t const expDiff = expA - expB;
+
+    if (0 == expDiff) {
+        /* if same exponent, fractional are aligned */
+        if (0 == expA) {
+            /** if a and b are subnormal(s) or zero(s), result is simple sum, possible carry of high sum bit to exponent is valid */
+            return u_as_f_32(uiA + sigB);
         }
+
+        /** add hidden bits to operands if fractional are normal aligned */
+        uint32_t const sigZ = (sigA + hidden_bit) + (sigB + hidden_bit);
+        bool const signA = signF32UI(uiA);
+
+        if (0 == (sigZ & 1) && expA < 0xFE) {
+            /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
+            return u_as_f_32(packToF32UI(signA, expA, sigZ >> 1));
+        }
+
+        /** in coommon case */
+        return softfloat_roundPackToF32(signA, expA, sigZ << 6);
+    }
+
+    /* unaligned fractional */
+    int16_t expZ;
+    /* fractional bits before shift are [22..0] and after shift are [28..6] */
+    assert(0 == ((sigA | sigB) & (~UINT32_C(0) << 23)));
+    uint32_t sigA_scaled = sigA << 6;
+    uint32_t sigB_scaled = sigB << 6;
+    /* bit before point is [29] */
+    uint32_t const hidden_bit_scaled = hidden_bit << 6;
+    assert(0 == ((sigA_scaled | sigB_scaled) & (~UINT32_C(0) << 29)));
+
+    if (expDiff < 0) {
+        /* magnitude b greater than magnitude a */
+        expZ = expB;
+        /* add hidden bit and shift */
+        sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
+        sigB_scaled += hidden_bit_scaled;
+    } else {
+        /* magnitude a greater than magnitude b */
+        expZ = expA;
+        /* add hidden bit and shift */
+        sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
+        sigA_scaled += hidden_bit_scaled;
+    }
+
+    {
+        /* mantissa bits are [29..0] with 1 digit before point */
+        uint32_t sigZ = sigA_scaled + sigB_scaled;
+
+        /* mantissa bits are [30..0] with up to 2 digits before point */
+        if (sigZ < 2 * hidden_bit_scaled) {
+            /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
+            --expZ;
+            sigZ <<= 1;
+        }
+
+        return softfloat_roundPackToF32(signF32UI(uiA), expZ, sigZ);
     }
 }
 
+}  // namespace softfloat

@@ -38,25 +38,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-float128_t f128_mulAdd( float128_t a, float128_t b, float128_t c )
+float128_t
+f128_mulAdd(float128_t a,
+            float128_t b,
+            float128_t c)
 {
-    union ui128_f128 uA;
+    using namespace softfloat;
+    ui128_f128 uA;
     uint64_t uiA64, uiA0;
-    union ui128_f128 uB;
+    ui128_f128 uB;
     uint64_t uiB64, uiB0;
-    union ui128_f128 uC;
+    ui128_f128 uC;
     uint64_t uiC64, uiC0;
 
     uA.f = a;
     uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
+    uiA0 = uA.ui.v0;
     uB.f = b;
     uiB64 = uB.ui.v64;
-    uiB0  = uB.ui.v0;
+    uiB0 = uB.ui.v0;
     uC.f = c;
     uiC64 = uC.ui.v64;
-    uiC0  = uC.ui.v0;
-    return softfloat_mulAddF128( uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, 0 );
+    uiC0 = uC.ui.v0;
+    return softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, 0);
 
 }
 

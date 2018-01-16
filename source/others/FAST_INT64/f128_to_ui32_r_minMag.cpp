@@ -41,9 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @todo refactoring */
 uint32_t
-f128_to_ui32_r_minMag(float128_t a, 
+f128_to_ui32_r_minMag(float128_t a,
                       bool exact)
 {
+    using namespace softfloat;
     union ui128_f128 uA;
     uint64_t uiA64, uiA0;
     int32_t exp;
@@ -60,27 +61,32 @@ f128_to_ui32_r_minMag(float128_t a,
     sig64 = fracF128UI64(uiA64) | (uiA0 != 0);
 
     shiftDist = 0x402F - exp;
+
     if (49 <= shiftDist) {
         if (exact && (exp | sig64)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         return 0;
     }
 
     sign = signF128UI64(uiA64);
+
     if (sign || (shiftDist < 17)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            (exp == 0x7FFF) && sig64 ? ui32_fromNaN
-            : sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+            exp == 0x7FFF && sig64 ? ui32_fromNaN :
+            sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 
     sig64 |= UINT64_C(0x0001000000000000);
-    /** @todo Warning	C4244	'=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
+    /** @todo Warning   C4244   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
     z = sig64 >> shiftDist;
+
     if (exact && ((uint64_t)z << shiftDist != sig64)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     return z;
 
 }

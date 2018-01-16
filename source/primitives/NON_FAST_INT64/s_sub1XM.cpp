@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
+namespace softfloat {
+
 void
 softfloat_sub1XM(uint8_t size_words,
                  uint32_t* zPtr)
@@ -51,3 +53,5 @@ softfloat_sub1XM(uint8_t size_words,
         }
     }
 }
+
+}  // namespace softfloat

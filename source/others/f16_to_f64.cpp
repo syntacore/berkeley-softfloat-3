@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 f16_to_f64(float16_t a)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t exp = expF16UI(uiA);
@@ -50,19 +51,20 @@ f16_to_f64(float16_t a)
     if (exp == 0x1F) {
         if (frac) {
             return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f16UIToCommonNaN(uiA)));
-        } else {
-            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
-        }
-    } else {
-        if (!exp) {
-            if (!frac) {
-                return u_as_f_64(packToF64UI(sign, 0, 0));
-            }
-            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
-            exp = normExpSig.exp - 1;
-            frac = normExpSig.sig;
         }
 
-        return u_as_f_64(packToF64UI(sign, exp + 0x3F0, (uint64_t)frac << 42));
+        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
     }
+
+    if (!exp) {
+        if (!frac) {
+            return u_as_f_64(packToF64UI(sign, 0, 0));
+        }
+
+        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+        exp = normExpSig.exp - 1;
+        frac = normExpSig.sig;
+    }
+
+    return u_as_f_64(packToF64UI(sign, exp + 0x3F0, (uint64_t)frac << 42));
 }

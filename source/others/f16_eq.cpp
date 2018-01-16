@@ -42,14 +42,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 f16_eq(float16_t a, float16_t b)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     uint16_t const uiB = f_as_u_16(b);
+
     if (isNaNF16UI(uiA) || isNaNF16UI(uiB)) {
         if (softfloat_isSigNaNF16UI(uiA) || softfloat_isSigNaNF16UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
+
         return false;
-    } else {
-        return uiA == uiB || !(uint16_t)((uiA | uiB) << 1);
     }
+
+    return uiA == uiB || !(uint16_t)((uiA | uiB) << 1);
 }

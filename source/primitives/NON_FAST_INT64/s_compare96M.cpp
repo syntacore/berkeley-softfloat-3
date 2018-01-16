@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
+namespace softfloat {
+
 int
 softfloat_compare96M(uint32_t const* const aPtr,
                      uint32_t const* const bPtr)
@@ -57,3 +59,5 @@ softfloat_compare96M(uint32_t const* const aPtr,
 
     return 0;
 }
+
+}  // namespace softfloat

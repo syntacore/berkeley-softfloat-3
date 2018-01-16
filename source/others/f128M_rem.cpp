@@ -64,8 +64,11 @@ copyA(uint32_t const uiA96,
 }
 
 void
-f128M_rem(const float128_t* aPtr, const float128_t* bPtr, float128_t* zPtr)
+f128M_rem(const float128_t* aPtr,
+          const float128_t* bPtr,
+          float128_t* zPtr)
 {
+    using namespace softfloat;
     uint32_t x[4];
     uint32_t* remPtr;
     int32_t expDiff;
@@ -211,4 +214,3 @@ selectRem:
 }
 
 #endif
-

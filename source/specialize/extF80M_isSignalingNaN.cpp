@@ -37,15 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 bool
-extF80M_isSignalingNaN(const extFloat80_t *aPtr)
+extF80M_isSignalingNaN(const extFloat80_t* aPtr)
 {
-    extFloat80M const *const aSPtr = aPtr;
+    extFloat80M const* const aSPtr = aPtr;
+
     if ((aSPtr->signExp & 0x7FFF) != 0x7FFF) {
         return false;
-    } else {
-        uint64_t const uiA0 = aSPtr->signif;
-        return
-            !(uiA0 & UINT64_C(0x4000000000000000)) &&
-            (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
     }
+
+    uint64_t const uiA0 = aSPtr->signif;
+    return
+        !(uiA0 & UINT64_C(0x4000000000000000)) &&
+        (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
 }

@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
-extFloat80_t ui64_to_extF80( uint64_t a )
+extFloat80_t
+ui64_to_extF80( uint64_t a )
 {
+    using namespace softfloat;
     uint16_t uiZ64;
     int8_t shiftDist;
     /** @bug union of same type */

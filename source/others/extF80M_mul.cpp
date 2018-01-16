@@ -59,6 +59,7 @@ extF80M_mul(extFloat80_t const* const aPtr,
             extFloat80_t const* const bPtr,
             extFloat80_t* const zPtr)
 {
+    using namespace softfloat;
     uint64_t sigB;
     int32_t expZ;
     uint32_t sigProd[4], *extSigZPtr;

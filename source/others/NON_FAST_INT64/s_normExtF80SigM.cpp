@@ -36,11 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 int
-softfloat_normExtF80SigM(uint64_t *sigPtr)
+softfloat_normExtF80SigM(uint64_t* sigPtr)
 {
     uint64_t const sig = *sigPtr;
     auto const shiftDist = softfloat_countLeadingZeros64(sig);
     *sigPtr = sig << shiftDist;
     return -shiftDist;
 }
+
+}  // namespace softfloat

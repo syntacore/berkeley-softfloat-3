@@ -36,28 +36,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-struct exp32_sig128
- softfloat_normSubnormalF128Sig( uint64_t sig64, uint64_t sig0 )
+namespace softfloat {
+
+exp32_sig128
+softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
 {
     int8_t shiftDist;
     struct exp32_sig128 z;
 
-    if ( ! sig64 ) {
-        shiftDist = softfloat_countLeadingZeros64( sig0 ) - 15;
+    if (!sig64) {
+        shiftDist = softfloat_countLeadingZeros64(sig0) - 15;
         z.exp = -63 - shiftDist;
-        if ( shiftDist < 0 ) {
-            z.sig.v64 = sig0>>-shiftDist;
-            z.sig.v0  = sig0<<(shiftDist & 63);
+
+        if (shiftDist < 0) {
+            z.sig.v64 = sig0 >> -shiftDist;
+            z.sig.v0 = sig0 << (shiftDist & 63);
         } else {
-            z.sig.v64 = sig0<<shiftDist;
-            z.sig.v0  = 0;
+            z.sig.v64 = sig0 << shiftDist;
+            z.sig.v0 = 0;
         }
     } else {
-        shiftDist = softfloat_countLeadingZeros64( sig64 ) - 15;
+        shiftDist = softfloat_countLeadingZeros64(sig64) - 15;
         z.exp = 1 - shiftDist;
-        z.sig = softfloat_shortShiftLeft128( sig64, sig0, shiftDist );
+        z.sig = softfloat_shortShiftLeft128(sig64, sig0, shiftDist);
     }
+
     return z;
 
 }
 
+}  // namespace softfloat

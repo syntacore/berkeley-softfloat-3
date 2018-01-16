@@ -39,8 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-float64_t f32_to_f64(float32_t a)
+float64_t
+f32_to_f64(float32_t a)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
     int16_t exp = expF32UI(uiA);
@@ -49,17 +51,20 @@ float64_t f32_to_f64(float32_t a)
     if (exp == 0xFF) {
         if (frac) {
             return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(uiA)));
-        } else {
-            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-    } else if (!exp) {
+
+        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
+    }
+
+    if (!exp) {
         if (!frac) {
             return u_as_f_64(packToF64UI(sign, 0, 0));
-        } else {
-            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
-            exp = normExpSig.exp - 1;
-            frac = normExpSig.sig;
         }
+
+        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+        exp = normExpSig.exp - 1;
+        frac = normExpSig.sig;
     }
+
     return u_as_f_64(packToF64UI(sign, exp + 0x380, (uint64_t)frac << 29));
 }

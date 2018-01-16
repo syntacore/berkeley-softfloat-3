@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
+namespace softfloat {
+
 exp16_sig64
 softfloat_normSubnormalF64Sig(uint64_t sig)
 {
@@ -45,3 +47,5 @@ softfloat_normSubnormalF64Sig(uint64_t sig)
     z.sig = sig << shiftDist;
     return z;
 }
+
+}  // namespace softfloat

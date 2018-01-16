@@ -50,8 +50,10 @@ extF80M_to_f16(const extFloat80_t *aPtr)
 
 #else
 
-float16_t extF80M_to_f16(const extFloat80_t *aPtr)
+float16_t
+extF80M_to_f16(const extFloat80_t *aPtr)
 {
+    using namespace softfloat;
     extFloat80M const *const aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = signExtF80UI64(uiA64);

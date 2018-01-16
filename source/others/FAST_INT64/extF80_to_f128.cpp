@@ -39,18 +39,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-float128_t extF80_to_f128(extFloat80_t a)
+float128_t
+extF80_to_f128(extFloat80_t a)
 {
+    using namespace softfloat;
     uint128 uiZ;
     bool sign;
-    struct uint128 frac128;
+    uint128 frac128;
     ui128_f128 uZ;
 
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     uint16_t const exp = expExtF80UI64(uiA64);
     uint64_t const frac = uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF);
-    if (0x7FFF == exp  && 0 != frac) {
+
+    if (0x7FFF == exp && 0 != frac) {
         uiZ = softfloat_commonNaNToF128UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0));
     } else {
         sign = signExtF80UI64(uiA64);
@@ -58,6 +61,7 @@ float128_t extF80_to_f128(extFloat80_t a)
         uiZ.v64 = packToF128UI64(sign, exp, frac128.v64);
         uiZ.v0 = frac128.v0;
     }
+
     uZ.ui = uiZ;
     return uZ.f;
 }

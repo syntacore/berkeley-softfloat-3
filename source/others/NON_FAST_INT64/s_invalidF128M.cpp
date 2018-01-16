@@ -39,7 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
-void softfloat_invalidF128M( uint32_t *zWPtr )
+namespace softfloat {
+
+void
+softfloat_invalidF128M( uint32_t *zWPtr )
 {
 
     softfloat_raiseFlags( softfloat_flag_invalid );
@@ -50,3 +53,4 @@ void softfloat_invalidF128M( uint32_t *zWPtr )
 
 }
 
+}  // namespace softfloat

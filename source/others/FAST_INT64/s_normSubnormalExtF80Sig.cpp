@@ -36,7 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-struct exp32_sig64 softfloat_normSubnormalExtF80Sig( uint64_t sig )
+namespace softfloat {
+
+exp32_sig64
+softfloat_normSubnormalExtF80Sig( uint64_t sig )
 {
     int8_t shiftDist;
     struct exp32_sig64 z;
@@ -47,4 +50,4 @@ struct exp32_sig64 softfloat_normSubnormalExtF80Sig( uint64_t sig )
     return z;
 
 }
-
+}  // namespace softfloat

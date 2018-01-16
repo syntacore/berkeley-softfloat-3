@@ -39,8 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
+float16_t
+f16_roundToInt(float16_t a,
+               uint8_t roundingMode,
+               bool exact)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     int8_t const exp = expF16UI(uiA);
 
@@ -48,31 +52,41 @@ float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
         if (!(uint16_t)(uiA << 1)) {
             return a;
         }
+
         if (exact) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         uint16_t const uiZ = static_cast<uint16_t>(uiA & packToF16UI(1, 0, 0u));
+
         switch (roundingMode) {
         case softfloat_round_near_even:
             if (!fracF16UI(uiA)) {
                 return u_as_f_16(uiZ);
             }
+
         case softfloat_round_near_maxMag:
             if (exp == 0xE) {
                 return u_as_f_16(static_cast<uint16_t>(uiZ | packToF16UI(0, 0xF, 0u)));
             }
+
             break;
+
         case softfloat_round_min:
             if (uiZ) {
                 return u_as_f_16(packToF16UI(1, 0xF, 0));
             }
+
             break;
+
         case softfloat_round_max:
             if (!uiZ) {
                 return u_as_f_16(packToF16UI(0, 0xF, 0));
             }
+
             break;
         }
+
         return u_as_f_16(uiZ);
     } else if (0x19 <= exp) {
         return
@@ -82,10 +96,12 @@ float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
         uint16_t uiZ = uiA;
         uint16_t const lastBitMask = static_cast<uint16_t>(1 << (0x19 - exp));
         uint16_t const roundBitsMask = lastBitMask - 1u;
+
         if (roundingMode == softfloat_round_near_maxMag) {
             uiZ += lastBitMask >> 1;
         } else if (roundingMode == softfloat_round_near_even) {
             uiZ += lastBitMask >> 1;
+
             if (!(uiZ & roundBitsMask)) {
                 uiZ &= ~lastBitMask;
             }
@@ -94,10 +110,13 @@ float16_t f16_roundToInt(float16_t a, uint8_t roundingMode, bool exact)
                 uiZ += roundBitsMask;
             }
         }
+
         uiZ &= ~roundBitsMask;
+
         if (exact && (uiZ != uiA)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         return u_as_f_16(uiZ);
     }
 }

@@ -42,19 +42,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 uint32_t
 f16_to_ui32_r_minMag(float16_t a, bool exact)
 {
+    using namespace softfloat;
     uint16_t const uiA = f_as_u_16(a);
     int8_t const exp = expF16UI(uiA);
     uint16_t const frac = fracF16UI(uiA);
 
     int8_t const shiftDist = exp - 0x0F;
+
     if (shiftDist < 0) {
         if (exact && (exp | frac)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         return 0;
     }
 
     bool const sign = signF16UI(uiA);
+
     if (sign || 0x1F == exp) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
@@ -65,9 +69,11 @@ f16_to_ui32_r_minMag(float16_t a, bool exact)
     }
 
     uint32_t const alignedSig = (uint32_t)(frac | 0x0400) << shiftDist;
+
     if (exact && (alignedSig & 0x3FF)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     return alignedSig >> 10;
 }
 

@@ -39,12 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 uint32_t
 softfloat_roundPackToUI32(bool sign,
                           uint64_t sig,
                           uint8_t roundingMode,
                           bool exact)
 {
+    using namespace softfloat;
     uint16_t const roundIncrement =
         softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x800u :
         (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0xFFFu :
@@ -75,3 +78,5 @@ softfloat_roundPackToUI32(bool sign,
 
     return z;
 }
+
+}  // namespace softfloat

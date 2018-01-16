@@ -39,8 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-float16_t f128_to_f16(float128_t a)
+float16_t
+f128_to_f16(float128_t a)
 {
+    using namespace softfloat;
     union ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;
@@ -48,6 +50,7 @@ float16_t f128_to_f16(float128_t a)
     bool const sign = signF128UI64(uiA64);
     int32_t exp = expF128UI64(uiA64);
     uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
+
     if (exp == 0x7FFF) {
         if (frac64) {
             return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
@@ -56,14 +59,17 @@ float16_t f128_to_f16(float128_t a)
         }
     } else {
         uint16_t const frac16 = (uint16_t)softfloat_shortShiftRightJam64(frac64, 34);
+
         if (!(exp | frac16)) {
             return u_as_f_16(packToF16UI(sign, 0, 0));
         } else {
             exp -= 0x3FF1;
+
             if (exp < -0x40) {
                 exp = -0x40;
             }
-            /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+
+            /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
             return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), frac16 | 0x4000u);
         }
     }

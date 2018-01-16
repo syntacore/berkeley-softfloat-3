@@ -38,14 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 float128_t
-softfloat_roundPackToF128(
-    bool sign,
-    int32_t exp,
-    uint64_t sig64,
-    uint64_t sig0,
-    uint64_t sigExtra
-)
+softfloat_roundPackToF128(bool sign,
+                          int32_t exp,
+                          uint64_t sig64,
+                          uint64_t sig0,
+                          uint64_t sigExtra)
 {
     bool roundNearEven, doIncrement;
     struct uint128_extra sig128Extra;
@@ -56,11 +56,13 @@ softfloat_roundPackToF128(
     uint8_t const roundingMode = softfloat_roundingMode;
     roundNearEven = (roundingMode == softfloat_round_near_even);
     doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+
     if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
         doIncrement =
             (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) &&
             sigExtra;
     }
+
     if (0x7FFD <= (uint32_t)exp) {
         if (exp < 0) {
             bool const isTiny =
@@ -68,19 +70,22 @@ softfloat_roundPackToF128(
                 exp < -1 ||
                 !doIncrement ||
                 softfloat_lt128(
-                       sig64,
-                       sig0,
-                       UINT64_C(0x0001FFFFFFFFFFFF),
-                       UINT64_MAX);
+                    sig64,
+                    sig0,
+                    UINT64_C(0x0001FFFFFFFFFFFF),
+                    UINT64_MAX);
             sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, -exp);
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
             exp = 0;
+
             if (isTiny && sigExtra) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
+
             doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+
             if (!roundNearEven && roundingMode != softfloat_round_near_maxMag) {
                 doIncrement =
                     roundingMode == (sign ? softfloat_round_min : softfloat_round_max) &&
@@ -95,22 +100,26 @@ softfloat_roundPackToF128(
             )
         ) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
+
             if (roundNearEven ||
-                roundingMode == softfloat_round_near_maxMag ||
-                roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
-            ) {
+                    roundingMode == softfloat_round_near_maxMag ||
+                    roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
+               ) {
                 uiZ64 = packToF128UI64(sign, 0x7FFF, 0);
                 uiZ0 = 0;
             } else {
                 uiZ64 = packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF));
                 uiZ0 = UINT64_MAX;
             }
+
             goto uiZ;
         }
     }
+
     if (sigExtra) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     if (doIncrement) {
         sig128 = softfloat_add128(sig64, sig0, 0, 1);
         sig64 = sig128.v64;
@@ -121,6 +130,7 @@ softfloat_roundPackToF128(
             exp = 0;
         }
     }
+
     uiZ64 = packToF128UI64(sign, exp, sig64);
     uiZ0 = sig0;
 uiZ:
@@ -128,3 +138,5 @@ uiZ:
     uZ.ui.v0 = uiZ0;
     return uZ.f;
 }
+
+}  // namespace softfloat

@@ -36,13 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "primitives/functions.hpp"
 
-bool softfloat_isNaNF128M( const uint32_t *aWPtr )
+namespace softfloat {
+bool
+softfloat_isNaNF128M(const uint32_t* aWPtr)
 {
-    uint32_t uiA96;
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
 
-    uiA96 = aWPtr[indexWordHi( 4 )];
-    if ( (~uiA96 & 0x7FFF0000) != 0 ) return false;
+    if ((~uiA96 & 0x7FFF0000) != 0) {
+        return false;
+    }
+
     return
-        (uiA96 & 0x0000FFFF) != 0 || 
-        (aWPtr[indexWord( 4, 2 )] | aWPtr[indexWord( 4, 1 )] | aWPtr[indexWord( 4, 0 )]) != 0;
+        (uiA96 & 0x0000FFFF) != 0 ||
+        (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0;
 }
+}  // namespace softfloat

@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 
+namespace softfloat {
+
 float16_t
 softfloat_roundPackToF16(bool sign, 
                          int16_t exp, 
@@ -77,3 +79,5 @@ softfloat_roundPackToF16(bool sign,
     sig &= ~static_cast<uint16_t>(!(roundBits ^ 8) & !!(softfloat_round_near_even == softfloat_roundingMode));
     return u_as_f_16(packToF16UI(sign, static_cast<int8_t>(sig ? exp : 0), sig));
 }
+
+}  // namespace softfloat

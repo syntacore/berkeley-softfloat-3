@@ -38,14 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-bool f32_eq_signaling(float32_t a, float32_t b)
+bool
+f32_eq_signaling(float32_t a, float32_t b)
 {
+    using namespace softfloat;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
+
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        return uiA == uiB || 0 == ((uiA | uiB) << 1);
     }
+
+    return uiA == uiB || 0 == ((uiA | uiB) << 1);
 }
