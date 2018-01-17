@@ -45,8 +45,8 @@ namespace softfloat {
 
 struct uint128
 {
-    uint64_t v0;
     uint64_t v64;
+    uint64_t v0;
 };
 struct uint64_extra
 {
