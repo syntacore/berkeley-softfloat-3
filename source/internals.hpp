@@ -240,15 +240,13 @@ isNaNF64UI(uint64_t a)
 inline constexpr bool
 isInf64UI(uint64_t a)
 {
-    return
-        2047 == expF64UI(a) &&
-        0 == fracF64UI(a);
+    return (~(~UINT64_C(0) << 11) << 52) == (~(~UINT64_C(0) << 63) & a);
 }
 
 inline constexpr bool
 isZero64UI(uint64_t a)
 {
-    return 0 == (a << 1);
+    return 0 == (~(~UINT64_C(0) << 63) & a);
 }
 
 inline constexpr bool
