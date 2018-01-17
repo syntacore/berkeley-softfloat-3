@@ -59,43 +59,6 @@ extern "C" {
 #endif
 
     /**
-    Software floating-point underflow tininess-detection mode.
-    */
-    typedef enum softfloat_tininess
-    {
-        softfloat_tininess_beforeRounding = 0,
-        softfloat_tininess_afterRounding = 1
-    } softfloat_tininess;
-    extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
-
-    /**
-    Software floating-point rounding mode.
-    */
-    /**@{*/
-    typedef enum softfloat_round_mode
-    {
-        softfloat_round_near_even = 0,
-        softfloat_round_minMag = 1,
-        softfloat_round_min = 2,
-        softfloat_round_max = 3,
-        softfloat_round_near_maxMag = 4
-    } softfloat_round_mode;
-    extern THREAD_LOCAL softfloat_round_mode softfloat_roundingMode;
-    /**@}*/
-
-    /**
-    Software floating-point exception flags.
-    */
-    enum softfloat_flags
-    {
-        softfloat_flag_inexact = 1 << 0,
-        softfloat_flag_underflow = 1 << 1,
-        softfloat_flag_overflow = 1 << 2,
-        softfloat_flag_infinite = 1 << 3,
-        softfloat_flag_invalid = 1 << 4
-    };
-
-    /**
     Routine to raise any or all of the software floating-point exception flags.
     */
     /**@{*/
@@ -254,12 +217,6 @@ extern "C" {
     bool f64_lt_quiet(float64_t, float64_t);
     bool f64_isSignalingNaN(float64_t);
     /**@}*/
-
-    /**
-    Rounding precision for 80-bit extended double-precision floating-point.
-    Valid values are 32, 64, and 80.
-    */
-    extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
 
     /**
     80-bit extended double-precision floating-point operations.

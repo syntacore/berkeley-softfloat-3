@@ -39,44 +39,116 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-/**
-Types used to pass 16-bit, 32-bit, 64-bit, and 128-bit floating-point
-arguments and results to/from functions.  These types must be exactly
-16 bits, 32 bits, 64 bits, and 128 bits in size, respectively.  Where a
-platform has "native" support for IEEE-Standard floating-point formats,
-the types below may, if desired, be defined as aliases for the native types
-(typically `float' and `double', and possibly `long double').
-*/
-typedef struct float16_t { uint16_t v; } float16_t;
-typedef struct float32_t { uint32_t v; } float32_t;
-typedef struct float64_t { uint64_t v; } float64_t;
-typedef struct float128_t { uint64_t v[2]; } float128_t;
+#ifndef THREAD_LOCAL
+#define THREAD_LOCAL
+#endif
 
-/**
-The format of an 80-bit extended floating-point number in memory.  This
-structure must contain a 16-bit field named `signExp' and a 64-bit field
-named `signif'.
-*/
-/** @bug macro value dependent interface */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    /**
+    Types used to pass 16-bit, 32-bit, 64-bit, and 128-bit floating-point
+    arguments and results to/from functions.  These types must be exactly
+    16 bits, 32 bits, 64 bits, and 128 bits in size, respectively.  Where a
+    platform has "native" support for IEEE-Standard floating-point formats,
+    the types below may, if desired, be defined as aliases for the native types
+    (typically `float' and `double', and possibly `long double').
+    */
+    typedef struct float16_t
+    {
+        uint16_t v;
+    } float16_t;
+    typedef struct float32_t
+    {
+        uint32_t v;
+    } float32_t;
+    typedef struct float64_t
+    {
+        uint64_t v;
+    } float64_t;
+    typedef struct float128_t
+    {
+        uint64_t v[2];
+    } float128_t;
+
+    /**
+    The format of an 80-bit extended floating-point number in memory.  This
+    structure must contain a 16-bit field named `signExp' and a 64-bit field
+    named `signif'.
+    */
+    /** @bug macro value dependent interface */
 #ifdef LITTLEENDIAN
-struct extFloat80M { uint64_t signif; uint16_t signExp; };
+    struct extFloat80M
+    {
+        uint64_t signif;
+        uint16_t signExp;
+    };
 #else
-struct extFloat80M { uint16_t signExp; uint64_t signif; };
+    struct extFloat80M
+    {
+        uint16_t signExp;
+        uint64_t signif;
+    };
 #endif
 
-/**
-The type used to pass 80-bit extended floating-point arguments and
-results to/from functions.  This type must have size identical to
-`struct extFloat80M'.  Type `extFloat80_t' can be defined as an alias for
-`struct extFloat80M'.  Alternatively, if a platform has "native" support
-for IEEE-Standard 80-bit extended floating-point, it may be possible,
-if desired, to define `extFloat80_t' as an alias for the native type
-(presumably either `long double' or a nonstandard compiler-intrinsic type).
-In that case, the `signif' and `signExp' fields of `struct extFloat80M'
-must align exactly with the locations in memory of the sign, exponent, and
-significand of the native type.
-*/
-typedef struct extFloat80M extFloat80_t;
+    /**
+    The type used to pass 80-bit extended floating-point arguments and
+    results to/from functions.  This type must have size identical to
+    `struct extFloat80M'.  Type `extFloat80_t' can be defined as an alias for
+    `struct extFloat80M'.  Alternatively, if a platform has "native" support
+    for IEEE-Standard 80-bit extended floating-point, it may be possible,
+    if desired, to define `extFloat80_t' as an alias for the native type
+    (presumably either `long double' or a nonstandard compiler-intrinsic type).
+    In that case, the `signif' and `signExp' fields of `struct extFloat80M'
+    must align exactly with the locations in memory of the sign, exponent, and
+    significand of the native type.
+    */
+    typedef struct extFloat80M extFloat80_t;
 
+    /**
+    Software floating-point exception flags.
+    */
+    enum softfloat_flags
+    {
+        softfloat_flag_inexact = 1 << 0,
+        softfloat_flag_underflow = 1 << 1,
+        softfloat_flag_overflow = 1 << 2,
+        softfloat_flag_infinite = 1 << 3,
+        softfloat_flag_invalid = 1 << 4
+    };
+
+    /**
+    Software floating-point underflow tininess-detection mode.
+    */
+    typedef enum softfloat_tininess
+    {
+        softfloat_tininess_beforeRounding = 0,
+        softfloat_tininess_afterRounding = 1
+    } softfloat_tininess;
+
+    /**
+    Software floating-point rounding mode.
+    */
+    typedef enum softfloat_round_mode
+    {
+        softfloat_round_near_even = 0,
+        softfloat_round_minMag = 1,
+        softfloat_round_min = 2,
+        softfloat_round_max = 3,
+        softfloat_round_near_maxMag = 4
+    } softfloat_round_mode;
+
+    /**
+    Rounding precision for 80-bit extended double-precision floating-point.
+    Valid values are 32, 64, and 80.
+    */
+    extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
+    extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
+    extern THREAD_LOCAL softfloat_round_mode softfloat_roundingMode;
+
+#ifdef __cplusplus
+}  // extern "C"
 #endif
 
+#endif
