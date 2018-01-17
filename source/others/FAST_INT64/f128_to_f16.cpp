@@ -43,7 +43,7 @@ float16_t
 f128_to_f16(float128_t a)
 {
     using namespace softfloat;
-    union ui128_f128 uA;
+    ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;
     uint64_t const uiA0 = uA.ui.v0;

@@ -55,8 +55,8 @@ softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
     bool const isSigNaNA = softfloat_isSigNaNF16UI(uiA);
     bool const isSigNaNB = softfloat_isSigNaNF16UI(uiB);
     /* Make NaNs non-signaling.*/
-    uint16_t const uiNonsigA = uiA | 0x0200;
-    uint16_t const uiNonsigB = uiB | 0x0200;
+    uint16_t const uiNonsigA = uiA | 0x0200u;
+    uint16_t const uiNonsigB = uiB | 0x0200u;
 
     if (isSigNaNA | isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -69,8 +69,8 @@ softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
         }
     }
     {
-        uint16_t const uiMagA = uiNonsigA & 0x7FFF;
-        uint16_t const uiMagB = uiNonsigB & 0x7FFF;
+        uint16_t const uiMagA = uiNonsigA & 0x7FFFu;
+        uint16_t const uiMagB = uiNonsigB & 0x7FFFu;
         return
             uiMagA < uiMagB ? uiNonsigB :
             uiMagB < uiMagA ? uiNonsigA :

@@ -43,7 +43,7 @@ i64_to_f128(int64_t a)
 {
     using namespace softfloat;
     uint64_t uiZ64, uiZ0;
-    union ui128_f128 uZ;
+    ui128_f128 uZ;
 
     if (!a) {
         uiZ64 = 0;
@@ -51,18 +51,21 @@ i64_to_f128(int64_t a)
     } else {
         bool const sign = (a < 0);
         /** @bug for INT64_MIN */
-        uint64_t absA = sign ? -a : a;
+        uint64_t absA = static_cast<uint64_t>(sign ? -a : a);
         int8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 49;
-        struct uint128 zSig;
+        uint128 zSig;
+
         if (64 <= shiftDist) {
             zSig.v64 = absA << (shiftDist - 64);
             zSig.v0 = 0;
         } else {
-            zSig = softfloat_shortShiftLeft128(0, absA, shiftDist);
+            zSig = softfloat_shortShiftLeft128(0, absA, static_cast<uint8_t>(shiftDist));
         }
+
         uiZ64 = packToF128UI64(sign, 0x406E - shiftDist, zSig.v64);
         uiZ0 = zSig.v0;
     }
+
     uZ.ui.v64 = uiZ64;
     uZ.ui.v0 = uiZ0;
     return uZ.f;

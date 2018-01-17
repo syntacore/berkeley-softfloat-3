@@ -45,7 +45,7 @@ f128_to_ui32_r_minMag(float128_t a,
                       bool exact)
 {
     using namespace softfloat;
-    union ui128_f128 uA;
+    ui128_f128 uA;
     uint64_t uiA64, uiA0;
     int32_t exp;
     uint64_t sig64;
@@ -80,8 +80,7 @@ f128_to_ui32_r_minMag(float128_t a,
     }
 
     sig64 |= UINT64_C(0x0001000000000000);
-    /** @todo Warning   C4244   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
-    z = sig64 >> shiftDist;
+    z = static_cast<uint32_t>(sig64 >> shiftDist);
 
     if (exact && ((uint64_t)z << shiftDist != sig64)) {
         softfloat_raiseFlags(softfloat_flag_inexact);

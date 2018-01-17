@@ -44,7 +44,7 @@ f128_to_i64_r_minMag(float128_t a,
                      bool exact)
 {
     using namespace softfloat;
-    union ui128_f128 uA;
+    ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;
     uint64_t const uiA0 = uA.ui.v0;
@@ -72,10 +72,10 @@ f128_to_i64_r_minMag(float128_t a,
         } else {
             sig64 |= UINT64_C(0x0001000000000000);
             /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data */
-            int8_t const negShiftDist = -shiftDist;
-            int64_t const absZ = sig64 << negShiftDist | sig0 >> (shiftDist & 63);
+            auto const negShiftDist = -shiftDist;
+            int64_t const absZ = static_cast<int64_t>(sig64 << negShiftDist | sig0 >> (shiftDist & 63u));
 
-            if (exact && (uint64_t)(sig0 << negShiftDist)) {
+            if (exact && static_cast<uint64_t>(sig0 << negShiftDist)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
@@ -90,9 +90,9 @@ f128_to_i64_r_minMag(float128_t a,
             return 0;
         } else {
             sig64 |= UINT64_C(0x0001000000000000);
-            int64_t const absZ = sig64 >> shiftDist;
+            int64_t const absZ = static_cast<int64_t>(sig64 >> shiftDist);
 
-            if (exact && (sig0 || (absZ << shiftDist != sig64))) {
+            if (exact && (sig0 || static_cast<uint64_t>(absZ << shiftDist) != sig64)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 

@@ -62,11 +62,10 @@ f128_to_ui64_r_minMag(float128_t a,
         }
 
         sig64 |= UINT64_C(0x0001000000000000);
-        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data */
-        int8_t const negShiftDist = -shiftDist;
+        auto const negShiftDist = -shiftDist;
         z = sig64 << negShiftDist | sig0 >> (shiftDist & 63);
 
-        if (exact && (uint64_t)(sig0 << negShiftDist)) {
+        if (exact && 0 != static_cast<uint64_t>(sig0 << negShiftDist)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
     } else {

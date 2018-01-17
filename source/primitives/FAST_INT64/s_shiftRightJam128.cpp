@@ -44,13 +44,13 @@ softfloat_shiftRightJam128(uint64_t a64,
                            uint32_t dist)
 {
     if (dist < 64) {
-        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
-        uint8_t const u8NegDist = -(int32_t)dist;
+        auto const u8NegDist = 63u & -static_cast<int32_t>(dist);
         uint128 z;
         z.v64 = a64 >> dist;
         z.v0 =
-            a64 << (u8NegDist & 63) | a0 >> dist |
-            ((uint64_t)(a0 << (u8NegDist & 63)) != 0);
+            a64 << u8NegDist |
+            a0 >> dist |
+            !!(0 != static_cast<uint64_t>(a0 << u8NegDist));
         return z;
     }
 

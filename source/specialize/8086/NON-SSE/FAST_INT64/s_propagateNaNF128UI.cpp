@@ -103,14 +103,14 @@ returnLargerMag:
 
 returnB:
         {
-            struct uint128 uiZ;
+            uint128 uiZ;
             uiZ.v64 = uiNonsigB64;
             uiZ.v0 = uiB0;
             return uiZ;
         }
 returnA:
         {
-            struct uint128 uiZ;
+            uint128 uiZ;
             uiZ.v64 = uiNonsigA64;
             uiZ.v0 = uiA0;
             return uiZ;

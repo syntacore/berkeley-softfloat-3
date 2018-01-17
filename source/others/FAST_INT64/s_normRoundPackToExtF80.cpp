@@ -45,20 +45,17 @@ softfloat_normRoundPackToExtF80(bool sign,
                                 uint64_t sigExtra,
                                 uint8_t roundingPrecision)
 {
-    int8_t shiftDist;
-    struct uint128 sig128;
-
-    if (! sig) {
+    if (!sig) {
         exp -= 64;
         sig = sigExtra;
         sigExtra = 0;
     }
 
-    shiftDist = softfloat_countLeadingZeros64(sig);
+    auto const shiftDist = softfloat_countLeadingZeros64(sig);
     exp -= shiftDist;
 
     if (shiftDist) {
-        sig128 = softfloat_shortShiftLeft128(sig, sigExtra, shiftDist);
+        uint128 const sig128 = softfloat_shortShiftLeft128(sig, sigExtra, shiftDist);
         sig = sig128.v64;
         sigExtra = sig128.v0;
     }

@@ -56,10 +56,10 @@ softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
     if (isSigNaNA || softfloat_isSigNaNF16UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         if (isSigNaNA) {
-            return uiA | 0x0200;
+            return uiA | 0x0200u;
         }
     }
-    return (isNaNF16UI(uiA) ? uiA : uiB) | 0x0200;
+    return (isNaNF16UI(uiA) ? uiA : uiB) | 0x0200u;
 }
 
 }  // namespace Intel_8086

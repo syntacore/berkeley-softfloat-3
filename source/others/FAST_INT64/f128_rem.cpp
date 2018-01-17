@@ -57,7 +57,7 @@ f128_rem(float128_t a, float128_t b)
     exp32_sig128 normExpSig;
     uint128 rem;
     int32_t expDiff;
-    uint32_t q, recip32;
+    uint32_t recip32;
     uint64_t q64;
     uint128 term, altRem, meanRem;
     bool signRem;
@@ -122,6 +122,8 @@ f128_rem(float128_t a, float128_t b)
     rem = sigA;
     expDiff = expA - expB;
 
+    uint32_t q;
+
     if (expDiff < 1) {
         if (expDiff < -1) {
             return a;
@@ -132,14 +134,14 @@ f128_rem(float128_t a, float128_t b)
             sigB = softfloat_add128(sigB.v64, sigB.v0, sigB.v64, sigB.v0);
             q = 0;
         } else {
-            q = softfloat_le128(sigB.v64, sigB.v0, rem.v64, rem.v0);
+            q = 0u + !!softfloat_le128(sigB.v64, sigB.v0, rem.v64, rem.v0);
 
             if (q) {
                 rem = softfloat_sub128(rem.v64, rem.v0, sigB.v64, sigB.v0);
             }
         }
     } else {
-        recip32 = softfloat_approxRecip32_1(sigB.v64 >> 17);
+        recip32 = softfloat_approxRecip32_1(static_cast<uint32_t>(sigB.v64 >> 17));
         expDiff -= 30;
 
         for (;;) {
@@ -164,8 +166,7 @@ f128_rem(float128_t a, float128_t b)
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
         q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
-        /** @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data */
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, expDiff + 30);
+        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, static_cast<uint8_t>(expDiff + 30u));
         term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 

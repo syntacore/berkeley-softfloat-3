@@ -48,7 +48,7 @@ f16_to_f128(float16_t a)
     int8_t exp = expF16UI(uiA);
     uint16_t frac = fracF16UI(uiA);
 
-    struct uint128 uiZ;
+    uint128 uiZ;
 
     if (exp == 0x1F) {
         if (frac) {
@@ -60,7 +60,7 @@ f16_to_f128(float16_t a)
     } else {
         if (!exp) {
             if (frac) {
-                struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
                 exp = normExpSig.exp - 1;
                 frac = normExpSig.sig;
             } else {
@@ -76,7 +76,7 @@ f16_to_f128(float16_t a)
 
 uiZ:
     {
-        union ui128_f128 uZ;
+        ui128_f128 uZ;
         uZ.ui = uiZ;
         return uZ.f;
     }

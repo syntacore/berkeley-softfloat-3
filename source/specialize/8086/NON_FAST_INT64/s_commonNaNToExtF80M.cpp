@@ -46,10 +46,10 @@ floating-point NaN, and stores this NaN at the location pointed to by
 `zSPtr'.
 */
 /** @bug use extFloat80_t */
-struct extFloat80M
-softfloat_commonNaNToExtF80M(struct commonNaN a)
+extFloat80M
+softfloat_commonNaNToExtF80M(commonNaN a)
 {
-    struct extFloat80M z;
+    extFloat80M z;
     z.signExp = packToExtF80UI64(a.sign, 0x7FFF);
     z.signif = UINT64_C(0xC000000000000000) | a.v64 >> 1;
     return z;

@@ -68,7 +68,7 @@ f64_to_ui64(float64_t a,
         sigExtra.v = sig << -shiftDist;
         sigExtra.extra = 0;
     } else {
-        sigExtra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
+        sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
     }
 
     return

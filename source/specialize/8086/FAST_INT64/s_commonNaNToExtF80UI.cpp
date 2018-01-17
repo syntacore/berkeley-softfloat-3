@@ -47,10 +47,10 @@ floating-point NaN, and returns the bit pattern of this value as an unsigned
 integer.
 */
 uint128
-    softfloat_commonNaNToExtF80UI(struct commonNaN a)
+softfloat_commonNaNToExtF80UI(commonNaN a)
 {
-    struct uint128 uiZ;
-    uiZ.v64 = (uint16_t)a.sign << 15 | 0x7FFF;
+    uint128 uiZ;
+    uiZ.v64 = static_cast<uint16_t>(a.sign) << 15 | 0x7FFFu;
     uiZ.v0 = UINT64_C(0xC000000000000000) | a.v64 >> 1;
     return uiZ;
 }

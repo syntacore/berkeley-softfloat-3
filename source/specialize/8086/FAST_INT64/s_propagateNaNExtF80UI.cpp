@@ -86,8 +86,8 @@ softfloat_propagateNaNExtF80UI(uint16_t uiA64,
     }
 
 returnLargerMag: {
-        uint16_t const uiMagA64 = uiA64 & 0x7FFF;
-        uint16_t const uiMagB64 = uiB64 & 0x7FFF;
+        uint16_t const uiMagA64 = uiA64 & 0x7FFFu;
+        uint16_t const uiMagB64 = uiB64 & 0x7FFFu;
 
         if (uiMagA64 < uiMagB64) {
             goto returnB;
@@ -110,13 +110,13 @@ returnLargerMag: {
         }
     }
 returnB: {
-        struct uint128 uiZ;
+        uint128 uiZ;
         uiZ.v64 = uiB64;
         uiZ.v0 = uiNonsigB0;
         return uiZ;
     }
 returnA: {
-        struct uint128 uiZ;
+        uint128 uiZ;
         uiZ.v64 = uiA64;
         uiZ.v0 = uiNonsigA0;
         return uiZ;

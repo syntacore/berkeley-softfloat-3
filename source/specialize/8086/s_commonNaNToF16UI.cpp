@@ -45,9 +45,9 @@ Converts the common NaN into a 16-bit floating-point NaN,
 @returns the bit pattern of this value as an unsigned integer.
 */
 uint16_t
-softfloat_commonNaNToF16UI(struct commonNaN a)
+softfloat_commonNaNToF16UI(commonNaN a)
 {
-    return (uint16_t)a.sign << 15 | 0x7E00 | a.v64 >> 54;
+    return static_cast<uint16_t>(a.sign) << 15 | 0x7E00 | a.v64 >> 54;
 }
 
 }  // namespace Intel_8086

@@ -48,7 +48,7 @@ f32_to_i64(float32_t a, uint8_t roundingMode, bool exact)
     int16_t const exp = expF32UI(uiA);
     uint32_t sig = fracF32UI(uiA);
 
-    int16_t const shiftDist = 0xBE - exp;
+    auto const shiftDist = 0xBE - exp;
 
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -65,7 +65,7 @@ f32_to_i64(float32_t a, uint8_t roundingMode, bool exact)
     uint64_t extra = 0;
 
     if (shiftDist) {
-        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0, shiftDist);
+        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0u, static_cast<uint32_t>(shiftDist));
         sig64 = sig64Extra.v;
         extra = sig64Extra.extra;
     }

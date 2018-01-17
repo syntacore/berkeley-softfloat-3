@@ -41,10 +41,10 @@ namespace softfloat {
 namespace Intel_8086 {
 
 uint64_t
-softfloat_commonNaNToF64UI(struct commonNaN a)
+softfloat_commonNaNToF64UI(commonNaN a)
 {
     return
-        (uint64_t)a.sign << 63 | UINT64_C(0x7FF8000000000000) | 
+        static_cast<uint64_t>(a.sign) << 63 | UINT64_C(0x7FF8000000000000) | 
         a.v64 >> 12;
 }
 

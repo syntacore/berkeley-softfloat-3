@@ -38,31 +38,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 float128_t
-ui64_to_f128( uint64_t a )
+ui64_to_f128(uint64_t a)
 {
     using namespace softfloat;
     uint64_t uiZ64, uiZ0;
     int8_t shiftDist;
-    struct uint128 zSig;
-    union ui128_f128 uZ;
+    uint128 zSig;
+    ui128_f128 uZ;
 
-    if ( ! a ) {
+    if (!a) {
         uiZ64 = 0;
-        uiZ0  = 0;
+        uiZ0 = 0;
     } else {
-        shiftDist = softfloat_countLeadingZeros64( a ) + 49;
-        if ( 64 <= shiftDist ) {
-            zSig.v64 = a<<(shiftDist - 64);
-            zSig.v0  = 0;
-        } else {
-            zSig = softfloat_shortShiftLeft128( 0, a, shiftDist );
-        }
-        uiZ64 = packToF128UI64( 0, 0x406E - shiftDist, zSig.v64 );
-        uiZ0  = zSig.v0;
-    }
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0  = uiZ0;
-    return uZ.f;
+        shiftDist = softfloat_countLeadingZeros64(a) + 49;
 
+        if (64 <= shiftDist) {
+            zSig.v64 = a << (shiftDist - 64);
+            zSig.v0 = 0;
+        } else {
+            zSig = softfloat_shortShiftLeft128(0u, a, static_cast<uint8_t>(shiftDist));
+        }
+
+        uiZ64 = packToF128UI64(0, 0x406E - shiftDist, zSig.v64);
+        uiZ0 = zSig.v0;
+    }
+
+    uZ.ui.v64 = uiZ64;
+    uZ.ui.v0 = uiZ0;
+    return uZ.f;
 }
 

@@ -44,27 +44,26 @@ f128_mul(float128_t a,
          float128_t b)
 {
     using namespace softfloat;
-    union ui128_f128 uA;
+    ui128_f128 uA;
     uint64_t uiA64, uiA0;
     bool signA;
     int32_t expA;
-    struct uint128 sigA;
-    union ui128_f128 uB;
+    uint128 sigA;
+    ui128_f128 uB;
     uint64_t uiB64, uiB0;
     bool signB;
     int32_t expB;
-    struct uint128 sigB;
+    uint128 sigB;
     bool signZ;
     uint64_t magBits;
-    struct exp32_sig128 normExpSig;
+    exp32_sig128 normExpSig;
     int32_t expZ;
     uint64_t sig256Z[4];
     uint64_t sigZExtra;
-    struct uint128 sigZ;
-    struct uint128_extra sig128Extra;
-    struct uint128 uiZ;
-    union ui128_f128 uZ;
-
+    uint128 sigZ;
+    uint128_extra sig128Extra;
+    uint128 uiZ;
+    ui128_f128 uZ;
 
     uA.f = a;
     uiA64 = uA.ui.v64;

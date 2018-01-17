@@ -46,7 +46,7 @@ extF80_rem(extFloat80_t a,
     using namespace softfloat;
     exp32_sig64 normExpSig;
     int32_t expDiff;
-    struct uint128 rem, shiftedSigB;
+    uint128 rem, shiftedSigB;
     uint32_t q, recip32;
     uint128 altRem;
     uint128 meanRem;

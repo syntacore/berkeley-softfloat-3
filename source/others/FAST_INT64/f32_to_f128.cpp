@@ -61,7 +61,7 @@ f32_to_f128(float32_t a)
 
     if (0 == exp) {
         if (0 == frac) {
-            struct uint128 uiZ;
+            uint128 uiZ;
             uiZ.v64 = packToF128UI64(sign, 0, 0);
             uiZ.v0 = 0;
             return u_as_f_128(uiZ);

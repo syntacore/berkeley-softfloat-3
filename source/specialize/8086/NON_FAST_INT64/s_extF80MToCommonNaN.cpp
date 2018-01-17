@@ -49,7 +49,7 @@ NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
 commonNaN
-softfloat_extF80MToCommonNaN(struct extFloat80M a)
+softfloat_extF80MToCommonNaN(extFloat80M a)
 {
 
     if (extF80M_isSignalingNaN(&a)) {

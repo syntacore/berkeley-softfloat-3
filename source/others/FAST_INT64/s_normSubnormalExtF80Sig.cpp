@@ -39,15 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 
 exp32_sig64
-softfloat_normSubnormalExtF80Sig( uint64_t sig )
+softfloat_normSubnormalExtF80Sig(uint64_t sig)
 {
-    int8_t shiftDist;
-    struct exp32_sig64 z;
-
-    shiftDist = softfloat_countLeadingZeros64( sig );
+    auto const shiftDist = softfloat_countLeadingZeros64(sig);
+    exp32_sig64 z;
     z.exp = -shiftDist;
-    z.sig = sig<<shiftDist;
+    z.sig = sig << shiftDist;
     return z;
-
 }
 }  // namespace softfloat

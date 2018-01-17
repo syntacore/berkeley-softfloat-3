@@ -47,12 +47,12 @@ softfloat_subMagsF128(uint64_t uiA64,
                       uint64_t uiB0,
                       bool signZ)
 {
-    struct uint128 sigA;
+    uint128 sigA;
     int32_t expB;
-    struct uint128 sigB, sigZ;
+    uint128 sigB, sigZ;
     int32_t expDiff, expZ;
-    struct uint128 uiZ;
-    union ui128_f128 uZ;
+    uint128 uiZ;
+    ui128_f128 uZ;
 
     int32_t const expA = expF128UI64(uiA64);
     sigA.v64 = fracF128UI64(uiA64);
@@ -125,7 +125,7 @@ expBBigger:
         }
     }
 
-    sigA = softfloat_shiftRightJam128(sigA.v64, sigA.v0, -expDiff);
+    sigA = softfloat_shiftRightJam128(sigA.v64, sigA.v0, static_cast<uint32_t>(-expDiff));
 newlyAlignedBBigger:
     expZ = expB;
     sigB.v64 |= UINT64_C(0x0010000000000000);
@@ -155,7 +155,7 @@ expABigger:
         }
     }
 
-    sigB = softfloat_shiftRightJam128(sigB.v64, sigB.v0, expDiff);
+    sigB = softfloat_shiftRightJam128(sigB.v64, sigB.v0, static_cast<uint32_t>(expDiff));
 newlyAlignedABigger:
     expZ = expA;
     sigA.v64 |= UINT64_C(0x0010000000000000);
