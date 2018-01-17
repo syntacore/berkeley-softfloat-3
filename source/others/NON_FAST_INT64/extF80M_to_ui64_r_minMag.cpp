@@ -4,7 +4,7 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,40 +39,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+uint64_t
+extF80M_to_ui64_r_minMag(const extFloat80_t *aPtr, bool exact)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    extFloat80M const *aSPtr;
+    uint16_t uiA64;
+    int32_t exp;
+    uint64_t sig;
+    int32_t shiftDist;
+    bool sign;
+    uint64_t z;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
-
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+    aSPtr = aPtr;
+    uiA64 = aSPtr->signExp;
+    exp = expExtF80UI64(uiA64);
+    sig = aSPtr->signif;
+    
+    if (!sig && (exp != 0x7FFF)) {
+        return 0;
     }
-
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
+    shiftDist = 0x403E - exp;
+    if (64 <= shiftDist) {
+        if (exact) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+        return 0;
     }
+    
+    sign = signExtF80UI64(uiA64);
+    if (shiftDist < 0) {
+        if (sign || (shiftDist <= -63)) {
+            goto invalid;
+        }
+        shiftDist = -shiftDist;
+        z = sig << shiftDist;
+        if (z >> shiftDist != sig) {
+            goto invalid;
+        }
+    } else {
+        z = sig;
+        if (shiftDist) {
+            z >>= shiftDist;
+        }
+        if (sign && z) {
+            goto invalid;
+        }
+        if (exact && shiftDist && (z << shiftDist != sig)) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
+    }
+    return z;
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+invalid:
+    softfloat_raiseFlags(softfloat_flag_invalid);
+    return
+        (exp == 0x7FFF) && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))
+        ? ui64_fromNaN
+        : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+
 }

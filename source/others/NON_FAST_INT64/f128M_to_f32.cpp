@@ -39,40 +39,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+float32_t
+f128M_to_f32(const float128_t* aPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint32_t const* const aWPtr = (const uint32_t*)aPtr;
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool const sign = signF128UI96(uiA96);
+    int32_t exp = expF128UI96(uiA96);
+    uint64_t const frac64 =
+        static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 |
+        aWPtr[indexWord(4, 2)] |
+        (0 != (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]));
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
+    if (exp != INT16_MAX) {
+        uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac64, 18u));
+
+        if (exp | frac32) {
+            exp -= 0x3F81;
+
+            if (exp < -0x1000) {
+                exp = -0x1000;
+            }
+
+            assert(INT16_MIN <= exp && exp <= INT16_MAX);
+            return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+        return signed_zero_F32(sign);
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    if (frac64) {
+        return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f128MToCommonNaN(aWPtr)));
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    return signed_inf_F32(sign);
 }

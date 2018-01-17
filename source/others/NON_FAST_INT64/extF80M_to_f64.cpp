@@ -6,7 +6,8 @@ Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -39,40 +40,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+float64_t
+extF80M_to_f64(extFloat80_t const *aPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    extFloat80M const *aSPtr = aPtr;
+    uint16_t const uiA64 = aSPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t exp = expExtF80UI64(uiA64);
+    uint64_t sig = aSPtr->signif;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
+    if (exp == 0x7FFF) {
+        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_extF80MToCommonNaN(*aSPtr)));
+        } else {
+            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
-    }
-
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
+    } else {
+        if (!(sig & UINT64_C(0x8000000000000000))) {
+            if (!sig) {
+                return u_as_f_64(packToF64UI(sign, 0, 0));
+            } else {
+                exp += softfloat_normExtF80SigM(&sig);
+            }
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+        sig = softfloat_shortShiftRightJam64(sig, 1);
+        exp -= 0x3C01;
+        if (exp < -0x1000) {
+            exp = -0x1000;
+        }
+        /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+        return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
     }
-
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }

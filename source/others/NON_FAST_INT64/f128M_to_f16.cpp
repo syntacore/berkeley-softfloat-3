@@ -39,40 +39,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+float16_t
+f128M_to_f16(const float128_t* aPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint32_t const* const aWPtr = (uint32_t const*)aPtr;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool const sign = signF128UI96(uiA96);
+    int32_t exp = expF128UI96(uiA96);
+    uint32_t const frac32 =
+        fracF128UI96(uiA96) |
+        ((aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0);
+
+    if (exp == 0x7FFF) {
+        if (frac32) {
+            return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f128MToCommonNaN(aWPtr)));
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+        return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
+    uint16_t const frac16 = static_cast<uint16_t>(frac32 >> 2 | (frac32 & 3));
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    if (0 == (exp | frac16)) {
+        return u_as_f_16(packToF16UI(sign, 0, 0));
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    exp -= 0x3FF1;
+
+    if (exp < -0x40) {
+        exp = -0x40;
+    }
+
+    return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
 }

@@ -4,9 +4,10 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
-California.  All rights reserved.
-
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -37,42 +38,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
+
+namespace softfloat {
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+extF80M_sub(const extFloat80_t* aPtr,
+            const extFloat80_t* bPtr,
+            extFloat80_t* zPtr)
 {
-    using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
-
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
-
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+    extFloat80M const* aSPtr;
+    extFloat80M const* bSPtr;
+    uint16_t uiA64;
+    uint64_t uiA0;
+    bool signA;
+    uint16_t uiB64;
+    uint64_t uiB0;
+    bool signB;
+    aSPtr = aPtr;
+    bSPtr = bPtr;
+    uiA64 = aSPtr->signExp;
+    uiA0 = aSPtr->signif;
+    signA = signExtF80UI64(uiA64);
+    uiB64 = bSPtr->signExp;
+    uiB0 = bSPtr->signif;
+    signB = signExtF80UI64(uiB64);
+    if (signA == signB) {
+        *zPtr = softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
+    } else {
+        *zPtr = softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
     }
-
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
-    }
-
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }
+
+}  // namespace softfloat

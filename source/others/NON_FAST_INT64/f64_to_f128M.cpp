@@ -4,8 +4,8 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
-California.  All rights reserved.
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -40,39 +40,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+f64_to_f128M(float64_t a,
+             float128_t* zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
+    uint32_t* zWPtr = (uint32_t*)zPtr;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
     uint64_t frac = fracF64UI(uiA);
 
-    if (exp == 0x7FF) {
+    zWPtr[indexWord(4, 0)] = 0;
+
+    if (0x7FF == exp) {
         if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
+            softfloat_commonNaNToF128M(softfloat_f64UIToCommonNaN(uiA), zWPtr);
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
         return;
     }
 
     if (!exp) {
         if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
+            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
             return;
         }
 
         exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
+        exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    zWPtr[indexWord(4, 1)] = static_cast<uint32_t>(frac) << 28;
+    frac >>= 4;
+    zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp + 0x3C00u, frac >> 32);
+    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
+    zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(frac);
 }

@@ -4,9 +4,10 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
-California.  All rights reserved.
-
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -37,42 +38,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+bool extF80M_lt(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    extFloat80M const *aSPtr;
+    extFloat80M const *bSPtr;
+    uint16_t uiA64;
+    uint64_t uiA0;
+    uint16_t uiB64;
+    uint64_t uiB0;
+    bool signA, ltMags;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
+    aSPtr = aPtr;
+    bSPtr = bPtr;
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+    uiA64 = aSPtr->signExp;
+    uiA0 = aSPtr->signif;
+    uiB64 = bSPtr->signExp;
+    uiB0 = bSPtr->signif;
+
+    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return false;
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
+    signA = signExtF80UI64(uiA64);
+    if ((uiA64 ^ uiB64) & 0x8000) {
+        /* Signs are different. */
+        return signA && ((uiA0 | uiB0) != 0);
+    } else {
+        /* Signs are the same. */
+        if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+            return (softfloat_compareNonnormExtF80M(aSPtr, bSPtr) < 0);
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+        if (uiA64 == uiB64) {
+            if (uiA0 == uiB0) {
+                return false;
+            }
+            ltMags = (uiA0 < uiB0);
+        } else {
+            ltMags = (uiA64 < uiB64);
+        }
+        return signA ^ ltMags;
     }
-
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }

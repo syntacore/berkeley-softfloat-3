@@ -4,8 +4,8 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
-California.  All rights reserved.
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -39,40 +39,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+bool
+f128M_eq(const float128_t *aPtr,
+         const float128_t *bPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    const uint32_t *aWPtr, *bWPtr;
+    uint32_t wordA, wordB, uiA96, uiB96;
+    bool possibleOppositeZeros;
+    uint32_t mashWord;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
-
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+    aWPtr = (const uint32_t *)aPtr;
+    bWPtr = (const uint32_t *)bPtr;
+    wordA = aWPtr[indexWord(4, 2)];
+    wordB = bWPtr[indexWord(4, 2)];
+    if (wordA != wordB) {
+        goto false_checkSigNaNs;
     }
-
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
+    uiA96 = aWPtr[indexWordHi(4)];
+    uiB96 = bWPtr[indexWordHi(4)];
+    possibleOppositeZeros = false;
+    if (uiA96 != uiB96) {
+        possibleOppositeZeros = (((uiA96 | uiB96) & 0x7FFFFFFF) == 0);
+        if (!possibleOppositeZeros) {
+            goto false_checkSigNaNs;
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
     }
+    mashWord = wordA | wordB;
+    wordA = aWPtr[indexWord(4, 1)];
+    wordB = bWPtr[indexWord(4, 1)];
+    if (wordA != wordB) {
+        goto false_checkSigNaNs;
+    }
+    mashWord |= wordA | wordB;
+    wordA = aWPtr[indexWord(4, 0)];
+    wordB = bWPtr[indexWord(4, 0)];
+    if (wordA != wordB) {
+        goto false_checkSigNaNs;
+    }
+    if (possibleOppositeZeros && ((mashWord | wordA | wordB) != 0)) {
+        goto false_checkSigNaNs;
+    }
+    if (!softfloat_isNaNF128M(aWPtr) && !softfloat_isNaNF128M(bWPtr)) {
+        return true;
+    }
+false_checkSigNaNs:
+    if (f128M_isSignalingNaN((const float128_t *)aWPtr) || f128M_isSignalingNaN((const float128_t *)bWPtr)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+    }
+    return false;
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }

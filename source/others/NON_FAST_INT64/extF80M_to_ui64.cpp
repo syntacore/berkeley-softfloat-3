@@ -4,7 +4,7 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,40 +39,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+uint64_t
+extF80M_to_ui64(const extFloat80_t *aSPtr, 
+                uint8_t roundingMode, bool exact)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
-
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
-
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+    uint16_t const uiA64 = aSPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = aSPtr->signif;
+    int32_t const shiftDist = 0x403E - exp;
+    if (shiftDist < 0) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == INT16_MAX && (sig & INT64_MAX) ? ui64_fromNaN :
+            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    uint32_t extSig[3];
+    extSig[indexWord(3, 2)] = sig >> 32;
+    extSig[indexWord(3, 1)] = (uint32_t)sig;
+    extSig[indexWord(3, 0)] = 0;
+    if (shiftDist) {
+        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
-
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
 }

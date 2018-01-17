@@ -1,10 +1,9 @@
-
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,42 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
-
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
-
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+    extFloat80M *const zSPtr = zPtr;
+    uint16_t uiZ64 = 0;
+    uint64_t sigZ = 0;
+    if (0 != a) {
+        bool const sign = a < 0;
+        uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
+        auto const shiftDist = softfloat_countLeadingZeros64(absA);
+        uiZ64 = packToExtF80UI64(sign, 0x403Eu - shiftDist);
+        sigZ = absA << shiftDist;
     }
-
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
-    }
-
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    zSPtr->signExp = uiZ64;
+    zSPtr->signif = sigZ;
 }

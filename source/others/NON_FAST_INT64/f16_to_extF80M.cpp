@@ -40,39 +40,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
+f16_to_extF80M(float16_t a,
                extFloat80_t* zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint16_t uiZ64;
+    uint32_t uiZ32;
 
-    if (exp == 0x7FF) {
+    extFloat80M* const zSPtr = zPtr;
+    uint16_t const uiA = f_as_u_16(a);
+    bool const sign = signF16UI(uiA);
+    int8_t exp = expF16UI(uiA);
+    uint16_t frac = fracF16UI(uiA);
+
+    if (exp == 0x1F) {
         if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
+            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f16UIToCommonNaN(uiA));
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+        uiZ64 = packToExtF80UI64(sign, 0x7FFF);
+        uiZ32 = 0x80000000;
+        goto uiZ;
     }
 
     if (!exp) {
         if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
+            uiZ64 = packToExtF80UI64(sign, 0);
+            uiZ32 = 0;
+            goto uiZ;
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    uiZ64 = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3FF0));
+    uiZ32 = 0x80000000 | (uint32_t)frac << 21;
+uiZ:
+    zSPtr->signExp = uiZ64;
+    zSPtr->signif = (uint64_t)uiZ32 << 32;
 }

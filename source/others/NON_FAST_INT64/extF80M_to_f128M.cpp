@@ -4,9 +4,10 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
-California.  All rights reserved.
-
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -40,39 +41,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+    uint16_t const uiA64 = aPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t exp = expExtF80UI64(uiA64);
+    uint64_t sig = aPtr->signif;
+    zWPtr[indexWord(4, 0)] = 0;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
+    if (exp == 0x7FFF) {
+        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+            softfloat_commonNaNToF128M(softfloat_extF80MToCommonNaN(*aPtr), zWPtr);
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
         return;
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
+    if (exp) {
+        --exp;
+    }
+
+    if (0 == (sig & UINT64_C(0x8000000000000000))) {
+        if (0 == sig) {
+            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
             return;
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+        exp += softfloat_normExtF80SigM(&sig);
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    zWPtr[indexWord(4, 1)] = (uint32_t)sig << 17;
+    sig >>= 15;
+    zWPtr[indexWord(4, 2)] = (uint32_t)sig;
+
+    if (exp < 0) {
+        zWPtr[indexWordHi(4)] = sig >> 32;
+        softfloat_shiftRight96M(
+            &zWPtr[indexMultiwordHi(4, 3)],
+            static_cast<uint8_t>(-exp),
+            &zWPtr[indexMultiwordHi(4, 3)]);
+        exp = 0;
+        sig = (uint64_t)zWPtr[indexWordHi(4)] << 32;
+    }
+
+    zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), sig >> 32);
+    return;
 }

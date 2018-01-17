@@ -39,40 +39,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+float64_t
+f128M_to_f64(const float128_t* aPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint32_t const* aWPtr = (const uint32_t*)aPtr;
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    bool const sign = signF128UI96(uiA96);
+    int32_t exp = expF128UI96(uiA96);
+    uint64_t frac64 = (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)];
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
+    if (exp == 0x7FFF) {
+        if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
+            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f128MToCommonNaN(aWPtr)));
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
+    uint32_t const frac32 = aWPtr[indexWord(4, 1)];
+    frac64 = frac64 << 14 | frac32 >> 18;
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    if (0 != (frac32 & 0x0003FFFF) || 0 != aWPtr[indexWord(4, 0)]) {
+        frac64 |= 1;
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    if (0 == exp && 0 == frac64) {
+        return u_as_f_64(packToF64UI(sign, 0, 0));
+    }
+
+    exp -= 0x3C01;
+
+    if (exp < -0x1000) {
+        exp = -0x1000;
+    }
+
+    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+    return
+        softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
 }

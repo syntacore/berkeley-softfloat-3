@@ -4,9 +4,10 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -39,40 +40,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+uint32_t
+extF80M_to_ui32(extFloat80_t const* const aPtr,
+                uint8_t roundingMode,
+                bool exact)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint16_t const uiA64 = aPtr->signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t sig = aPtr->signif;
+    int32_t const shiftDist = 0x4032 - exp;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
+    if (shiftDist <= 0) {
+        if (sig >> 32) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? ui32_fromNaN :
+                sign ? ui32_fromNegOverflow :
+                ui32_fromPosOverflow;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
-    }
-
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
+        if (-32 < shiftDist) {
+            sig <<= -shiftDist;
+        } else if (0 != sig) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? ui32_fromNaN :
+                sign ? ui32_fromNegOverflow :
+                ui32_fromPosOverflow;
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    } else {
+        sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    return softfloat_roundPackToUI32(sign, sig, roundingMode, exact);
 }

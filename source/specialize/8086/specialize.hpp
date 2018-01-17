@@ -76,8 +76,7 @@ invalid exception.
 "Common NaN" structure, used to transfer NaN representations from one format
 to another.
 */
-struct commonNaN
-{
+struct commonNaN {
     bool sign;
 #ifdef LITTLEENDIAN
     uint64_t v0, v64;
@@ -109,7 +108,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 struct commonNaN
-    softfloat_f16UIToCommonNaN(uint16_t uiA);
+softfloat_f16UIToCommonNaN(uint16_t uiA);
 
 /**
 Converts the common NaN pointed to by `aPtr' into a 16-bit floating-point
@@ -183,7 +182,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 struct commonNaN
-    softfloat_f64UIToCommonNaN(uint64_t uiA);
+softfloat_f64UIToCommonNaN(uint64_t uiA);
 
 /**
 Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
@@ -237,17 +236,17 @@ this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
-struct commonNaN
-    softfloat_extF80UIToCommonNaN(uint16_t uiA64,
-                                  uint64_t uiA0);
+commonNaN
+softfloat_extF80UIToCommonNaN(uint16_t uiA64,
+                              uint64_t uiA0);
 
 /**
 Converts the common NaN pointed to by `aPtr' into an 80-bit extended
 floating-point NaN, and returns the bit pattern of this value as an unsigned
 integer.
 */
-struct uint128
-    softfloat_commonNaNToExtF80UI(struct commonNaN a);
+uint128
+softfloat_commonNaNToExtF80UI(commonNaN a);
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
@@ -259,10 +258,10 @@ result.  If either original floating-point value is a signaling NaN, the
 invalid exception is raised.
 */
 struct uint128
-    softfloat_propagateNaNExtF80UI(uint16_t uiA64,
-                                   uint64_t uiA0,
-                                   uint16_t uiB64,
-                                   uint64_t uiB0);
+softfloat_propagateNaNExtF80UI(uint16_t uiA64,
+                               uint64_t uiA0,
+                               uint16_t uiB64,
+                               uint64_t uiB0);
 
 /**
 The bit pattern for a default generated 128-bit floating-point NaN.

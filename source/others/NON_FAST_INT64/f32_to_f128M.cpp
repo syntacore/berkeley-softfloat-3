@@ -40,39 +40,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+f32_to_f128M(float32_t a,
+             float128_t* zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint32_t* zWPtr = (uint32_t*)zPtr;
+    uint32_t const uiA = f_as_u_32(a);
+    bool const sign = signF32UI(uiA);
+    int16_t exp = expF32UI(uiA);
+    uint32_t frac = fracF32UI(uiA);
 
-    if (exp == 0x7FF) {
+    if (exp == 0xFF) {
         if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
+            softfloat_commonNaNToF128M(softfloat_f32UIToCommonNaN(uiA), zWPtr);
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
         return;
     }
 
     if (!exp) {
         if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
+            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[indexWord(4, 0)] = 0;
             return;
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
+        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+        exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    uint64_t const frac64 = (uint64_t)frac << 25;
+    zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3F80u, frac64 >> 32);
+    zWPtr[indexWord(4, 2)] = (uint32_t)frac64;
+    zWPtr[indexWord(4, 1)] = 0;
+    zWPtr[indexWord(4, 0)] = 0;
+    return;
 }

@@ -1,10 +1,9 @@
-
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,42 +36,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+i64_to_f128M(int64_t const a,
+             float128_t* const zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+    uint32_t uiZ96 = 0;
+    uint32_t uiZ64 = 0;
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
+    zWPtr[indexWord(4, 1)] = 0;
+    zWPtr[indexWord(4, 0)] = 0;
+
+    if (0 != a) {
+        bool const sign = (a < 0);
+        /** @bug INT64_MIN */
+        uint64_t absA = static_cast<uint64_t>(sign ? -a : a);
+        uint8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 17u;
+
+        if (shiftDist < 32) {
+            uint32_t* const ptr = zWPtr + indexMultiwordHi(4, 3);
+            ptr[indexWord(3, 2)] = 0;
+            ptr[indexWord(3, 1)] = absA >> 32;
+            ptr[indexWord(3, 0)] = (uint32_t)absA;
+            softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
+            ptr[indexWordHi(3)] = packToF128UI96(sign, 0x404Eu - shiftDist, ptr[indexWordHi(3)]);
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
-        zSPtr->signif = UINT64_C(0x8000000000000000);
-        return;
+        absA <<= shiftDist - 32;
+        uiZ96 = packToF128UI96(sign, 0x404Eu - shiftDist, absA >> 32);
+        uiZ64 = static_cast<uint32_t>(absA);
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
-    }
-
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    zWPtr[indexWord(4, 3)] = uiZ96;
+    zWPtr[indexWord(4, 2)] = uiZ64;
 }

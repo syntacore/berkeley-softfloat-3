@@ -4,8 +4,8 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
-California.  All rights reserved.
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -40,19 +40,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 void
-f64_to_extF80M(float64_t a,
-               extFloat80_t* zPtr)
+f128M_to_extF80M(const float128_t* aPtr,
+                 extFloat80_t* zPtr)
 {
     using namespace softfloat;
-    extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    const uint32_t* aWPtr;
+    extFloat80M* zSPtr;
+    uint32_t uiA96;
+    bool sign;
+    int32_t exp;
+    uint32_t sig[4];
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
+
+    aWPtr = (const uint32_t*)aPtr;
+    zSPtr = zPtr;
+
+    uiA96 = aWPtr[indexWordHi(4)];
+    sign = signF128UI96(uiA96);
+    exp = expF128UI96(uiA96);
+
+    if (exp == 0x7FFF) {
+        if (softfloat_isNaNF128M(aWPtr)) {
+            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f128MToCommonNaN(aWPtr));
             return;
         }
 
@@ -61,18 +70,19 @@ f64_to_extF80M(float64_t a,
         return;
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
+    exp = softfloat_shiftNormSigF128M(aWPtr, 15, sig);
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    if (exp == -128) {
+        zSPtr->signExp = packToExtF80UI64(sign, 0);
+        zSPtr->signif = 0;
+        return;
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
-    zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
+    if (sig[indexWord(4, 0)]) {
+        sig[indexWord(4, 1)] |= 1;
+    }
+
+    softfloat_roundPackMToExtF80M(
+        sign, exp, &sig[indexMultiwordHi(4, 3)], 80, zSPtr);
+
 }
