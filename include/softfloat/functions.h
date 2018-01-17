@@ -61,12 +61,12 @@ extern "C" {
     /**
     Software floating-point underflow tininess-detection mode.
     */
-    enum softfloat_tininess
+    typedef enum softfloat_tininess
     {
         softfloat_tininess_beforeRounding = 0,
         softfloat_tininess_afterRounding = 1
-    };
-    extern THREAD_LOCAL enum softfloat_tininess softfloat_detectTininess;
+    } softfloat_tininess;
+    extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
 
     /**
     Software floating-point rounding mode.
