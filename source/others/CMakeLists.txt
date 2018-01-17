@@ -4,8 +4,6 @@ add_subdirectory(FAST_INT64)
 add_subdirectory(NON_FAST_INT64)
 
 set(SRC_OTHERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_div.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_eq.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_eq_signaling.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_le.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_le_quiet.cpp

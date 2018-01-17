@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 set(SRC_OTHERS_FAST_INT64
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_add.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_div.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_eq.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80_add.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80_div.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80_eq.cpp

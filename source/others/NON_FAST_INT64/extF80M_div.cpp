@@ -40,17 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-/** @todo split to different implementations */
-#ifdef SOFTFLOAT_FAST_INT64
-
-void
-extF80M_div(const extFloat80_t* aPtr, const extFloat80_t* bPtr, extFloat80_t* zPtr)
-{
-    *zPtr = extF80_div(*aPtr, *bPtr);
-}
-
-#else
-
 void
 extF80M_div(extFloat80_t const* const aSPtr,
             extFloat80_t const* const bSPtr,
@@ -184,6 +173,3 @@ extF80M_div(extFloat80_t const* const aSPtr,
     softfloat_roundPackMToExtF80M(signZ, expZ, y, extF80_roundingPrecision, zSPtr);
     return;
 }
-
-#endif
-

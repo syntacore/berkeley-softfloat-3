@@ -40,40 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-/** @todo split to different implementations */
-#ifdef SOFTFLOAT_FAST_INT64
-
-bool extF80M_eq(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
+bool
+extF80M_eq(const extFloat80_t *aPtr,
+           const extFloat80_t *bPtr)
 {
     return extF80_eq(*aPtr, *bPtr);
 }
-
-#else
-
-bool
-extF80M_eq(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
-{
-    using namespace softfloat;
-    extFloat80M const *const aSPtr = aPtr;
-    extFloat80M const *bSPtr = bPtr;
-
-    uint16_t const uiA64 = aSPtr->signExp;
-    uint64_t const uiA0 = aSPtr->signif;
-    uint16_t const uiB64 = bSPtr->signExp;
-    uint64_t const uiB0 = bSPtr->signif;
-    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
-        if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-        }
-        return false;
-    } else if (uiA0 == uiB0) {
-        return uiA64 == uiB64 || !uiA0;
-    } else if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
-        return !softfloat_compareNonnormExtF80M(aSPtr, bSPtr);
-    } else {
-        return false;
-    }
-}
-
-#endif
-
