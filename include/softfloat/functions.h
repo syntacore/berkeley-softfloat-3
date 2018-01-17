@@ -72,15 +72,15 @@ extern "C" {
     Software floating-point rounding mode.
     */
     /**@{*/
-    enum softfloat_round_mode
+    typedef enum softfloat_round_mode
     {
         softfloat_round_near_even = 0,
         softfloat_round_minMag = 1,
         softfloat_round_min = 2,
         softfloat_round_max = 3,
         softfloat_round_near_maxMag = 4
-    };
-    extern THREAD_LOCAL enum softfloat_round_mode softfloat_roundingMode;
+    } softfloat_round_mode;
+    extern THREAD_LOCAL softfloat_round_mode softfloat_roundingMode;
     /**@}*/
 
     /**
