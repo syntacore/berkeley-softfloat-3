@@ -39,65 +39,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-extFloat80_t f128_to_extF80( float128_t a )
+extFloat80_t
+f128_to_extF80(float128_t const a)
 {
     using namespace softfloat;
-    union ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    bool sign;
-    int32_t exp;
-    uint64_t frac64, frac0;
-    struct uint128 uiZ;
+
+    ui128_f128 uA;
+    uA.f = a;
+    uint64_t const uiA64 = uA.ui.v64;
+    uint64_t const uiA0 = uA.ui.v0;
+    bool const sign = signF128UI64(uiA64);
+    int32_t exp = expF128UI64(uiA64);
+    uint64_t frac64 = fracF128UI64(uiA64);
+    uint64_t frac0 = uiA0;
+
     uint16_t uiZ64;
     uint64_t uiZ0;
-    struct exp32_sig128 normExpSig;
-    struct uint128 sig128;
-    /** @bug union of same type */
-    union { struct extFloat80M s; extFloat80_t f; } uZ;
-
-    
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
-    sign   = signF128UI64( uiA64 );
-    exp    = expF128UI64( uiA64 );
-    frac64 = fracF128UI64( uiA64 );
-    frac0  = uiA0;
-    
-    if ( exp == 0x7FFF ) {
-        if ( frac64 | frac0 ) {
-            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f128UIToCommonNaN(uiA64, uiA0));
-            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-            uiZ64 = uiZ.v64;
-            uiZ0  = uiZ.v0;
+    if (exp == 0x7FFF) {
+        if (frac64 | frac0) {
+            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f128UIToCommonNaN(uiA64, uiA0));
+            uiZ64 = static_cast<uint16_t>(uiZ.v64);
+            uiZ0 = uiZ.v0;
         } else {
-            uiZ64 = packToExtF80UI64( sign, 0x7FFF );
-            uiZ0  = UINT64_C( 0x8000000000000000 );
+            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
+            uiZ0 = UINT64_C(0x8000000000000000);
         }
+
         goto uiZ;
     }
-    
-    if ( ! exp ) {
-        if ( ! (frac64 | frac0) ) {
-            uiZ64 = packToExtF80UI64( sign, 0 );
-            uiZ0  = 0;
+
+    if (!exp) {
+        if (!(frac64 | frac0)) {
+            uiZ64 = packToExtF80UI64(sign, 0);
+            uiZ0 = 0;
             goto uiZ;
         }
-        normExpSig = softfloat_normSubnormalF128Sig( frac64, frac0 );
-        exp   = normExpSig.exp;
-        frac64 = normExpSig.sig.v64;
-        frac0  = normExpSig.sig.v0;
-    }
-    
-    sig128 =
-        softfloat_shortShiftLeft128(
-            frac64 | UINT64_C( 0x0001000000000000 ), frac0, 15 );
-    return softfloat_roundPackToExtF80( sign, exp, sig128.v64, sig128.v0, 80 );
-    
- uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif  = uiZ0;
-    return uZ.f;
 
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(frac64, frac0);
+        exp = normExpSig.exp;
+        frac64 = normExpSig.sig.v64;
+        frac0 = normExpSig.sig.v0;
+    }
+
+    uint128 const sig128 =
+        softfloat_shortShiftLeft128(
+            frac64 | UINT64_C(0x0001000000000000), frac0, 15);
+    return softfloat_roundPackToExtF80(sign, exp, sig128.v64, sig128.v0, 80);
+
+uiZ:
+    extFloat80_t uZ;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 }
 

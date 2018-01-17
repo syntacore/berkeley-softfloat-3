@@ -41,110 +41,139 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 
 float128_t
- softfloat_addMagsF128(uint64_t uiA64,
-                       uint64_t uiA0,
-                       uint64_t uiB64,
-                       uint64_t uiB0,
-                       bool signZ)
+softfloat_addMagsF128(uint64_t uiA64,
+                      uint64_t uiA0,
+                      uint64_t uiB64,
+                      uint64_t uiB0,
+                      bool signZ)
 {
     int32_t expA;
-    struct uint128 sigA;
+    uint128 sigA;
     int32_t expB;
-    struct uint128 sigB;
+    uint128 sigB;
     int32_t expDiff;
-    struct uint128 uiZ, sigZ;
+    uint128 uiZ, sigZ;
     int32_t expZ;
     uint64_t sigZExtra;
-    struct uint128_extra sig128Extra;
-    union ui128_f128 uZ;
+    uint128_extra sig128Extra;
+    ui128_f128 uZ;
 
-    expA = expF128UI64( uiA64 );
-    sigA.v64 = fracF128UI64( uiA64 );
-    sigA.v0  = uiA0;
-    expB = expF128UI64( uiB64 );
-    sigB.v64 = fracF128UI64( uiB64 );
-    sigB.v0  = uiB0;
+    expA = expF128UI64(uiA64);
+    sigA.v64 = fracF128UI64(uiA64);
+    sigA.v0 = uiA0;
+    expB = expF128UI64(uiB64);
+    sigB.v64 = fracF128UI64(uiB64);
+    sigB.v0 = uiB0;
     expDiff = expA - expB;
-    if ( ! expDiff ) {
-        if ( expA == 0x7FFF ) {
-            if ( sigA.v64 | sigA.v0 | sigB.v64 | sigB.v0 ) goto propagateNaN;
+
+    if (!expDiff) {
+        if (expA == 0x7FFF) {
+            if (sigA.v64 | sigA.v0 | sigB.v64 | sigB.v0) {
+                goto propagateNaN;
+            }
+
             uiZ.v64 = uiA64;
-            uiZ.v0  = uiA0;
+            uiZ.v0 = uiA0;
             goto uiZ;
         }
-        sigZ = softfloat_add128( sigA.v64, sigA.v0, sigB.v64, sigB.v0 );
-        if ( ! expA ) {
-            uiZ.v64 = packToF128UI64( signZ, 0, sigZ.v64 );
-            uiZ.v0  = sigZ.v0;
+
+        sigZ = softfloat_add128(sigA.v64, sigA.v0, sigB.v64, sigB.v0);
+
+        if (!expA) {
+            uiZ.v64 = packToF128UI64(signZ, 0, sigZ.v64);
+            uiZ.v0 = sigZ.v0;
             goto uiZ;
         }
+
         expZ = expA;
-        sigZ.v64 |= UINT64_C( 0x0002000000000000 );
+        sigZ.v64 |= UINT64_C(0x0002000000000000);
         sigZExtra = 0;
         goto shiftRight1;
     }
-    if ( expDiff < 0 ) {
-        if ( expB == 0x7FFF ) {
-            if ( sigB.v64 | sigB.v0 ) goto propagateNaN;
-            uiZ.v64 = packToF128UI64( signZ, 0x7FFF, 0 );
-            uiZ.v0  = 0;
+
+    if (expDiff < 0) {
+        if (expB == 0x7FFF) {
+            if (sigB.v64 | sigB.v0) {
+                goto propagateNaN;
+            }
+
+            uiZ.v64 = packToF128UI64(signZ, 0x7FFF, 0);
+            uiZ.v0 = 0;
             goto uiZ;
         }
+
         expZ = expB;
-        if ( expA ) {
-            sigA.v64 |= UINT64_C( 0x0001000000000000 );
+
+        if (expA) {
+            sigA.v64 |= UINT64_C(0x0001000000000000);
         } else {
             ++expDiff;
             sigZExtra = 0;
-            if ( ! expDiff ) goto newlyAligned;
+
+            if (!expDiff) {
+                goto newlyAligned;
+            }
         }
-        sig128Extra =
-            softfloat_shiftRightJam128Extra( sigA.v64, sigA.v0, 0, -expDiff );
+
+        sig128Extra = softfloat_shiftRightJam128Extra(sigA.v64, sigA.v0, 0, static_cast<uint32_t>(-expDiff));
         sigA = sig128Extra.v;
         sigZExtra = sig128Extra.extra;
     } else {
-        if ( expA == 0x7FFF ) {
-            if ( sigA.v64 | sigA.v0 ) goto propagateNaN;
+        if (expA == 0x7FFF) {
+            if (sigA.v64 | sigA.v0) {
+                goto propagateNaN;
+            }
+
             uiZ.v64 = uiA64;
-            uiZ.v0  = uiA0;
+            uiZ.v0 = uiA0;
             goto uiZ;
         }
+
         expZ = expA;
-        if ( expB ) {
-            sigB.v64 |= UINT64_C( 0x0001000000000000 );
+
+        if (expB) {
+            sigB.v64 |= UINT64_C(0x0001000000000000);
         } else {
             --expDiff;
             sigZExtra = 0;
-            if ( ! expDiff ) goto newlyAligned;
+
+            if (!expDiff) {
+                goto newlyAligned;
+            }
         }
-        sig128Extra =
-            softfloat_shiftRightJam128Extra( sigB.v64, sigB.v0, 0, expDiff );
+
+        sig128Extra = softfloat_shiftRightJam128Extra(sigB.v64, sigB.v0, 0, static_cast<uint32_t>(expDiff));
         sigB = sig128Extra.v;
         sigZExtra = sig128Extra.extra;
     }
- newlyAligned:
+
+newlyAligned:
     sigZ =
         softfloat_add128(
-            sigA.v64 | UINT64_C( 0x0001000000000000 ),
+            sigA.v64 | UINT64_C(0x0001000000000000),
             sigA.v0,
             sigB.v64,
             sigB.v0
         );
     --expZ;
-    if ( sigZ.v64 < UINT64_C( 0x0002000000000000 ) ) goto roundAndPack;
+
+    if (sigZ.v64 < UINT64_C(0x0002000000000000)) {
+        goto roundAndPack;
+    }
+
     ++expZ;
- shiftRight1:
+shiftRight1:
     sig128Extra =
         softfloat_shortShiftRightJam128Extra(
-            sigZ.v64, sigZ.v0, sigZExtra, 1 );
+            sigZ.v64, sigZ.v0, sigZExtra, 1);
     sigZ = sig128Extra.v;
     sigZExtra = sig128Extra.extra;
- roundAndPack:
+roundAndPack:
     return
-        softfloat_roundPackToF128( signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra );
- propagateNaN:
-    uiZ = softfloat_propagateNaNF128UI( uiA64, uiA0, uiB64, uiB0 );
- uiZ:
+        softfloat_roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
+propagateNaN:
+    uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
+uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 

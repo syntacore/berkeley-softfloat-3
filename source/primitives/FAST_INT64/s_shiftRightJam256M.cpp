@@ -43,12 +43,12 @@ namespace softfloat {
 
 static
 void
-softfloat_shortShiftRightJamM(uint8_t size_words,
+softfloat_shortShiftRightJamM(size_t size_words,
                               const uint64_t* aPtr,
                               uint8_t dist,
                               uint64_t* zPtr)
 {
-    uint8_t const uNegDist = -(int8_t)dist;
+    uint8_t const uNegDist = 63u & -static_cast<int8_t>(dist);
     unsigned index = indexWordLo(size_words);
     unsigned const lastIndex = indexWordHi(size_words);
     uint64_t wordA = aPtr[index];
@@ -60,7 +60,7 @@ softfloat_shortShiftRightJamM(uint8_t size_words,
 
     while (index != lastIndex) {
         wordA = aPtr[index + wordIncr];
-        zPtr[index] = wordA << (uNegDist & 63) | partWordZ;
+        zPtr[index] = wordA << uNegDist | partWordZ;
         index += wordIncr;
         partWordZ = wordA >> dist;
     }
@@ -70,13 +70,12 @@ softfloat_shortShiftRightJamM(uint8_t size_words,
 }
 
 void
-softfloat_shiftRightJam256M(
-    const uint64_t* aPtr, uint32_t dist, uint64_t* zPtr)
+softfloat_shiftRightJam256M(uint64_t const* aPtr,
+                            uint32_t const dist,
+                            uint64_t* const zPtr)
 {
-    uint64_t* ptr = NULL;
-    uint8_t innerDist;
-
     uint64_t wordJam = 0;
+    uint64_t* ptr = nullptr;
     uint32_t wordDist = dist >> 6;
 
     if (wordDist) {
@@ -84,12 +83,12 @@ softfloat_shiftRightJam256M(
             wordDist = 4;
         }
 
-        ptr = (uint64_t*)(aPtr + indexMultiwordLo(4, wordDist));
+        uint64_t const* ptr1 = aPtr + indexMultiwordLo(4, wordDist);
         {
             uint32_t i = wordDist;
 
             do {
-                wordJam = *ptr++;
+                wordJam = *ptr1++;
 
                 if (wordJam) {
                     break;
@@ -101,26 +100,22 @@ softfloat_shiftRightJam256M(
 
     if (wordDist < 4) {
         aPtr += indexMultiwordHiBut(4, wordDist);
-        innerDist = dist & 63;
+        uint8_t const innerDist = dist & 63;
 
         if (innerDist) {
-            /** @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
-            softfloat_shortShiftRightJamM(
-                4 - wordDist,
-                aPtr,
-                innerDist,
-                zPtr + indexMultiwordLoBut(4, wordDist)
-            );
+            softfloat_shortShiftRightJamM(4u - wordDist,
+                                          aPtr,
+                                          innerDist,
+                                          zPtr + indexMultiwordLoBut(4, wordDist));
 
             if (!wordDist) {
                 goto wordJam;
             }
-        }
-        else {
+        } else {
             aPtr += indexWordLo(4 - wordDist);
             ptr = zPtr + indexWordLo(4);
 
-            for (int i = 4 - wordDist; i; --i) {
+            for (auto i = 4 - wordDist; i; --i) {
                 *ptr = *aPtr;
                 aPtr += wordIncr;
                 ptr += wordIncr;
@@ -132,6 +127,7 @@ softfloat_shiftRightJam256M(
 
     assert(ptr);
     memset(ptr, 0, wordDist * (sizeof * ptr));
+
 wordJam:
 
     if (wordJam) {

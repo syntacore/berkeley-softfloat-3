@@ -47,20 +47,16 @@ softfloat_roundPackToF128(bool sign,
                           uint64_t sig0,
                           uint64_t sigExtra)
 {
-    bool roundNearEven, doIncrement;
-    struct uint128_extra sig128Extra;
+    uint128_extra sig128Extra;
     uint64_t uiZ64, uiZ0;
-    struct uint128 sig128;
-    union ui128_f128 uZ;
+    uint128 sig128;
+    ui128_f128 uZ;
 
-    uint8_t const roundingMode = softfloat_roundingMode;
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+    bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
+    bool doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 
-    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
-        doIncrement =
-            (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) &&
-            sigExtra;
+    if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
+        doIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra;
     }
 
     if (0x7FFD <= (uint32_t)exp) {
@@ -74,7 +70,7 @@ softfloat_roundPackToF128(bool sign,
                     sig0,
                     UINT64_C(0x0001FFFFFFFFFFFF),
                     UINT64_MAX);
-            sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, -exp);
+            sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, static_cast<uint32_t>(-exp));
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
@@ -86,9 +82,9 @@ softfloat_roundPackToF128(bool sign,
 
             doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
 
-            if (!roundNearEven && roundingMode != softfloat_round_near_maxMag) {
+            if (!roundNearEven && softfloat_roundingMode != softfloat_round_near_maxMag) {
                 doIncrement =
-                    roundingMode == (sign ? softfloat_round_min : softfloat_round_max) &&
+                    softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max) &&
                     sigExtra;
             }
         } else if (
@@ -102,8 +98,8 @@ softfloat_roundPackToF128(bool sign,
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
 
             if (roundNearEven ||
-                    roundingMode == softfloat_round_near_maxMag ||
-                    roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
+                    softfloat_roundingMode == softfloat_round_near_maxMag ||
+                    softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
                ) {
                 uiZ64 = packToF128UI64(sign, 0x7FFF, 0);
                 uiZ0 = 0;

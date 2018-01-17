@@ -52,26 +52,26 @@ softfloat_mulAddF128(uint64_t uiA64,
 {
     bool signA;
     int32_t expA;
-    struct uint128 sigA;
+    uint128 sigA;
     bool signB;
     int32_t expB;
-    struct uint128 sigB;
+    uint128 sigB;
     bool signC;
     int32_t expC;
-    struct uint128 sigC;
+    uint128 sigC;
     bool signZ;
     uint64_t magBits;
-    struct uint128 uiZ;
-    struct exp32_sig128 normExpSig;
+    uint128 uiZ;
+    exp32_sig128 normExpSig;
     int32_t expZ;
     uint64_t sig256Z[4];
-    struct uint128 sigZ;
+    uint128 sigZ;
     int32_t shiftDist, expDiff;
-    struct uint128 x128;
+    uint128 x128;
     uint64_t sig256C[4];
-    static uint64_t zero256[4] = INIT_UINTM4(0, 0, 0, 0);
+    uint64_t zero256[4] = INIT_UINTM4(0, 0, 0, 0);
     uint64_t sigZExtra, sig256Z0;
-    union ui128_f128 uZ;
+    ui128_f128 uZ;
 
 
     signA = signF128UI64(uiA64);
@@ -178,8 +178,7 @@ softfloat_mulAddF128(uint64_t uiA64,
             shiftDist -= expDiff;
 
             if (shiftDist) {
-                sigZ =
-                    softfloat_shiftRightJam128(sigZ.v64, sigZ.v0, shiftDist);
+                sigZ = softfloat_shiftRightJam128(sigZ.v64, sigZ.v0, static_cast<uint32_t>(shiftDist));
             }
         } else {
             if (!shiftDist) {
@@ -208,7 +207,7 @@ softfloat_mulAddF128(uint64_t uiA64,
             sig256C[indexWord(4, 2)] = sigC.v0;
             sig256C[indexWord(4, 1)] = 0;
             sig256C[indexWord(4, 0)] = 0;
-            softfloat_shiftRightJam256M(sig256C, expDiff, sig256C);
+            softfloat_shiftRightJam256M(sig256C, static_cast<uint32_t>(expDiff), sig256C);
         }
     }
 
