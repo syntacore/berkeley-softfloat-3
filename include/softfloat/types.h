@@ -47,10 +47,10 @@ platform has "native" support for IEEE-Standard floating-point formats,
 the types below may, if desired, be defined as aliases for the native types
 (typically `float' and `double', and possibly `long double').
 */
-typedef struct { uint16_t v; } float16_t;
-typedef struct { uint32_t v; } float32_t;
-typedef struct { uint64_t v; } float64_t;
-typedef struct { uint64_t v[2]; } float128_t;
+typedef struct float16_t { uint16_t v; } float16_t;
+typedef struct float32_t { uint32_t v; } float32_t;
+typedef struct float64_t { uint64_t v; } float64_t;
+typedef struct float128_t { uint64_t v[2]; } float128_t;
 
 /**
 The format of an 80-bit extended floating-point number in memory.  This
