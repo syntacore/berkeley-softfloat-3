@@ -39,58 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-/** @todo split to different implementations */
-#ifdef SOFTFLOAT_FAST_INT64
-
-void
-extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr)
-{
-    using namespace softfloat;
-    const extFloat80M *aSPtr, *bSPtr;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    bool signA;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    bool signB;
-#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
-    extFloat80_t
-    (*magsFuncPtr)(
-        uint16_t, uint64_t, uint16_t, uint64_t, bool);
-#endif
-
-    /** @bug cast to same type */
-    aSPtr = (const extFloat80M *)aPtr;
-    /** @bug cast to same type */
-    bSPtr = (const extFloat80M *)bPtr;
-    uiA64 = aSPtr->signExp;
-    uiA0 = aSPtr->signif;
-    signA = signExtF80UI64(uiA64);
-    uiB64 = bSPtr->signExp;
-    uiB0 = bSPtr->signif;
-    signB = signExtF80UI64(uiB64);
-#if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
-    if (signA == signB) {
-        *zPtr = softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
-    } else {
-        *zPtr = softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
-    }
-#else
-    magsFuncPtr =
-        (signA == signB) ? softfloat_addMagsExtF80 : softfloat_subMagsExtF80;
-    *zPtr = (*magsFuncPtr)(uiA64, uiA0, uiB64, uiB0, signA);
-#endif
-
-}
-
-#else
-
 void
 extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr)
 {
     using namespace softfloat;
     softfloat_addExtF80M(aPtr, bPtr, zPtr, false);
 }
-
-#endif
-

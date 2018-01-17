@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(SRC_OTHERS_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF64.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/i32_to_extF80M.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_add.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80_add.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80_div.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/extF80_eq.cpp
@@ -63,12 +62,14 @@ set(SRC_OTHERS_FAST_INT64
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_to_extF80.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_to_f128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/i32_to_extF80.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/i32_to_extF80M.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/i32_to_f128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/i64_to_extF80.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsExtF80.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF128.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToExtF80.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF128.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normSubnormalExtF80Sig.cpp
