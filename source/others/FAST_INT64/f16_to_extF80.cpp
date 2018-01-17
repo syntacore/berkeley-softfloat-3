@@ -40,18 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 extFloat80_t
-f16_to_extF80(float16_t a)
+f16_to_extF80(float16_t const a)
 {
     using namespace softfloat;
-    struct uint128 uiZ;
+    uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s; 
-        extFloat80_t f;
-    } uZ;
 
 
     uint16_t const uiA = f_as_u_16(a);
@@ -62,13 +56,13 @@ f16_to_extF80(float16_t a)
     if (exp == 0x1F) {
         if (frac) {
             uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(uiA));
-            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-            uiZ64 = uiZ.v64;
+            uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         } else {
             uiZ64 = packToExtF80UI64(sign, 0x7FFF);
             uiZ0 = UINT64_C(0x8000000000000000);
         }
+
         goto uiZ;
     }
 
@@ -78,15 +72,17 @@ f16_to_extF80(float16_t a)
             uiZ0 = 0;
             goto uiZ;
         }
-        struct exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+
+        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
 
-    uiZ64 = packToExtF80UI64(sign, exp + 0x3FF0);
+    uiZ64 = packToExtF80UI64(sign, exp + 0x3FF0u);
     uiZ0 = (uint64_t)(frac | 0x0400) << 53;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = uiZ0;
-    return uZ.f;
+    extFloat80_t uZ;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 }

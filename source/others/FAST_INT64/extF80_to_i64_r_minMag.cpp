@@ -40,30 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 int64_t
-extF80_to_i64_r_minMag(extFloat80_t a,
+extF80_to_i64_r_minMag(extFloat80_t const a,
                        bool exact)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
-    bool sign;
-    int64_t absZ;
-
-
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    exp = expExtF80UI64(uiA64);
-    sig = uA.s.signif;
-
-    shiftDist = 0x403E - exp;
+    uint16_t const uiA64 = a.signExp;
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = a.signif;
+    int32_t const shiftDist = 0x403E - exp;
 
     if (64 <= shiftDist) {
         if (exact && (exp | sig)) {
@@ -73,24 +57,20 @@ extF80_to_i64_r_minMag(extFloat80_t a,
         return 0;
     }
 
-    sign = signExtF80UI64(uiA64);
+    bool const sign = signExtF80UI64(uiA64);
 
     if (shiftDist <= 0) {
-        if (
-            (uiA64 == packToExtF80UI64(1, 0x403E))
-            && (sig == UINT64_C(0x8000000000000000))
-        ) {
+        if (uiA64 == packToExtF80UI64(1, 0x403E) && sig == UINT64_C(0x8000000000000000)) {
             return -INT64_C(0x7FFFFFFFFFFFFFFF) - 1;
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            (exp == 0x7FFF) && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))
-            ? i64_fromNaN
-            : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+            exp == 0x7FFF && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? i64_fromNaN : 
+            sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
 
-    absZ = sig >> shiftDist;
+    int64_t const absZ = static_cast<int64_t>(sig >> shiftDist);
 
     if (exact && (uint64_t)(sig << (-shiftDist & 63))) {
         softfloat_raiseFlags(softfloat_flag_inexact);

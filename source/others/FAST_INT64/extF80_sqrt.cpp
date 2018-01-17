@@ -43,36 +43,26 @@ extFloat80_t
 extF80_sqrt(extFloat80_t a)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
     uint16_t uiA64;
     uint64_t uiA0;
     bool signA;
     int32_t expA;
     uint64_t sigA;
-    struct uint128 uiZ;
+    uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    struct exp32_sig64 normExpSig;
+    exp32_sig64 normExpSig;
     int32_t expZ;
     uint32_t sig32A, recipSqrt32, sig32Z;
-    struct uint128 rem;
+    uint128 rem;
     uint64_t q, sigZ, x64;
-    struct uint128 term;
+    uint128 term;
     uint64_t sigZExtra;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
+    extFloat80_t uZ;
 
 
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0  = uA.s.signif;
+    uiA64 = a.signExp;
+    uiA0  = a.signif;
     signA = signExtF80UI64(uiA64);
     expA  = expExtF80UI64(uiA64);
     sigA  = uiA0;
@@ -80,8 +70,7 @@ extF80_sqrt(extFloat80_t a)
     if (expA == 0x7FFF) {
         if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
             uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, 0, 0);
-            /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-            uiZ64 = uiZ.v64;
+            uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0  = uiZ.v0;
             goto uiZ;
         }
@@ -123,8 +112,8 @@ extF80_sqrt(extFloat80_t a)
     expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
     expA &= 1;
     sig32A = sigA >> 32;
-    recipSqrt32 = softfloat_approxRecipSqrt32_1(expA, sig32A);
-    sig32Z = ((uint64_t) sig32A * recipSqrt32) >> 32;
+    recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     if (expA) {
         sig32Z >>= 1;
@@ -140,7 +129,7 @@ extF80_sqrt(extFloat80_t a)
     sigZ = ((uint64_t) sig32Z << 32) + (q << 3);
     x64 = ((uint64_t) sig32Z << 32) + sigZ;
     /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
-    term = softfloat_mul64ByShifted32To128(x64, q);
+    term = softfloat_mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
     rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
     rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
@@ -153,7 +142,7 @@ extF80_sqrt(extFloat80_t a)
         q &= ~(uint64_t) 0xFFFF;
         sigZExtra = (uint64_t)(q << 39);
         /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
-        term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), q);
+        term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
         x64 = (uint32_t)(q << 5) * (uint64_t)(uint32_t) q;
         term = softfloat_add128(term.v64, term.v0, 0, x64);
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 28);
@@ -187,9 +176,8 @@ zero:
     uiZ64 = packToExtF80UI64(signA, 0);
     uiZ0  = 0;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif  = uiZ0;
-    return uZ.f;
-
+    uZ.signExp = uiZ64;
+    uZ.signif  = uiZ0;
+    return uZ;
 }
 

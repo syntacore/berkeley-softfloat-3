@@ -45,33 +45,21 @@ extF80_roundToInt(extFloat80_t a,
                   bool exact)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64, signUI64;
+    uint16_t uiA64;
     int32_t exp;
     uint64_t sigA;
     uint16_t uiZ64;
     uint64_t sigZ;
-    struct exp32_sig64 normExpSig;
-    struct uint128 uiZ;
+    exp32_sig64 normExpSig;
+    uint128 uiZ;
     uint64_t lastBitMask, roundBitsMask;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
+    extFloat80_t  uZ;
 
 
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    signUI64 = uiA64 & packToExtF80UI64(1, 0);
+    uiA64 = a.signExp;
+    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(1, 0));
     exp = expExtF80UI64(uiA64);
-    sigA = uA.s.signif;
+    sigA = a.signif;
 
     if (!(sigA & UINT64_C(0x8000000000000000)) && (exp != 0x7FFF)) {
         if (!sigA) {
@@ -89,8 +77,7 @@ extF80_roundToInt(extFloat80_t a,
         if (exp == 0x7FFF) {
             if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
                 uiZ = softfloat_propagateNaNExtF80UI(uiA64, sigA, 0, 0);
-                /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-                uiZ64 = uiZ.v64;
+                uiZ64 = static_cast<uint16_t>(uiZ.v64);
                 sigZ = uiZ.v0;
                 goto uiZ;
             }
@@ -142,7 +129,7 @@ extF80_roundToInt(extFloat80_t a,
         sigZ = 0;
         goto uiZ;
 mag1:
-        uiZ64 = signUI64 | 0x3FFF;
+        uiZ64 = signUI64 | 0x3FFFu;
         sigZ = UINT64_C(0x8000000000000000);
         goto uiZ;
     }
@@ -178,9 +165,8 @@ mag1:
     }
 
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = sigZ;
-    return uZ.f;
-
+    uZ.signExp = uiZ64;
+    uZ.signif = sigZ;
+    return uZ;
 }
 

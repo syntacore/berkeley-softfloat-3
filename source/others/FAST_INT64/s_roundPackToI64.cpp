@@ -48,42 +48,27 @@ softfloat_roundPackToI64(bool sign,
                          uint8_t roundingMode,
                          bool exact)
 {
-    bool roundNearEven, doIncrement;
-    union {
-        uint64_t ui;
-        int64_t i;
-    } uZ;
-    int64_t z;
-
-
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
-
-    if (! roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
-        doIncrement =
-            (roundingMode
-             == (sign ? softfloat_round_min : softfloat_round_max))
-            && sigExtra;
-    }
+    bool const roundNearEven = (roundingMode == softfloat_round_near_even);
+    bool const doIncrement =
+        !roundNearEven && (roundingMode != softfloat_round_near_maxMag) ? (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra :
+        UINT64_C(0x8000000000000000) <= sigExtra;
 
     if (doIncrement) {
         ++sig;
 
-        if (! sig) {
-            goto invalid;
+        if (!sig) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
 
-        sig &=
-            ~(uint64_t)
-            (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
-             & roundNearEven);
+        sig &= ~static_cast<uint64_t>(!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF)) & roundNearEven);
     }
 
-    uZ.ui = sign ? -(int64_t)sig : sig;
-    z = uZ.i;
+    int64_t const z = sign ? -static_cast<int64_t>(sig) : static_cast<int64_t>(sig);
 
     if (z && ((z < 0) ^ sign)) {
-        goto invalid;
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
 
     if (exact && sigExtra) {
@@ -91,11 +76,6 @@ softfloat_roundPackToI64(bool sign,
     }
 
     return z;
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-
 }
 
 }  // namespace softfloat

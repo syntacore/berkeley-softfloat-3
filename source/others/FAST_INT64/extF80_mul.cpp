@@ -44,21 +44,10 @@ extF80_mul(extFloat80_t a,
            extFloat80_t b)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
     uint64_t uiA0;
     bool signA;
     int32_t expA;
     uint64_t sigA;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uB;
     uint16_t uiB64;
     uint64_t uiB0;
     bool signB;
@@ -66,37 +55,28 @@ extF80_mul(extFloat80_t a,
     uint64_t sigB;
     bool signZ;
     uint64_t magBits;
-    struct exp32_sig64 normExpSig;
+    exp32_sig64 normExpSig;
     int32_t expZ;
-    struct uint128 sig128Z, uiZ;
+    uint128 sig128Z, uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
+    extFloat80_t uZ;
 
 
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0  = uA.s.signif;
+    uint16_t const uiA64 = a.signExp;
+    uiA0  = a.signif;
     signA = signExtF80UI64(uiA64);
     expA  = expExtF80UI64(uiA64);
     sigA  = uiA0;
-    uB.f = b;
-    uiB64 = uB.s.signExp;
-    uiB0  = uB.s.signif;
+    uiB64 = b.signExp;
+    uiB0  = b.signif;
     signB = signExtF80UI64(uiB64);
     expB  = expExtF80UI64(uiB64);
     sigB  = uiB0;
     signZ = signA ^ signB;
 
     if (expA == 0x7FFF) {
-        if (
-            (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))
-            || ((expB == 0x7FFF) && (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))
-        ) {
+        if ((sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) || (expB == 0x7FFF && (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))) {
             goto propagateNaN;
         }
 
@@ -146,9 +126,7 @@ extF80_mul(extFloat80_t a,
 
     if (sig128Z.v64 < UINT64_C(0x8000000000000000)) {
         --expZ;
-        sig128Z =
-            softfloat_add128(
-                sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
+        sig128Z = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
     }
 
     return
@@ -157,8 +135,7 @@ extF80_mul(extFloat80_t a,
 
 propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-    uiZ64 = uiZ.v64;
+    uiZ64 = static_cast<uint16_t>(uiZ.v64);
     uiZ0  = uiZ.v0;
     goto uiZ;
 
@@ -180,8 +157,8 @@ zero:
     uiZ64 = packToExtF80UI64(signZ, 0);
     uiZ0  = 0;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif  = uiZ0;
-    return uZ.f;
+    uZ.signExp = uiZ64;
+    uZ.signif  = uiZ0;
+    return uZ;
 }
 

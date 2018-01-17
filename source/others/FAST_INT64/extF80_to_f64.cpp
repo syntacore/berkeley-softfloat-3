@@ -43,16 +43,8 @@ float64_t
 extF80_to_f64(extFloat80_t a)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-
-    uA.f = a;
-    uint16_t const uiA64 = uA.s.signExp;
-    uint64_t const uiA0 = uA.s.signif;
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 =  a.signif;
     bool const sign = signExtF80UI64(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = uiA0;
@@ -76,6 +68,5 @@ extF80_to_f64(extFloat80_t a)
         exp = -0x1000;
     }
 
-    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
     return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
 }

@@ -40,20 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint32_t
-extF80_to_ui32_r_minMag(extFloat80_t a,
+extF80_to_ui32_r_minMag(extFloat80_t const a,
                         bool exact)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-
-    uA.f = a;
-    uint16_t const uiA64 = uA.s.signExp;
+    uint16_t const uiA64 = a.signExp;
     int32_t const exp = expExtF80UI64(uiA64);
-    uint64_t const sig = uA.s.signif;
+    uint64_t const sig = a.signif;
 
     int32_t const shiftDist = 0x403E - exp;
 
@@ -74,7 +67,7 @@ extF80_to_ui32_r_minMag(extFloat80_t a,
             sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 
-    uint32_t const z = sig >> shiftDist;
+    uint32_t const z = static_cast<uint32_t>(sig >> shiftDist);
 
     if (exact && ((uint64_t)z << shiftDist != sig)) {
         softfloat_raiseFlags(softfloat_flag_inexact);

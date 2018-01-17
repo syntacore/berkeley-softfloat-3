@@ -40,34 +40,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 int64_t
-extF80_to_i64(extFloat80_t a,
-              uint8_t roundingMode,
-              bool exact)
+extF80_to_i64(extFloat80_t const a,
+              uint8_t const roundingMode,
+              bool const exact)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    bool sign;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
+    uint16_t const uiA64 = a.signExp;
+    bool const sign = signExtF80UI64(uiA64);
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t sig = a.signif;
+    int32_t const shiftDist = 0x403E - exp;
+
     uint64_t sigExtra;
-    struct uint64_extra sig64Extra;
-
-
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    sign = signExtF80UI64(uiA64);
-    exp = expExtF80UI64(uiA64);
-    sig = uA.s.signif;
-
-    shiftDist = 0x403E - exp;
-
     if (shiftDist <= 0) {
 
         if (shiftDist) {
@@ -79,7 +63,7 @@ extF80_to_i64(extFloat80_t a,
 
         sigExtra = 0;
     } else {
-        sig64Extra = softfloat_shiftRightJam64Extra(sig, 0, shiftDist);
+        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig, 0u, static_cast<uint32_t>(shiftDist));
         sig = sig64Extra.v;
         sigExtra = sig64Extra.extra;
     }

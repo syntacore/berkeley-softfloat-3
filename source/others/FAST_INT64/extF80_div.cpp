@@ -44,59 +44,39 @@ extF80_div(extFloat80_t a,
            extFloat80_t b)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
     uint16_t uiA64;
     uint64_t uiA0;
     bool signA;
     int32_t expA;
     uint64_t sigA;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uB;
     uint16_t uiB64;
     uint64_t uiB0;
     bool signB;
     int32_t expB;
     uint64_t sigB;
     bool signZ;
-    struct exp32_sig64 normExpSig;
+    exp32_sig64 normExpSig;
     int32_t expZ;
-    struct uint128 rem;
+    uint128 rem;
     uint32_t recip32;
     uint64_t sigZ;
     int ix;
     uint64_t q64;
     uint32_t q;
-    struct uint128 term;
+    uint128 term;
     uint64_t sigZExtra;
-    struct uint128 uiZ;
+    uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
 
 
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0 = uA.s.signif;
+    uiA64 = a.signExp;
+    uiA0 = a.signif;
     signA = signExtF80UI64(uiA64);
     expA = expExtF80UI64(uiA64);
     sigA = uiA0;
-    uB.f = b;
-    uiB64 = uB.s.signExp;
-    uiB0 = uB.s.signif;
+    uiB64 = b.signExp;
+    uiB0 = b.signif;
     signB = signExtF80UI64(uiB64);
     expB = expExtF80UI64(uiB64);
     sigB = uiB0;
@@ -220,8 +200,7 @@ extF80_div(extFloat80_t a,
 
 propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-    uiZ64 = uiZ.v64;
+    uiZ64 = static_cast<uint16_t>(uiZ.v64);
     uiZ0 = uiZ.v0;
     goto uiZ;
 
@@ -240,9 +219,10 @@ zero:
     uiZ64 = packToExtF80UI64(signZ, 0);
     uiZ0 = 0;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = uiZ0;
-    return uZ.f;
+    extFloat80_t uZ;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 
 }
 

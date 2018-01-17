@@ -39,55 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 extFloat80_t
-extF80_sub(extFloat80_t a,
-           extFloat80_t b)
+extF80_sub(extFloat80_t const a,
+           extFloat80_t const b)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    bool signA;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uB;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    bool signB;
-#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
-    extFloat80_t
-    (*magsFuncPtr)(
-        uint16_t, uint64_t, uint16_t, uint64_t, bool);
-#endif
-
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    uiA0 = uA.s.signif;
-    signA = signExtF80UI64(uiA64);
-    uB.f = b;
-    uiB64 = uB.s.signExp;
-    uiB0 = uB.s.signif;
-    signB = signExtF80UI64(uiB64);
-#if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
-
-    if (signA == signB) {
-        return softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
-} else {
-        return softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
-    }
-
-#else
-    magsFuncPtr =
-        (signA == signB) ? softfloat_subMagsExtF80 : softfloat_addMagsExtF80;
-    return (*magsFuncPtr)(uiA64, uiA0, uiB64, uiB0, signA);
-#endif
-
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 = a.signif;
+    bool const signA = signExtF80UI64(uiA64);
+    uint16_t const uiB64 = b.signExp;
+    uint64_t const uiB0 = b.signif;
+    bool const signB = signExtF80UI64(uiB64);
+    return
+        signA == signB ? softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA) :
+        softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
 }
 

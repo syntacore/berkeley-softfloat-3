@@ -40,19 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 extFloat80_t
-f32_to_extF80(float32_t a)
+f32_to_extF80(float32_t const a)
 {
     using namespace softfloat;
     uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
     exp16_sig32 normExpSig;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
+    extFloat80_t  uZ;
 
 
     uint32_t const uiA = f_as_u_32(a);
@@ -63,13 +58,13 @@ f32_to_extF80(float32_t a)
     if (exp == 0xFF) {
         if (frac) {
             uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(uiA));
-            /** @todo Warning	C4242	'=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-            uiZ64 = uiZ.v64;
+            uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         } else {
             uiZ64 = packToExtF80UI64(sign, 0x7FFF);
             uiZ0 = UINT64_C(0x8000000000000000);
         }
+
         goto uiZ;
     }
 
@@ -79,17 +74,18 @@ f32_to_extF80(float32_t a)
             uiZ0 = 0;
             goto uiZ;
         }
+
         normExpSig = softfloat_normSubnormalF32Sig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }
 
-    uiZ64 = packToExtF80UI64(sign, exp + 0x3F80);
+    uiZ64 = packToExtF80UI64(sign, exp + 0x3F80u);
     uiZ0 = (uint64_t)(frac | 0x00800000) << 40;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = uiZ0;
-    return uZ.f;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 
 }
 

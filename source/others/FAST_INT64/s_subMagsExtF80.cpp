@@ -57,13 +57,8 @@ softfloat_subMagsExtF80(uint16_t uiA64,
     uint64_t uiZ0;
     int32_t expZ;
     uint64_t sigExtra;
-    struct uint128 sig128, uiZ;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
+    uint128 sig128, uiZ;
+    extFloat80_t uZ;
 
 
     expA = expExtF80UI64(uiA64);
@@ -134,7 +129,7 @@ expBBigger:
         }
     }
 
-    sig128 = softfloat_shiftRightJam128(sigA, 0, -expDiff);
+    sig128 = softfloat_shiftRightJam128(sigA, 0, static_cast<uint32_t>(-expDiff));
     sigA = sig128.v64;
     sigExtra = sig128.v0;
 newlyAlignedBBigger:
@@ -165,7 +160,7 @@ expABigger:
         }
     }
 
-    sig128 = softfloat_shiftRightJam128(sigB, 0, expDiff);
+    sig128 = softfloat_shiftRightJam128(sigB, 0, static_cast<uint32_t>(expDiff));
     sigB = sig128.v64;
     sigExtra = sig128.v0;
 newlyAlignedABigger:
@@ -180,13 +175,12 @@ normRoundPack:
 
 propagateNaN:
     uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-    uiZ64 = uiZ.v64;
+    uiZ64 = static_cast<uint16_t>(uiZ.v64);
     uiZ0 = uiZ.v0;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = uiZ0;
-    return uZ.f;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 
 }
 

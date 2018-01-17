@@ -40,28 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 uint64_t
-extF80_to_ui64_r_minMag(extFloat80_t a,
+extF80_to_ui64_r_minMag(extFloat80_t const a,
                         bool exact)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-    uint16_t uiA64;
-    int32_t exp;
-    uint64_t sig;
     int32_t shiftDist;
-    bool sign;
-    uint64_t z;
 
 
-    uA.f = a;
-    uiA64 = uA.s.signExp;
-    exp = expExtF80UI64(uiA64);
-    sig = uA.s.signif;
+    uint16_t const uiA64 = a.signExp;
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = a.signif;
 
     shiftDist = 0x403E - exp;
 
@@ -73,22 +61,21 @@ extF80_to_ui64_r_minMag(extFloat80_t a,
         return 0;
     }
 
-    sign = signExtF80UI64(uiA64);
+    bool const sign = signExtF80UI64(uiA64);
 
-    if (sign || (shiftDist < 0)) {
+    if (sign || shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             exp == 0x7FFF && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? ui64_fromNaN :
             sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
 
-    z = sig >> shiftDist;
+    uint64_t const z = sig >> shiftDist;
 
     if (exact && (z << shiftDist != sig)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
     return z;
-
 }
 

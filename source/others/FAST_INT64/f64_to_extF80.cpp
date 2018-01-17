@@ -46,11 +46,6 @@ f64_to_extF80(float64_t a)
     uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;
-    /** @bug union of same type */
-    union {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
 
 
     uint64_t const uiA = f_as_u_64(a);
@@ -61,8 +56,7 @@ f64_to_extF80(float64_t a)
     if (exp == 0x7FF) {
         if (frac) {
             uiZ = softfloat_commonNaNToExtF80UI(softfloat_f64UIToCommonNaN(uiA));
-            /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data */
-            uiZ64 = uiZ.v64;
+            uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         }
         else {
@@ -85,10 +79,11 @@ f64_to_extF80(float64_t a)
         frac = normExpSig.sig;
     }
 
-    uiZ64 = packToExtF80UI64(sign, exp + 0x3C00);
+    uiZ64 = packToExtF80UI64(sign, exp + 0x3C00u);
     uiZ0 = (frac | UINT64_C(0x0010000000000000)) << 11;
 uiZ:
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = uiZ0;
-    return uZ.f;
+    extFloat80_t uZ;
+    uZ.signExp = uiZ64;
+    uZ.signif = uiZ0;
+    return uZ;
 }

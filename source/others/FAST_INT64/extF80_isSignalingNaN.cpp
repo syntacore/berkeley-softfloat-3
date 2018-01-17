@@ -43,15 +43,5 @@ bool
 extF80_isSignalingNaN(extFloat80_t a)
 {
     using namespace softfloat;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uA;
-
-    uA.f = a;
-    return softfloat_isSigNaNExtF80UI(uA.s.signExp, uA.s.signif);
-
+    return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
 }
-

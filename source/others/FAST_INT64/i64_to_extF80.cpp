@@ -42,27 +42,20 @@ extFloat80_t
 i64_to_extF80(int64_t a)
 {
     using namespace softfloat;
-    int8_t shiftDist;
-    /** @bug union of same type */
-    union
-    {
-        struct extFloat80M s;
-        extFloat80_t f;
-    } uZ;
-
     uint16_t uiZ64 = 0;
     uint64_t absA = 0;
 
     if (a) {
         bool const sign = (a < 0);
         /** @bug for INT64_MIN */
-        absA = sign ? -a : a;
-        shiftDist = softfloat_countLeadingZeros64(absA);
-        uiZ64 = packToExtF80UI64(sign, 0x403E - shiftDist);
+        absA = static_cast<uint64_t>(sign ? -a : a);
+        auto const shiftDist = softfloat_countLeadingZeros64(absA);
+        uiZ64 = packToExtF80UI64(sign, 0x403Eu - shiftDist);
         absA <<= shiftDist;
     }
 
-    uZ.s.signExp = uiZ64;
-    uZ.s.signif = absA;
-    return uZ.f;
+    extFloat80_t uZ;
+    uZ.signExp = uiZ64;
+    uZ.signif = absA;
+    return uZ;
 }
