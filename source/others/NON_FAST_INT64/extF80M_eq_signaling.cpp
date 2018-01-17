@@ -39,17 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-/** @todo split to different implementations */
-#ifdef SOFTFLOAT_FAST_INT64
-
-bool
-extF80M_eq_signaling(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
-{
-    return extF80_eq_signaling(*aPtr, *bPtr);
-}
-
-#else
-
 bool
 extF80M_eq_signaling(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
@@ -74,5 +63,3 @@ extF80M_eq_signaling(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
         return false;
     }
 }
-
-#endif
