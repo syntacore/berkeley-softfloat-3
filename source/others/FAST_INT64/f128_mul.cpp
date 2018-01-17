@@ -44,17 +44,6 @@ f128_mul(float128_t a,
          float128_t b)
 {
     using namespace softfloat;
-    ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    bool signA;
-    int32_t expA;
-    uint128 sigA;
-    ui128_f128 uB;
-    uint64_t uiB64, uiB0;
-    bool signB;
-    int32_t expB;
-    uint128 sigB;
-    bool signZ;
     uint64_t magBits;
     exp32_sig128 normExpSig;
     int32_t expZ;
@@ -63,47 +52,72 @@ f128_mul(float128_t a,
     uint128 sigZ;
     uint128_extra sig128Extra;
     uint128 uiZ;
-    ui128_f128 uZ;
 
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
-    signA = signF128UI64(uiA64);
-    expA = expF128UI64(uiA64);
+    uint64_t const uiA64 = reinterpret_cast<uint128 const&>(a).v64;
+    uint64_t const uiA0 = reinterpret_cast<uint128 const&>(a).v0;
+    bool const signA = signF128UI64(uiA64);
+    int32_t expA = expF128UI64(uiA64);
+
+    uint128 sigA;
     sigA.v64 = fracF128UI64(uiA64);
     sigA.v0 = uiA0;
-    uB.f = b;
-    uiB64 = uB.ui.v64;
-    uiB0 = uB.ui.v0;
-    signB = signF128UI64(uiB64);
-    expB = expF128UI64(uiB64);
+
+    uint64_t const uiB64 = reinterpret_cast<uint128 const&>(b).v64;
+    uint64_t const uiB0 = reinterpret_cast<uint128 const&>(b).v0;
+    bool const signB = signF128UI64(uiB64);
+    int32_t expB = expF128UI64(uiB64);
+
+    uint128 sigB;
     sigB.v64 = fracF128UI64(uiB64);
     sigB.v0 = uiB0;
-    signZ = signA ^ signB;
+
+    bool signZ = signA ^ signB;
 
     if (expA == 0x7FFF) {
         if (
             (sigA.v64 | sigA.v0) || ((expB == 0x7FFF) && (sigB.v64 | sigB.v0))
         ) {
-            goto propagateNaN;
+            uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
+            return reinterpret_cast<float128_t const&>(uiZ);
         }
 
         magBits = expB | sigB.v64 | sigB.v0;
-        goto infArg;
+        if (!magBits) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            uiZ.v64 = defaultNaNF128UI64;
+            uiZ.v0 = defaultNaNF128UI0;
+            return reinterpret_cast<float128_t const&>(uiZ);
+        }
+
+        uiZ.v64 = packToF128UI64(signZ, 0x7FFF, 0);
+        uiZ.v0 = 0;
+        return reinterpret_cast<float128_t const&>(uiZ);
     }
 
     if (expB == 0x7FFF) {
         if (sigB.v64 | sigB.v0) {
-            goto propagateNaN;
+            uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
+            return reinterpret_cast<float128_t const&>(uiZ);
         }
 
         magBits = expA | sigA.v64 | sigA.v0;
-        goto infArg;
+        if (!magBits) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            uiZ.v64 = defaultNaNF128UI64;
+            uiZ.v0 = defaultNaNF128UI0;
+            return reinterpret_cast<float128_t const&>(uiZ);
+        }
+
+        uiZ.v64 = packToF128UI64(signZ, 0x7FFF, 0);
+        uiZ.v0 = 0;
+        return reinterpret_cast<float128_t const&>(uiZ);
     }
 
     if (!expA) {
         if (!(sigA.v64 | sigA.v0)) {
-            goto zero;
+            uiZ.v64 = packToF128UI64(signZ, 0, 0);
+            uiZ.v0 = 0;
+            return reinterpret_cast<float128_t const&>(uiZ);
         }
 
         normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);
@@ -113,7 +127,9 @@ f128_mul(float128_t a,
 
     if (!expB) {
         if (!(sigB.v64 | sigB.v0)) {
-            goto zero;
+            uiZ.v64 = packToF128UI64(signZ, 0, 0);
+            uiZ.v0 = 0;
+            return reinterpret_cast<float128_t const&>(uiZ);
         }
 
         normExpSig = softfloat_normSubnormalF128Sig(sigB.v64, sigB.v0);
@@ -141,32 +157,6 @@ f128_mul(float128_t a,
         sigZExtra = sig128Extra.extra;
     }
 
-    return
-        softfloat_roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-    goto uiZ;
-
-infArg:
-
-    if (!magBits) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        uiZ.v64 = defaultNaNF128UI64;
-        uiZ.v0 = defaultNaNF128UI0;
-        goto uiZ;
-    }
-
-    uiZ.v64 = packToF128UI64(signZ, 0x7FFF, 0);
-    goto uiZ0;
-
-zero:
-    uiZ.v64 = packToF128UI64(signZ, 0, 0);
-uiZ0:
-    uiZ.v0 = 0;
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return softfloat_roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
 }
 

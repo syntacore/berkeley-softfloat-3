@@ -39,28 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-/** @todo refactoring */
 uint32_t
 f128_to_ui32_r_minMag(float128_t a,
                       bool exact)
 {
     using namespace softfloat;
-    ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    int32_t exp;
-    uint64_t sig64;
-    int32_t shiftDist;
-    bool sign;
-    uint32_t z;
-
-
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
-    exp = expF128UI64(uiA64);
-    sig64 = fracF128UI64(uiA64) | (uiA0 != 0);
-
-    shiftDist = 0x402F - exp;
+    uint64_t const uiA64 = reinterpret_cast<uint128 const&>(a).v64;
+    uint64_t const uiA0 = reinterpret_cast<uint128 const&>(a).v0;
+    int32_t const exp = expF128UI64(uiA64);
+    uint64_t sig64 = fracF128UI64(uiA64) | (uiA0 != 0);
+    int32_t const shiftDist = 0x402F - exp;
 
     if (49 <= shiftDist) {
         if (exact && (exp | sig64)) {
@@ -70,9 +58,9 @@ f128_to_ui32_r_minMag(float128_t a,
         return 0;
     }
 
-    sign = signF128UI64(uiA64);
+    bool const sign = signF128UI64(uiA64);
 
-    if (sign || (shiftDist < 17)) {
+    if (sign || shiftDist < 17) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             exp == 0x7FFF && sig64 ? ui32_fromNaN :
@@ -80,13 +68,12 @@ f128_to_ui32_r_minMag(float128_t a,
     }
 
     sig64 |= UINT64_C(0x0001000000000000);
-    z = static_cast<uint32_t>(sig64 >> shiftDist);
+    uint32_t const z = static_cast<uint32_t>(sig64 >> shiftDist);
 
-    if (exact && ((uint64_t)z << shiftDist != sig64)) {
+    if (exact && static_cast<uint64_t>(z) << shiftDist != sig64) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
     return z;
-
 }
 

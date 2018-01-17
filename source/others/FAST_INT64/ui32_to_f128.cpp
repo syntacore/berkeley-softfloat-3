@@ -42,8 +42,6 @@ float128_t
 ui32_to_f128(uint32_t a)
 {
     using namespace softfloat;
-    ui128_f128 uZ;
-
     uint64_t uiZ64 = 0;
 
     if (a) {
@@ -52,8 +50,9 @@ ui32_to_f128(uint32_t a)
             packToF128UI64(0, 0x402E - shiftDist, (uint64_t)a << shiftDist);
     }
 
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0 = 0;
-    return uZ.f;
+    uint128 uZ;
+    uZ.v64 = uiZ64;
+    uZ.v0 = 0;
+    return reinterpret_cast<float128_t const&>(uZ);
 }
 

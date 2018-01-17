@@ -41,30 +41,23 @@ float128_t
 ui64_to_f128(uint64_t a)
 {
     using namespace softfloat;
-    uint64_t uiZ64, uiZ0;
-    int8_t shiftDist;
-    uint128 zSig;
-    ui128_f128 uZ;
 
     if (!a) {
-        uiZ64 = 0;
-        uiZ0 = 0;
-    } else {
-        shiftDist = softfloat_countLeadingZeros64(a) + 49;
-
-        if (64 <= shiftDist) {
-            zSig.v64 = a << (shiftDist - 64);
-            zSig.v0 = 0;
-        } else {
-            zSig = softfloat_shortShiftLeft128(0u, a, static_cast<uint8_t>(shiftDist));
-        }
-
-        uiZ64 = packToF128UI64(0, 0x406E - shiftDist, zSig.v64);
-        uiZ0 = zSig.v0;
+        uint128 uZ{0u, 0u};
+        return reinterpret_cast<float128_t const&>(uZ);
     }
 
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0 = uiZ0;
-    return uZ.f;
+    int8_t const shiftDist = softfloat_countLeadingZeros64(a) + 49;
+    uint128 zSig;
+
+    if (64 <= shiftDist) {
+        zSig.v64 = a << (shiftDist - 64);
+        zSig.v0 = 0;
+    } else {
+        zSig = softfloat_shortShiftLeft128(0u, a, static_cast<uint8_t>(shiftDist));
+    }
+
+    uint128 uZ{packToF128UI64(0, 0x406E - shiftDist, zSig.v64), zSig.v0};
+    return reinterpret_cast<float128_t const&>(uZ);
 }
 

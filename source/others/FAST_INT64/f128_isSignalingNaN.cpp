@@ -40,13 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 bool
-f128_isSignalingNaN( float128_t a )
+f128_isSignalingNaN(float128_t a)
 {
     using namespace softfloat;
-    ui128_f128 uA;
-
-    uA.f = a;
-    return softfloat_isSigNaNF128UI( uA.ui.v64, uA.ui.v0 );
-
+    return softfloat_isSigNaNF128UI(reinterpret_cast<uint128 const&>(a).v64, reinterpret_cast<uint128 const&>(a).v0);
 }
 

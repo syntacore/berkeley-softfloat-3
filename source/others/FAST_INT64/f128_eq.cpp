@@ -44,23 +44,13 @@ f128_eq(float128_t a,
         float128_t b)
 {
     using namespace softfloat;
-    ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    ui128_f128 uB;
-    uint64_t uiB64, uiB0;
-
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0  = uA.ui.v0;
-    uB.f = b;
-    uiB64 = uB.ui.v64;
-    uiB0  = uB.ui.v0;
+    uint64_t const uiA64 = reinterpret_cast<uint128 const&>(a).v64;
+    uint64_t const uiA0  = reinterpret_cast<uint128 const&>(a).v0;
+    uint64_t const uiB64 = reinterpret_cast<uint128 const&>(b).v64;
+    uint64_t const uiB0  = reinterpret_cast<uint128 const&>(b).v0;
 
     if (isNaNF128UI(uiA64, uiA0) || isNaNF128UI(uiB64, uiB0)) {
-        if (
-            softfloat_isSigNaNF128UI(uiA64, uiA0)
-            || softfloat_isSigNaNF128UI(uiB64, uiB0)
-        ) {
+        if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 
@@ -68,10 +58,6 @@ f128_eq(float128_t a,
     }
 
     return
-        (uiA0 == uiB0)
-        && ((uiA64 == uiB64)
-            || (! uiA0 && !((uiA64 | uiB64) & UINT64_C(0x7FFFFFFFFFFFFFFF)))
-           );
-
+        uiA0 == uiB0 && (uiA64 == uiB64 || (0 == uiA0 && 0 == ((uiA64 | uiB64) & UINT64_C(0x7FFFFFFFFFFFFFFF))));
 }
 

@@ -50,7 +50,6 @@ softfloat_roundPackToF128(bool sign,
     uint128_extra sig128Extra;
     uint64_t uiZ64, uiZ0;
     uint128 sig128;
-    ui128_f128 uZ;
 
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
     bool doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
@@ -130,9 +129,11 @@ softfloat_roundPackToF128(bool sign,
     uiZ64 = packToF128UI64(sign, exp, sig64);
     uiZ0 = sig0;
 uiZ:
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0 = uiZ0;
-    return uZ.f;
+    ;
+    uint128 uZ;
+    uZ.v64 = uiZ64;
+    uZ.v0 = uiZ0;
+    return reinterpret_cast<float128_t const&>(uZ);
 }
 
 }  // namespace softfloat

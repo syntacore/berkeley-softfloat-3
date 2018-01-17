@@ -46,7 +46,6 @@ extF80_to_f128(extFloat80_t a)
     uint128 uiZ;
     bool sign;
     uint128 frac128;
-    ui128_f128 uZ;
 
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
@@ -62,6 +61,5 @@ extF80_to_f128(extFloat80_t a)
         uiZ.v0 = frac128.v0;
     }
 
-    uZ.ui = uiZ;
-    return uZ.f;
+    return reinterpret_cast<float128_t const&>(uiZ);
 }

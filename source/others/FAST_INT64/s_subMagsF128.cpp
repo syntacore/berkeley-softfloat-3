@@ -52,7 +52,6 @@ softfloat_subMagsF128(uint64_t uiA64,
     uint128 sigB, sigZ;
     int32_t expDiff, expZ;
     uint128 uiZ;
-    ui128_f128 uZ;
 
     int32_t const expA = expF128UI64(uiA64);
     sigA.v64 = fracF128UI64(uiA64);
@@ -166,7 +165,6 @@ normRoundPack:
 propagateNaN:
     uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
 uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
+    return reinterpret_cast<float128_t const&>(uiZ);
 }
 }  // namespace softfloat
