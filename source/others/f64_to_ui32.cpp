@@ -51,14 +51,12 @@ f64_to_ui32(float64_t const a,
     uint64_t sig = fracF64UI(uiA);
 
     if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {
-        if (0x7FF == exp && sig) {
+        if (0x7FF == exp && 0 != sig) {
             if (ui32_fromNaN == ui32_fromPosOverflow) {
                 sign = 0;
-            }
-            else if (ui32_fromNaN == ui32_fromNegOverflow) {
+            } else if (ui32_fromNaN == ui32_fromNegOverflow) {
                 sign = 1;
-            }
-            else {
+            } else {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return ui32_fromNaN;
             }
