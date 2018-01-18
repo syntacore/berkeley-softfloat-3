@@ -44,8 +44,6 @@ f64_to_f128(float64_t a)
 {
     using namespace softfloat;
     uint128 uiZ;
-
-
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
@@ -59,14 +57,18 @@ f64_to_f128(float64_t a)
             uiZ.v0 = 0;
         }
 
-        goto uiZ;
+        ui128_f128 uZ;
+        uZ.ui = uiZ;
+        return uZ.f;
     }
 
     if (!exp) {
         if (!frac) {
             uiZ.v64 = packToF128UI64(sign, 0, 0);
             uiZ.v0 = 0;
-            goto uiZ;
+            ui128_f128 uZ;
+            uZ.ui = uiZ;
+            return uZ.f;
         }
 
         exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
@@ -77,8 +79,6 @@ f64_to_f128(float64_t a)
     uint128 const frac128 = softfloat_shortShiftLeft128(0, frac, 60);
     uiZ.v64 = packToF128UI64(sign, exp + 0x3C00, frac128.v64);
     uiZ.v0 = frac128.v0;
-
-uiZ:
     ui128_f128 uZ;
     uZ.ui = uiZ;
     return uZ.f;

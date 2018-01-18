@@ -65,14 +65,20 @@ f128_to_extF80(float128_t const a)
             uiZ0 = UINT64_C(0x8000000000000000);
         }
 
-        goto uiZ;
+        extFloat80_t uZ;
+        uZ.signExp = uiZ64;
+        uZ.signif = uiZ0;
+        return uZ;
     }
 
     if (!exp) {
         if (!(frac64 | frac0)) {
             uiZ64 = packToExtF80UI64(sign, 0);
             uiZ0 = 0;
-            goto uiZ;
+            extFloat80_t uZ;
+            uZ.signExp = uiZ64;
+            uZ.signif = uiZ0;
+            return uZ;
         }
 
         exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(frac64, frac0);
@@ -85,11 +91,4 @@ f128_to_extF80(float128_t const a)
         softfloat_shortShiftLeft128(
             frac64 | UINT64_C(0x0001000000000000), frac0, 15);
     return softfloat_roundPackToExtF80(sign, exp, sig128.v64, sig128.v0, 80);
-
-uiZ:
-    extFloat80_t uZ;
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
-    return uZ;
 }
-

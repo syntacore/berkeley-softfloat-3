@@ -66,15 +66,27 @@ extF80_rem(extFloat80_t a,
 
     if (expA == 0x7FFF) {
         if (0 != (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) || (0x7FFF == expB && 0 != (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))) {
-            goto propagateNaN;
+            uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+            extFloat80_t uZ;
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
+            return uZ;
         }
 
-        goto invalid;
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        extFloat80_t uZ;
+        uZ.signExp = defaultNaNExtF80UI64;
+        uZ.signif = defaultNaNExtF80UI0;
+        return uZ;
     }
 
     if (0x7FFF == expB) {
         if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            goto propagateNaN;
+            uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+            extFloat80_t uZ;
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
+            return uZ;
         }
 
         /*
@@ -91,7 +103,11 @@ extF80_rem(extFloat80_t a,
 
     if (!(sigB & UINT64_C(0x8000000000000000))) {
         if (!sigB) {
-            goto invalid;
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            extFloat80_t uZ;
+            uZ.signExp = defaultNaNExtF80UI64;
+            uZ.signif = defaultNaNExtF80UI0;
+            return uZ;
         }
 
         normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
@@ -106,7 +122,16 @@ extF80_rem(extFloat80_t a,
     if (!(sigA & UINT64_C(0x8000000000000000))) {
         if (!sigA) {
             expA = 0;
-            goto copyA;
+
+            if (expA < 1) {
+                sigA >>= 1 - expA;
+                expA = 0;
+            }
+
+            extFloat80_t uZ;
+            uZ.signExp = static_cast<uint16_t>(packToExtF80UI64(signA, static_cast<uint16_t>(expA)));
+            uZ.signif = sigA;
+            return uZ;
         }
 
         normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
@@ -117,7 +142,15 @@ extF80_rem(extFloat80_t a,
     expDiff = expA - expB;
 
     if (expDiff < -1) {
-        goto copyA;
+        if (expA < 1) {
+            sigA >>= 1 - expA;
+            expA = 0;
+        }
+
+        extFloat80_t uZ;
+        uZ.signExp = static_cast<uint16_t>(packToExtF80UI64(signA, static_cast<uint16_t>(expA)));
+        uZ.signif = sigA;
+        return uZ;
     }
 
     rem = softfloat_shortShiftLeft128(0, sigA, 32);
@@ -174,7 +207,21 @@ extF80_rem(extFloat80_t a,
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             altRem = softfloat_add128(rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
-            goto selectRem;
+            meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
+
+            if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
+                rem = altRem;
+            }
+
+            bool signRem = signA;
+
+            if (rem.v64 & UINT64_C(0x8000000000000000)) {
+                signRem = !signRem;
+                rem = softfloat_sub128(0, 0, rem.v64, rem.v0);
+            }
+
+            return
+                softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
         }
     }
 
@@ -186,7 +233,6 @@ extF80_rem(extFloat80_t a,
                 rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
     } while (!(rem.v64 & UINT64_C(0x8000000000000000)));
 
-selectRem:
     meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
 
     if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
@@ -202,31 +248,4 @@ selectRem:
 
     return
         softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    uiZ64 = static_cast<uint16_t>(uiZ.v64);
-    uiZ0 = uiZ.v0;
-    goto uiZ;
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    uiZ64 = defaultNaNExtF80UI64;
-    uiZ0 = defaultNaNExtF80UI0;
-    goto uiZ;
-
-copyA:
-
-    if (expA < 1) {
-        sigA >>= 1 - expA;
-        expA = 0;
-    }
-
-    uiZ64 = static_cast<uint16_t>(packToExtF80UI64(signA, static_cast<uint16_t>(expA)));
-    uiZ0 = sigA;
-uiZ:
-    extFloat80_t uZ;
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
-    return uZ;
 }
