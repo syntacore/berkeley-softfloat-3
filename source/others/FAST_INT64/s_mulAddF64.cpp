@@ -188,7 +188,7 @@ softfloat_mulAddF64(uint64_t uiA,
     } else if (0 == expDiff) {
         sig128Z.v64 = sig128Z.v64 - sigC;
 
-        if (!(sig128Z.v64 | sig128Z.v0)) {
+        if (0 == (sig128Z.v64 | sig128Z.v0)) {
             return u_as_f_64(packToF64UI((softfloat_roundingMode == softfloat_round_min), 0, 0));
         }
 
@@ -208,7 +208,7 @@ softfloat_mulAddF64(uint64_t uiA,
         sig128Z.v0 = 0;
     }
 
-    auto const shiftDist = softfloat_countLeadingZeros64(sig128Z.v64) - 1u;
+    int16_t const shiftDist = softfloat_countLeadingZeros64(sig128Z.v64) - 1;
     expZ -= shiftDist;
 
     if (shiftDist < 0) {
