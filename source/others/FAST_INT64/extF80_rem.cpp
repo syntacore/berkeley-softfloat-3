@@ -51,8 +51,6 @@ extF80_rem(extFloat80_t a,
     uint128 altRem;
     uint128 meanRem;
     uint128 uiZ;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
 
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
