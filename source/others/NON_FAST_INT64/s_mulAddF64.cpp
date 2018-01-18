@@ -62,8 +62,7 @@ softfloat_mulAddF64(uint64_t uiA,
 
     if (isInf64UI(uiA) || isInf64UI(uiB)) {
         /* a or b is inf, product is inf or undefined, check other operand for zero */
-        bool const is_product_undefined =
-            isInf64UI(uiA) ? isZero64UI(uiB) : isZero64UI(uiA);
+        bool const is_product_undefined = isInf64UI(uiA) ? isZero64UI(uiB) : isZero64UI(uiA);
 
         if (!is_product_undefined) {
             /* product is inf */
@@ -94,7 +93,7 @@ softfloat_mulAddF64(uint64_t uiA,
 
     int16_t expA = expF64UI(uiA);
 
-    if (!expA) {
+    if (0 == expA) {
         if (!sigA) {
             return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
         }
@@ -267,7 +266,8 @@ softfloat_mulAddF64(uint64_t uiA,
     }
 
     return
-        softfloat_roundPackToF64(signZ, expZ - 1,
+        softfloat_roundPackToF64(signZ,
+                                 expZ - 1,
                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
 }
 
