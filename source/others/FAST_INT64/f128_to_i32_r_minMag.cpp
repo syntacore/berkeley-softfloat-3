@@ -89,9 +89,7 @@ f128_to_i32_r_minMag(float128_t a,
     sig64 |= UINT64_C(0x0001000000000000);
     absZ = static_cast<int32_t>(sig64 >> shiftDist);
 
-    if (
-        exact && (static_cast<uint64_t>(static_cast<uint32_t>absZ) << shiftDist != sig64)
-    ) {
+    if (exact && (static_cast<uint64_t>(static_cast<uint32_t>(absZ)) << shiftDist != sig64)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
