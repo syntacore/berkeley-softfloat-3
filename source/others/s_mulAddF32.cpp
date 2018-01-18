@@ -45,7 +45,7 @@ float32_t
 softfloat_mulAddF32(uint32_t uiA,
                     uint32_t uiB,
                     uint32_t uiC,
-                    uint8_t op)
+                    Mul_add_operations op)
 {
     if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB) || softfloat_isNaNF32UI(uiC)) {
         return u_as_f_32(softfloat_propagateNaNF32UI(softfloat_propagateNaNF32UI(uiA, uiB), uiC));

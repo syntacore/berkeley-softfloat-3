@@ -59,6 +59,6 @@ f128M_mulAdd(const float128_t* aPtr,
     uiB0 = bWPtr[indexWord(2, 0)];
     uiC64 = cWPtr[indexWord(2, 1)];
     uiC0 = cWPtr[indexWord(2, 0)];
-    *zPtr = softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, 0);
+    *zPtr = softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, softfloat_mulAdd_madd);
 
 }

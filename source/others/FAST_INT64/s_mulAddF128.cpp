@@ -48,7 +48,7 @@ softfloat_mulAddF128(uint64_t uiA64,
                      uint64_t uiB0,
                      uint64_t uiC64,
                      uint64_t uiC0,
-                     uint8_t op)
+                     Mul_add_operations op)
 {
     bool signA;
     int32_t expA;

@@ -60,7 +60,7 @@ f128_mulAdd(float128_t a,
     uC.f = c;
     uiC64 = uC.ui.v64;
     uiC0 = uC.ui.v0;
-    return softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, 0);
+    return softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, softfloat_mulAdd_madd);
 
 }
 

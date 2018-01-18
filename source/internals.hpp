@@ -284,12 +284,6 @@ union ui128_f128
 };
 #endif
 
-enum
-{
-    softfloat_mulAdd_subC = 1,
-    softfloat_mulAdd_subProd = 2
-};
-
 #ifdef SOFTFLOAT_FAST_INT64
 
 inline constexpr uint128
@@ -400,11 +394,18 @@ softfloat_addMagsF16(uint16_t,
 float16_t
 softfloat_subMagsF16(uint16_t,
                      uint16_t);
+enum Mul_add_operations
+{
+    softfloat_mulAdd_madd = 0,
+    softfloat_mulAdd_subC = 1,
+    softfloat_mulAdd_subProd = 2
+};
+
 float16_t
 softfloat_mulAddF16(uint16_t,
                     uint16_t,
                     uint16_t,
-                    uint8_t);
+                    Mul_add_operations);
 
 struct exp16_sig32
 {
@@ -434,7 +435,7 @@ float32_t
 softfloat_mulAddF32(uint32_t,
                     uint32_t,
                     uint32_t,
-                    uint8_t);
+                    Mul_add_operations);
 
 struct exp16_sig64
 {
@@ -466,7 +467,7 @@ float64_t
 softfloat_mulAddF64(uint64_t,
                     uint64_t,
                     uint64_t,
-                    uint8_t);
+                    Mul_add_operations);
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -476,17 +477,36 @@ signF128UI64(uint64_t a64)
     return static_cast<int64_t>(a64) < 0;
 }
 
-#define expF128UI64( a64 ) ((int32_t) ((a64)>>48) & 0x7FFF)
-#define fracF128UI64( a64 ) ((a64) & UINT64_C( 0x0000FFFFFFFFFFFF ))
-#define packToF128UI64( sign, exp, sig64 ) (((uint64_t) (sign)<<63) + ((uint64_t) (exp)<<48) + (sig64))
+inline constexpr int32_t
+expF128UI64(uint64_t a64)
+{
+    return static_cast<int32_t>(a64 >> 48) & INT32_C(0x7FFF);
+}
+
+inline constexpr uint64_t
+fracF128UI64(uint64_t a64)
+{
+    return a64 & UINT64_C(0x0000FFFFFFFFFFFF);
+}
+
+inline constexpr uint64_t
+packToF128UI64(bool sign,
+               int32_t exp,
+               uint64_t sig64)
+{
+    return
+        (static_cast<uint64_t>(sign) << 63) + 
+        (static_cast<uint64_t>(exp) << 48) + 
+        sig64;
+}
 
 inline constexpr bool
-isNaNF128UI(uint64_t a64, uint64_t a0)
+isNaNF128UI(uint64_t a64,
+            uint64_t a0)
 {
     return
         0 == (~a64 & UINT64_C(0x7FFF000000000000)) &&
-        (0 != a0 || 0 != (a64 & UINT64_C(0x0000FFFFFFFFFFFF))
-        );
+        (0 != a0 || 0 != (a64 & UINT64_C(0x0000FFFFFFFFFFFF)));
 }
 
 struct exp32_sig64
@@ -559,7 +579,7 @@ softfloat_mulAddF128(uint64_t,
                      uint64_t,
                      uint64_t,
                      uint64_t,
-                     uint8_t);
+                     Mul_add_operations);
 
 #else
 
@@ -650,7 +670,7 @@ softfloat_mulAddF128M(uint32_t const*,
                       uint32_t const*,
                       uint32_t const*,
                       uint32_t*,
-                      uint8_t);
+                      Mul_add_operations);
 
 #endif
 

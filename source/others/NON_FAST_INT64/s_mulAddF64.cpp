@@ -42,7 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 
 float64_t
-softfloat_mulAddF64(uint64_t uiA, uint64_t uiB, uint64_t uiC, uint8_t op)
+softfloat_mulAddF64(uint64_t uiA,
+                    uint64_t uiB,
+                    uint64_t uiC,
+                    Mul_add_operations op)
 {
     if (softfloat_isNaNF64UI(uiC) || softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB)) {
         return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));

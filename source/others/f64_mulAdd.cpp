@@ -44,6 +44,6 @@ f64_mulAdd(float64_t a,
            float64_t c)
 {
     using namespace softfloat;
-    return softfloat_mulAddF64(f_as_u_64(a), f_as_u_64(b), f_as_u_64(c), 0);
+    return softfloat_mulAddF64(f_as_u_64(a), f_as_u_64(b), f_as_u_64(c), softfloat_mulAdd_madd);
 }
 
