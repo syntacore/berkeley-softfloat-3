@@ -54,23 +54,23 @@ static softfloat_tininess const init_detectTininess = softfloat_tininess_afterRo
 The values to return on conversions to 32-bit integer formats that raise an
 invalid exception.
 */
-#define ui32_fromPosOverflow UINT32_MAX
-#define ui32_fromNegOverflow 0
-#define ui32_fromNaN         UINT32_MAX
-#define i32_fromPosOverflow  INT32_MAX
-#define i32_fromNegOverflow  INT32_MIN
-#define i32_fromNaN          INT32_MAX
+static uint32_t const ui32_fromPosOverflow = UINT32_MAX;
+static uint32_t const ui32_fromNegOverflow = 0;
+static uint32_t const ui32_fromNaN = UINT32_MAX;
+static int32_t const i32_fromPosOverflow  = INT32_MAX;
+static int32_t const i32_fromNegOverflow  = INT32_MIN;
+static int32_t const i32_fromNaN          = INT32_MAX;
 
 /**
 The values to return on conversions to 64-bit integer formats that raise an
 invalid exception.
 */
-#define ui64_fromPosOverflow UINT64_MAX
-#define ui64_fromNegOverflow 0
-#define ui64_fromNaN         UINT64_MAX
-#define i64_fromPosOverflow  INT64_MAX
-#define i64_fromNegOverflow  INT64_MIN
-#define i64_fromNaN          INT64_MAX
+static uint64_t const ui64_fromPosOverflow = UINT64_MAX;
+static uint64_t const ui64_fromNegOverflow = 0;
+static uint64_t const ui64_fromNaN = UINT64_MAX;
+static int64_t const i64_fromPosOverflow = INT64_MAX;
+static int64_t const i64_fromNegOverflow = INT64_MIN;
+static int64_t const i64_fromNaN = INT64_MAX;
 
 /**
 "Common NaN" structure, used to transfer NaN representations from one format
@@ -78,17 +78,17 @@ to another.
 */
 struct commonNaN {
     bool sign;
-#ifdef LITTLEENDIAN
-    uint64_t v0, v64;
-#else
+#ifdef BIG_ENDIAN
     uint64_t v64, v0;
+#else
+    uint64_t v0, v64;
 #endif
 };
 
 /**
 The bit pattern for a default generated 16-bit floating-point NaN.
 */
-#define defaultNaNF16UI 0xFE00
+static uint16_t const defaultNaNF16UI = UINT16_C(0xFE00);
 
 /**
 Returns true when 16-bit unsigned integer `uiA' has the bit pattern of a
@@ -98,7 +98,7 @@ Note:  This macro evaluates its argument more than once.
 inline bool
 softfloat_isSigNaNF16UI(uint16_t uiA)
 {
-    return ((uiA & 0x7E00) == 0x7C00) && (uiA & 0x01FF);
+    return UINT16_C(0x7C00) == (uiA & UINT16_C(0x7E00)) && 0 != (uiA & 0x01FF);
 }
 
 /**
@@ -358,10 +358,10 @@ softfloat_propagateNaNExtF80M(extFloat80M const* aSPtr,
 /**
 The bit pattern for a default generated 128-bit floating-point NaN.
 */
-#define defaultNaNF128UI96 0xFFFF8000
-#define defaultNaNF128UI64 0
-#define defaultNaNF128UI32 0
-#define defaultNaNF128UI0  0
+static uint32_t const defaultNaNF128UI96 = UINT32_C(0xFFFF8000);
+static uint32_t const defaultNaNF128UI64 = UINT32_C(0);
+static uint32_t const defaultNaNF128UI32 = UINT32_C(0);
+static uint32_t const defaultNaNF128UI0  = UINT32_C(0);
 
 /**
 Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,
