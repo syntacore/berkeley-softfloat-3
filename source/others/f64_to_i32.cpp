@@ -51,7 +51,7 @@ f64_to_i32(float64_t const a,
     uint64_t sig = fracF64UI(uiA);
 
     if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
-        if ((exp == 0x7FF) && sig) {
+        if (exp == 0x7FF && 0 != sig) {
             if (i32_fromNaN == i32_fromPosOverflow) {
                 sign = 0;
             } else if (i32_fromNaN == i32_fromNegOverflow) {
