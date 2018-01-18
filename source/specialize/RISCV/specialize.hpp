@@ -410,10 +410,10 @@ softfloat_propagateNaNF128UI(uint64_t uiA64,
 /**
 The bit pattern for a default generated 128-bit floating-point NaN.
 */
-#define defaultNaNF128UI96 0x7FFF8000
-#define defaultNaNF128UI64 0
-#define defaultNaNF128UI32 0
-#define defaultNaNF128UI0  0
+static uint32_t const defaultNaNF128UI96 = UINT32_C(0x7FFF8000);
+static uint32_t const defaultNaNF128UI64 = UINT32_C(0);
+static uint32_t const defaultNaNF128UI32 UINT32_C(0);
+static uint32_t const defaultNaNF128UI0  UINT32_C(0);
 
 /**
 Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is
