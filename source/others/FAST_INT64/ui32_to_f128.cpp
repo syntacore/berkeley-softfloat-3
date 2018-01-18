@@ -47,7 +47,7 @@ ui32_to_f128(uint32_t a)
     if (a) {
         int8_t shiftDist = softfloat_countLeadingZeros32(a) + 17;
         uiZ64 =
-            packToF128UI64(0, 0x402E - shiftDist, (uint64_t)a << shiftDist);
+            packToF128UI64(0, 0x402E - shiftDist, static_cast<uint64_t>(a) << shiftDist);
     }
 
     uint128 uZ;

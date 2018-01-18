@@ -70,7 +70,7 @@ f128_roundToInt(float128_t a,
             return a;
         }
 
-        lastBitMask = (uint64_t)2 << (0x406E - exp);
+        lastBitMask = static_cast<uint64_t>(2) << (0x406E - exp);
         roundBitsMask = lastBitMask - 1;
         uiZ.v64 = uiA64;
         uiZ.v0 = uiA0;
@@ -151,7 +151,7 @@ f128_roundToInt(float128_t a,
 
         uiZ.v64 = uiA64;
         uiZ.v0 = 0;
-        lastBitMask = (uint64_t)1 << (0x402F - exp);
+        lastBitMask = static_cast<uint64_t>(1) << (0x402F - exp);
         roundBitsMask = lastBitMask - 1;
 
         if (roundingMode == softfloat_round_near_maxMag) {

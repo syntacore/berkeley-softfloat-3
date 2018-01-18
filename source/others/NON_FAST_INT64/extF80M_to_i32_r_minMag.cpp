@@ -86,7 +86,7 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
             return invalid(sign, exp, sig);
         }
 
-        shiftedSig = (uint64_t)(uint32_t)sig << -shiftDist;
+        shiftedSig = static_cast<uint64_t>((uint32_t)sig) << -shiftDist;
 
         if (shiftedSig >> 32) {
             return invalid(sign, exp, sig);

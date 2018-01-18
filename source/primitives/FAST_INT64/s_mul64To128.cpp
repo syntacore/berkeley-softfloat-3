@@ -48,11 +48,11 @@ softfloat_mul64To128(uint64_t a,
     uint32_t const b32 = b >> 32;
     uint32_t const b0 = (uint32_t)b;
     uint128 z;
-    z.v0 = (uint64_t)a0 * b0;
-    uint64_t const mid1 = (uint64_t)a32 * b0;
-    uint64_t mid = mid1 + (uint64_t)a0 * b32;
-    z.v64 = (uint64_t)a32 * b32;
-    z.v64 += (uint64_t)(mid < mid1) << 32 | mid >> 32;
+    z.v0 = static_cast<uint64_t>(a0) * b0;
+    uint64_t const mid1 = static_cast<uint64_t>(a32) * b0;
+    uint64_t mid = mid1 + static_cast<uint64_t>(a0) * b32;
+    z.v64 = static_cast<uint64_t>(a32) * b32;
+    z.v64 += static_cast<uint64_t>(mid < mid1) << 32 | mid >> 32;
     mid <<= 32;
     z.v0 += mid;
     z.v64 += (z.v0 < mid);

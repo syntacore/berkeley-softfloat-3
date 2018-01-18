@@ -66,5 +66,5 @@ f32_to_f64(float32_t a)
         frac = normExpSig.sig;
     }
 
-    return u_as_f_64(packToF64UI(sign, exp + 0x380, (uint64_t)frac << 29));
+    return u_as_f_64(packToF64UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
 }

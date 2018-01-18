@@ -117,7 +117,7 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
         q,
         &rem[indexMultiwordHi(4, 3)]
     );
-    rem64 = (uint64_t)rem[indexWord(4, 3)] << 32 | rem[indexWord(4, 2)];
+    rem64 = static_cast<uint64_t>(rem[indexWord(4, 3)]) << 32 | rem[indexWord(4, 2)];
 
     q = ((static_cast<uint32_t>(rem64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     x64 = static_cast<uint64_t>(q) << 7;

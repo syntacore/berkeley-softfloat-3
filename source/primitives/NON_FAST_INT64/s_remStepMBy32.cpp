@@ -61,7 +61,7 @@ softfloat_remStepMBy32(uint8_t size_words,
         for (;;) {
             wordShiftedRem = wordRem >> uNegDist;
             index += wordIncr;
-            dwordProd = (uint64_t)bPtr[index] * q + (dwordProd >> 32);
+            dwordProd = static_cast<uint64_t>(bPtr[index]) * q + (dwordProd >> 32);
             wordRem = remPtr[index];
             wordShiftedRem |= wordRem << dist;
             wordProd = static_cast<uint32_t>(dwordProd);

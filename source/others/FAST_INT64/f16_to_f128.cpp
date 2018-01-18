@@ -69,6 +69,6 @@ f16_to_f128(float16_t a)
         return u_as_f_128(uiZ);
     }
 
-    uint128 const uiZ{packToF128UI64(sign, exp + 0x3FF0, (uint64_t)frac << 38), 0};
+    uint128 const uiZ{packToF128UI64(sign, exp + 0x3FF0, static_cast<uint64_t>(frac) << 38), 0};
     return u_as_f_128(uiZ);
 }

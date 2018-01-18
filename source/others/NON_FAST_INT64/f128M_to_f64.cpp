@@ -47,7 +47,7 @@ f128M_to_f64(const float128_t* aPtr)
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t exp = expF128UI96(uiA96);
-    uint64_t frac64 = (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)];
+    uint64_t frac64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];
 
     if (exp == 0x7FFF) {
         if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {

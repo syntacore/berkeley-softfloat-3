@@ -52,6 +52,6 @@ ui32_to_extF80(uint32_t a)
 
     extFloat80_t uZ;
     uZ.signExp = uiZ64;
-    uZ.signif = (uint64_t)a << 32;
+    uZ.signif = static_cast<uint64_t>(a) << 32;
     return uZ;
 }

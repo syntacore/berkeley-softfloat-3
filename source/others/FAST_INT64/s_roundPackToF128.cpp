@@ -118,8 +118,7 @@ softfloat_roundPackToF128(bool sign,
     if (doIncrement) {
         sig128 = softfloat_add128(sig64, sig0, 0, 1);
         sig64 = sig128.v64;
-        sig0 = sig128.v0 &
-            ~(uint64_t)(!(sigExtra & INT64_MAX) & roundNearEven);
+        sig0 = sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven);
     } else {
         if (!(sig64 | sig0)) {
             exp = 0;

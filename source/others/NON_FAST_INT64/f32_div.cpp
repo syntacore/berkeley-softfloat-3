@@ -116,15 +116,15 @@ f32_div(float32_t a,
 
         if (sigA < sigB) {
             --expZ;
-            sig64A = (uint64_t)sigA << 31;
+            sig64A = static_cast<uint64_t>(sigA) << 31;
         } else {
-            sig64A = (uint64_t)sigA << 30;
+            sig64A = static_cast<uint64_t>(sigA) << 30;
         }
 
         sigZ = sig64A / sigB;
 
         if (!(sigZ & 0x3F)) {
-            sigZ |= ((uint64_t)sigB * sigZ != sig64A);
+            sigZ |= (static_cast<uint64_t>(sigB) * sigZ != sig64A);
         }
 
 #else
@@ -137,13 +137,13 @@ f32_div(float32_t a,
         }
 
         sigB <<= 8;
-        sigZ = ((uint64_t)sigA * softfloat_approxRecip32_1(sigB)) >> 32;
+        sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecip32_1(sigB)) >> 32;
 
         sigZ += 2;
 
         if ((sigZ & 0x3F) < 2) {
             sigZ &= ~3;
-            rem = ((uint64_t)sigA << 32) - (uint64_t)(sigZ << 1) * sigB;
+            rem = (static_cast<uint64_t>(sigA) << 32) - (uint64_t)(sigZ << 1) * sigB;
 
             if (rem & UINT64_C(0x8000000000000000)) {
                 sigZ -= 4;

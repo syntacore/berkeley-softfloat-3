@@ -96,7 +96,7 @@ f32_mul(float32_t a,
     int16_t expZ = expA + expB - 127;
     sigA = (sigA | 0x00800000) << 7;
     sigB = (sigB | 0x00800000) << 8;
-    uint32_t sigZ = (uint32_t)softfloat_shortShiftRightJam64((uint64_t)sigA * sigB, 32);
+    uint32_t sigZ = (uint32_t)softfloat_shortShiftRightJam64(static_cast<uint64_t>(sigA) * sigB, 32);
 
     if (sigZ < 0x40000000) {
         --expZ;

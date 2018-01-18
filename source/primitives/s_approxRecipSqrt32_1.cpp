@@ -49,12 +49,12 @@ softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
         softfloat_approxRecipSqrt_1k0s[index] -
         ((softfloat_approxRecipSqrt_1k1s[index] * (uint32_t)eps) >> 20);
     uint32_t ESqrR0 = ((uint32_t)r0 * r0) << (!oddExpA ? 1 : 0);
-    uint32_t const sigma0 = ~(uint32_t)(((uint32_t)ESqrR0 * (uint64_t)a) >> 23);
+    uint32_t const sigma0 = ~(uint32_t)(((uint32_t)ESqrR0 * static_cast<uint64_t>(a)) >> 23);
     uint32_t r =
         ((uint32_t)r0 << 16) +
-        ((r0 * (uint64_t)sigma0) >> 25);
-    uint32_t const sqrSigma0 = ((uint64_t)sigma0 * sigma0) >> 32;
-    r += ((uint32_t)((r >> 1) + (r >> 3) - ((uint32_t)r0 << 14)) * (uint64_t)sqrSigma0) >> 48;
+        ((r0 * static_cast<uint64_t>(sigma0)) >> 25);
+    uint32_t const sqrSigma0 = (static_cast<uint64_t>(sigma0) * sigma0) >> 32;
+    r += ((uint32_t)((r >> 1) + (r >> 3) - ((uint32_t)r0 << 14)) * static_cast<uint64_t>(sqrSigma0)) >> 48;
     return !(r & 0x80000000) ? 0x80000000 : r;
 }
 

@@ -73,7 +73,7 @@ f32_to_f128(float32_t a)
     }
 
     uint128 uiZ;
-    uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, (uint64_t)frac << 25);
+    uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25);
     uiZ.v0 = 0;
     return u_as_f_128(uiZ);
 }

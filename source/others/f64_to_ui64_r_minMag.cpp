@@ -78,7 +78,7 @@ f64_to_ui64_r_minMag(float64_t a, bool exact)
 
     sig |= UINT64_C(0x0010000000000000);
 
-    if (exact && (uint64_t)(sig << (-shiftDist & 63))) {
+    if (exact && static_cast<uint64_t>(sig << (-shiftDist & 63))) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

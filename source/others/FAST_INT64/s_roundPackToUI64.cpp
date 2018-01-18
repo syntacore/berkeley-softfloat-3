@@ -68,10 +68,7 @@ softfloat_roundPackToUI64(bool sign,
             goto invalid;
         }
 
-        sig &=
-            ~(uint64_t)
-            (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
-             & roundNearEven);
+        sig &= ~static_cast<uint64_t>(!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF)) & roundNearEven);
     }
 
     if (sign && sig) {

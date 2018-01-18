@@ -80,5 +80,5 @@ f16_to_extF80M(float16_t a,
     uiZ32 = 0x80000000 | (uint32_t)frac << 21;
 uiZ:
     zSPtr->signExp = uiZ64;
-    zSPtr->signif = (uint64_t)uiZ32 << 32;
+    zSPtr->signif = static_cast<uint64_t>(uiZ32) << 32;
 }

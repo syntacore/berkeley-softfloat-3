@@ -175,7 +175,7 @@ extF80_rem(extFloat80_t a,
         uint64_t q64;
 
         for (;;) {
-            q64 = (uint64_t)(uint32_t)(rem.v64 >> 2) * recip32;
+            q64 = static_cast<uint64_t>((uint32_t)(rem.v64 >> 2)) * recip32;
 
             if (expDiff < 0) {
                 break;

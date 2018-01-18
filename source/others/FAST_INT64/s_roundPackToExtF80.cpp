@@ -115,7 +115,7 @@ softfloat_roundPackToExtF80(bool sign,
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    sig = (uint64_t)(sig + roundIncrement);
+    sig = static_cast<uint64_t>(sig + roundIncrement);
 
     if (sig < roundIncrement) {
         ++exp;
@@ -180,10 +180,7 @@ precision80:
 
             if (doIncrement) {
                 ++sig;
-                sig &=
-                    ~(uint64_t)
-                    (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
-                     & roundNearEven);
+                sig &= ~static_cast<uint64_t>(!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF)) & roundNearEven);
                 exp = ((sig & UINT64_C(0x8000000000000000)) != 0);
             }
 
@@ -228,10 +225,7 @@ overflow:
             ++exp;
             sig = UINT64_C(0x8000000000000000);
         } else {
-            sig &=
-                ~(uint64_t)
-                (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
-                 & roundNearEven);
+            sig &= ~static_cast<uint64_t>(!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF)) & roundNearEven);
         }
     } else {
         if (!sig) {

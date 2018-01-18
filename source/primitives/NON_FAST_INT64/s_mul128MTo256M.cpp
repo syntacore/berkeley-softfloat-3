@@ -49,37 +49,37 @@ softfloat_mul128MTo256M(uint32_t const *aPtr,
     uint32_t wordB = *bPtr;
     uint64_t dwordProd = static_cast<uint64_t>(aPtr[indexWord(4, 0)]) * wordB;
     zPtr[indexWord(5, 0)] = (uint32_t)dwordProd;
-    dwordProd = (uint64_t)aPtr[indexWord(4, 1)] * wordB + (dwordProd >> 32);
+    dwordProd = static_cast<uint64_t>(aPtr[indexWord(4, 1)]) * wordB + (dwordProd >> 32);
     zPtr[indexWord(5, 1)] = (uint32_t)dwordProd;
-    dwordProd = (uint64_t)aPtr[indexWord(4, 2)] * wordB + (dwordProd >> 32);
+    dwordProd = static_cast<uint64_t>(aPtr[indexWord(4, 2)]) * wordB + (dwordProd >> 32);
     zPtr[indexWord(5, 2)] = (uint32_t)dwordProd;
-    dwordProd = (uint64_t)aPtr[indexWord(4, 3)] * wordB + (dwordProd >> 32);
+    dwordProd = static_cast<uint64_t>(aPtr[indexWord(4, 3)]) * wordB + (dwordProd >> 32);
     zPtr[indexWord(5, 3)] = (uint32_t)dwordProd;
     zPtr[indexWord(5, 4)] = dwordProd >> 32;
     do {
         bPtr += wordIncr;
         zPtr += wordIncr;
         wordB = *bPtr;
-        dwordProd = (uint64_t)aPtr[indexWord(4, 0)] * wordB;
+        dwordProd = static_cast<uint64_t>(aPtr[indexWord(4, 0)]) * wordB;
         uint32_t wordZ = zPtr[indexWord(5, 0)] + (uint32_t)dwordProd;
         zPtr[indexWord(5, 0)] = wordZ;
         bool carry = wordZ < static_cast<uint32_t>(dwordProd);
         dwordProd =
-            (uint64_t)aPtr[indexWord(4, 1)] * wordB + (dwordProd >> 32);
+            static_cast<uint64_t>(aPtr[indexWord(4, 1)]) * wordB + (dwordProd >> 32);
         wordZ = zPtr[indexWord(5, 1)] + static_cast<uint32_t>(dwordProd) + !!carry;
         zPtr[indexWord(5, 1)] = wordZ;
         if (wordZ != static_cast<uint32_t>(dwordProd)) {
             carry = wordZ < static_cast<uint32_t>(dwordProd);
         }
         dwordProd =
-            (uint64_t)aPtr[indexWord(4, 2)] * wordB + (dwordProd >> 32);
+            static_cast<uint64_t>(aPtr[indexWord(4, 2)]) * wordB + (dwordProd >> 32);
         wordZ = zPtr[indexWord(5, 2)] + static_cast<uint32_t>(dwordProd) + !!carry;
         zPtr[indexWord(5, 2)] = wordZ;
         if (wordZ != (uint32_t)dwordProd) {
             carry = wordZ < static_cast<uint32_t>(dwordProd);
         }
         dwordProd =
-            (uint64_t)aPtr[indexWord(4, 3)] * wordB + (dwordProd >> 32);
+            static_cast<uint64_t>(aPtr[indexWord(4, 3)]) * wordB + (dwordProd >> 32);
         wordZ = zPtr[indexWord(5, 3)] + static_cast<uint32_t>(dwordProd) + !!carry;
         zPtr[indexWord(5, 3)] = wordZ;
         if (wordZ != (uint32_t)dwordProd) {

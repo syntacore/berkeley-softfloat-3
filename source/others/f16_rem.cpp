@@ -126,7 +126,7 @@ f16_rem(float16_t const a,
         uint32_t q32;
 
         for (;;) {
-            q32 = (rem * (uint64_t)recip32) >> 16;
+            q32 = (rem * static_cast<uint64_t>(recip32)) >> 16;
 
             if (expDiff < 0) {
                 break;

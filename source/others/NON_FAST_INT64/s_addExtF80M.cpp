@@ -66,7 +66,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
                 }
             }
             zSPtr->signExp = uiZ64;
-            zSPtr->signif = (uint64_t)INT64_MIN;
+            zSPtr->signif = static_cast<uint64_t>(INT64_MIN);
             return;
         }
     } else {
@@ -100,7 +100,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
             extSigX[indexWord(3, 0)] = 0;
             softfloat_shiftRightJam96M(extSigX, static_cast<uint8_t>(expDiff), extSigX);
             sigB =
-                (uint64_t)extSigX[indexWord(3, 2)] << 32 |
+                static_cast<uint64_t>(extSigX[indexWord(3, 2)]) << 32 |
                 extSigX[indexWord(3, 1)];
             if (negateB) {
                 sigZ -= sigB;

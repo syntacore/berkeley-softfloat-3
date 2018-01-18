@@ -47,5 +47,5 @@ ui32_to_f64(uint32_t a)
     }
 
     int8_t const shiftDist = softfloat_countLeadingZeros32(a) + 21;
-    return u_as_f_64(packToF64UI(0, 0x432 - shiftDist, (uint64_t)a << shiftDist));
+    return u_as_f_64(packToF64UI(0, 0x432 - shiftDist, static_cast<uint64_t>(a) << shiftDist));
 }

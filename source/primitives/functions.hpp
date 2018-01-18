@@ -63,7 +63,7 @@ softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
 {
     return
         a >> dist |
-        ((a & (((uint64_t)1 << dist) - 1)) != 0);
+        ((a & ((static_cast<uint64_t>(1) << dist) - 1)) != 0);
 }
 #endif
 
@@ -118,7 +118,7 @@ inline uint64_t
 softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
 {
     return
-        dist >= 63 ? a != 0 : a >> dist | ((uint64_t)(a << (-(int32_t)dist & 63)) != 0);
+        dist >= 63 ? a != 0 : a >> dist | (static_cast<uint64_t>(a << (-(int32_t)dist & 63)) != 0);
 }
 #endif
 
@@ -223,7 +223,7 @@ softfloat_approxRecip32_1(uint32_t a)
         ((softfloat_approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
     uint32_t const sigma0 = ~static_cast<uint32_t>((r0 * static_cast<uint64_t>(a)) >> 7);
     uint32_t r = (static_cast<uint32_t>(r0) << 16) + ((r0 * static_cast<uint64_t>(sigma0)) >> 24);
-    uint32_t const sqrSigma0 = ((uint64_t)sigma0 * sigma0) >> 32;
+    uint32_t const sqrSigma0 = (static_cast<uint64_t>(sigma0) * sigma0) >> 32;
     return r + ((static_cast<uint32_t>(r) * static_cast<uint64_t>(sqrSigma0)) >> 48);
 #endif
 }
@@ -530,7 +530,7 @@ inline uint128
 softfloat_mul64ByShifted32To128(uint64_t a,
                                 uint32_t b)
 {
-    uint64_t const mid = (uint64_t)(uint32_t)a * b;
+    uint64_t const mid = static_cast<uint64_t>((uint32_t)a) * b;
     uint128 z;
     z.v0 = mid << 32;
     z.v64 = static_cast<uint64_t>(static_cast<uint32_t>(a >> 32)) * b + (mid >> 32);

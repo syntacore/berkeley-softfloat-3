@@ -57,7 +57,7 @@ softfloat_shiftRightJam128(uint64_t a64,
     uint128 z;
     z.v64 = 0;
     z.v0 =
-        dist < 127 ? a64 >> (dist & 63) | (((a64 & (((uint64_t)1 << (dist & 63)) - 1)) | a0) != 0) :
+        dist < 127 ? a64 >> (dist & 63) | (((a64 & ((static_cast<uint64_t>(1) << (dist & 63)) - 1)) | a0) != 0) :
         (a64 | a0) != 0;
     return z;
 }

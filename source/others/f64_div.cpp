@@ -114,21 +114,21 @@ f64_div(float64_t a,
 
     sigB <<= 11;
     uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32) - 2;
-    uint32_t const sig32Z = ((uint32_t)(sigA >> 32) * (uint64_t)recip32) >> 32;
+    uint32_t const sig32Z = ((uint32_t)(sigA >> 32) * static_cast<uint64_t>(recip32)) >> 32;
     uint32_t doubleTerm = sig32Z << 1;
     uint64_t rem =
-        ((sigA - (uint64_t)doubleTerm * (uint32_t)(sigB >> 32)) << 28) -
-        (uint64_t)doubleTerm * ((uint32_t)sigB >> 4);
-    uint32_t q = (((uint32_t)(rem >> 32) * (uint64_t)recip32) >> 32) + 4;
-    uint64_t sigZ = ((uint64_t)sig32Z << 32) + ((uint64_t)q << 4);
+        ((sigA - static_cast<uint64_t>(doubleTerm) * (uint32_t)(sigB >> 32)) << 28) -
+        static_cast<uint64_t>(doubleTerm) * ((uint32_t)sigB >> 4);
+    uint32_t q = (((uint32_t)(rem >> 32) * static_cast<uint64_t>(recip32)) >> 32) + 4;
+    uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32) + ((uint64_t)q << 4);
 
     if ((sigZ & 0x1FF) < 4 << 4) {
         q &= ~7;
-        sigZ &= ~(uint64_t)0x7F;
+        sigZ &= ~static_cast<uint64_t>(0x7F);
         doubleTerm = q << 1;
         rem =
-            ((rem - (uint64_t)doubleTerm * (uint32_t)(sigB >> 32)) << 28)
-            - (uint64_t)doubleTerm * ((uint32_t)sigB >> 4);
+            ((rem - static_cast<uint64_t>(doubleTerm) * (uint32_t)(sigB >> 32)) << 28)
+            - static_cast<uint64_t>(doubleTerm) * ((uint32_t)sigB >> 4);
 
         if (rem & UINT64_C(0x8000000000000000)) {
             sigZ -= 1 << 7;

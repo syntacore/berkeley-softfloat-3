@@ -145,7 +145,7 @@ f128_rem(float128_t a, float128_t b)
         expDiff -= 30;
 
         for (;;) {
-            q64 = (uint64_t)(uint32_t)(rem.v64 >> 19) * recip32;
+            q64 = static_cast<uint64_t>((uint32_t)(rem.v64 >> 19)) * recip32;
 
             if (expDiff < 0) {
                 break;

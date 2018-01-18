@@ -131,7 +131,7 @@ extF80M_div(extFloat80_t const* const aSPtr,
     uint32_t qs[2];
 
     for (;;) {
-        x64 = (uint64_t)y[indexWordHi(3)] * recip32;
+        x64 = static_cast<uint64_t>(y[indexWordHi(3)]) * recip32;
         q = (x64 + 0x80000000) >> 32;
         --ix;
 
@@ -165,9 +165,9 @@ extF80M_div(extFloat80_t const* const aSPtr,
         }
     }
 
-    x64 = (uint64_t)q << 9;
+    x64 = static_cast<uint64_t>(q) << 9;
     y[indexWord(3, 0)] = (uint32_t)x64;
-    x64 = ((uint64_t)qs[0] << 6) + (x64 >> 32);
+    x64 = (static_cast<uint64_t>(qs[0]) << 6) + (x64 >> 32);
     y[indexWord(3, 1)] = (uint32_t)x64;
     y[indexWord(3, 2)] = (qs[1] << 3) + (x64 >> 32);
     softfloat_roundPackMToExtF80M(signZ, expZ, y, extF80_roundingPrecision, zSPtr);

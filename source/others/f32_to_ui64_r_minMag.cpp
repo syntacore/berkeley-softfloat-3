@@ -69,7 +69,7 @@ f32_to_ui64_r_minMag(float32_t a,
     uint64_t sig64;
     uint64_t z;
     sig |= 0x00800000;
-    sig64 = (uint64_t)sig << 40;
+    sig64 = static_cast<uint64_t>(sig) << 40;
     z = sig64 >> shiftDist;
     shiftDist = 40 - shiftDist;
 

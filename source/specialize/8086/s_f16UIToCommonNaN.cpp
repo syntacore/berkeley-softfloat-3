@@ -51,7 +51,7 @@ softfloat_f16UIToCommonNaN(uint16_t uiA)
 
     commonNaN z;
     z.sign = 0 != (uiA >> 15);
-    z.v64 = (uint64_t)uiA << 54;
+    z.v64 = static_cast<uint64_t>(uiA) << 54;
     z.v0 = 0;
     return z;
 }

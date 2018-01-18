@@ -114,7 +114,7 @@ f128M_sqrt(float128_t const* const aPtr,
 
     uint32_t qs[3];
     qs[2] = sig32Z;
-    rem64 -= (uint64_t)sig32Z * sig32Z;
+    rem64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
     rem[indexWord(4, 3)] = rem64 >> 32;
     rem[indexWord(4, 2)] = (uint32_t)rem64;
 
@@ -129,7 +129,7 @@ f128M_sqrt(float128_t const* const aPtr,
     term[indexWord(4, 0)] = 0;
     uint32_t y[5];
     softfloat_remStep128MBy32(rem, 29, term, q, y);
-    rem64 = (uint64_t)y[indexWord(4, 3)] << 32 | y[indexWord(4, 2)];
+    rem64 = static_cast<uint64_t>(y[indexWord(4, 3)]) << 32 | y[indexWord(4, 2)];
 
     q = (static_cast<uint32_t>(rem64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
     sig64Z <<= 1;
@@ -154,16 +154,16 @@ f128M_sqrt(float128_t const* const aPtr,
     }
 
     qs[0] = q;
-    rem64 = (uint64_t)rem32 << 32 | rem[indexWord(6, 4)];
+    rem64 = static_cast<uint64_t>(rem32) << 32 | rem[indexWord(6, 4)];
 
     q = ((static_cast<uint32_t>(rem64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     x64 = static_cast<uint64_t>(q) << 27;
     y[indexWord(5, 0)] = static_cast<uint32_t>(x64);
-    x64 = ((uint64_t)qs[0] << 24) + (x64 >> 32);
+    x64 = (static_cast<uint64_t>(qs[0]) << 24) + (x64 >> 32);
     y[indexWord(5, 1)] = static_cast<uint32_t>(x64);
     x64 = (static_cast<uint64_t>(qs[1]) << 21) + (x64 >> 32);
     y[indexWord(5, 2)] = static_cast<uint32_t>(x64);
-    x64 = ((uint64_t)qs[2] << 18) + (x64 >> 32);
+    x64 = (static_cast<uint64_t>(qs[2]) << 18) + (x64 >> 32);
     y[indexWord(5, 3)] = static_cast<uint32_t>(x64);
     y[indexWord(5, 4)] = x64 >> 32;
 

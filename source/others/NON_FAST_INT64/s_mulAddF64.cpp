@@ -121,7 +121,7 @@ softfloat_mulAddF64(uint64_t uiA,
     sigB = (sigB | UINT64_C(0x0010000000000000)) << 11;
     uint32_t sig128Z[4];
     softfloat_mul64To128M(sigA, sigB, sig128Z);
-    uint64_t sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+    uint64_t sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
     int16_t shiftDist = 0;
 
     if (0 == (sigZ & UINT64_C(0x4000000000000000))) {
@@ -170,7 +170,7 @@ softfloat_mulAddF64(uint64_t uiA,
         }
 
         if (0 == expDiff) {
-            sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+            sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
         } else {
             sig128C[indexWord(4, 3)] = sigC >> 32;
             sig128C[indexWord(4, 2)] = (uint32_t)sigC;
@@ -236,7 +236,7 @@ softfloat_mulAddF64(uint64_t uiA,
             softfloat_sub128M(sig128Z, sig128C, sig128Z);
 
             if (1 < expDiff) {
-                sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+                sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
 
                 if (!(sigZ & UINT64_C(0x4000000000000000))) {
                     --expZ;
@@ -250,11 +250,11 @@ softfloat_mulAddF64(uint64_t uiA,
         }
 
         shiftDist = 0;
-        sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+        sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
 
         if (!sigZ) {
             shiftDist = 64;
-            sigZ = (uint64_t)sig128Z[indexWord(4, 1)] << 32 | sig128Z[indexWord(4, 0)];
+            sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 1)]) << 32 | sig128Z[indexWord(4, 0)];
         }
 
         shiftDist += softfloat_countLeadingZeros64(sigZ) - 1;
@@ -262,7 +262,7 @@ softfloat_mulAddF64(uint64_t uiA,
         if (shiftDist) {
             expZ -= shiftDist;
             softfloat_shiftLeft128M(sig128Z, static_cast<uint32_t>(shiftDist), sig128Z);
-            sigZ = (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+            sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
         }
     }
 

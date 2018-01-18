@@ -123,27 +123,27 @@ extF80_sqrt(extFloat80_t a)
         rem = softfloat_shortShiftLeft128(0, sigA, 62);
     }
 
-    rem.v64 -= (uint64_t) sig32Z * sig32Z;
+    rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
 
-    q = ((uint32_t)(rem.v64 >> 2) * (uint64_t) recipSqrt32) >> 32;
-    sigZ = ((uint64_t) sig32Z << 32) + (q << 3);
-    x64 = ((uint64_t) sig32Z << 32) + sigZ;
+    q = ((uint32_t)(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
+    sigZ = (static_cast<uint64_t>(sig32Z) << 32) + (q << 3);
+    x64 = (static_cast<uint64_t>(sig32Z) << 32) + sigZ;
     /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
     term = softfloat_mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
     rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
     rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
-    q = (((uint32_t)(rem.v64 >> 2) * (uint64_t) recipSqrt32) >> 32) + 2;
+    q = (((uint32_t)(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     x64 = sigZ;
     sigZ = (sigZ << 1) + (q >> 25);
-    sigZExtra = (uint64_t)(q << 39);
+    sigZExtra = static_cast<uint64_t>(q << 39);
 
     if ((q & 0xFFFFFF) <= 2) {
-        q &= ~(uint64_t) 0xFFFF;
-        sigZExtra = (uint64_t)(q << 39);
+        q &= ~static_cast<uint64_t>(0xFFFF);
+        sigZExtra = static_cast<uint64_t>(q << 39);
         /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
         term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
-        x64 = (uint32_t)(q << 5) * (uint64_t)(uint32_t) q;
+        x64 = (uint32_t)(q << 5) * static_cast<uint64_t>((uint32_t) q);
         term = softfloat_add128(term.v64, term.v0, 0, x64);
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 28);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);

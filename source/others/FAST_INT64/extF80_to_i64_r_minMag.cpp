@@ -72,7 +72,7 @@ extF80_to_i64_r_minMag(extFloat80_t const a,
 
     int64_t const absZ = static_cast<int64_t>(sig >> shiftDist);
 
-    if (exact && (uint64_t)(sig << (-shiftDist & 63))) {
+    if (exact && static_cast<uint64_t>(sig << (-shiftDist & 63))) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

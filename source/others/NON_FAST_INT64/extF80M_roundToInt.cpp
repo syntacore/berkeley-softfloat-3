@@ -117,7 +117,7 @@ extF80M_roundToInt(extFloat80_t const *const aPtr,
 
     /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uint16_t uiZ64 = static_cast<uint16_t>(signUI64 | exp);
-    uint64_t const lastBitMask = (uint64_t)1 << (0x403E - exp);
+    uint64_t const lastBitMask = static_cast<uint64_t>(1) << (0x403E - exp);
     uint64_t const roundBitsMask = lastBitMask - 1;
     uint64_t sigZ = sigA;
     if (softfloat_round_near_maxMag == roundingMode) {

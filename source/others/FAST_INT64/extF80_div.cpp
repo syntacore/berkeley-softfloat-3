@@ -153,7 +153,7 @@ extF80_div(extFloat80_t a,
     ix = 2;
 
     for (;;) {
-        q64 = (uint64_t)(uint32_t)(rem.v64 >> 2) * recip32;
+        q64 = static_cast<uint64_t>((uint32_t)(rem.v64 >> 2)) * recip32;
         q = (q64 + 0x80000000) >> 32;
         --ix;
 
@@ -193,7 +193,7 @@ extF80_div(extFloat80_t a,
     }
 
     sigZ = (sigZ << 6) + (q >> 23);
-    sigZExtra = (uint64_t)((uint64_t)q << 41);
+    sigZExtra = static_cast<uint64_t>((uint64_t)q << 41);
     return
         softfloat_roundPackToExtF80(
             signZ, expZ, sigZ, sigZExtra, extF80_roundingPrecision);

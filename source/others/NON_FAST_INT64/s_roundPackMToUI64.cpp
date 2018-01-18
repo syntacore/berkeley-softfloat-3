@@ -64,7 +64,7 @@ softfloat_roundPackMToUI64(bool sign,
     }
 
     sig =
-        (uint64_t)extSigPtr[indexWord(3, 2)] << 32
+        static_cast<uint64_t>(extSigPtr[indexWord(3, 2)]) << 32
         | extSigPtr[indexWord(3, 1)];
 
     if (doIncrement) {

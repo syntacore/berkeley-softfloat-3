@@ -100,7 +100,7 @@ f128_sqrt(float128_t a)
         sigA.v64 |= UINT64_C(0x0001000000000000);
         uint32_t const sig32A = static_cast<uint32_t>(sigA.v64 >> 17);
         uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
-        uint32_t sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;
+        uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
         uint128 rem;
 
         if (expA) {
@@ -112,25 +112,25 @@ f128_sqrt(float128_t a)
 
         uint32_t qs[3];
         qs[2] = sig32Z;
-        rem.v64 -= (uint64_t)sig32Z * sig32Z;
+        rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
 
-        uint32_t q = ((uint32_t)(rem.v64 >> 2) * (uint64_t)recipSqrt32) >> 32;
+        uint32_t q = ((uint32_t)(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
         qs[1] = q;
-        uint64_t x64 = (uint64_t)sig32Z << 32;
-        uint64_t sig64Z = x64 + ((uint64_t)q << 3);
+        uint64_t x64 = static_cast<uint64_t>(sig32Z) << 32;
+        uint64_t sig64Z = x64 + (static_cast<uint64_t>(q) << 3);
         x64 += sig64Z;
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
         uint128 term = softfloat_mul64ByShifted32To128(x64, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
-        q = ((uint32_t)(rem.v64 >> 2) * (uint64_t)recipSqrt32) >> 32;
+        q = ((uint32_t)(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
         uint128 y = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
         sig64Z <<= 1;
 
         /* Repeating this loop is a rare occurrence.*/
         for (;;) {
             term = softfloat_shortShiftLeft128(0, sig64Z, 32);
-            term = softfloat_add128(term.v64, term.v0, 0, (uint64_t)q << 6);
+            term = softfloat_add128(term.v64, term.v0, 0, static_cast<uint64_t>(q) << 6);
             term = softfloat_mul128By32(term.v64, term.v0, q);
             rem = softfloat_sub128(y.v64, y.v0, term.v64, term.v0);
 
@@ -143,14 +143,14 @@ f128_sqrt(float128_t a)
 
         qs[0] = q;
 
-        q = (((uint32_t)(rem.v64 >> 2) * (uint64_t)recipSqrt32) >> 32) + 2;
-        uint64_t sigZExtra = (uint64_t)((uint64_t)q << 59);
+        q = (((uint32_t)(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
+        uint64_t sigZExtra = static_cast<uint64_t>((uint64_t)q << 59);
         term = softfloat_shortShiftLeft128(0, qs[1], 53);
-        uint128 sigZ = softfloat_add128((uint64_t)qs[2] << 18, ((uint64_t)qs[0] << 24) + (q >> 5), term.v64, term.v0);
+        uint128 sigZ = softfloat_add128(static_cast<uint64_t>(qs[2]) << 18, ((uint64_t)qs[0] << 24) + (q >> 5), term.v64, term.v0);
 
         if ((q & 0xF) <= 2) {
             q &= ~3;
-            sigZExtra = (uint64_t)((uint64_t)q << 59);
+            sigZExtra = static_cast<uint64_t>((uint64_t)q << 59);
             y = softfloat_shortShiftLeft128(sigZ.v64, sigZ.v0, 6);
             y.v0 |= sigZExtra >> 58;
             term = softfloat_sub128(y.v64, y.v0, 0, q);

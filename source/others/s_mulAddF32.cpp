@@ -122,7 +122,7 @@ softfloat_mulAddF32(uint32_t uiA,
     int16_t expProd = expA + expB - 0x7E;
     sigA = (sigA | 0x00800000) << 7;
     sigB = (sigB | 0x00800000) << 7;
-    uint64_t sigProd = (uint64_t)sigA * sigB;
+    uint64_t sigProd = static_cast<uint64_t>(sigA) * sigB;
 
     if (sigProd < UINT64_C(0x2000000000000000)) {
         --expProd;
@@ -166,7 +166,7 @@ softfloat_mulAddF32(uint32_t uiA,
             sigZ <<= 1;
         }
     } else {
-        sig64C = (uint64_t)sigC << 32;
+        sig64C = static_cast<uint64_t>(sigC) << 32;
 
         if (expDiff < 0) {
             signZ = signC;

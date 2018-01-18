@@ -140,7 +140,7 @@ f32_rem(float32_t a,
         sigB <<= 6;
 
         for (;;) {
-            q = (rem * (uint64_t)recip32) >> 32;
+            q = (rem * static_cast<uint64_t>(recip32)) >> 32;
 
             if (expDiff < 0) {
                 break;

@@ -79,7 +79,7 @@ f16_to_extF80(float16_t const a)
     }
 
     uiZ64 = packToExtF80UI64(sign, exp + 0x3FF0u);
-    uiZ0 = (uint64_t)(frac | 0x0400) << 53;
+    uiZ0 = static_cast<uint64_t>(frac | 0x0400) << 53;
 uiZ:
     extFloat80_t uZ;
     uZ.signExp = uiZ64;

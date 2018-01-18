@@ -62,7 +62,7 @@ f32_to_ui64(float32_t a,
         sig |= 0x00800000;
     }
 
-    uint64_t sig64 = (uint64_t)sig << 40;
+    uint64_t sig64 = static_cast<uint64_t>(sig) << 40;
     uint64_t extra = 0;
 
     if (shiftDist) {

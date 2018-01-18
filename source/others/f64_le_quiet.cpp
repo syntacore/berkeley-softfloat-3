@@ -58,6 +58,6 @@ f64_le_quiet(float64_t a,
     bool const signA = signF64UI(uiA);
     bool const signB = signF64UI(uiB);
     return
-        signA != signB ? signA || !((uiA | uiB) & (uint64_t)INT64_MAX) :
+        signA != signB ? signA || !((uiA | uiB) & static_cast<uint64_t>(INT64_MAX)) :
         uiA == uiB || (signA ^ (uiA < uiB));
 }

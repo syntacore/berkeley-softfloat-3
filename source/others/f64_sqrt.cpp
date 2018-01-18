@@ -90,7 +90,7 @@ f64_sqrt(float64_t a)
     sigA |= UINT64_C(0x0010000000000000);
     uint32_t const sig32A = static_cast<uint32_t>(sigA >> 21);
     uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
-    uint32_t sig32Z = ((uint64_t)sig32A * recipSqrt32) >> 32;
+    uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     if (expA) {
         sigA <<= 8;
@@ -99,12 +99,12 @@ f64_sqrt(float64_t a)
         sigA <<= 9;
     }
 
-    uint64_t rem = sigA - (uint64_t)sig32Z * sig32Z;
-    uint32_t const q = ((uint32_t)(rem >> 2) * (uint64_t)recipSqrt32) >> 32;
-    uint64_t sigZ = ((uint64_t)sig32Z << 32 | 1 << 5) + ((uint64_t)q << 3);
+    uint64_t rem = sigA - static_cast<uint64_t>(sig32Z) * sig32Z;
+    uint32_t const q = ((uint32_t)(rem >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
+    uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32 | 1 << 5) + ((uint64_t)q << 3);
 
     if ((sigZ & 0x1FF) < 1 << 5) {
-        sigZ &= ~(uint64_t)0x3F;
+        sigZ &= ~static_cast<uint64_t>(0x3F);
         uint64_t const shiftedSigZ = sigZ >> 6;
         rem = (sigA << 52) - shiftedSigZ * shiftedSigZ;
 

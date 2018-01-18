@@ -103,7 +103,7 @@ extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
             sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 
-    if (exact && shiftDist && ((uint64_t)z << shiftDist != sig)) {
+    if (exact && shiftDist && (static_cast<uint64_t>(z) << shiftDist != sig)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

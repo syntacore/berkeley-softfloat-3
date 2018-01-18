@@ -100,7 +100,7 @@ f64_roundToInt(float64_t a,
     }
 
     uint64_t uiZ = uiA;
-    uint64_t const lastBitMask = (uint64_t)1 << (0x433 - exp);
+    uint64_t const lastBitMask = static_cast<uint64_t>(1) << (0x433 - exp);
     uint64_t const roundBitsMask = lastBitMask - 1;
 
     if (roundingMode == softfloat_round_near_maxMag) {

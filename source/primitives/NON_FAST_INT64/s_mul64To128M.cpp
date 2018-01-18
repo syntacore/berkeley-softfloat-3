@@ -49,11 +49,11 @@ softfloat_mul64To128M(uint64_t a,
     uint32_t const a0 = (uint32_t)a;
     uint32_t const b32 = b >> 32;
     uint32_t const b0 = (uint32_t)b;
-    uint64_t const mid1 = (uint64_t)a32 * b0;
-    uint64_t const mid = mid1 + (uint64_t)a0 * b32;
+    uint64_t const mid1 = static_cast<uint64_t>(a32) * b0;
+    uint64_t const mid = mid1 + static_cast<uint64_t>(a0) * b32;
     uint64_t const mid2 = mid << 32;
-    uint64_t const z0 = (uint64_t)a0 * b0 + mid2;
-    uint64_t const z64 = ((uint64_t)a32 * b32 + (((uint64_t)(mid < mid1) << 32) | (mid >> 32))) + (z0 < mid2);
+    uint64_t const z0 = static_cast<uint64_t>(a0) * b0 + mid2;
+    uint64_t const z64 = (static_cast<uint64_t>(a32) * b32 + (((uint64_t)(mid < mid1) << 32) | (mid >> 32))) + (z0 < mid2);
     zPtr[indexWord(4, 1)] = z0 >> 32;
     zPtr[indexWord(4, 0)] = (uint32_t)z0;
     zPtr[indexWord(4, 3)] = z64 >> 32;

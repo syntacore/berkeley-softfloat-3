@@ -135,7 +135,7 @@ mag1:
     }
 
     uiZ64 = static_cast<uint16_t>(signUI64 | exp);
-    lastBitMask = (uint64_t)1 << (0x403E - exp);
+    lastBitMask = static_cast<uint64_t>(1) << (0x403E - exp);
     roundBitsMask = lastBitMask - 1;
     sigZ = sigA;
 

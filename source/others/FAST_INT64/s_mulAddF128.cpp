@@ -339,7 +339,7 @@ softfloat_mulAddF128(uint64_t uiA64,
 sigZ:
     sigZExtra = sig256Z[indexWord(4, 1)] | sig256Z[indexWord(4, 0)];
 shiftRightRoundPack:
-    sigZExtra = (uint64_t)(sigZ.v0 << (64 - shiftDist)) | (sigZExtra != 0);
+    sigZExtra = static_cast<uint64_t>(sigZ.v0 << (64 - shiftDist)) | (sigZExtra != 0);
     /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int8_t', possible loss of data */
     sigZ = softfloat_shortShiftRight128(sigZ.v64, sigZ.v0, static_cast<uint8_t>(shiftDist));
 roundPack:

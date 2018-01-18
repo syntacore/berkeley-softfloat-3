@@ -48,7 +48,7 @@ f128M_to_ui32_r_minMag(float128_t const* aPtr,
     uint32_t const* aWPtr = (uint32_t const*)aPtr;
     uint32_t uiA96 = aWPtr[indexWordHi(4)];
     int32_t exp = expF128UI96(uiA96);
-    uint64_t sig64 = (uint64_t)fracF128UI96(uiA96) << 32 | aWPtr[indexWord(4, 2)];
+    uint64_t sig64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];
 
     if (0 != (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) {
         sig64 |= 1;
@@ -76,7 +76,7 @@ f128M_to_ui32_r_minMag(float128_t const* aPtr,
     sig64 |= UINT64_C(0x0001000000000000);
     uint32_t const z = static_cast<uint32_t>(sig64 >> shiftDist);
 
-    if (exact && ((uint64_t)z << shiftDist != sig64)) {
+    if (exact && (static_cast<uint64_t>(z) << shiftDist != sig64)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

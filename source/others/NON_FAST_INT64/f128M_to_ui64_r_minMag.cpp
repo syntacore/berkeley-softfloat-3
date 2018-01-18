@@ -90,8 +90,8 @@ f128M_to_ui64_r_minMag(float128_t const* aPtr,
         }
 
         z = UINT64_C(0x8000000000000000)
-            | (uint64_t)sig96 << 47
-            | (uint64_t)aWPtr[indexWord(4, 2)] << 15
+            | static_cast<uint64_t>(sig96) << 47
+            | static_cast<uint64_t>(aWPtr[indexWord(4, 2)]) << 15
             | aWPtr[indexWord(4, 1)] >> 17;
         z >>= shiftDist;
     }

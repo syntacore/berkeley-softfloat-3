@@ -68,7 +68,7 @@ f32_to_ui32(float32_t a,
         sig |= 0x00800000;
     }
 
-    uint64_t const sig64 = (uint64_t)sig << 32;
+    uint64_t const sig64 = static_cast<uint64_t>(sig) << 32;
     int16_t const shiftDist = 0xAA - exp;
     return
         softfloat_roundPackToUI32(sign,

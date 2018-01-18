@@ -111,7 +111,7 @@ f64_mul(float64_t a,
     uint32_t sig128Z[4];
     softfloat_mul64To128M(sigA, sigB, sig128Z);
     uint64_t sigZ =
-        (uint64_t)sig128Z[indexWord(4, 3)] << 32 | sig128Z[indexWord(4, 2)];
+        static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
 
     if (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]) {
         sigZ |= 1;
