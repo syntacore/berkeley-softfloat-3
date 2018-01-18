@@ -56,7 +56,7 @@ ui64_to_f128M(uint64_t a,
             uint32_t* const ptr = zWPtr + indexMultiwordHi(4, 3);
             ptr[indexWord(3, 2)] = 0;
             ptr[indexWord(3, 1)] = a >> 32;
-            ptr[indexWord(3, 0)] = (uint32_t)a;
+            ptr[indexWord(3, 0)] = static_cast<uint32_t>(a);
             softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
             ptr[indexWordHi(3)] = packToF128UI96(0, 0x404Eu - shiftDist, ptr[indexWordHi(3)]);
             return;
@@ -64,7 +64,7 @@ ui64_to_f128M(uint64_t a,
 
         a <<= shiftDist - 32;
         uiZ96 = packToF128UI96(0, 0x404Eu - shiftDist, a >> 32);
-        uiZ64 = (uint32_t)a;
+        uiZ64 = static_cast<uint32_t>(a);
     }
 
     zWPtr[indexWord(4, 3)] = uiZ96;

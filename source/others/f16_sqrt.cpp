@@ -86,21 +86,21 @@ f16_sqrt(float16_t a)
     int const index = (sigA >> 6 & 0xE) + expA;
     uint16_t const r0 =
         softfloat_approxRecipSqrt_1k0s[index] -
-        (((uint32_t)softfloat_approxRecipSqrt_1k1s[index] * (sigA & 0x7F)) >> 11);
-    uint32_t ESqrR0 = ((uint32_t)r0 * r0) >> 1;
+        ((static_cast<uint32_t>(softfloat_approxRecipSqrt_1k1s[index]) * (sigA & 0x7F)) >> 11);
+    uint32_t ESqrR0 = (static_cast<uint32_t>(r0) * r0) >> 1;
 
     if (expA) {
         ESqrR0 >>= 1;
     }
 
     uint16_t const sigma0 = static_cast<uint16_t>(~((ESqrR0 * sigA) >> 16));
-    uint16_t recipSqrt16 = r0 + (((uint32_t)r0 * sigma0) >> 25);
+    uint16_t recipSqrt16 = r0 + ((static_cast<uint32_t>(r0) * sigma0) >> 25);
 
     if (!(recipSqrt16 & 0x8000)) {
         recipSqrt16 = 0x8000;
     }
 
-    uint16_t sigZ = ((uint32_t)(sigA << 5) * recipSqrt16) >> 16;
+    uint16_t sigZ = (static_cast<uint32_t>(sigA << 5) * recipSqrt16) >> 16;
 
     if (expA) {
         sigZ >>= 1;

@@ -49,7 +49,7 @@ f32_roundToInt(float32_t a,
     int16_t const exp = expF32UI(uiA);
 
     if (exp <= 0x7E) {
-        if (!(uint32_t)(uiA << 1)) {
+        if (!static_cast<uint32_t>(uiA << 1)) {
             return a;
         }
 
@@ -96,7 +96,7 @@ f32_roundToInt(float32_t a,
     }
 
     uint32_t uiZ = uiA;
-    uint32_t const lastBitMask = (uint32_t)1 << (0x96 - exp);
+    uint32_t const lastBitMask = static_cast<uint32_t>(1) << (0x96 - exp);
     uint32_t const roundBitsMask = lastBitMask - 1;
 
     if (roundingMode == softfloat_round_near_maxMag) {

@@ -96,7 +96,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
         uint32_t extSigX[3];
         if (expDiff) {
             extSigX[indexWord(3, 2)] = sigB >> 32;
-            extSigX[indexWord(3, 1)] = (uint32_t)sigB;
+            extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigB);
             extSigX[indexWord(3, 0)] = 0;
             softfloat_shiftRightJam96M(extSigX, static_cast<uint8_t>(expDiff), extSigX);
             sigB =
@@ -123,7 +123,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
                 if (sigZ & UINT64_C(0x8000000000000000)) {
                     goto sigZ;
                 } else {
-                    sigZExtra = ((uint32_t)sigZ << 31) | (0 != extSigX[indexWordLo(3)]);
+                    sigZExtra = (static_cast<uint32_t>(sigZ) << 31) | (0 != extSigX[indexWordLo(3)]);
                     goto completeNormAfterAdd;
                 }
             }
@@ -146,7 +146,7 @@ softfloat_addExtF80M(extFloat80M const *aSPtr,
             } else {
                 sigZ += sigB;
                 if (sigZ < sigB) {
-                    sigZExtra = (uint32_t)sigZ << 31;
+                    sigZExtra = static_cast<uint32_t>(sigZ) << 31;
 completeNormAfterAdd:
                     ++expA;
                     sigZ = UINT64_C(0x8000000000000000) | sigZ >> 1;
@@ -160,7 +160,7 @@ completeNormAfterAdd:
         extSigX[indexWord(3, 0)] = sigZExtra;
 sigZ:
         extSigX[indexWord(3, 2)] = sigZ >> 32;
-        extSigX[indexWord(3, 1)] = (uint32_t)sigZ;
+        extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigZ);
 
         (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_roundingPrecision, zSPtr);
     }

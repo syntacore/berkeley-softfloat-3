@@ -45,7 +45,7 @@ ui64_to_f32(uint64_t a)
     int8_t shiftDist = softfloat_countLeadingZeros64(a) - 40;
 
     if (0 <= shiftDist) {
-        return u_as_f_32(a ? packToF32UI(0, 0x95 - shiftDist, (uint32_t)a << shiftDist) : 0);
+        return u_as_f_32(a ? packToF32UI(0, 0x95 - shiftDist, static_cast<uint32_t>(a) << shiftDist) : 0);
     }
 
     shiftDist += 7;

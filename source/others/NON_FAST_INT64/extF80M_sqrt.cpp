@@ -125,7 +125,7 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
     extSigZ[indexWord(3, 0)] = static_cast<uint32_t>(x64);
     x64 = (sig64Z << 1) + (x64 >> 32);
     extSigZ[indexWord(3, 2)] = x64 >> 32;
-    extSigZ[indexWord(3, 1)] = (uint32_t)x64;
+    extSigZ[indexWord(3, 1)] = static_cast<uint32_t>(x64);
 
     if ((q & 0xFFFFFF) <= 2) {
         q &= ~static_cast<uint32_t>(0xFFFF);

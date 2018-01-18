@@ -69,10 +69,10 @@ f64_to_ui64(float64_t a,
 
         sig <<= -shiftDist;
         extSig[indexWord(3, 2)] = sig >> 32;
-        extSig[indexWord(3, 1)] = (uint32_t)sig;
+        extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
     } else {
         extSig[indexWord(3, 2)] = sig >> 32;
-        extSig[indexWord(3, 1)] = (uint32_t)sig;
+        extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
         softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
 

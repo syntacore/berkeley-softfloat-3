@@ -76,7 +76,7 @@ f32_to_i64_r_minMag(float32_t a,
     int64_t const absZ = static_cast<int64_t>(sig64 >> shiftDist);
     auto const shiftDist1 = 40 - shiftDist;
 
-    if (exact && (shiftDist1 < 0) && (uint32_t)(sig << (shiftDist1 & 31))) {
+    if (exact && (shiftDist1 < 0) && static_cast<uint32_t>(sig << (shiftDist1 & 31))) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

@@ -57,7 +57,7 @@ extF80_to_f16(extFloat80_t a)
         return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
 
-    uint16_t const sig16 = (uint16_t)softfloat_shortShiftRightJam64(sig, 49);
+    uint16_t const sig16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(sig, 49));
 
     if (!(exp | sig16)) {
         return u_as_f_16(packToF16UI(sign, 0, 0));

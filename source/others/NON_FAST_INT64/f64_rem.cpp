@@ -131,14 +131,14 @@ f64_rem(float64_t a,
         uint64_t q64;
 
         for (;;) {
-            q64 = (uint32_t)(rem >> 32) * static_cast<uint64_t>(recip32);
+            q64 = static_cast<uint32_t>(rem >> 32) * static_cast<uint64_t>(recip32);
 
             if (expDiff < 0) {
                 break;
             }
 
             q = (q64 + 0x80000000) >> 32;
-            rem = static_cast<uint64_t>((uint32_t)(rem >> 3)) << 32;
+            rem = static_cast<uint64_t>(static_cast<uint32_t>(rem >> 3)) << 32;
             rem -= q * static_cast<uint64_t>(sigB);
 
             if (rem & UINT64_C(0x8000000000000000)) {
@@ -149,7 +149,7 @@ f64_rem(float64_t a,
         }
 
         /* `expDiff' cannot be less than -29 here. */
-        q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
+        q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         rem = (rem << (expDiff + 30)) - q * static_cast<uint64_t>(sigB);
 
         if (rem & UINT64_C(0x8000000000000000)) {

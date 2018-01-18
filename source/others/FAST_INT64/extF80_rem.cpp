@@ -175,7 +175,7 @@ extF80_rem(extFloat80_t a,
         uint64_t q64;
 
         for (;;) {
-            q64 = static_cast<uint64_t>((uint32_t)(rem.v64 >> 2)) * recip32;
+            q64 = static_cast<uint64_t>(static_cast<uint32_t>(rem.v64 >> 2)) * recip32;
 
             if (expDiff < 0) {
                 break;
@@ -197,7 +197,7 @@ extF80_rem(extFloat80_t a,
 
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
-        q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
+        q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         /** @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data */
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, uint8_t(expDiff + 30));
         uint128 term = softfloat_mul64ByShifted32To128(sigB, q);

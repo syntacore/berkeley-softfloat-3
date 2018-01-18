@@ -62,7 +62,7 @@ f128_to_f32(float128_t a)
                 exp = -0x1000;
             }
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
-            return softfloat_roundPackToF32(sign, (int16_t)exp, frac32 | 0x40000000);
+            return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
         } else {
             return signed_zero_F32(sign);
         }

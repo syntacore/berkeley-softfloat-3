@@ -58,7 +58,7 @@ f128_to_f16(float128_t a)
             return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
     } else {
-        uint16_t const frac16 = (uint16_t)softfloat_shortShiftRightJam64(frac64, 34);
+        uint16_t const frac16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(frac64, 34));
 
         if (!(exp | frac16)) {
             return u_as_f_16(packToF16UI(sign, 0, 0));

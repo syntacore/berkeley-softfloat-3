@@ -143,7 +143,7 @@ f32_div(float32_t a,
 
         if ((sigZ & 0x3F) < 2) {
             sigZ &= ~3;
-            rem = (static_cast<uint64_t>(sigA) << 32) - (uint64_t)(sigZ << 1) * sigB;
+            rem = (static_cast<uint64_t>(sigA) << 32) - static_cast<uint64_t>(sigZ << 1) * sigB;
 
             if (rem & UINT64_C(0x8000000000000000)) {
                 sigZ -= 4;

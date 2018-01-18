@@ -59,7 +59,7 @@ softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t s
             sig0 = sig128.v0;
         }
 
-        if ((uint32_t)exp < 0x7FFD) {
+        if (static_cast<uint32_t>(exp) < 0x7FFD) {
             ui128_f128 uZ;
             uZ.ui.v64 = packToF128UI64(sign, sig64 | sig0 ? exp : 0, sig64);
             uZ.ui.v0 = sig0;

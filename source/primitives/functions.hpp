@@ -90,7 +90,7 @@ inline uint32_t
 softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
 {
     return
-        dist >= 31 ? a != 0 : a >> dist | ((uint32_t)(a << (-(int16_t)dist & 31)) != 0);
+        dist >= 31 ? a != 0 : a >> dist | (static_cast<uint32_t>(a << (-static_cast<int16_t>(dist) & 31)) != 0);
 }
 #endif
 
@@ -118,7 +118,7 @@ inline uint64_t
 softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
 {
     return
-        dist >= 63 ? a != 0 : a >> dist | (static_cast<uint64_t>(a << (-(int32_t)dist & 63)) != 0);
+        dist >= 63 ? a != 0 : a >> dist | (static_cast<uint64_t>(a << (-static_cast<int32_t>(dist) & 63)) != 0);
 }
 #endif
 
@@ -325,7 +325,7 @@ softfloat_shortShiftRightJam64Extra(uint64_t a,
                                     uint64_t extra,
                                     uint8_t dist)
 {
-    return uint64_extra{a >> dist, a << (-(int8_t)dist & 63) | (extra != 0)};
+    return uint64_extra{a >> dist, a << (-static_cast<int8_t>(dist) & 63) | (extra != 0)};
 }
 
 /**
@@ -530,7 +530,7 @@ inline uint128
 softfloat_mul64ByShifted32To128(uint64_t a,
                                 uint32_t b)
 {
-    uint64_t const mid = static_cast<uint64_t>((uint32_t)a) * b;
+    uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a)) * b;
     uint128 z;
     z.v0 = mid << 32;
     z.v64 = static_cast<uint64_t>(static_cast<uint32_t>(a >> 32)) * b + (mid >> 32);
@@ -620,10 +620,10 @@ softfloat_shortShiftLeft64To96M(uint64_t a,
                                 uint8_t dist,
                                 uint32_t* zPtr)
 {
-    zPtr[indexWord(3, 0)] = (uint32_t)a << dist;
+    zPtr[indexWord(3, 0)] = static_cast<uint32_t>(a) << dist;
     a >>= 32 - dist;
     zPtr[indexWord(3, 2)] = a >> 32;
-    zPtr[indexWord(3, 1)] = (uint32_t)a;
+    zPtr[indexWord(3, 1)] = static_cast<uint32_t>(a);
 }
 
 /**

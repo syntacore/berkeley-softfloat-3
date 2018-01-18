@@ -74,5 +74,5 @@ f32_to_extF80M(float32_t a,
     }
 
     zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3F80));
-    zSPtr->signif = static_cast<uint64_t>(0x80000000 | (uint32_t)frac << 8) << 32;
+    zSPtr->signif = static_cast<uint64_t>(0x80000000 | static_cast<uint32_t>(frac) << 8) << 32;
 }

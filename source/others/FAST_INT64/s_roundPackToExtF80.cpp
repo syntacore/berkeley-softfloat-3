@@ -79,7 +79,7 @@ softfloat_roundPackToExtF80(bool sign,
 
     roundBits = sig & roundMask;
 
-    if (0x7FFD <= (uint32_t)(exp - 1)) {
+    if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
         if (exp <= 0) {
             isTiny = softfloat_tininess_beforeRounding == softfloat_detectTininess || exp < 0 || sig <= static_cast<uint64_t>(sig + roundIncrement);
             sig = softfloat_shiftRightJam64(sig, 1u - exp);
@@ -145,7 +145,7 @@ precision80:
             && sigExtra;
     }
 
-    if (0x7FFD <= (uint32_t)(exp - 1)) {
+    if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
         if (exp <= 0) {
             isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||

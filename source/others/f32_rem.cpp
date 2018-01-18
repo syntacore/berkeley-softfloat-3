@@ -152,7 +152,7 @@ f32_rem(float32_t a,
 
         /* `expDiff' cannot be less than -30 here. */
         q >>= ~expDiff & 31;
-        rem = (rem << (expDiff + 30)) - q * (uint32_t)sigB;
+        rem = (rem << (expDiff + 30)) - q * static_cast<uint32_t>(sigB);
     }
 
     do {

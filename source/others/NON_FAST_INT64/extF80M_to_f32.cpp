@@ -65,12 +65,12 @@ extF80M_to_f32(const extFloat80_t *aPtr)
             }
         }
 
-        uint32_t const sig32 = (uint32_t)softfloat_shortShiftRightJam64(sig, 33);
+        uint32_t const sig32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(sig, 33));
         exp -= 0x3F81;
         if (exp < -0x1000) {
             exp = -0x1000;
         }
         assert(INT16_MIN <= exp && exp <= INT16_MAX);
-        return softfloat_roundPackToF32(sign, (int16_t)exp, sig32);
+        return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
     }
 }

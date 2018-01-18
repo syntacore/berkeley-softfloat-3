@@ -49,7 +49,7 @@ f16_roundToInt(float16_t a,
     int8_t const exp = expF16UI(uiA);
 
     if (exp <= 0xE) {
-        if (!(uint16_t)(uiA << 1)) {
+        if (!static_cast<uint16_t>(uiA << 1)) {
             return a;
         }
 

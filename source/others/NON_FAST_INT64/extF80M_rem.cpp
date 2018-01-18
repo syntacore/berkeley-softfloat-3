@@ -119,13 +119,13 @@ extF80M_rem(extFloat80_t const* const aPtr,
 
         {
             rem[indexWord(3, 2)] = sigA >> 34;
-            rem[indexWord(3, 1)] = (uint32_t)(sigA >> 2);
-            rem[indexWord(3, 0)] = (uint32_t)sigA << 30;
-            x[indexWord(3, 0)] = (uint32_t)x64 << 30;
+            rem[indexWord(3, 1)] = static_cast<uint32_t>(sigA >> 2);
+            rem[indexWord(3, 0)] = static_cast<uint32_t>(sigA) << 30;
+            x[indexWord(3, 0)] = static_cast<uint32_t>(x64) << 30;
             uint32_t const sig32B = x64 >> 32;
             x64 >>= 2;
             x[indexWord(3, 2)] = x64 >> 32;
-            x[indexWord(3, 1)] = (uint32_t)x64;
+            x[indexWord(3, 1)] = static_cast<uint32_t>(x64);
 
             if (expDiff < 1) {
                 if (expDiff) {

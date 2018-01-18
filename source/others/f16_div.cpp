@@ -106,8 +106,8 @@ f16_div(float16_t const a,
     }
 
     int8_t expZ = expA - expB + 0xE;
-    sigA |= 0x0400;
-    sigB |= 0x0400;
+    sigA |= 0x0400u;
+    sigB |= 0x0400u;
 #ifdef SOFTFLOAT_FAST_DIV32TO16
     uint32_t sig32A;
 
@@ -121,7 +121,7 @@ f16_div(float16_t const a,
     uint16_t sigZ = static_cast<uint16_t>(sig32A / sigB);
 
     if (!(sigZ & 7)) {
-        sigZ |= ((uint32_t)sigB * sigZ != sig32A);
+        sigZ |= (static_cast<uint32_t>(sigB) * sigZ != sig32A);
     }
 
 #else
@@ -134,13 +134,12 @@ f16_div(float16_t const a,
     }
 
     int const index = sigB >> 6 & 0xF;
-    uint16_t const r0 = softfloat_approxRecip_1k0s[index]
-        - (((uint32_t)softfloat_approxRecip_1k1s[index]
-           * (sigB & 0x3F))
-           >> 10);
-    uint16_t sigZ = ((uint32_t)sigA * r0) >> 16;
+    uint16_t const r0 =
+        softfloat_approxRecip_1k0s[index] - 
+        ((static_cast<uint32_t>(softfloat_approxRecip_1k1s[index]) * (sigB & 0x3F)) >> 10);
+    uint16_t sigZ = (static_cast<uint32_t>(sigA) * r0) >> 16;
     uint16_t rem = (sigA << 10) - sigZ * sigB;
-    sigZ += (rem * (uint32_t)r0) >> 26;
+    sigZ += (rem * static_cast<uint32_t>(r0)) >> 26;
 
     ++sigZ;
 

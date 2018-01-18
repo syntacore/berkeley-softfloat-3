@@ -86,5 +86,5 @@ f128M_to_i32_r_minMag(const float128_t* aPtr,
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    return (int32_t)uiZ;
+    return static_cast<int32_t>(uiZ);
 }

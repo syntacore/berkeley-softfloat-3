@@ -58,7 +58,7 @@ softfloat_roundPackMToF128M(bool sign,
             sigExtra;
     }
 
-    if (0x7FFD <= (uint32_t)exp) {
+    if (0x7FFD <= static_cast<uint32_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||

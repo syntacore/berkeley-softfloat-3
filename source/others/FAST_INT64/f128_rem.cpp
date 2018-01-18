@@ -145,7 +145,7 @@ f128_rem(float128_t a, float128_t b)
         expDiff -= 30;
 
         for (;;) {
-            q64 = static_cast<uint64_t>((uint32_t)(rem.v64 >> 19)) * recip32;
+            q64 = static_cast<uint64_t>(static_cast<uint32_t>(rem.v64 >> 19)) * recip32;
 
             if (expDiff < 0) {
                 break;
@@ -165,7 +165,7 @@ f128_rem(float128_t a, float128_t b)
 
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
-        q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
+        q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, static_cast<uint8_t>(expDiff + 30u));
         term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);

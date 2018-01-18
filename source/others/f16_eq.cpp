@@ -54,5 +54,5 @@ f16_eq(float16_t a, float16_t b)
         return false;
     }
 
-    return uiA == uiB || !(uint16_t)((uiA | uiB) << 1);
+    return uiA == uiB || !static_cast<uint16_t>((uiA | uiB) << 1);
 }

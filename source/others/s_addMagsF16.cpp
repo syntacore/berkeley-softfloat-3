@@ -128,7 +128,7 @@ softfloat_addMagsF16(uint16_t uiA,
                     if (roundingMode == (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max)) {
                         ++uiZ;
 
-                        if ((uint16_t)(uiZ << 1) == 0xF800) {
+                        if (static_cast<uint16_t>(uiZ << 1) == UINT16_C(0xF800)) {
                             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
                         }
                     }

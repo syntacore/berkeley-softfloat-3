@@ -68,7 +68,7 @@ f16_to_ui32_r_minMag(float16_t a, bool exact)
             ui32_fromPosOverflow;
     }
 
-    uint32_t const alignedSig = (uint32_t)(frac | 0x0400) << shiftDist;
+    uint32_t const alignedSig = static_cast<uint32_t>(frac | 0x0400) << shiftDist;
 
     if (exact && (alignedSig & 0x3FF)) {
         softfloat_raiseFlags(softfloat_flag_inexact);

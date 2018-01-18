@@ -80,5 +80,5 @@ f64_to_i64_r_minMag(float64_t a, bool exact)
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    return sign ? -(int64_t)absZ : (int64_t)absZ;
+    return sign ? -static_cast<int64_t>(absZ) : static_cast<int64_t>(absZ);
 }

@@ -173,7 +173,7 @@ softfloat_mulAddF64(uint64_t uiA,
             sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
         } else {
             sig128C[indexWord(4, 3)] = sigC >> 32;
-            sig128C[indexWord(4, 2)] = (uint32_t)sigC;
+            sig128C[indexWord(4, 2)] = static_cast<uint32_t>(sigC);
             sig128C[indexWord(4, 1)] = 0;
             sig128C[indexWord(4, 0)] = 0;
             softfloat_shiftRightJam128M(sig128C, static_cast<uint8_t>(expDiff), sig128C);
@@ -213,7 +213,7 @@ softfloat_mulAddF64(uint64_t uiA,
                 return softfloat_roundPackToF64(signZ, expZ - 1, sigZ);
             } else {
                 sig128C[indexWord(4, 3)] = sigC >> 32;
-                sig128C[indexWord(4, 2)] = (uint32_t)sigC;
+                sig128C[indexWord(4, 2)] = static_cast<uint32_t>(sigC);
                 sig128C[indexWord(4, 1)] = 0;
                 sig128C[indexWord(4, 0)] = 0;
                 softfloat_sub128M(sig128C, sig128Z, sig128Z);
@@ -226,7 +226,7 @@ softfloat_mulAddF64(uint64_t uiA,
             }
 
             sig128Z[indexWord(4, 3)] = sigZ >> 32;
-            sig128Z[indexWord(4, 2)] = (uint32_t)sigZ;
+            sig128Z[indexWord(4, 2)] = static_cast<uint32_t>(sigZ);
 
             if (sigZ & INT64_MIN) {
                 signZ = !signZ;

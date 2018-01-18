@@ -78,9 +78,9 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
         exp += softfloat_normExtF80SigM(&sig);
     }
 
-    zWPtr[indexWord(4, 1)] = (uint32_t)sig << 17;
+    zWPtr[indexWord(4, 1)] = static_cast<uint32_t>(sig) << 17;
     sig >>= 15;
-    zWPtr[indexWord(4, 2)] = (uint32_t)sig;
+    zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(sig);
 
     if (exp < 0) {
         zWPtr[indexWordHi(4)] = sig >> 32;

@@ -73,7 +73,7 @@ f32_to_ui64_r_minMag(float32_t a,
     z = sig64 >> shiftDist;
     shiftDist = 40 - shiftDist;
 
-    if (exact && (shiftDist < 0) && (uint32_t)(sig << (shiftDist & 31))) {
+    if (exact && (shiftDist < 0) && static_cast<uint32_t>(sig << (shiftDist & 31))) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

@@ -110,7 +110,7 @@ f16_rem(float16_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = softfloat_approxRecip32_1((uint32_t)sigB << 21);
+        uint32_t const recip32 = softfloat_approxRecip32_1(static_cast<uint32_t>(sigB) << 21);
         /*
         Changing the shift of `rem' here requires also changing the initial
         subtraction from `expDiff'.

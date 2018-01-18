@@ -140,7 +140,7 @@ softfloat_subMagsF16(uint16_t uiA,
             }
         }
 
-        uint32_t sig32Z = ((uint32_t)sigX << expDiff) - sigY;
+        uint32_t sig32Z = (static_cast<uint32_t>(sigX) << expDiff) - sigY;
         int8_t shiftDist = softfloat_countLeadingZeros32(sig32Z) - 1;
         sig32Z <<= shiftDist;
         expZ -= shiftDist;

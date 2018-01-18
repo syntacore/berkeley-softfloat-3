@@ -52,7 +52,7 @@ f32_eq(float32_t a,
         }
         return false;
     }
-    return uiA == uiB || !(uint32_t)((uiA | uiB) << 1);
+    return uiA == uiB || !static_cast<uint32_t>((uiA | uiB) << 1);
 
 }
 

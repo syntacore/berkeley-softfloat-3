@@ -72,7 +72,7 @@ f32_to_i32_r_minMag(float32_t a, bool exact)
     sig = (sig | 0x00800000) << 8;
     int32_t absZ = static_cast<int32_t>(sig >> shiftDist);
 
-    if (exact && ((uint32_t)absZ << shiftDist != sig)) {
+    if (exact && (static_cast<uint32_t>(absZ) << shiftDist != sig)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

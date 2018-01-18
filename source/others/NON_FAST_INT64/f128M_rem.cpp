@@ -155,7 +155,7 @@ f128M_rem(const float128_t* aPtr,
         }
 
         /* `expDiff' cannot be less than -29 here. */
-        q = (uint32_t)(q64 >> 32) >> (~expDiff & 31);
+        q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         /** @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data */
         softfloat_remStep128MBy32(remPtr, static_cast<uint8_t>(expDiff + 30), x, q, remPtr);
 

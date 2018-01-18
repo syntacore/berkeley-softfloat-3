@@ -59,7 +59,7 @@ i64_to_f128M(int64_t const a,
             uint32_t* const ptr = zWPtr + indexMultiwordHi(4, 3);
             ptr[indexWord(3, 2)] = 0;
             ptr[indexWord(3, 1)] = absA >> 32;
-            ptr[indexWord(3, 0)] = (uint32_t)absA;
+            ptr[indexWord(3, 0)] = static_cast<uint32_t>(absA);
             softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
             ptr[indexWordHi(3)] = packToF128UI96(sign, 0x404Eu - shiftDist, ptr[indexWordHi(3)]);
             return;

@@ -58,7 +58,7 @@ extF80M_to_ui64(const extFloat80_t *aSPtr,
 
     uint32_t extSig[3];
     extSig[indexWord(3, 2)] = sig >> 32;
-    extSig[indexWord(3, 1)] = (uint32_t)sig;
+    extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
     extSig[indexWord(3, 0)] = 0;
     if (shiftDist) {
         softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);

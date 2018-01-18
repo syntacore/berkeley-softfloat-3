@@ -77,7 +77,7 @@ f16_to_extF80M(float16_t a,
     }
 
     uiZ64 = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3FF0));
-    uiZ32 = 0x80000000 | (uint32_t)frac << 21;
+    uiZ32 = 0x80000000 | static_cast<uint32_t>(frac) << 21;
 uiZ:
     zSPtr->signExp = uiZ64;
     zSPtr->signif = static_cast<uint64_t>(uiZ32) << 32;

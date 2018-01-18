@@ -62,8 +62,8 @@ softfloat_roundPackToI32(bool sign,
         return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
 
-    uint32_t sig32 = (sig >> 12) & (~(uint32_t)(!(roundBits ^ 0x800) & roundNearEven));
-    int32_t const z = sign ? -(int32_t)sig32 : (int32_t)sig32;
+    uint32_t sig32 = (sig >> 12) & (~static_cast<uint32_t>(!(roundBits ^ 0x800) & roundNearEven));
+    int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
 
     if (z && ((z < 0) ^ sign)) {
         softfloat_raiseFlags(softfloat_flag_invalid);

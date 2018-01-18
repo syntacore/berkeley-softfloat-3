@@ -64,7 +64,7 @@ extF80M_to_f16(const extFloat80_t *aPtr)
                 exp += softfloat_normExtF80SigM(&sig);
             }
         }
-        uint16_t const sig16 = (uint16_t)softfloat_shortShiftRightJam64(sig, 49);
+        uint16_t const sig16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(sig, 49));
         exp -= 0x3FF1;
         if (exp < -0x40) {
             exp = -0x40;

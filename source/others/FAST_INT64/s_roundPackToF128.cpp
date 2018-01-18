@@ -58,7 +58,7 @@ softfloat_roundPackToF128(bool sign,
         doIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra;
     }
 
-    if (0x7FFD <= (uint32_t)exp) {
+    if (0x7FFD <= static_cast<uint32_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
                 softfloat_detectTininess == softfloat_tininess_beforeRounding ||

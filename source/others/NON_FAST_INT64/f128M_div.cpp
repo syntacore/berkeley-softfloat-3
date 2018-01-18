@@ -158,13 +158,13 @@ f128M_div(float128_t const* const aPtr,
     }
 
     q64 = static_cast<uint64_t>(q) << 28;
-    y[indexWord(5, 0)] = (uint32_t)q64;
+    y[indexWord(5, 0)] = static_cast<uint32_t>(q64);
     q64 = (static_cast<uint64_t>(qs[0]) << 25) + (q64 >> 32);
-    y[indexWord(5, 1)] = (uint32_t)q64;
+    y[indexWord(5, 1)] = static_cast<uint32_t>(q64);
     q64 = (static_cast<uint64_t>(qs[1]) << 22) + (q64 >> 32);
-    y[indexWord(5, 2)] = (uint32_t)q64;
+    y[indexWord(5, 2)] = static_cast<uint32_t>(q64);
     q64 = (static_cast<uint64_t>(qs[2]) << 19) + (q64 >> 32);
-    y[indexWord(5, 3)] = (uint32_t)q64;
+    y[indexWord(5, 3)] = static_cast<uint32_t>(q64);
     y[indexWord(5, 4)] = q64 >> 32;
     softfloat_roundPackMToF128M(signZ, expZ, y, zWPtr);
     return;

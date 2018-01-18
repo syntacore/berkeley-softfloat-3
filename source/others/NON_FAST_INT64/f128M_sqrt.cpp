@@ -116,7 +116,7 @@ f128M_sqrt(float128_t const* const aPtr,
     qs[2] = sig32Z;
     rem64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
     rem[indexWord(4, 3)] = rem64 >> 32;
-    rem[indexWord(4, 2)] = (uint32_t)rem64;
+    rem[indexWord(4, 2)] = static_cast<uint32_t>(rem64);
 
     uint32_t q = (static_cast<uint32_t>(rem64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
     qs[1] = q;
@@ -125,7 +125,7 @@ f128M_sqrt(float128_t const* const aPtr,
     uint32_t term[5];
     term[indexWord(4, 3)] = 0;
     term[indexWord(4, 2)] = x64 >> 32;
-    term[indexWord(4, 1)] = (uint32_t)x64;
+    term[indexWord(4, 1)] = static_cast<uint32_t>(x64);
     term[indexWord(4, 0)] = 0;
     uint32_t y[5];
     softfloat_remStep128MBy32(rem, 29, term, q, y);
@@ -140,7 +140,7 @@ f128M_sqrt(float128_t const* const aPtr,
     for (;;) {
         x64 = sig64Z + (q >> 26);
         term[indexWord(4, 2)] = x64 >> 32;
-        term[indexWord(4, 1)] = (uint32_t)x64;
+        term[indexWord(4, 1)] = static_cast<uint32_t>(x64);
         term[indexWord(4, 0)] = q << 6;
         term[indexWord(4, 3)] = 0;
         softfloat_remStep128MBy32(y, 29, term, q, &rem[indexMultiwordHi(6, 4)]);

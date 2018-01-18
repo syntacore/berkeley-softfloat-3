@@ -140,7 +140,7 @@ softfloat_mulAddF16(uint16_t uiA,
     int8_t expProd = expA + expB - 0xE;
     sigA = static_cast<uint16_t>((sigA | 0x0400) << 4);
     sigB = static_cast<uint16_t>((sigB | 0x0400) << 4);
-    uint32_t sigProd = (uint32_t)sigA * sigB;
+    uint32_t sigProd = static_cast<uint32_t>(sigA) * sigB;
     int8_t expZ;
     uint16_t sigZ;
     uint32_t sig32Z;
@@ -187,7 +187,7 @@ softfloat_mulAddF16(uint16_t uiA,
             sigZ <<= 1;
         }
     } else {
-        uint32_t sig32C = (uint32_t)sigC << 16;
+        uint32_t sig32C = static_cast<uint32_t>(sigC) << 16;
 
         if (expDiff < 0) {
             signZ = signC;

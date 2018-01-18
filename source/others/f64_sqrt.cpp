@@ -100,8 +100,8 @@ f64_sqrt(float64_t a)
     }
 
     uint64_t rem = sigA - static_cast<uint64_t>(sig32Z) * sig32Z;
-    uint32_t const q = ((uint32_t)(rem >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
-    uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32 | 1 << 5) + ((uint64_t)q << 3);
+    uint32_t const q = (static_cast<uint32_t>(rem >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
+    uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32 | 1 << 5) + (static_cast<uint64_t>(q) << 3);
 
     if ((sigZ & 0x1FF) < 1 << 5) {
         sigZ &= ~static_cast<uint64_t>(0x3F);
