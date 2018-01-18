@@ -51,7 +51,6 @@ extF80_to_i32(extFloat80_t a,
     uint64_t sig = a.signif;
 
     if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
-
         if (0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             if (i32_fromNaN == i32_fromPosOverflow) {
                 sign = false;
