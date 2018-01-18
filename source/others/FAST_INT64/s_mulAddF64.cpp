@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 
-float64_t
+namespace {
+static inline float64_t
 softfloat_mulAddF64(uint64_t uiA,
                     uint64_t uiB,
                     uint64_t uiC,
@@ -224,5 +225,16 @@ softfloat_mulAddF64(uint64_t uiA,
                                     expZ,
                                     sig128Z_1.v64 | !!(0 != sig128Z_1.v0));
 }
+}
 
 }  // namespace softfloat
+
+float64_t
+f64_mulAdd(float64_t a,
+           float64_t b,
+           float64_t c)
+{
+    using namespace softfloat;
+    return softfloat_mulAddF64(f_as_u_64(a), f_as_u_64(b), f_as_u_64(c), softfloat_mulAdd_madd);
+}
+

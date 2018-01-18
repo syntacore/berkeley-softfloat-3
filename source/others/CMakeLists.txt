@@ -60,7 +60,6 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_le_quiet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_lt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_lt_quiet.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/f64_mulAdd.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_roundToInt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_sqrt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_sub.cpp

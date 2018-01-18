@@ -463,11 +463,6 @@ float64_t
 softfloat_subMagsF64(uint64_t,
                      uint64_t,
                      bool);
-float64_t
-softfloat_mulAddF64(uint64_t,
-                    uint64_t,
-                    uint64_t,
-                    Mul_add_operations);
 
 #ifdef SOFTFLOAT_FAST_INT64
 
