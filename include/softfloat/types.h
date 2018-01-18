@@ -78,19 +78,16 @@ extern "C" {
     named `signif'.
     */
     /** @bug macro value dependent interface */
-#ifdef LITTLEENDIAN
     struct extFloat80M
     {
-        uint64_t signif;
+#ifdef BIG_ENDIAN
         uint16_t signExp;
-    };
+        uint64_t signif;
 #else
-    struct extFloat80M
-    {
-        uint16_t signExp;
         uint64_t signif;
-    };
+        uint16_t signExp;
 #endif
+    };
 
     /**
     The type used to pass 80-bit extended floating-point arguments and

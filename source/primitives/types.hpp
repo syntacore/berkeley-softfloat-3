@@ -45,18 +45,35 @@ namespace softfloat {
 
 struct uint128
 {
+#ifdef BIG_ENDIAN
     uint64_t v64;
     uint64_t v0;
+#else
+    uint64_t v0;
+    uint64_t v64;
+#endif
 };
+
 struct uint64_extra
 {
+#ifdef BIG_ENDIAN
     uint64_t v;
     uint64_t extra;
+#else
+    uint64_t extra;
+    uint64_t v;
+#endif
 };
+
 struct uint128_extra
 {
+#ifdef BIG_ENDIAN
     uint128 v;
     uint64_t extra;
+#else
+    uint64_t extra;
+    uint128 v;
+#endif
 };
 
 #endif
@@ -65,18 +82,7 @@ struct uint128_extra
 These macros are used to isolate the differences in word order between big-
 endian and little-endian platforms.
 */
-#ifdef LITTLEENDIAN
-#define wordIncr 1
-#define indexWord( total, n ) (n)
-#define indexWordHi( total ) ((total) - 1u)
-#define indexWordLo( total ) 0u
-#define indexMultiword( total, m, n ) (n)
-#define indexMultiwordHi( total, n ) ((total) - (n))
-#define indexMultiwordLo( total, n ) 0u
-#define indexMultiwordHiBut( total, n ) (n)
-#define indexMultiwordLoBut( total, n ) 0u
-#define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
-#else
+#ifdef BIG_ENDIAN
 #define wordIncr -1
 #define indexWord( total, n ) ((total) - 1 - (n))
 #define indexWordHi( total ) 0
@@ -87,6 +93,17 @@ endian and little-endian platforms.
 #define indexMultiwordHiBut( total, n ) 0
 #define indexMultiwordLoBut( total, n ) (n)
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v3, v2, v1, v0 }
+#else
+#define wordIncr 1
+#define indexWord( total, n ) (n)
+#define indexWordHi( total ) ((total) - 1u)
+#define indexWordLo( total ) 0u
+#define indexMultiword( total, m, n ) (n)
+#define indexMultiwordHi( total, n ) ((total) - (n))
+#define indexMultiwordLo( total, n ) 0u
+#define indexMultiwordHiBut( total, n ) (n)
+#define indexMultiwordLoBut( total, n ) 0u
+#define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
 #endif
 
 }  // namespace softfloat
