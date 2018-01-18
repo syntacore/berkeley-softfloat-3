@@ -51,11 +51,11 @@ f16_to_f128(float16_t a)
     if (exp == 0x1F) {
         if (frac) {
             uint128 const uiZ = softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA));
-            return reinterpret_cast<float128_t const&>(uiZ);
+            return u_as_f_128(uiZ);
         }
 
         uint128 const uiZ{packToF128UI64(sign, 0x7FFF, 0), 0};
-        return reinterpret_cast<float128_t const&>(uiZ);
+        return u_as_f_128(uiZ);
     }
 
     if (!exp) {
@@ -66,9 +66,9 @@ f16_to_f128(float16_t a)
         }
 
         uint128 const uiZ{packToF128UI64(sign, 0, 0), 0};
-        return reinterpret_cast<float128_t const&>(uiZ);
+        return u_as_f_128(uiZ);
     }
 
     uint128 const uiZ{packToF128UI64(sign, exp + 0x3FF0, (uint64_t)frac << 38), 0};
-    return reinterpret_cast<float128_t const&>(uiZ);
+    return u_as_f_128(uiZ);
 }

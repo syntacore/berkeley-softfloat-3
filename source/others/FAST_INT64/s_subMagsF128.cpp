@@ -165,6 +165,6 @@ normRoundPack:
 propagateNaN:
     uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
 uiZ:
-    return reinterpret_cast<float128_t const&>(uiZ);
+    return u_as_f_128(uiZ);
 }
 }  // namespace softfloat

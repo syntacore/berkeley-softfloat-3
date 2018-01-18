@@ -133,7 +133,7 @@ uiZ:
     uint128 uZ;
     uZ.v64 = uiZ64;
     uZ.v0 = uiZ0;
-    return reinterpret_cast<float128_t const&>(uZ);
+    return u_as_f_128(uZ);
 }
 
 }  // namespace softfloat

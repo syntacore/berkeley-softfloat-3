@@ -45,8 +45,8 @@ f128_to_ui64(float128_t a,
              bool exact)
 {
     using namespace softfloat;
-    uint64_t const uiA64 = reinterpret_cast<uint128 const&>(a).v64;
-    uint64_t const uiA0 = reinterpret_cast<uint128 const&>(a).v0;
+    uint64_t const uiA64 = f_as_u_128(a).v64;
+    uint64_t const uiA0 = f_as_u_128(a).v0;
     bool const sign = signF128UI64(uiA64);
     int32_t const exp = expF128UI64(uiA64);
     uint64_t sig64 = fracF128UI64(uiA64);

@@ -44,7 +44,7 @@ ui64_to_f128(uint64_t a)
 
     if (!a) {
         uint128 uZ{0u, 0u};
-        return reinterpret_cast<float128_t const&>(uZ);
+        return u_as_f_128(uZ);
     }
 
     int8_t const shiftDist = softfloat_countLeadingZeros64(a) + 49;
@@ -58,6 +58,6 @@ ui64_to_f128(uint64_t a)
     }
 
     uint128 uZ{packToF128UI64(0, 0x406E - shiftDist, zSig.v64), zSig.v0};
-    return reinterpret_cast<float128_t const&>(uZ);
+    return u_as_f_128(uZ);
 }
 

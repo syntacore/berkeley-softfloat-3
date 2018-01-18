@@ -53,6 +53,6 @@ ui32_to_f128(uint32_t a)
     uint128 uZ;
     uZ.v64 = uiZ64;
     uZ.v0 = 0;
-    return reinterpret_cast<float128_t const&>(uZ);
+    return u_as_f_128(uZ);
 }
 

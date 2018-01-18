@@ -43,10 +43,10 @@ f128_lt(float128_t a,
         float128_t b)
 {
     using namespace softfloat;
-    uint64_t const uiA64 = reinterpret_cast<uint128 const&>(a).v64;
-    uint64_t const uiA0 = reinterpret_cast<uint128 const&>(a).v0;
-    uint64_t const uiB64 = reinterpret_cast<uint128 const&>(b).v64;
-    uint64_t const uiB0 = reinterpret_cast<uint128 const&>(b).v0;
+    uint64_t const uiA64 = f_as_u_128(a).v64;
+    uint64_t const uiA0 = f_as_u_128(a).v0;
+    uint64_t const uiB64 = f_as_u_128(b).v64;
+    uint64_t const uiB0 = f_as_u_128(b).v0;
 
     if (isNaNF128UI(uiA64, uiA0) || isNaNF128UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
