@@ -390,13 +390,13 @@ softfloat_shiftRightJam64Extra(uint64_t a,
 
     if (dist < 64) {
         z.v = a >> dist;
-        z.extra = a << (-(int32_t)dist & 63);
+        z.extra = a << (63 & -static_cast<int32_t>(dist));
     } else {
         z.v = 0;
-        z.extra = (dist == 64) ? a : (a != 0);
+        z.extra = dist == 64 ? a : !!(0 != a );
     }
 
-    z.extra |= (extra != 0);
+    z.extra |= !!(extra != 0);
     return z;
 }
 
