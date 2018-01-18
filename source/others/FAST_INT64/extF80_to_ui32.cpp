@@ -51,7 +51,7 @@ extF80_to_ui32(extFloat80_t const a,
     uint64_t sig = a.signif;
 
     if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {
-        if ((exp == 0x7FFF) && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+        if (exp == 0x7FFF && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             if (ui32_fromNaN == ui32_fromPosOverflow) {
                 sign = 0;
             } else if (ui32_fromNaN == ui32_fromNegOverflow) {
