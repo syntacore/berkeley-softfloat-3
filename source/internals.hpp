@@ -286,14 +286,14 @@ union ui128_f128
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-inline constexpr uint128
-f_as_u_128(float128_t v)
+inline uint128 const&
+f_as_u_128(float128_t const& v)
 {
     return reinterpret_cast<uint128 const&>(v);
 }
 
-inline constexpr float128_t
-u_as_f_128(uint128 v)
+inline float128_t const&
+u_as_f_128(uint128 const& v)
 {
     return reinterpret_cast<float128_t const&>(v);
 }
