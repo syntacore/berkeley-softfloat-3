@@ -79,8 +79,8 @@ inline constexpr bool
 isNaNF16UI(uint16_t a)
 {
     return
-        0 == (~a & 0x7C00) &&
-        0 != (a & 0x03FF);
+        0 == (UINT16_C(0x7C00) & ~a) &&
+        0 != (UINT16_C(0x03FF) &  a);
 }
 
 inline constexpr uint16_t
@@ -259,21 +259,23 @@ signExtF80UI64(uint16_t a64)
 inline constexpr uint16_t
 expExtF80UI64(uint16_t a64)
 {
-    return a64 & 0x7FFFu;
+    return UINT16_C(0x7FFF) & a64;
 }
 
 inline constexpr uint16_t
-packToExtF80UI64(bool sign, uint16_t exp)
+packToExtF80UI64(bool sign,
+                 uint16_t exp)
 {
     return static_cast<uint16_t>((!!sign << 15) | exp);
 }
 
 inline constexpr bool
-isNaNExtF80UI(uint16_t a64, uint64_t a0)
+isNaNExtF80UI(uint16_t a64,
+              uint64_t a0)
 {
     return
-        0x7FFFu == (a64 & 0x7FFFu) &&
-        0 != (a0 & UINT64_C(0x7FFFFFFFFFFFFFFF));
+        UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & a64) &&
+        0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & a0);
 }
 
 #ifdef SOFTFLOAT_FAST_INT64
@@ -318,8 +320,8 @@ inline constexpr bool
 softfloat_isNaNF64UI(uint64_t uiA)
 {
     return
-        (~(~UINT64_C(0) << 11) << 52) == (uiA & (~(~UINT64_C(0) << 11) << 52)) &&
-        0 != (uiA & (~(~UINT64_C(0) << 52)));
+        (~(~UINT64_C(0) << 11) << 52) == ((~(~UINT64_C(0) << 11) << 52) & uiA) &&
+        0 != ((~(~UINT64_C(0) << 52)) & uiA);
 }
 /**
 Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
@@ -329,8 +331,8 @@ inline constexpr bool
 softfloat_isSigNaNF32UI(uint32_t uiA)
 {
     return
-        (~(~UINT32_C(0) << 8) << 23) == (uiA & ((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22))) &&
-        0 != (uiA & (~(~UINT32_C(0) << 23)));
+        (~(~UINT32_C(0) << 8) << 23) == (((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22)) & uiA) &&
+        0 != (~(~UINT32_C(0) << 23) & uiA);
 }
 
 uint32_t
