@@ -154,7 +154,7 @@ signed_zero_F32UI(bool sign)
     return packToF32UI(sign, 0, 0u);
 }
 
-inline float32_t
+inline constexpr float32_t
 signed_zero_F32(bool sign)
 {
     return u_as_f_32(signed_zero_F32UI(sign));
