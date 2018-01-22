@@ -42,6 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 extF80M_sub(extFloat80_t const* aPtr, extFloat80_t const* bPtr, extFloat80_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     softfloat_addExtF80M(aPtr, bPtr, zPtr, true);
 }

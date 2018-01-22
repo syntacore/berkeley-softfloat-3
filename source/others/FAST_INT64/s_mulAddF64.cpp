@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 namespace {
 static inline float64_t
@@ -227,6 +228,7 @@ softfloat_mulAddF64(uint64_t uiA,
 }
 }
 
+}  // namespace internals
 }  // namespace softfloat
 
 float64_t
@@ -234,7 +236,7 @@ f64_mulAdd(float64_t a,
            float64_t b,
            float64_t c)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return softfloat_mulAddF64(f_as_u_64(a), f_as_u_64(b), f_as_u_64(c), softfloat_mulAdd_madd);
 }
 

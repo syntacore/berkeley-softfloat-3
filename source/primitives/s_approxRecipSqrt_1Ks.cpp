@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
 
 uint16_t const softfloat_approxRecipSqrt_1k0s[16] = {
     0xB4C9, 0xFFAB, 0xAA7D, 0xF11C, 0xA1C5, 0xE4C7, 0x9A43, 0xDA29,
@@ -47,4 +48,5 @@ uint16_t const softfloat_approxRecipSqrt_1k1s[16] = {
     0x5CC7, 0x8335, 0x52A6, 0x74E2, 0x4A3E, 0x68FE, 0x432B, 0x5EFD
 };
 
+}  // namespace internals
 }  // namespace softfloat

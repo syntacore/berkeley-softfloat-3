@@ -43,7 +43,7 @@ float64_t
 f64_rem(float64_t a,
         float64_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     bool const signA = signF64UI(uiA);
     int16_t expA = expF64UI(uiA);

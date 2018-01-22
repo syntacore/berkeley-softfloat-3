@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 ui32_to_f32(uint32_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return
         !a ? u_as_f_32(0) :
         0 != (a & 0x80000000) ? softfloat_roundPackToF32(0, 0x9D, a >> 1 | (a & 1)) :

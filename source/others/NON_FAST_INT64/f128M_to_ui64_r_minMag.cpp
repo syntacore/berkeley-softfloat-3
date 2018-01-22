@@ -43,7 +43,7 @@ uint64_t
 f128M_to_ui64_r_minMag(float128_t const* aPtr,
                        bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     int32_t shiftDist;
     uint32_t sig[4];
     uint64_t z;

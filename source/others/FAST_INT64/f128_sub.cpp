@@ -42,7 +42,7 @@ float128_t
 f128_sub(float128_t const a,
          float128_t const b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     ui128_f128 uA;
     uint64_t uiA64;
     uint64_t uiA0;

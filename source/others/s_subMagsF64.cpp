@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 float64_t
 softfloat_subMagsF64(uint64_t uiA,
@@ -119,4 +120,5 @@ softfloat_subMagsF64(uint64_t uiA,
                                      static_cast<uint32_t>(expDiff)));
 }
 
+}  // namespace internals
 }  // namespace softfloat

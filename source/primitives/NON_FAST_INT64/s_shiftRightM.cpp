@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_shiftRightM(size_t const size_words,
@@ -84,4 +85,5 @@ softfloat_shiftRightM(size_t const size_words,
     } while (wordDist);
 }
 
+}  // namespace internals
 }  // namespace softfloat

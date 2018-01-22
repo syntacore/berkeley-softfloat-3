@@ -43,7 +43,7 @@ bool
 extF80_le_quiet(extFloat80_t a,
                 extFloat80_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0  = a.signif;
     uint16_t const uiB64 = b.signExp;

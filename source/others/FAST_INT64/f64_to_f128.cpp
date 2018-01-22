@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 f64_to_f128(float64_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint128 uiZ;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);

@@ -44,7 +44,7 @@ f64_roundToInt(float64_t a,
                uint8_t roundingMode,
                bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     int16_t const exp = expF64UI(uiA);
 

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 f64_sqrt(float64_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     bool const signA = signF64UI(uiA);
     int16_t expA = expF64UI(uiA);

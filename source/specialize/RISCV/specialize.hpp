@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
-
+namespace internals {
 inline namespace riscv {
 
 /**
@@ -413,7 +413,7 @@ The bit pattern for a default generated 128-bit floating-point NaN.
 static uint32_t const defaultNaNF128UI96 = UINT32_C(0x7FFF8000);
 static uint32_t const defaultNaNF128UI64 = UINT32_C(0);
 static uint32_t const defaultNaNF128UI32 = UINT32_C(0);
-static uint32_t const defaultNaNF128UI0  = UINT32_C(0);
+static uint32_t const defaultNaNF128UI0 = UINT32_C(0);
 
 /**
 Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is
@@ -505,6 +505,7 @@ softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32
 
 #endif
 }  // namespace riscv
+}  // namespace internals
 }  // namespace softfloat
 
 #endif  /* SPECIALIZE_H_ */

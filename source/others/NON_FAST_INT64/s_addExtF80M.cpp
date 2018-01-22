@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 /** @bug use extFloat80_t */
 void
@@ -183,4 +184,5 @@ sigZ:
     (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_roundingPrecision, zSPtr);
 }
 
+}  // namespace internals
 }  // namespace softfloat

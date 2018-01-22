@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
 
 uint128
@@ -117,5 +118,7 @@ returnA:
         }
     }
 }
+
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

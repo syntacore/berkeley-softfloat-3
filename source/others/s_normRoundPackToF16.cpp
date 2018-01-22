@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 float16_t
 softfloat_normRoundPackToF16(bool sign,
@@ -54,4 +55,5 @@ softfloat_normRoundPackToF16(bool sign,
     return softfloat_roundPackToF16(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << shiftDist));
 }
 
+}  // namespace internals
 }  // namespace softfloat

@@ -41,12 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 namespace {
     static int32_t
         invalid(bool sign, int32_t exp, uint64_t sig)
     {
-        using namespace softfloat;
+        using namespace softfloat::internals;
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             exp == INT16_MAX && (sig & INT64_MAX) ? i32_fromNaN :
@@ -134,4 +135,5 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
     return static_cast<int32_t>(absZ);
 }
 
+}  // namespace internals
 }  // namespace softfloat

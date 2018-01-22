@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 /**
 @param[in] sign sign bit
@@ -80,4 +81,5 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     return u_as_f_32(packToF32UI(sign, 0 != sig1 ? exp : 0, sig1));
 }
 
+}  // namespace internals
 }  // namespace softfloat

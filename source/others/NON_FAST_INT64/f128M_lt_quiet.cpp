@@ -43,7 +43,7 @@ bool
 f128M_lt_quiet(const float128_t* aPtr,
                const float128_t* bPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     const uint32_t* aWPtr, *bWPtr;
     uint32_t uiA96, uiB96;
     bool signA, signB;

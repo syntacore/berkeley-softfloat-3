@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_normRoundPackMToF128M(bool sign,
@@ -82,4 +83,5 @@ softfloat_normRoundPackMToF128M(bool sign,
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

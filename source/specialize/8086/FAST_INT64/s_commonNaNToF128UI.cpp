@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
 
 /**
@@ -54,4 +55,5 @@ softfloat_commonNaNToF128UI(commonNaN a)
 }
 
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

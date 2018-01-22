@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 namespace softfloat {
+namespace internals {
 
 uint32_t
 softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
@@ -58,4 +59,5 @@ softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
     return !(r & 0x80000000) ? 0x80000000 : r;
 }
 
+}  // namespace internals
 }  // namespace softfloat

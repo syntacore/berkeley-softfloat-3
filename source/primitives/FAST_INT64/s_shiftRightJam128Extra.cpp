@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
+
 uint128_extra
 softfloat_shiftRightJam128Extra(uint64_t a64,
                                 uint64_t a0,
@@ -74,4 +76,6 @@ softfloat_shiftRightJam128Extra(uint64_t a64,
     return z;
 
 }
+
+}  // namespace internals
 }  // namespace softfloat

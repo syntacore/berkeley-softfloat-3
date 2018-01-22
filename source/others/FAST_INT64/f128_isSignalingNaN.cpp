@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 f128_isSignalingNaN(float128_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return softfloat_isSigNaNF128UI(f_as_u_128(a).v64, f_as_u_128(a).v0);
 }
 

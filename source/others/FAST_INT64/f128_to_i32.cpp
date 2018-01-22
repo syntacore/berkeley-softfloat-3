@@ -44,7 +44,7 @@ f128_to_i32(float128_t const a,
             uint8_t const roundingMode,
             bool const exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;

@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 i32_to_f16(int32_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     bool const sign = a < 0;
     /** @bug INT32_MIN */
     uint32_t absA = static_cast<uint32_t>(sign ? -a : a);

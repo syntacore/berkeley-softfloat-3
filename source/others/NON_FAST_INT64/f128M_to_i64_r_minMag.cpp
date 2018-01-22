@@ -45,7 +45,7 @@ invalid(bool const sign,
         uint32_t sig96,
         uint32_t const* aWPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
         exp == 0x7FFF && (sig96 || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) ? i64_fromNaN :
@@ -56,7 +56,7 @@ int64_t
 f128M_to_i64_r_minMag(const float128_t* aPtr,
                       bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t sig[4];
     uint64_t uiZ;
     uint32_t const* aWPtr = reinterpret_cast<const uint32_t*>(aPtr);

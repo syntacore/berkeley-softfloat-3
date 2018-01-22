@@ -43,7 +43,7 @@ extFloat80_t
 extF80_rem(extFloat80_t a,
            extFloat80_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     exp32_sig64 normExpSig;
     int32_t expDiff;
     uint128 rem, shiftedSigB;

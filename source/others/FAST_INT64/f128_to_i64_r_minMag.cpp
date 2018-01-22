@@ -43,7 +43,7 @@ int64_t
 f128_to_i64_r_minMag(float128_t a,
                      bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     ui128_f128 uA;
     uA.f = a;
     uint64_t const uiA64 = uA.ui.v64;

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     extFloat80M *const zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;

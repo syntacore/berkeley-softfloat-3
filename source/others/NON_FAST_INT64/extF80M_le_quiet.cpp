@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 extF80M_le_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
 
     extFloat80M const *aSPtr;
     extFloat80M const *bSPtr;

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
 
 /**
@@ -157,4 +158,5 @@ copy:
 }
 
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

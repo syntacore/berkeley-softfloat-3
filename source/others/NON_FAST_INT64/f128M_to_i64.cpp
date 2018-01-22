@@ -44,7 +44,7 @@ f128M_to_i64(const float128_t* aPtr,
              uint8_t roundingMode,
              bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);

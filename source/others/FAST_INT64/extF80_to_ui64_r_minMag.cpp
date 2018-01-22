@@ -43,7 +43,7 @@ uint64_t
 extF80_to_ui64_r_minMag(extFloat80_t const a,
                         bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     int32_t shiftDist;
 
 

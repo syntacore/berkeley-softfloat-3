@@ -45,7 +45,7 @@ extF80M_rem(extFloat80_t const* const aPtr,
             extFloat80_t const* const bPtr,
             extFloat80_t* const zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t x64;
     uint32_t rem[3];
     uint32_t x[3];

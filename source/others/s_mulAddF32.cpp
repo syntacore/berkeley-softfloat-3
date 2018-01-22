@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 float32_t
 softfloat_mulAddF32(uint32_t uiA,
@@ -201,4 +202,5 @@ softfloat_mulAddF32(uint32_t uiA,
     return softfloat_roundPackToF32(signZ, expZ, sigZ);
 }
 
+}  // namespace internals
 }  // namespace softfloat

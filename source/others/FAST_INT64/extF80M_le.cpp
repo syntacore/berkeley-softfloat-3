@@ -42,6 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 extF80M_le(extFloat80_t const* aPtr, extFloat80_t const* bPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return extF80_le(*aPtr, *bPtr);
 }

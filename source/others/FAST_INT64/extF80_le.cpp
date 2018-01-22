@@ -43,7 +43,7 @@ bool
 extF80_le(extFloat80_t a,
           extFloat80_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     auto const uiA64 = a.signExp;
     auto const uiA0 = a.signif;
     auto const uiB64 = b.signExp;

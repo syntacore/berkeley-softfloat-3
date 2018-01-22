@@ -43,7 +43,7 @@ extFloat80_t
 extF80_div(extFloat80_t a,
            extFloat80_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t uiA64;
     uint64_t uiA0;
     bool signA;

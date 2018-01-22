@@ -44,7 +44,7 @@ f128_roundToInt(float128_t a,
                 uint8_t roundingMode,
                 bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     ui128_f128 uA;
     uint64_t uiA64, uiA0;
     int32_t exp;

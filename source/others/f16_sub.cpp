@@ -42,7 +42,7 @@ float16_t
 f16_sub(float16_t a,
         float16_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
     uint16_t const uiB = f_as_u_16(b);
     return

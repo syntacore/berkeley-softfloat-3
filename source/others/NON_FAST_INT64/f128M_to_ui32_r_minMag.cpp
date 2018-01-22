@@ -44,7 +44,7 @@ uint32_t
 f128M_to_ui32_r_minMag(float128_t const* aPtr,
                        bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t const* aWPtr = (uint32_t const*)aPtr;
     uint32_t uiA96 = aWPtr[indexWordHi(4)];
     int32_t exp = expF128UI96(uiA96);

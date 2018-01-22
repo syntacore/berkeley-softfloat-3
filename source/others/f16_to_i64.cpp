@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int64_t
 f16_to_i64(float16_t a, uint8_t roundingMode, bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t const exp = expF16UI(uiA);

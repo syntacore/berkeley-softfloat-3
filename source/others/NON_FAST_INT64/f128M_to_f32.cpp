@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 f128M_to_f32(const float128_t* aPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t const* const aWPtr = (const uint32_t*)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);

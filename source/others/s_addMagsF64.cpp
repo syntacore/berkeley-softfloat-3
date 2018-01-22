@@ -39,11 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 float64_t
 softfloat_addMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     int16_t const expA = expF64UI(uiA);
     uint64_t sigA = fracF64UI(uiA);
     int16_t const expB = expF64UI(uiB);
@@ -106,4 +107,5 @@ softfloat_addMagsF64(uint64_t uiA, uint64_t uiB, bool signZ)
     return softfloat_roundPackToF64(signZ, expZ, sigZ);
 }
 
+}  // namespace internals
 }  // namespace softfloat

@@ -43,7 +43,7 @@ int32_t
 f128M_to_i32_r_minMag(const float128_t* aPtr,
                       bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t const* aWPtr = (const uint32_t*)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
 
 commonNaN
@@ -58,4 +59,5 @@ softfloat_f64UIToCommonNaN(uint64_t uiA)
 }
 
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

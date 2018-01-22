@@ -43,7 +43,7 @@ void
 f32_to_extF80M(float32_t a,
                extFloat80_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     extFloat80M* const zSPtr = zPtr;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);

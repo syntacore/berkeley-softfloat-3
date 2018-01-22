@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 
 namespace softfloat {
+namespace internals {
 
 static
 void
@@ -134,4 +135,6 @@ wordJam:
         zPtr[indexWordLo(4)] |= 1;
     }
 }
+
+}  // namespace internals
 }  // namespace softfloat

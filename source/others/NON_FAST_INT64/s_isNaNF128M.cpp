@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
+
 bool
 softfloat_isNaNF128M(const uint32_t* aWPtr)
 {
@@ -50,4 +52,6 @@ softfloat_isNaNF128M(const uint32_t* aWPtr)
         (uiA96 & 0x0000FFFF) != 0 ||
         (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0;
 }
+
+}  // namespace internals
 }  // namespace softfloat

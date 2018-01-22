@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 bool
 softfloat_tryPropagateNaNF128M(const uint32_t* aWPtr,
@@ -54,4 +55,5 @@ softfloat_tryPropagateNaNF128M(const uint32_t* aWPtr,
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 f128M_isSignalingNaN(const float128_t *aPtr)
 {
-    using namespace softfloat;
-    const uint32_t *aWPtr = (const uint32_t *)aPtr;
+    using namespace softfloat::internals;
+    const uint32_t *aWPtr = reinterpret_cast<uint32_t const *>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     if ((uiA96 & 0x7FFF8000) != 0x7FFF0000) {
         return false;

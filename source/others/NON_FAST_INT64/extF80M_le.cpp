@@ -43,7 +43,7 @@ bool
 extF80M_le(extFloat80_t const* aPtr,
            extFloat80_t const* bPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     extFloat80M const* const aSPtr = aPtr;
     extFloat80M const* const bSPtr = bPtr;
     uint16_t const uiA64 = aSPtr->signExp;

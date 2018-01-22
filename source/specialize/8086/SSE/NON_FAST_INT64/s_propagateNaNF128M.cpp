@@ -41,7 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
+
 /**
 Assuming at least one of the two 128-bit floating-point values pointed to by
 `aWPtr' and `bWPtr' is a NaN, stores the combined NaN result at the location
@@ -84,4 +86,5 @@ copy:
 }
 
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

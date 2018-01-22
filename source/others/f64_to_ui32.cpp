@@ -44,7 +44,7 @@ f64_to_ui32(float64_t const a,
             uint8_t const roundingMode,
             bool const exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     bool sign = signF64UI(uiA);
     int16_t const exp = expF64UI(uiA);

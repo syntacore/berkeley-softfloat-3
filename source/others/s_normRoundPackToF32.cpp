@@ -37,13 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 float32_t
 softfloat_normRoundPackToF32(bool sign,
                              int16_t exp,
                              uint32_t sig)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 1;
     exp -= shiftDist;
 
@@ -54,4 +55,5 @@ softfloat_normRoundPackToF32(bool sign,
     return softfloat_roundPackToF32(sign, exp, sig << shiftDist);
 }
 
+}  // namespace internals
 }  // namespace softfloat

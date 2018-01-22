@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 bool
 softfloat_tryPropagateNaNExtF80M(
@@ -72,4 +73,5 @@ propagateNaN:
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

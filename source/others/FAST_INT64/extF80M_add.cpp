@@ -44,7 +44,7 @@ extF80M_add(extFloat80_t const *const aPtr,
             extFloat80_t const *const bPtr,
             extFloat80_t *const zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA64 = aPtr->signExp;
     uint64_t const uiA0 = aPtr->signif;
     bool const signA = signExtF80UI64(uiA64);

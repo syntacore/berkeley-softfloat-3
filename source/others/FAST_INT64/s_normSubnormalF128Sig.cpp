@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 exp32_sig128
 softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
@@ -64,4 +65,5 @@ softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

@@ -44,7 +44,7 @@ f128M_mulAdd(const float128_t* aPtr,
              const float128_t* cPtr,
              float128_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     const uint64_t* aWPtr, *bWPtr, *cWPtr;
     uint64_t uiA64, uiA0;
     uint64_t uiB64, uiB0;

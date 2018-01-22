@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
+
 /**
 Converts the common NaN into a 16-bit floating-point NaN, 
 
@@ -51,4 +53,5 @@ softfloat_commonNaNToF16UI(commonNaN a)
 }
 
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

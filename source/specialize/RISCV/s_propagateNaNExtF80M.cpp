@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 namespace riscv {
 
 /**
@@ -65,4 +66,5 @@ softfloat_propagateNaNExtF80M(extFloat80M const* aSPtr,
 }
 
 }  // namespace riscv 
+}  // namespace internals
 }  // namespace softfloat

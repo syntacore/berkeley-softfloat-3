@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
-
+namespace internals {
 inline namespace Intel_8086 {
 
 /**
@@ -399,7 +399,7 @@ softfloat_propagateNaNF128M(uint32_t const* aWPtr,
 
 #endif  /* SOFTFLOAT_FAST_INT64 */
 }  // namespace Intel_8086
-
+}  // namespace internals
 }  // namespace softfloat
 
 #endif  /* SPECIALIZE_H_ */

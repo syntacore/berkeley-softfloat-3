@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 /**
 @param[in] sign
@@ -246,4 +247,5 @@ softfloat_roundPackMToExtF80M(bool sign,
     }
 }
 
+}  // namespace internals
 }  // namespace softfloat

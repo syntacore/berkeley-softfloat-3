@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
 ui32_to_extF80(uint32_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t  uiZ64 = 0;
 
     if (a) {

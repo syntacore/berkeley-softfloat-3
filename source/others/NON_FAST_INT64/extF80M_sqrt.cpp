@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t uiA64 = aPtr->signExp;
     uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(true, 0u));
     int32_t expA = expExtF80UI64(uiA64);

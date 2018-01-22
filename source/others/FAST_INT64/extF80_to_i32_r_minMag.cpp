@@ -43,7 +43,7 @@ int32_t
 extF80_to_i32_r_minMag(extFloat80_t a,
                        bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
 
 
     uint16_t const uiA64 = a.signExp;

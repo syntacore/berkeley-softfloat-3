@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
 extF80_sqrt(extFloat80_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t uiA64;
     uint64_t uiA0;
     bool signA;

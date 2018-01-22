@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/types.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_mul64To128M(uint64_t a,
@@ -60,4 +61,5 @@ softfloat_mul64To128M(uint64_t a,
     zPtr[indexWord(4, 2)] = static_cast<uint32_t>(z64);
 }
 
+}  // namespace internals
 }  // namespace softfloat

@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 extF80M_eq(const extFloat80_t* aPtr, const extFloat80_t* bPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     extFloat80M const* const aSPtr = aPtr;
     extFloat80M const* bSPtr = bPtr;
 

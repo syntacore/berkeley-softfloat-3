@@ -43,7 +43,7 @@ float16_t
 f16_div(float16_t const a,
         float16_t const b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
     bool const signA = signF16UI(uiA);
     int8_t expA = expF16UI(uiA);

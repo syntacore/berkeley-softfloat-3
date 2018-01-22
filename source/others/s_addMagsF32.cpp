@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 float32_t
 softfloat_addMagsF32(uint32_t uiA,
@@ -120,4 +121,5 @@ softfloat_addMagsF32(uint32_t uiA,
     }
 }
 
+}  // namespace internals
 }  // namespace softfloat

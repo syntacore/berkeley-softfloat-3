@@ -55,7 +55,7 @@ f128M_rem(const float128_t* aPtr,
           const float128_t* bPtr,
           float128_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t x[4];
     uint32_t* remPtr;
     int32_t expDiff;

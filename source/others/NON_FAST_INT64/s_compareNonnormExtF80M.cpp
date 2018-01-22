@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/types.h"
 
 namespace softfloat {
+namespace internals {
 
 /** @bug use extFloat80_t */
 int
@@ -131,4 +132,5 @@ resultFromSignB:
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

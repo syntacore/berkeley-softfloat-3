@@ -43,7 +43,7 @@ f128_mulAdd(float128_t a,
             float128_t b,
             float128_t c)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     ui128_f128 uA;
     uint64_t uiA64, uiA0;
     ui128_f128 uB;

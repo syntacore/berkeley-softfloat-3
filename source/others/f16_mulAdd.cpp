@@ -43,6 +43,6 @@ f16_mulAdd(float16_t a,
            float16_t b,
            float16_t c)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return softfloat_mulAddF16(f_as_u_16(a), f_as_u_16(b), f_as_u_16(c), softfloat_mulAdd_madd);
 }

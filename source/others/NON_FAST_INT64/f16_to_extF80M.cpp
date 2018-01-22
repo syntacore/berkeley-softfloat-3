@@ -43,7 +43,7 @@ void
 f16_to_extF80M(float16_t a,
                extFloat80_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t uiZ64;
     uint32_t uiZ32;
 

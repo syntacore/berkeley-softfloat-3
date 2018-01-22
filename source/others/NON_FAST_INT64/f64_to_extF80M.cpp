@@ -43,7 +43,7 @@ void
 f64_to_extF80M(float64_t a,
                extFloat80_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     extFloat80M* zSPtr = zPtr;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);

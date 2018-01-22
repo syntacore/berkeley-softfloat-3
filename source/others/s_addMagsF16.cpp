@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 float16_t
 softfloat_addMagsF16(uint16_t uiA,
@@ -163,4 +164,5 @@ softfloat_addMagsF16(uint16_t uiA,
     return softfloat_roundPackToF16(signZ, expZ, sigZ);
 }
 
+}  // namespace internals
 }  // namespace softfloat

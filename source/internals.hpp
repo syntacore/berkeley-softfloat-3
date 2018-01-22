@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 namespace softfloat {
+namespace internals {
 
 inline constexpr bool
 signF16UI(uint16_t a)
@@ -601,7 +602,10 @@ packToF128UI96(bool sign,
                unsigned exp,
                uint32_t sig96)
 {
-    return (static_cast<uint32_t>(sign) << 31) + (static_cast<uint32_t>(exp) << 16) + sig96;
+    return
+        sig96 +
+        (static_cast<uint32_t>((!!sign) << 31) + 
+        (static_cast<uint32_t>(exp) << 16));
 }
 
 bool
@@ -668,7 +672,7 @@ softfloat_mulAddF128M(uint32_t const*,
                       Mul_add_operations);
 
 #endif
-
+}  // namespace internals
 }  // namespace softfloat
 
 #endif  /* SOFTFLOAT_INTERNALS_H_ */

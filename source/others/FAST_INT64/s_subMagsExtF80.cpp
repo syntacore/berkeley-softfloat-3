@@ -40,148 +40,111 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 extFloat80_t
-softfloat_subMagsExtF80(uint16_t uiA64,
-                        uint64_t uiA0,
-                        uint16_t uiB64,
-                        uint64_t uiB0,
-                        bool signZ)
+softfloat_subMagsExtF80(uint16_t const uiA64,
+                        uint64_t const uiA0,
+                        uint16_t const uiB64,
+                        uint64_t const uiB0,
+                        bool const signZ)
 {
-    int32_t expA;
-    uint64_t sigA;
-    int32_t expB;
-    uint64_t sigB;
-    int32_t expDiff;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-    int32_t expZ;
-    uint64_t sigExtra;
-    uint128 sig128, uiZ;
-    extFloat80_t uZ;
-
-
-    expA = expExtF80UI64(uiA64);
-    sigA = uiA0;
-    expB = expExtF80UI64(uiB64);
-    sigB = uiB0;
-
-    expDiff = expA - expB;
+    int32_t const expA = expExtF80UI64(uiA64);
+    int32_t const expB = expExtF80UI64(uiB64);
+    int32_t expDiff = expA - expB;
 
     if (0 < expDiff) {
-        goto expABigger;
-    }
+        if (expA == 0x7FFF) {
+            if (0 != (uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                extFloat80_t uZ;
+                uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+                uZ.signif = uiZ.v0;
+                return uZ;
+            } else {
+                extFloat80_t uZ;
+                uZ.signExp = uiA64;
+                uZ.signif = uiA0;
+                return uZ;
+            }
+        } else {
+            if (0 == expB) {
+                --expDiff;
 
-    if (expDiff < 0) {
-        goto expBBigger;
-    }
+                if (0 == expDiff) {
+                    uint128 const sig128_6 = softfloat_sub128(uiA0, 0, uiB0, 0);
+                    return
+                        softfloat_normRoundPackToExtF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_roundingPrecision);
+                }
+            }
 
-    if (expA == 0x7FFF) {
-        if ((sigA | sigB) & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            goto propagateNaN;
+            uint128 const sig128_2 = softfloat_shiftRightJam128(uiB0, 0, static_cast<uint32_t>(expDiff));
+            uint128 const sig128_1 = softfloat_sub128(uiA0, 0, sig128_2.v64, sig128_2.v0);
+            return
+                softfloat_normRoundPackToExtF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_roundingPrecision);
         }
+    } else if (expDiff < 0) {
+        if (expB == 0x7FFF) {
+            if (0 != (uiB0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                extFloat80_t uZ;
+                uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+                uZ.signif = uiZ.v0;
+                return uZ;
+            } else {
+                extFloat80_t uZ;
+                uZ.signExp = packToExtF80UI64(signZ ^ 1, 0x7FFF);
+                uZ.signif = UINT64_C(0x8000000000000000);
+                return uZ;
+            }
+        } else {
+            if (0 == expA) {
+                ++expDiff;
 
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        uiZ64 = defaultNaNExtF80UI64;
-        uiZ0 = defaultNaNExtF80UI0;
-        goto uiZ;
-    }
+                if (0 == expDiff) {
+                    uint128 const sig128_7 = softfloat_sub128(uiB0, 0, uiA0, 0);
+                    return
+                        softfloat_normRoundPackToExtF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_roundingPrecision);
+                }
+            }
 
-    expZ = expA;
-
-    if (!expZ) {
-        expZ = 1;
-    }
-
-    sigExtra = 0;
-
-    if (sigB < sigA) {
-        goto aBigger;
-    }
-
-    if (sigA < sigB) {
-        goto bBigger;
-    }
-
-    uiZ64 =
-        packToExtF80UI64((softfloat_roundingMode == softfloat_round_min), 0);
-    uiZ0 = 0;
-    goto uiZ;
-
-expBBigger:
-
-    if (expB == 0x7FFF) {
-        if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            goto propagateNaN;
+            uint128 const sig128_4 = softfloat_shiftRightJam128(uiA0, 0, static_cast<uint32_t>(-expDiff));
+            uint128 const sig128_3 = softfloat_sub128(uiB0, 0, sig128_4.v64, sig128_4.v0);
+            return
+                softfloat_normRoundPackToExtF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_roundingPrecision);
         }
-
-        uiZ64 = packToExtF80UI64(signZ ^ 1, 0x7FFF);
-        uiZ0 = UINT64_C(0x8000000000000000);
-        goto uiZ;
-    }
-
-    if (!expA) {
-        ++expDiff;
-        sigExtra = 0;
-
-        if (!expDiff) {
-            goto newlyAlignedBBigger;
+    } else if (0x7FFF == expA) {
+        if (0 != ((uiA0 | uiB0) & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+            extFloat80_t uZ;
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
+            return uZ;
+        } else {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            extFloat80_t uZ;
+            uZ.signExp = defaultNaNExtF80UI64;
+            uZ.signif = defaultNaNExtF80UI0;
+            return uZ;
         }
-    }
+    } else {
+        int32_t const expZ = 0 == expA ? 1 : expA;
 
-    sig128 = softfloat_shiftRightJam128(sigA, 0, static_cast<uint32_t>(-expDiff));
-    sigA = sig128.v64;
-    sigExtra = sig128.v0;
-newlyAlignedBBigger:
-    expZ = expB;
-bBigger:
-    signZ = !signZ;
-    sig128 = softfloat_sub128(sigB, 0, sigA, sigExtra);
-    goto normRoundPack;
-
-expABigger:
-
-    if (expA == 0x7FFF) {
-        if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            goto propagateNaN;
-        }
-
-        uiZ64 = uiA64;
-        uiZ0 = uiA0;
-        goto uiZ;
-    }
-
-    if (!expB) {
-        --expDiff;
-        sigExtra = 0;
-
-        if (!expDiff) {
-            goto newlyAlignedABigger;
+        if (uiA0 > uiB0) {
+            uint128 const sig128 = softfloat_sub128(uiA0, 0, uiB0, 0);
+            return softfloat_normRoundPackToExtF80(signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
+        } else if (uiA0 < uiB0) {
+            uint128 const sig128 = softfloat_sub128(uiB0, 0, uiA0, 0);
+            return softfloat_normRoundPackToExtF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
+        } else {
+            /* uiA0 == uiB0 */
+            extFloat80_t uZ;
+            uZ.signExp = packToExtF80UI64(softfloat_round_min == softfloat_roundingMode, 0);
+            uZ.signif = 0;
+            return uZ;
         }
     }
-
-    sig128 = softfloat_shiftRightJam128(sigB, 0, static_cast<uint32_t>(expDiff));
-    sigB = sig128.v64;
-    sigExtra = sig128.v0;
-newlyAlignedABigger:
-    expZ = expA;
-aBigger:
-    sig128 = softfloat_sub128(sigA, 0, sigB, sigExtra);
-
-normRoundPack:
-    return
-        softfloat_normRoundPackToExtF80(
-            signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    uiZ64 = static_cast<uint16_t>(uiZ.v64);
-    uiZ0 = uiZ.v0;
-uiZ:
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
-    return uZ;
-
 }
 
+}  // namespace internals
 }  // namespace softfloat

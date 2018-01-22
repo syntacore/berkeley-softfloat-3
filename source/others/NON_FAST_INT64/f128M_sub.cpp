@@ -44,6 +44,6 @@ f128M_sub(const float128_t* aPtr,
           float128_t* zPtr)
 {
 
-    using namespace softfloat;
+    using namespace softfloat::internals;
     softfloat_addF128M((const uint32_t*)aPtr, (const uint32_t*)bPtr, (uint32_t*)zPtr, true);
 }

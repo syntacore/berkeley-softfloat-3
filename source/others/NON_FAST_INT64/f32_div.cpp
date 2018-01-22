@@ -43,7 +43,7 @@ float32_t
 f32_div(float32_t a,
         float32_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     bool const signA = signF32UI(uiA);
     int16_t expA = expF32UI(uiA);

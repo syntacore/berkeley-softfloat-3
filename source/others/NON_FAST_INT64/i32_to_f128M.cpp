@@ -45,7 +45,7 @@ void
 i32_to_f128M(int32_t a,
              float128_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t* const zWPtr = (uint32_t*)zPtr;
     zWPtr[indexWord(4, 0)] = 0;
     zWPtr[indexWord(4, 1)] = 0;

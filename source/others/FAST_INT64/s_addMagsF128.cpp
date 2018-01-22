@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 float128_t
 softfloat_addMagsF128(uint64_t uiA64,
@@ -179,4 +180,5 @@ uiZ:
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

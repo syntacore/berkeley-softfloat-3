@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
+
 float128_t
 softfloat_subMagsF128(uint64_t uiA64,
                       uint64_t uiA0,
@@ -167,4 +169,6 @@ propagateNaN:
 uiZ:
     return u_as_f_128(uiZ);
 }
+
+}  // namespace internals
 }  // namespace softfloat

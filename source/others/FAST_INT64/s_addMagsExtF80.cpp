@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 extFloat80_t
 softfloat_addMagsExtF80(uint16_t uiA64,
@@ -173,5 +174,6 @@ uiZ:
     return uZ;
 }
 
+}  // namespace internals
 }  // namespace softfloat
 

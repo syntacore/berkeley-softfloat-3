@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 uint32_t
 softfloat_roundPackToUI32(bool sign,
@@ -47,7 +48,7 @@ softfloat_roundPackToUI32(bool sign,
                           uint8_t roundingMode,
                           bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const roundIncrement =
         softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x800u :
         (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0xFFFu :
@@ -79,4 +80,5 @@ softfloat_roundPackToUI32(bool sign,
     return z;
 }
 
+}  // namespace internals
 }  // namespace softfloat

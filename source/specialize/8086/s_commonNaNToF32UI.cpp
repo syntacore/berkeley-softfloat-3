@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
+
 /**
 Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
@@ -49,5 +51,6 @@ softfloat_commonNaNToF32UI(commonNaN a)
     return static_cast<uint32_t>(a.sign) << 31 | 0x7FC00000 | a.v64 >> 41;
 }
 
+}  // namespace internals
 }  // namespace Intel_8086
 }  // namespace softfloat

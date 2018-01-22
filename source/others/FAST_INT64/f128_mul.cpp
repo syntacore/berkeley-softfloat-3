@@ -43,7 +43,7 @@ float128_t
 f128_mul(float128_t a,
          float128_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t magBits;
     exp32_sig128 normExpSig;
     int32_t expZ;

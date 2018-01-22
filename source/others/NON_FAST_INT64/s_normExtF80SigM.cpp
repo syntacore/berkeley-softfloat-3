@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 int
 softfloat_normExtF80SigM(uint64_t* sigPtr)
@@ -47,4 +48,5 @@ softfloat_normExtF80SigM(uint64_t* sigPtr)
     return -shiftDist;
 }
 
+}  // namespace internals
 }  // namespace softfloat

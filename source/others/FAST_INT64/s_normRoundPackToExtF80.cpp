@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 extFloat80_t
 softfloat_normRoundPackToExtF80(bool sign,
@@ -65,4 +66,6 @@ softfloat_normRoundPackToExtF80(bool sign,
             sign, exp, sig, sigExtra, roundingPrecision);
 
 }
+
+}  // namespace internals
 }  // namespace softfloat

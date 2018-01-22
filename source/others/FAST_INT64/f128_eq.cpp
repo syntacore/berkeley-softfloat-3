@@ -43,7 +43,7 @@ bool
 f128_eq(float128_t a,
         float128_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t const uiA64 = f_as_u_128(a).v64;
     uint64_t const uiA0  = f_as_u_128(a).v0;
     uint64_t const uiB64 = f_as_u_128(b).v64;

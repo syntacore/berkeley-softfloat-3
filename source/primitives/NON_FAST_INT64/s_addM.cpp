@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_addM(size_t size_words,
@@ -64,4 +65,5 @@ softfloat_addM(size_t size_words,
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

@@ -43,7 +43,7 @@ f128M_add(const float128_t* aPtr,
           const float128_t* bPtr,
           float128_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     const uint64_t* aWPtr, *bWPtr;
     uint64_t uiA64, uiA0;
     bool signA;

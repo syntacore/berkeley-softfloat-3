@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 ui64_to_f32(uint64_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     int8_t shiftDist = softfloat_countLeadingZeros64(a) - 40;
 
     if (0 <= shiftDist) {

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
 f16_to_extF80(float16_t const a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint128 uiZ;
     uint16_t uiZ64;
     uint64_t uiZ0;

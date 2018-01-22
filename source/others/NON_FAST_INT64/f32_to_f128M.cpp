@@ -43,7 +43,7 @@ void
 f32_to_f128M(float32_t a,
              float128_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t* zWPtr = (uint32_t*)zPtr;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);

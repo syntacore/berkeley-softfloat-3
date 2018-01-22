@@ -42,6 +42,6 @@ void
 i32_to_extF80M(int32_t a,
                extFloat80_t *zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     *zPtr = i32_to_extF80(a);
 }

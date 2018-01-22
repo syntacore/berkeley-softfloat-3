@@ -45,7 +45,7 @@ extF80M_to_i32(extFloat80_t const* const aPtr,
                uint8_t const roundingMode,
                bool const exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA64 = aPtr->signExp;
     bool const sign = signExtF80UI64(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);

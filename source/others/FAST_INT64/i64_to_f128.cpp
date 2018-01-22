@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 i64_to_f128(int64_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t uiZ64, uiZ0;
     ui128_f128 uZ;
 

@@ -43,7 +43,7 @@ extFloat80_t
 extF80_mul(extFloat80_t a,
            extFloat80_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t uiA0;
     bool signA;
     int32_t expA;

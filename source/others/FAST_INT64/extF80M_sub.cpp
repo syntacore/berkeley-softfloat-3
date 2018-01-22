@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 extF80M_sub(const extFloat80_t* aPtr,
@@ -69,4 +70,5 @@ extF80M_sub(const extFloat80_t* aPtr,
     }
 }
 
+}  // namespace internals
 }  // namespace softfloat

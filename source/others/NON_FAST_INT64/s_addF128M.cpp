@@ -38,20 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 #include "specialize.hpp"
+#include <utility>
 
 namespace softfloat {
+namespace internals {
+
 void
 softfloat_addF128M(uint32_t const* aWPtr,
                    uint32_t const* bWPtr,
-                   uint32_t* zWPtr,
+                   uint32_t* const zWPtr,
                    bool negateB)
 {
-    const uint32_t* tempPtr;
-    int32_t expDiff;
-    uint32_t extSigZ[5];
-    uint32_t wordSigZ;
-
-
     uint32_t uiA96 = aWPtr[indexWordHi(4)];
     int32_t expA = expF128UI96(uiA96);
     uint32_t uiB96 = bWPtr[indexWordHi(4)];
@@ -67,7 +64,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
         if (expB == 0x7FFF) {
             uiZ96 = uiB96 ^ packToF128UI96(negateB, 0, 0);
 
-            if ((expA == 0x7FFF) && (uiZ96 != uiA96)) {
+            if (0x7FFF == expA && uiZ96 != uiA96) {
                 softfloat_invalidF128M(zWPtr);
                 return;
             }
@@ -82,15 +79,13 @@ softfloat_addF128M(uint32_t const* aWPtr,
 
     bool signZ = signF128UI96(uiA96);
     bool const signB = signF128UI96(uiB96) ^ negateB;
-    negateB = (signZ != signB);
+    negateB = signZ != signB;
 
     if (static_cast<uint32_t>(uiA96 << 1) < static_cast<uint32_t>(uiB96 << 1)) {
         signZ = signB;
         expA = expB;
         expB = expF128UI96(uiA96);
-        tempPtr = aWPtr;
-        aWPtr = bWPtr;
-        bWPtr = tempPtr;
+        std::swap(aWPtr, bWPtr);
         uiA96 = uiB96;
         uiB96 = bWPtr[indexWordHi(4)];
     }
@@ -108,13 +103,13 @@ softfloat_addF128M(uint32_t const* aWPtr,
         }
     }
 
-    auto addCarryMRoutinePtr = negateB ? softfloat_addComplCarryM : softfloat_addCarryM;
-    expDiff = expA - expB;
+    auto const addCarryMRoutinePtr = negateB ? softfloat_addComplCarryM : softfloat_addCarryM;
+    int32_t const expDiff = expA - expB;
 
     bool carry;
-
+    uint32_t wordSigZ;
+    uint32_t extSigZ[5];
     if (expDiff) {
-
         extSigZ[indexWordHi(5)] = sig96B;
         extSigZ[indexWord(5, 3)] = bWPtr[indexWord(4, 2)];
         extSigZ[indexWord(5, 2)] = bWPtr[indexWord(4, 1)];
@@ -172,18 +167,18 @@ softfloat_addF128M(uint32_t const* aWPtr,
 
     extSigZ[indexWordHi(5)] = wordSigZ;
 
-    auto roundPackRoutinePtr = softfloat_normRoundPackMToF128M;
-
     if (0x00010000 <= wordSigZ) {
         if (0x00020000 <= wordSigZ) {
             ++expA;
             softfloat_shortShiftRightJam160M(extSigZ, 1, extSigZ);
         }
 
-        roundPackRoutinePtr = softfloat_roundPackMToF128M;
+        softfloat_roundPackMToF128M(signZ, expA, extSigZ, zWPtr);
+    } else {
+        softfloat_normRoundPackMToF128M(signZ, expA, extSigZ, zWPtr);
     }
 
-    (*roundPackRoutinePtr)(signZ, expA, extSigZ, zWPtr);
 }
 
+}  // namespace internals
 }  // namespace softfloat

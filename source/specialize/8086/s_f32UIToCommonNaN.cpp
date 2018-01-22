@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
 
 commonNaN
@@ -56,4 +57,5 @@ softfloat_f32UIToCommonNaN(uint32_t uiA)
 }
 
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

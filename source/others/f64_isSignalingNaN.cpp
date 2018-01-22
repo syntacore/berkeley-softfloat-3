@@ -42,6 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 f64_isSignalingNaN(float64_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return softfloat_isSigNaNF64UI(f_as_u_64(a));
 }

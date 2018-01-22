@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_mul128MTo256M(uint32_t const *aPtr,
@@ -89,4 +90,5 @@ softfloat_mul128MTo256M(uint32_t const *aPtr,
     } while (zPtr != lastZPtr);
 }
 
+}  // namespace internals
 }  // namespace softfloat

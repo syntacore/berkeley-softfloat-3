@@ -42,7 +42,7 @@ extFloat80_t
 extF80_sub(extFloat80_t const a,
            extFloat80_t const b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     bool const signA = signExtF80UI64(uiA64);

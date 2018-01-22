@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdint>
 
 namespace softfloat {
+namespace internals {
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -106,6 +107,7 @@ endian and little-endian platforms.
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
 #endif
 
+}  // namespace internals
 }  // namespace softfloat
 
 #endif  /* PRIMITIVETYPES_H_ */

@@ -44,7 +44,7 @@ f128M_to_ui64(const float128_t* aPtr,
               uint8_t roundingMode,
               bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     const uint32_t* aWPtr;
     uint32_t uiA96;
     bool sign;

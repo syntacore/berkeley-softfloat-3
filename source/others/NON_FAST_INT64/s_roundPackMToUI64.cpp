@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 uint64_t
 softfloat_roundPackMToUI64(bool sign,
@@ -95,4 +96,5 @@ invalid:
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

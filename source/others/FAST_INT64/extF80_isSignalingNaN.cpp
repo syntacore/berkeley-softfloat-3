@@ -42,6 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool
 extF80_isSignalingNaN(extFloat80_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
 }

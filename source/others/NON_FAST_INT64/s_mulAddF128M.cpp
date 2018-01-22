@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_mulAddF128M(uint32_t const* const aWPtr,
@@ -469,4 +470,5 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
     softfloat_roundPackMToF128M(signZ, expZ, extSigPtr, zWPtr);
 }
 
+}  // namespace internals
 }  // namespace softfloat

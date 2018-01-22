@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 int
 softfloat_shiftNormSigF128M(
@@ -86,4 +87,5 @@ softfloat_shiftNormSigF128M(
 
 }
 
+}  // namespace internals
 }  // namespace softfloat

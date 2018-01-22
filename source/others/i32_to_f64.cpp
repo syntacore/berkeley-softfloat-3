@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 i32_to_f64(int32_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     if (!a) {
         return u_as_f_64(0);
     }

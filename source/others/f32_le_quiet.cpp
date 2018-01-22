@@ -43,7 +43,7 @@ bool
 f32_le_quiet(float32_t a,
              float32_t b)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
 

@@ -45,7 +45,7 @@ f128M_roundToInt(float128_t const* aPtr,
                  bool exact,
                  float128_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t sigExtra;
     bool sign;
     unsigned int index, lastIndex;

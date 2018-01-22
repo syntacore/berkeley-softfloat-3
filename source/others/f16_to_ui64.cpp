@@ -44,7 +44,7 @@ f16_to_ui64(float16_t a,
             uint8_t roundingMode,
             bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t const exp = expF16UI(uiA);

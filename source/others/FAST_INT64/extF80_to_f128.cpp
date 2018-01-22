@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 extF80_to_f128(extFloat80_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint128 uiZ;
     bool sign;
     uint128 frac128;

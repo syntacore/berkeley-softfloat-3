@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 uint64_t
 f64_to_ui64_r_minMag(float64_t a, bool exact)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     int16_t const exp = expF64UI(uiA);
     uint64_t sig = fracF64UI(uiA);

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 /** @bug use extFloat80_t */
 void
@@ -49,4 +50,5 @@ softfloat_invalidExtF80M(extFloat80M* zSPtr)
     zSPtr->signif = defaultNaNExtF80UI0;
 }
 
+}  // namespace internals
 }  // namespace softfloat

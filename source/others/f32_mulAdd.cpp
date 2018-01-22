@@ -43,7 +43,7 @@ f32_mulAdd(float32_t a,
            float32_t b,
            float32_t c)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     return softfloat_mulAddF32(f_as_u_32(a), f_as_u_32(b), f_as_u_32(c), softfloat_mulAdd_madd);
 }
 

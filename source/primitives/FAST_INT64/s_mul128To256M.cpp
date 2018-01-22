@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_mul128To256M(uint64_t a64,
@@ -64,4 +65,6 @@ softfloat_mul128To256M(uint64_t a64,
     zPtr[indexWord(4, 2)] = z128;
     zPtr[indexWord(4, 3)] = z192 + (z128 < p64.v64);
 }
+
+}  // namespace internals
 }  // namespace softfloat

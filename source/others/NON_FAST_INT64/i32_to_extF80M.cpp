@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 
 namespace softfloat {
+namespace internals {
 
 void
 i32_to_extF80M(int32_t a,
                extFloat80_t* zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     extFloat80_t* zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
@@ -61,4 +62,5 @@ i32_to_extF80M(int32_t a,
     zSPtr->signif = sigZ;
 }
 
+}  // namespace internals
 }  // namespace softfloat

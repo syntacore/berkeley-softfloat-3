@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float32_t
 i32_to_f32(int32_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     bool const sign = a < 0;
     return
         0 == (a & INT32_MAX) ? u_as_f_32(sign ? packToF32UI(true, 0x9E, 0) : 0) :

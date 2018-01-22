@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extFloat80_t
 f128_to_extF80(float128_t const a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
 
     ui128_f128 uA;
     uA.f = a;

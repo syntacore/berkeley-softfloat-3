@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float128_t
 ui64_to_f128(uint64_t a)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
 
     if (!a) {
         uint128 uZ{0u, 0u};

@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 namespace softfloat {
+namespace internals {
+
 void
 softfloat_sub256M(uint64_t const* const aPtr,
                   uint64_t const* const bPtr,
@@ -57,4 +59,6 @@ softfloat_sub256M(uint64_t const* const aPtr,
         index += wordIncr;
     }
 }
+
+}  // namespace internals
 }  // namespace softfloat

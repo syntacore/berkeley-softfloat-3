@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 namespace Intel_8086 {
 
 uint64_t
@@ -54,5 +55,7 @@ softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
     }
     return (isNaNF64UI(uiA) ? uiA : uiB) | UINT64_C(0x0008000000000000);
 }
+
 }  // namespace Intel_8086
+}  // namespace internals
 }  // namespace softfloat

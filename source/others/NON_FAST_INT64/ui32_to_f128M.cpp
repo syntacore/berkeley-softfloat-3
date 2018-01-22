@@ -41,7 +41,7 @@ void
 ui32_to_f128M(uint32_t a,
               float128_t *zPtr)
 {
-    using namespace softfloat;
+    using namespace softfloat::internals;
     uint32_t *const zWPtr = (uint32_t *)zPtr;
     uint32_t uiZ96 = 0;
     uint32_t uiZ64 = 0;

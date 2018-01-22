@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 namespace softfloat {
+namespace internals {
 
 void
 softfloat_roundPackMToF128M(bool sign,
@@ -158,4 +159,5 @@ softfloat_roundPackMToF128M(bool sign,
     }
 }
 
+}  // namespace internals
 }  // namespace softfloat
