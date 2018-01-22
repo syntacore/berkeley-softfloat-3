@@ -228,12 +228,13 @@ floating-point signaling NaN.
 Note:  This macro evaluates its arguments more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNExtF80UI(uint16_t uiA64, uint64_t uiA0)
+softfloat_isSigNaNExtF80UI(uint16_t uiA64,
+                           uint64_t uiA0)
 {
     return
-        0x7FFFu == (uiA64 & 0x7FFFu) &&
-        0 == (uiA0 & UINT64_C(0x4000000000000000)) &&
-        0 != (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
+        UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & uiA64) &&
+        0 == (UINT64_C(0x4000000000000000) & uiA0) &&
+        0 != (UINT64_C(0x3FFFFFFFFFFFFFFF) & uiA0);
 }
 
 /**
@@ -471,10 +472,18 @@ at the location pointed to by `zSPtr'.  If either original floating-point
 value is a signaling NaN, the invalid exception is raised.
 */
 /** @bug use extFloat80_t */
-void
-softfloat_propagateNaNExtF80M(extFloat80M const *aSPtr,
-                              extFloat80M const *bSPtr,
-                              extFloat80M *zSPtr);
+inline void
+softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
+                              extFloat80M const* const bSPtr,
+                              extFloat80M* const zSPtr)
+{
+    if (softfloat_isSigNaNExtF80UI(aSPtr->signExp, aSPtr->signif) || (bSPtr && softfloat_isSigNaNExtF80UI(bSPtr->signExp, bSPtr->signif))) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+    }
+
+    zSPtr->signExp = defaultNaNExtF80UI64;
+    zSPtr->signif = defaultNaNExtF80UI0;
+}
 
 /**
 Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
