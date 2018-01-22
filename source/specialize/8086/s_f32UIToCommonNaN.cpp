@@ -49,6 +49,7 @@ softfloat_f32UIToCommonNaN(uint32_t uiA)
     if (softfloat_isSigNaNF32UI(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
+
     commonNaN z;
     z.sign = 0 != (uiA >> 31);
     z.v64 = static_cast<uint64_t>(uiA) << 41;
