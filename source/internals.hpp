@@ -283,9 +283,6 @@ union ui128_f128
     uint128 ui;
     float128_t f;
 };
-#endif
-
-#ifdef SOFTFLOAT_FAST_INT64
 
 inline uint128 const&
 f_as_u_128(float128_t const& v)
