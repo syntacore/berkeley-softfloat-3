@@ -41,36 +41,19 @@ namespace softfloat {
 namespace internals {
 
 bool
-softfloat_tryPropagateNaNExtF80M(
-    /** @bug use extFloat80_t */
-    extFloat80M const* aSPtr,
-    /** @bug use extFloat80_t */
-    extFloat80M const* bSPtr,
-    /** @bug use extFloat80_t */
-    extFloat80M* zSPtr)
+softfloat_tryPropagateNaNExtF80M(extFloat80M const* const aSPtr,
+                                 extFloat80M const* const bSPtr,
+                                 extFloat80M* const zSPtr)
 {
-    uint16_t ui64;
-    uint64_t ui0;
+    bool const result =
+        isNaNExtF80UI(aSPtr->signExp, aSPtr->signif) ||
+        isNaNExtF80UI(bSPtr->signExp, bSPtr->signif);
 
-    ui64 = aSPtr->signExp;
-    ui0 = aSPtr->signif;
-
-    if (isNaNExtF80UI(ui64, ui0)) {
-        goto propagateNaN;
+    if (result) {
+        softfloat_propagateNaNExtF80M(aSPtr, bSPtr, zSPtr);
     }
 
-    ui64 = bSPtr->signExp;
-    ui0 = bSPtr->signif;
-
-    if (isNaNExtF80UI(ui64, ui0)) {
-        goto propagateNaN;
-    }
-
-    return false;
-propagateNaN:
-    softfloat_propagateNaNExtF80M(aSPtr, bSPtr, zSPtr);
-    return true;
-
+    return result;
 }
 
 }  // namespace internals
