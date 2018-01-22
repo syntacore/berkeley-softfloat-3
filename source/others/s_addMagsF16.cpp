@@ -43,72 +43,61 @@ namespace softfloat {
 namespace internals {
 
 float16_t
-softfloat_addMagsF16(uint16_t uiA,
-                     uint16_t uiB)
+softfloat_addMagsF16(uint16_t const uiA,
+                     uint16_t const uiB)
 {
     int8_t const expA = expF16UI(uiA);
     uint16_t const sigA = fracF16UI(uiA);
     int8_t const expB = expF16UI(uiB);
     uint16_t const sigB = fracF16UI(uiB);
     int8_t const expDiff = expA - expB;
-    uint16_t sigZ;
-    int8_t expZ;
-    bool signZ;
 
-    if (!expDiff) {
-        if (!expA) {
+    if (0 == expDiff) {
+        if (0 == expA) {
             return u_as_f_16(static_cast<uint16_t>(uiA + sigB));
-        }
-
-        if (expA == 0x1F) {
+        } else if (0x1F == expA) {
             return u_as_f_16(sigA | sigB ? softfloat_propagateNaNF16UI(uiA, uiB) : uiA);
+        } else {
+            bool const signZ = signF16UI(uiA);
+            int8_t const expZ = expA;
+            uint16_t const sigZ = 0x0800u + sigA + sigB;
+
+            if (0 == (sigZ & 1) && expZ < 0x1E) {
+                return u_as_f_16(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
+            } else {
+                return softfloat_roundPackToF16(signZ, expZ, static_cast<uint16_t>(sigZ << 3));
+            }
         }
-
-        signZ = signF16UI(uiA);
-        expZ = expA;
-        sigZ = 0x0800u + sigA + sigB;
-
-        if (!(sigZ & 1) && (expZ < 0x1E)) {
-            return u_as_f_16(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
-        }
-
-        sigZ <<= 3;
     } else {
-        signZ = signF16UI(uiA);
+        bool const signZ = signF16UI(uiA);
         int8_t shiftDist;
         uint16_t sigY;
         uint16_t sigX;
+        int8_t expZ;
 
         if (expDiff < 0) {
             if (expB == 0x1F) {
                 return u_as_f_16(sigB ? softfloat_propagateNaNF16UI(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
-            }
-
-            if (expDiff <= -13) {
+            } else if (expDiff <= -13) {
                 uint16_t uiZ = packToF16UI(signZ, expB, sigB);
 
-                if (!(expA | sigA)) {
-                    return u_as_f_16(uiZ);
-                }
+                if (0 != (expA | sigA)) {
+                    softfloat_raiseFlags(softfloat_flag_inexact);
 
-                softfloat_round_mode const roundingMode = softfloat_roundingMode;
-
-                if (softfloat_round_near_even != roundingMode) {
-                    if (roundingMode == (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max)) {
+                    if (softfloat_round_near_even != softfloat_roundingMode && (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
                         ++uiZ;
 
                         if (static_cast<uint16_t>(uiZ << 1) == UINT16_C(0xF800)) {
-                            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
+                            softfloat_raiseFlags(softfloat_flag_overflow);
                         }
                     }
                 }
 
-                softfloat_raiseFlags(softfloat_flag_inexact);
                 return u_as_f_16(uiZ);
             }
 
             expZ = expB;
-            sigX = uint16_t(sigB | 0x0400u);
+            sigX = static_cast<uint16_t>(sigB | 0x0400u);
             sigY = sigA + (expA ? 0x0400u : sigA);
             shiftDist = 19 + expDiff;
         } else {
@@ -116,52 +105,47 @@ softfloat_addMagsF16(uint16_t uiA,
 
             if (expA == 0x1F) {
                 return u_as_f_16(sigA ? softfloat_propagateNaNF16UI(uiA, uiB) : uiZ);
-            }
+            } else if (13 <= expDiff) {
+                if (0 != (expB | sigB)) {
+                    softfloat_raiseFlags(softfloat_flag_inexact);
 
-            if (13 <= expDiff) {
-                if (!(expB | sigB)) {
-                    return u_as_f_16(uiZ);
-                }
-
-                softfloat_round_mode const roundingMode = softfloat_roundingMode;
-
-                if (roundingMode != softfloat_round_near_even) {
-                    if (roundingMode == (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max)) {
+                    if (softfloat_round_near_even != softfloat_roundingMode && (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
                         ++uiZ;
 
-                        if (static_cast<uint16_t>(uiZ << 1) == UINT16_C(0xF800)) {
-                            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
+                        if (UINT16_C(0xF800) == static_cast<uint16_t>(uiZ << 1)) {
+                            softfloat_raiseFlags(softfloat_flag_overflow);
                         }
                     }
                 }
 
-                softfloat_raiseFlags(softfloat_flag_inexact);
                 return u_as_f_16(uiZ);
-            } else {
-                expZ = expA;
-                sigX = sigA | 0x0400u;
-                sigY = sigB + (expB ? 0x0400u : sigB);
-                shiftDist = 19 - expDiff;
             }
+
+            expZ = expA;
+            sigX = sigA | 0x0400u;
+            sigY = sigB + (expB ? 0x0400u : sigB);
+            shiftDist = 19 - expDiff;
         }
 
-        uint32_t sig32Z = (static_cast<uint32_t>(sigX) << 19) + (static_cast<uint32_t>(sigY) << shiftDist);
+        uint32_t sig32Z =
+            (static_cast<uint32_t>(sigX) << 19) +
+            (static_cast<uint32_t>(sigY) << shiftDist);
 
         if (sig32Z < 0x40000000) {
             --expZ;
             sig32Z <<= 1;
         }
 
-        sigZ = sig32Z >> 16;
+        uint16_t const sigZ = sig32Z >> 16;
 
-        if (sig32Z & 0xFFFF) {
-            sigZ |= 1;
-        } else if (!(sigZ & 0xF) && (expZ < 0x1E)) {
+        if (0 != (sig32Z & 0xFFFF)) {
+            return softfloat_roundPackToF16(signZ, expZ, sigZ | 1u);
+        } else if (0 == (sigZ & 0xF) && expZ < 0x1E) {
             return u_as_f_16(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 4)));
+        } else {
+            return softfloat_roundPackToF16(signZ, expZ, sigZ);
         }
     }
-
-    return softfloat_roundPackToF16(signZ, expZ, sigZ);
 }
 
 }  // namespace internals
