@@ -114,8 +114,11 @@ softfloat_f16UIToCommonNaN(uint16_t uiA);
 Converts the common NaN pointed to by `aPtr' into a 16-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
-uint16_t
-softfloat_commonNaNToF16UI(commonNaN a);
+inline constexpr uint16_t
+softfloat_commonNaNToF16UI(commonNaN a)
+{
+    return static_cast<uint16_t>(a.sign) << 15 | 0x7E00 | a.v64 >> 54;
+}
 
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
@@ -144,8 +147,11 @@ softfloat_f32UIToCommonNaN(uint32_t uiA);
 Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
-uint32_t
-softfloat_commonNaNToF32UI(commonNaN a);
+inline constexpr uint32_t
+softfloat_commonNaNToF32UI(commonNaN a)
+{
+    return static_cast<uint32_t>(a.sign) << 31 | 0x7FC00000 | a.v64 >> 41;
+}
 
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
@@ -188,8 +194,13 @@ softfloat_f64UIToCommonNaN(uint64_t uiA);
 Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
-uint64_t
-softfloat_commonNaNToF64UI(commonNaN a);
+inline constexpr uint64_t
+softfloat_commonNaNToF64UI(commonNaN a)
+{
+    return
+        static_cast<uint64_t>(a.sign) << 63 | UINT64_C(0x7FF8000000000000) |
+        a.v64 >> 12;
+}
 
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
