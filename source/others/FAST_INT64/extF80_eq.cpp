@@ -40,18 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.hpp"
 
 bool
-extF80_eq(extFloat80_t a,
-          extFloat80_t b)
+extF80_eq(extFloat80_t const a,
+          extFloat80_t const b)
 {
     using namespace softfloat::internals;
 
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 = a.signif;
-    uint16_t const uiB64 = b.signExp;
-    uint64_t const uiB0 = b.signif;
-
-    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
-        if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
+    if (isNaNExtF80UI(a.signExp, a.signif) || isNaNExtF80UI(b.signExp, b.signif)) {
+        if (softfloat_isSigNaNExtF80UI(a.signExp, a.signif) || softfloat_isSigNaNExtF80UI(b.signExp, b.signif)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 
@@ -59,6 +54,6 @@ extF80_eq(extFloat80_t a,
     }
 
     return
-        uiA0 == uiB0 && (uiA64 == uiB64 || (!uiA0 && !((uiA64 | uiB64) & 0x7FFF)));
+        a.signif == b.signif && (a.signExp == b.signExp || (!a.signif && !((a.signExp | b.signExp) & 0x7FFF)));
 }
 
