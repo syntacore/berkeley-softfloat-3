@@ -259,7 +259,7 @@ signExtF80UI64(uint16_t a64)
 inline constexpr uint16_t
 expExtF80UI64(uint16_t a64)
 {
-    return UINT16_C(0x7FFF) & a64;
+    return static_cast<uint16_t>(0x7FFF & a64);
 }
 
 inline constexpr uint16_t
@@ -431,11 +431,6 @@ softfloat_addMagsF32(uint32_t,
 float32_t
 softfloat_subMagsF32(uint32_t,
                      uint32_t);
-float32_t
-softfloat_mulAddF32(uint32_t,
-                    uint32_t,
-                    uint32_t,
-                    Mul_add_operations);
 
 struct exp16_sig64
 {

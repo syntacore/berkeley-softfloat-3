@@ -81,7 +81,6 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF64.cpp
