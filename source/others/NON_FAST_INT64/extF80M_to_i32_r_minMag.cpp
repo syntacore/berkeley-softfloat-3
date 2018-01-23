@@ -40,9 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-namespace softfloat {
-namespace internals {
-
 namespace {
     static int32_t
         invalid(bool sign, int32_t exp, uint64_t sig)
@@ -59,7 +56,8 @@ int32_t
 extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
                         bool exact)
 {
-    uint32_t absZ;
+    using namespace softfloat::internals;
+
     uint16_t const uiA64 = aPtr->signExp;
     int32_t const exp = expExtF80UI64(uiA64);
     uint64_t const sig = aPtr->signif;
@@ -68,7 +66,7 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    int32_t shiftDist = 0x403E - exp;
+    int32_t const shiftDist = 0x403E - exp;
 
     if (64 <= shiftDist) {
         if (exact) {
@@ -80,14 +78,14 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
 
     bool const sign = signExtF80UI64(uiA64);
     bool raiseInexact = false;
-    uint64_t shiftedSig;
 
+    uint32_t absZ;
     if (shiftDist < 0) {
         if (sig >> 32 || (shiftDist <= -31)) {
             return invalid(sign, exp, sig);
         }
 
-        shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(sig)) << -shiftDist;
+        uint64_t const shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(sig)) << -shiftDist;
 
         if (shiftedSig >> 32) {
             return invalid(sign, exp, sig);
@@ -95,19 +93,16 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
 
         absZ = static_cast<uint32_t>(shiftedSig);
     } else {
-        shiftedSig = sig;
+        assert(0 <= shiftDist);
+        uint64_t const shiftedSig = sig >> shiftDist;
 
-        if (shiftDist) {
-            shiftedSig >>= shiftDist;
-        }
-
-        if (shiftedSig >> 32) {
+        if (0 != (shiftedSig >> 32)) {
             return invalid(sign, exp, sig);
         }
 
         absZ = static_cast<uint32_t>(shiftedSig);
 
-        if (exact && shiftDist) {
+        if (exact && 0 != shiftDist) {
             raiseInexact = static_cast<uint64_t>(absZ) << shiftDist != sig;
         }
     }
@@ -134,6 +129,3 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
 
     return static_cast<int32_t>(absZ);
 }
-
-}  // namespace internals
-}  // namespace softfloat
