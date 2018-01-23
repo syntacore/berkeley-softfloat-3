@@ -334,16 +334,11 @@ Converts the common NaN pointed to by `aPtr' into an 80-bit extended
 floating-point NaN, and returns the bit pattern of this value as an unsigned
 integer.
 */
-#if 1
 inline constexpr uint128
 softfloat_commonNaNToExtF80UI(commonNaN)
 {
     return uint128{defaultNaNExtF80UI0, defaultNaNExtF80UI64};
 }
-#else
-uint128
-softfloat_commonNaNToExtF80UI(struct commonNaN a);
-#endif
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
@@ -372,17 +367,12 @@ softfloat_propagateNaNExtF80UI(uint16_t uiA64,
 Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
-#if 1
 inline uint128
 softfloat_commonNaNToF128UI(struct commonNaN)
 {
     static uint128 uiZ{defaultNaNF128UI0, defaultNaNF128UI64};
     return uiZ;
 }
-#else
-uint128
-softfloat_commonNaNToF128UI(struct commonNaN);
-#endif
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
