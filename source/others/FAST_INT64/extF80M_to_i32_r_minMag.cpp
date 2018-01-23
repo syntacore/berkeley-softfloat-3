@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "specialize.hpp"
 
-int32_t extF80M_to_i32_r_minMag(const extFloat80_t* aPtr, bool exact)
+int32_t
+extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
+                        bool const exact)
 {
     return extF80_to_i32_r_minMag(*aPtr, exact);
 }
