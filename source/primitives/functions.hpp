@@ -48,7 +48,6 @@ the range 1 to 63.  If any nonzero bits are shifted off, they are "jammed"
 into the least-significant bit of the shifted value by setting the least-
 significant bit to 1.  This shifted-and-jammed value is returned.
 */
-#if 1
 inline constexpr uint64_t
 softfloat_shortShiftRightJam64(uint64_t a,
                                uint8_t dist)
@@ -57,15 +56,6 @@ softfloat_shortShiftRightJam64(uint64_t a,
         (a >> (dist >= 63 ? 63 : dist)) |
         ((((a << (63 - (dist >= 63 ? 63 : dist))) >> 1) + (~UINT64_C(0) >> 1)) >> 63);
 }
-#else
-inline uint64_t
-softfloat_shortShiftRightJam64(uint64_t a, uint8_t dist)
-{
-    return
-        a >> dist |
-        ((a & ((static_cast<uint64_t>(1) << dist) - 1)) != 0);
-}
-#endif
 
 /**
 Shifts `a' right by the number of bits given in `dist', which must not
@@ -76,7 +66,6 @@ bit to 1.  This shifted-and-jammed value is returned.
 greater than 32, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
-#if 1
 inline uint32_t
 softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
 {
@@ -85,14 +74,6 @@ softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
     auto const jam_bits = (a & mask) + mask;
     return (a | jam_bits) >> dist1;
 }
-#else
-inline uint32_t
-softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
-{
-    return
-        dist >= 31 ? a != 0 : a >> dist | (static_cast<uint32_t>(a << (-static_cast<int16_t>(dist) & 31)) != 0);
-}
-#endif
 
 /**
 Shifts `a' right by the number of bits given in `dist', which must not
@@ -103,7 +84,6 @@ bit to 1.  This shifted-and-jammed value is returned.
 greater than 64, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
-#if 1
 inline uint64_t
 softfloat_shiftRightJam64(uint64_t a,
                           uint32_t dist)
@@ -113,14 +93,6 @@ softfloat_shiftRightJam64(uint64_t a,
     auto const jam_bits = (a & mask) + mask;
     return (a | jam_bits) >> dist1;
 }
-#else
-inline uint64_t
-softfloat_shiftRightJam64(uint64_t a, uint32_t dist)
-{
-    return
-        dist >= 63 ? a != 0 : a >> dist | (static_cast<uint64_t>(a << (-static_cast<int32_t>(dist) & 63)) != 0);
-}
-#endif
 
 /**
 A constant table that translates an 8-bit unsigned integer (the array index)
