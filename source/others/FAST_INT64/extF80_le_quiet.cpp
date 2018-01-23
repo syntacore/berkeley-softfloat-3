@@ -44,23 +44,18 @@ extF80_le_quiet(extFloat80_t a,
                 extFloat80_t b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0  = a.signif;
-    uint16_t const uiB64 = b.signExp;
-    uint64_t const uiB0  = b.signif;
 
-    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
-        if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
+    if (isNaNExtF80UI(a.signExp, a.signif) || isNaNExtF80UI(b.signExp, b.signif)) {
+        if (softfloat_isSigNaNExtF80UI(a.signExp, a.signif) || softfloat_isSigNaNExtF80UI(b.signExp, b.signif)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 
         return false;
     }
 
-    bool const signA = signExtF80UI64(uiA64);
-    bool const signB = signExtF80UI64(uiB64);
+    bool const signA = signExtF80UI64(a.signExp);
+    bool const signB = signExtF80UI64(b.signExp);
     return
-        signA != signB ? signA || !(((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) : 
-        (uiA64 == uiB64 && uiA0 == uiB0) || (signA ^ softfloat_lt128(uiA64, uiA0, uiB64, uiB0));
+        signA != signB ? signA || !(((a.signExp | b.signExp) & 0x7FFF) | a.signif | b.signif) : 
+        (a.signExp == b.signExp && a.signif == b.signif) || (signA != softfloat_lt128(a.signExp, a.signif, b.signExp, b.signif));
 }
-
