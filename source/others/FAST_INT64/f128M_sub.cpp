@@ -38,34 +38,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-namespace softfloat {
-namespace internals {
-
 void
-f128M_sub(const float128_t* aPtr,
-          const float128_t* bPtr,
-          float128_t* zPtr)
+f128M_sub(float128_t const* const aPtr,
+          float128_t const* const bPtr,
+          float128_t* const  zPtr)
 {
-    const uint64_t* aWPtr, *bWPtr;
-    uint64_t uiA64, uiA0;
-    bool signA;
-    uint64_t uiB64, uiB0;
-    bool signB;
-    aWPtr = (const uint64_t*)aPtr;
-    bWPtr = (const uint64_t*)bPtr;
-    uiA64 = aWPtr[indexWord(2, 1)];
-    uiA0 = aWPtr[indexWord(2, 0)];
-    signA = signF128UI64(uiA64);
-    uiB64 = bWPtr[indexWord(2, 1)];
-    uiB0 = bWPtr[indexWord(2, 0)];
-    signB = signF128UI64(uiB64);
+    using namespace softfloat::internals;
+    auto const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);
+    auto const bWPtr = reinterpret_cast<uint64_t const*>(bPtr);
+    uint64_t const uiA64 = aWPtr[indexWord(2, 1)];
+    uint64_t const uiA0 = aWPtr[indexWord(2, 0)];
+    uint64_t const uiB64 = bWPtr[indexWord(2, 1)];
+    uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
+    bool const signA = signF128UI64(uiA64);
+    bool const signB = signF128UI64(uiB64);
 
-    if (signA == signB) {
-        *zPtr = softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
-    } else {
-        *zPtr = softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
-    }
+    *zPtr = 
+        signA == signB ? softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA):
+        softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
 }
-
-}  // namespace internals
-}  // namespace softfloat
