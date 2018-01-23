@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
+#include "target.hpp"
 
 float16_t
 f16_rem(float16_t const a,

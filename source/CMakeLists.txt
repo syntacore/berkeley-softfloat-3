@@ -8,4 +8,4 @@ set(INC_OTHERS
 
 add_subdirectory(primitives)
 add_subdirectory(others)
-add_subdirectory(specialize)
+add_subdirectory(targets)

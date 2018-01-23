@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
+#include "target.hpp"
 
 uint64_t
 f32_to_ui64(float32_t a,

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
+#include "target.hpp"
 
 void
 f128M_div(const float128_t* aPtr, const float128_t* bPtr, float128_t* zPtr)

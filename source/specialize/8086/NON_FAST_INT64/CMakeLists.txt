@@ -1,9 +1,0 @@
-cmake_minimum_required(VERSION 3.0)
-
-set(SRC_SPECIALIZE-8086_NON_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_commonNaNToExtF80M.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_commonNaNToF128M.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_extF80MToCommonNaN.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_f128MToCommonNaN.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80M.cpp
-PARENT_SCOPE)

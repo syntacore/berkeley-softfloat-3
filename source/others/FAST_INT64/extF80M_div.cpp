@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
+#include "target.hpp"
 
 void
 extF80M_div(const extFloat80_t* aPtr, const extFloat80_t* bPtr, extFloat80_t* zPtr)

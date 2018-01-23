@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-#include "specialize.hpp"
+#include "target.hpp"
 #include "softfloat/functions.h"
 
 namespace softfloat {

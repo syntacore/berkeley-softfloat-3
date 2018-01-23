@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/functions.h"
 
 #include "internals.hpp"
-#include "specialize.hpp"
+#include "target.hpp"
 
 int32_t
 f128M_to_i32(const float128_t* aPtr,

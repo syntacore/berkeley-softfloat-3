@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/functions.h"
 #include "internals.hpp"
-#include "specialize.hpp"
+#include "target.hpp"
 
 bool
 extF80M_le_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)

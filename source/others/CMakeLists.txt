@@ -4,6 +4,8 @@ add_subdirectory(FAST_INT64)
 add_subdirectory(NON_FAST_INT64)
 
 set(SRC_OTHERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_isSignalingNaN.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/f128M_isSignalingNaN.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f16_add.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f16_div.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f16_eq.cpp
@@ -95,6 +97,7 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF64.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_raiseFlags.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_f16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_f32.cpp
