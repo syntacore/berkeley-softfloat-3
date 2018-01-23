@@ -39,36 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-namespace softfloat {
-namespace internals {
-
 void
-extF80M_sub(const extFloat80_t* aPtr,
-            const extFloat80_t* bPtr,
-            extFloat80_t* zPtr)
+extF80M_sub(extFloat80_t const *const aPtr,
+            extFloat80_t const *const bPtr,
+            extFloat80_t* const zPtr)
 {
-    extFloat80M const* aSPtr;
-    extFloat80M const* bSPtr;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    bool signA;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    bool signB;
-    aSPtr = aPtr;
-    bSPtr = bPtr;
-    uiA64 = aSPtr->signExp;
-    uiA0 = aSPtr->signif;
-    signA = signExtF80UI64(uiA64);
-    uiB64 = bSPtr->signExp;
-    uiB0 = bSPtr->signif;
-    signB = signExtF80UI64(uiB64);
-    if (signA == signB) {
-        *zPtr = softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
-    } else {
-        *zPtr = softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
-    }
+    using namespace softfloat::internals;
+    bool const signA = signExtF80UI64(aPtr->signExp);
+    bool const signB = signExtF80UI64(bPtr->signExp);
+    *zPtr = 
+        signA == signB ? softfloat_subMagsExtF80(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA):
+        softfloat_addMagsExtF80(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA);
 }
-
-}  // namespace internals
-}  // namespace softfloat
