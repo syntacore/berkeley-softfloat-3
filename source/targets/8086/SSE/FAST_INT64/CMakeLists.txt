@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+set(TARGET_NAME 8086-SSE)
+
 set(SRC_TARGET_FAST_INT64
     ${SRC_TARGET-8086_FAST_INT64}
     ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128UI.cpp
@@ -46,7 +48,7 @@ FILES
     ${SRC_TARGET_FAST_INT64}
 )
 
-add_library(softfloat-8086-SSE-fi64 EXCLUDE_FROM_ALL
+add_library(softfloat-${TARGET_NAME}-fi64 EXCLUDE_FROM_ALL
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
     ${SRC_OTHERS}
@@ -58,9 +60,9 @@ add_library(softfloat-8086-SSE-fi64 EXCLUDE_FROM_ALL
     ${INC_TARGET}
     ${SRC_TARGET_FAST_INT64}
 )
-set_target_properties(softfloat-8086-SSE-fi64  PROPERTIES FOLDER "softfloat/8086-SSE")
+set_target_properties(softfloat-${TARGET_NAME}-fi64  PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
 
-target_compile_definitions(softfloat-8086-SSE-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
+target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
 if(${SOFTFLOAT_FAST_DIV64TO32})
-    target_compile_definitions(softfloat-8086-SSE-fi64 PRIVATE SOFTFLOAT_FAST_DIV64TO32)
+    target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_DIV64TO32)
 endif(${SOFTFLOAT_FAST_DIV64TO32})

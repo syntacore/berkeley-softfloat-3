@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+set(TARGET_NAME 8086)
+
 set(SRC_TARGET_NON_FAST_INT64
     ${SRC_TARGET-8086_NON_FAST_INT64}
     ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128M.cpp
@@ -46,7 +48,7 @@ FILES
     ${SRC_TARGET_NON_FAST_INT64}
 )
 
-add_library(softfloat-8086-nfi64 EXCLUDE_FROM_ALL
+add_library(softfloat-${TARGET_NAME}-nfi64 EXCLUDE_FROM_ALL
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
     ${SRC_OTHERS}
@@ -58,4 +60,4 @@ add_library(softfloat-8086-nfi64 EXCLUDE_FROM_ALL
     ${INC_TARGET}
     ${SRC_TARGET_NON_FAST_INT64}
 )
-set_target_properties(softfloat-8086-nfi64 PROPERTIES FOLDER "softfloat/8086")
+set_target_properties(softfloat-${TARGET_NAME}-nfi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
