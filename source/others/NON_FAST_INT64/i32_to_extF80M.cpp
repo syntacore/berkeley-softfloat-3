@@ -38,29 +38,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "internals.hpp"
 
-namespace softfloat {
-namespace internals {
-
 void
-i32_to_extF80M(int32_t a,
-               extFloat80_t* zPtr)
+i32_to_extF80M(int32_t const a,
+               extFloat80_t* const zPtr)
 {
     using namespace softfloat::internals;
-    extFloat80_t* zSPtr = zPtr;
-    uint16_t uiZ64 = 0;
-    uint64_t sigZ = 0;
 
-    if (a) {
+    if (0 == a) {
+        zPtr->signExp = 0;
+        zPtr->signif = 0;
+    } else {
         bool const sign = a < 0;
-        uint32_t absA = static_cast<uint32_t>(sign ? -a : a);
+        uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
         auto const shiftDist = softfloat_countLeadingZeros32(absA);
-        uiZ64 = packToExtF80UI64(sign, 0x401Eu - shiftDist);
-        sigZ = static_cast<uint64_t>(absA << shiftDist) << 32;
+        zPtr->signExp = packToExtF80UI64(sign, 0x401Eu - shiftDist);
+        zPtr->signif = static_cast<uint64_t>(absA) << (shiftDist + 32);
     }
-
-    zSPtr->signExp = uiZ64;
-    zSPtr->signif = sigZ;
 }
-
-}  // namespace internals
-}  // namespace softfloat
