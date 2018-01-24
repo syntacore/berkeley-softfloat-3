@@ -83,15 +83,15 @@ struct uint128
     {}
 
     explicit constexpr uint128(float128_t const& a)
-        : v64(a.v[indexWordHi(2)])
-        , v0(a.v[indexWordLo(2)])
+        : v64(a.v64)
+        , v0(a.v0)
     {}
 
     explicit operator float128_t()const
     {
         float128_t ret;
-        ret.v[indexWordHi(2)] = v64;
-        ret.v[indexWordLo(2)] = v0;
+        ret.v64 = v64;
+        ret.v0 = v0;
         return ret;
     }
 
@@ -119,6 +119,7 @@ struct uint128_extra
         : v(a_v)
         , extra(a_extra)
     {}
+
     uint128 v;
     uint64_t extra;
 };

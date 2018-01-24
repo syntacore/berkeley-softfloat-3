@@ -69,7 +69,13 @@ extern "C" {
     } float64_t;
     typedef struct float128_t
     {
-        uint64_t v[2];
+#ifdef BIG_ENDIAN
+        uint64_t v64;
+        uint64_t v0;
+#else
+        uint64_t v0;
+        uint64_t v64;
+#endif
     } float128_t;
 
     /**
