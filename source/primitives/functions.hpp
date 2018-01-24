@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PRIMITIVES_H_
-#define PRIMITIVES_H_
+#ifndef PRIMITIVES_FUNCTIONS_H_
+#define PRIMITIVES_FUNCTIONS_H_
 
 #include "primitives/types.hpp"
 #include <cstddef>
@@ -273,7 +273,7 @@ softfloat_shortShiftLeft128(uint64_t a64,
                             uint64_t a0,
                             uint8_t dist)
 {
-    return uint128{a0 << dist, a64 << dist | a0 >> (63u & -static_cast<int8_t>(dist))};
+    return uint128{a64 << dist | a0 >> (63u & -static_cast<int8_t>(dist)), a0 << dist};
 }
 
 /**
@@ -281,23 +281,23 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' right by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-softfloat_shortShiftRight128(uint64_t a64,
-                             uint64_t a0,
+softfloat_shortShiftRight128(uint64_t const& a64,
+                             uint64_t const& a0,
                              uint8_t dist)
 {
-    return uint128{a64 << (-dist & 63) | a0 >> dist, a64 >> dist};
+    return uint128{a64 >> dist, a64 << (63 & -dist) | a0 >> dist};
 }
 
 /**
 This function is the same as `softfloat_shiftRightJam64Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
-inline constexpr uint64_extra
+inline uint64_extra
 softfloat_shortShiftRightJam64Extra(uint64_t a,
                                     uint64_t extra,
                                     uint8_t dist)
 {
-    return uint64_extra{a >> dist, a << (-static_cast<int8_t>(dist) & 63) | (extra != 0)};
+    return uint64_extra{a >> dist, a << (-static_cast<int8_t>(dist) & 63) | !!(0 != extra)};
 }
 
 /**
@@ -365,7 +365,7 @@ softfloat_shiftRightJam64Extra(uint64_t a,
         z.extra = a << (63 & -static_cast<int32_t>(dist));
     } else {
         z.v = 0;
-        z.extra = dist == 64 ? a : !!(0 != a );
+        z.extra = dist == 64 ? a : !!(0 != a);
     }
 
     z.extra |= !!(extra != 0);
@@ -436,7 +436,7 @@ softfloat_add128(uint64_t a64,
                  uint64_t b64,
                  uint64_t b0)
 {
-    return uint128{a0 + b0, a64 + b64 + !!(a0 + b0 < a0)};
+    return uint128{a64 + b64 + !!(a0 + b0 < a0), a0 + b0};
 }
 
 /**
@@ -479,7 +479,7 @@ softfloat_sub128(uint64_t a64,
                  uint64_t b64,
                  uint64_t b0)
 {
-    return uint128{a0 - b0, a64 - b64 - !!(a0 < b0)};
+    return uint128{a64 - b64 - !!(a0 < b0), a0 - b0};
 }
 
 /**
@@ -1148,4 +1148,4 @@ softfloat_remStep160MBy32(uint32_t const* remPtr,
 }  // namespace internals
 }  // namespace softfloat
 
-#endif  /* PRIMITIVES_H_ */
+#endif  /* PRIMITIVES_FUNCTIONS_H_ */

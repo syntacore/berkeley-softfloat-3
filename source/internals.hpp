@@ -286,16 +286,16 @@ union ui128_f128
     float128_t f;
 };
 
-inline uint128 const&
+inline uint128
 f_as_u_128(float128_t const& v)
 {
-    return reinterpret_cast<uint128 const&>(v);
+    return uint128(v);
 }
 
-inline float128_t const&
+inline float128_t
 u_as_f_128(uint128 const& v)
 {
-    return reinterpret_cast<float128_t const&>(v);
+    return float128_t(v);
 }
 
 #endif  /* SOFTFLOAT_FAST_INT64 */
@@ -373,9 +373,17 @@ softfloat_roundPackMToI64(bool,
 
 struct exp8_sig16
 {
+    exp8_sig16() = default;
+    exp8_sig16(int8_t a_exp,
+               uint16_t a_sig)
+        : exp(a_exp)
+        , sig(a_sig)
+    {}
+
     int8_t exp;
     uint16_t sig;
 };
+
 exp8_sig16
 softfloat_normSubnormalF16Sig(uint16_t);
 
@@ -394,6 +402,7 @@ softfloat_addMagsF16(uint16_t,
 float16_t
 softfloat_subMagsF16(uint16_t,
                      uint16_t);
+
 enum Mul_add_operations
 {
     softfloat_mulAdd_madd = 0,
@@ -409,6 +418,13 @@ softfloat_mulAddF16(uint16_t,
 
 struct exp16_sig32
 {
+    exp16_sig32() = default;
+    constexpr exp16_sig32(int16_t a_exp,
+                          uint32_t a_sig)
+        : exp(a_exp)
+        , sig(a_sig)
+    {}
+
     int16_t exp;
     uint32_t sig;
 };
@@ -434,6 +450,12 @@ softfloat_subMagsF32(uint32_t,
 
 struct exp16_sig64
 {
+    exp16_sig64() = default;
+    constexpr exp16_sig64(int16_t a_exp,
+                          uint64_t a_sig)
+        : exp(a_exp)
+        , sig(a_sig)
+    {}
     int16_t exp;
     uint64_t sig;
 };
@@ -485,8 +507,8 @@ packToF128UI64(bool sign,
                uint64_t sig64)
 {
     return
-        (static_cast<uint64_t>(sign) << 63) + 
-        (static_cast<uint64_t>(exp) << 48) + 
+        (static_cast<uint64_t>(sign) << 63) +
+        (static_cast<uint64_t>(exp) << 48) +
         sig64;
 }
 
@@ -501,9 +523,17 @@ isNaNF128UI(uint64_t a64,
 
 struct exp32_sig64
 {
+    exp32_sig64() = default;
+    exp32_sig64(int32_t a_exp,
+                uint64_t a_sig)
+        : exp(a_exp)
+        , sig(a_sig)
+    {}
+
     int32_t exp;
     uint64_t sig;
 };
+
 exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
 
 extFloat80_t
@@ -534,6 +564,13 @@ softfloat_subMagsExtF80(uint16_t,
 
 struct exp32_sig128
 {
+    exp32_sig128() = default;
+    constexpr exp32_sig128(int32_t a_exp,
+                           uint128 const& a_sig)
+        : exp(a_exp)
+        , sig(a_sig)
+    {}
+
     int32_t exp;
     uint128 sig;
 };
@@ -598,7 +635,7 @@ packToF128UI96(bool sign,
 {
     return
         sig96 +
-        (static_cast<uint32_t>((!!sign) << 31) + 
+        (static_cast<uint32_t>((!!sign) << 31) +
         (static_cast<uint32_t>(exp) << 16));
 }
 

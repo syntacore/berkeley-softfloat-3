@@ -45,9 +45,9 @@ f128M_div(float128_t const* const aPtr,
           float128_t* const zPtr)
 {
     using namespace softfloat::internals;
-    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
-    uint32_t const* const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
-    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+    auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    auto const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
+    auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const signA = signF128UI96(uiA96);

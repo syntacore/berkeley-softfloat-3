@@ -1,9 +1,9 @@
 /** @file
 
-This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
+This C header file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015 The Regents of the University of
+@copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
 California.  All rights reserved.
 */
 /*
@@ -34,20 +34,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "target.hpp"
-#include "primitives/types.hpp"
-#include "softfloat/functions.h"
+#ifndef INTEL8086_NON_SSE_TARGET_HPP_
+#define INTEL8086_NON_SSE_TARGET_HPP_
 
-void
-softfloat_propagateNaNF128M(const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr)
+#include "target-Intel8086.hpp"
+
+namespace softfloat {
+namespace internals {
+inline namespace Intel_8086 {
+
+uint16_t
+softfloat_propagateNaNF16UI(uint16_t const uiA,
+                            uint16_t const uiB);
+
+/**
+Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
+point values, at least one of which is a NaN, returns the bit pattern of
+the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
+signaling NaN, the invalid exception is raised.
+*/
+inline uint32_t
+softfloat_propagateNaNF32UI(uint32_t const uiA,
+                            uint32_t const uiB)
 {
-    using namespace softfloat::internals;
-    if (f128M_isSignalingNaN((const float128_t *)aWPtr) || (bWPtr && f128M_isSignalingNaN((const float128_t *)bWPtr))) {
+    static uint32_t const quietNaN_bit = UINT32_C(0x00400000);
+    bool const isSigNaNA = softfloat_isSigNaNF32UI(uiA);
+    bool const isSigNaNB = softfloat_isSigNaNF32UI(uiB);
+    if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
+        if (isSigNaNA) {
+            return quietNaN_bit | uiA;
+        }
     }
-    zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
-    zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
-    zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
-    zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
+    return quietNaN_bit | (isNaNF32UI(uiA) ? uiA : uiB);
 }
 
+uint64_t
+softfloat_propagateNaNF64UI(uint64_t const uiA,
+                            uint64_t const uiB);
+}  // namespace Intel_8086
+}  // namespace internals
+}  // namespace softfloat
+
+#endif  /* INTEL8086_NON_SSE_TARGET_HPP_ */

@@ -44,7 +44,7 @@ void
 extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
 {
     using namespace softfloat::internals;
-    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+    auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
     uint16_t const uiA64 = aPtr->signExp;
     bool const sign = signExtF80UI64(uiA64);
     int32_t exp = expExtF80UI64(uiA64);

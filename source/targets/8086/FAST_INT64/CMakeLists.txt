@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(SRC_TARGET-8086_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_commonNaNToExtF80UI.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_commonNaNToF128UI.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_extF80UIToCommonNaN.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_f128UIToCommonNaN.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80UI.cpp
 PARENT_SCOPE)

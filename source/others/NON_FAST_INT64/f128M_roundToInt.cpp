@@ -54,8 +54,8 @@ f128M_roundToInt(float128_t const* aPtr,
     uint32_t extrasMask;
 
 
-    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
-    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+    auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
     uint32_t const ui96 = aWPtr[indexWordHi(4)];
     auto const exp = expF128UI96(ui96);

@@ -39,16 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 bool
-f128M_isSignalingNaN(const float128_t *aPtr)
+f128M_isSignalingNaN(float128_t const *aPtr)
 {
     using namespace softfloat::internals;
-    const uint32_t *aWPtr = reinterpret_cast<uint32_t const *>(aPtr);
+    auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    if ((uiA96 & 0x7FFF8000) != 0x7FFF0000) {
-        return false;
-    }
     return
-        (uiA96 & 0x00007FFF) != 0 ||
-        (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0;
-
+        UINT32_C(0x7FFF8000) == (uiA96 & UINT32_C(0x7FFF8000)) && 
+        (0 != (UINT32_C(0x00007FFF) & uiA96) || 0 != aWPtr[indexWord(4, 2)] || 0 != aWPtr[indexWord(4, 1)] || 0 != aWPtr[indexWord(4, 0)]);
 }

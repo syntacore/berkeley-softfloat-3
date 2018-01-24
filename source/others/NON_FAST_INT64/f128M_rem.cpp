@@ -39,16 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "target.hpp"
 
+namespace {
 static inline void
 copyA(uint32_t const uiA96,
       uint32_t const* const aWPtr,
-      uint32_t* const zWPtr)
+      uint32_t zWPtr[4])
 {
     zWPtr[indexWordHi(4)] = uiA96;
     zWPtr[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
     zWPtr[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
     zWPtr[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
 }
+}  // namespace
 
 void
 f128M_rem(const float128_t* aPtr,
@@ -65,9 +67,9 @@ f128M_rem(const float128_t* aPtr,
     uint32_t rem2[5];
     uint32_t* altRemPtr;
 
-    uint32_t const* const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
-    uint32_t const* const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);
-    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
+    auto const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
+    auto const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);
+    auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     int32_t expA = expF128UI96(uiA96);

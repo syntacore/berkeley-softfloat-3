@@ -45,7 +45,7 @@ f128M_to_ui32(float128_t const* const aPtr,
               bool const exact)
 {
     using namespace softfloat::internals;
-    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool sign = signF128UI96(uiA96);
     int32_t const exp = expF128UI96(uiA96);

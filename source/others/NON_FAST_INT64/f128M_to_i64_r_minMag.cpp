@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.hpp"
 #include "target.hpp"
 
+namespace {
+
 static int64_t
 invalid(bool const sign,
         int32_t const exp,
@@ -52,6 +54,8 @@ invalid(bool const sign,
         sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 }
 
+}  // namespace
+
 int64_t
 f128M_to_i64_r_minMag(const float128_t* aPtr,
                       bool exact)
@@ -59,7 +63,7 @@ f128M_to_i64_r_minMag(const float128_t* aPtr,
     using namespace softfloat::internals;
     uint32_t sig[4];
     uint64_t uiZ;
-    uint32_t const* aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
+    auto const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t const exp = expF128UI96(uiA96);

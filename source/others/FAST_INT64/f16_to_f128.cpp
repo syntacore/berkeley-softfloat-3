@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float128_t
-f16_to_f128(float16_t a)
+f16_to_f128(float16_t const a)
 {
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
@@ -50,12 +50,10 @@ f16_to_f128(float16_t a)
 
     if (exp == 0x1F) {
         if (frac) {
-            uint128 const uiZ = softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA));
-            return u_as_f_128(uiZ);
+            return u_as_f_128(softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA)));
         }
 
-        uint128 const uiZ{packToF128UI64(sign, 0x7FFF, 0), 0};
-        return u_as_f_128(uiZ);
+        return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
     }
 
     if (!exp) {
@@ -65,10 +63,8 @@ f16_to_f128(float16_t a)
             frac = normExpSig.sig;
         }
 
-        uint128 const uiZ{packToF128UI64(sign, 0, 0), 0};
-        return u_as_f_128(uiZ);
+        return u_as_f_128(uint128{packToF128UI64(sign, 0, 0), 0});
     }
 
-    uint128 const uiZ{packToF128UI64(sign, exp + 0x3FF0, static_cast<uint64_t>(frac) << 38), 0};
-    return u_as_f_128(uiZ);
+    return u_as_f_128(uint128{packToF128UI64(sign, exp + 0x3FF0, static_cast<uint64_t>(frac) << 38), 0});
 }

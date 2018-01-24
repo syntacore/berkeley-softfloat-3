@@ -7,9 +7,8 @@ set(TARGET_NAME RISCV)
 add_definitions(-DSOFTFLOAT_FAST_DIV32TO16)
 
 set(INC_TARGET ${CMAKE_CURRENT_SOURCE_DIR}/target.hpp)
-set(SRC_TARGET_NON_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128M.cpp
-)
+set(SRC_TARGET)
+set(SRC_TARGET_NON_FAST_INT64)
 source_group(include
 FILES
     ${INC_SOFTFLOAT}
@@ -64,6 +63,7 @@ add_library(softfloat-${TARGET_NAME}-fi64 EXCLUDE_FROM_ALL
     ${SRC_PRIMITIVES}
     ${INC_PRIMITIVES}
     ${INC_TARGET}
+    ${SRC_TARGET}
 )
 set_target_properties(softfloat-${TARGET_NAME}-fi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
 
@@ -77,6 +77,7 @@ add_library(softfloat-${TARGET_NAME}-nfi64 EXCLUDE_FROM_ALL
     ${INC_PRIMITIVES}
     ${INC_TARGET}
     ${SRC_TARGET_NON_FAST_INT64}
+    ${SRC_TARGET}
 )
 set_target_properties(softfloat-${TARGET_NAME}-nfi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
 

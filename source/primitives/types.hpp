@@ -37,47 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PRIMITIVETYPES_H_
 #define PRIMITIVETYPES_H_
 
+#include "softfloat/types.h"
 #include <cstdint>
 
 namespace softfloat {
 namespace internals {
-
-#ifdef SOFTFLOAT_FAST_INT64
-
-struct uint128
-{
-#ifdef BIG_ENDIAN
-    uint64_t v64;
-    uint64_t v0;
-#else
-    uint64_t v0;
-    uint64_t v64;
-#endif
-};
-
-struct uint64_extra
-{
-#ifdef BIG_ENDIAN
-    uint64_t v;
-    uint64_t extra;
-#else
-    uint64_t extra;
-    uint64_t v;
-#endif
-};
-
-struct uint128_extra
-{
-#ifdef BIG_ENDIAN
-    uint128 v;
-    uint64_t extra;
-#else
-    uint64_t extra;
-    uint128 v;
-#endif
-};
-
-#endif
 
 /**
 These macros are used to isolate the differences in word order between big-
@@ -105,6 +69,60 @@ endian and little-endian platforms.
 #define indexMultiwordHiBut( total, n ) (n)
 #define indexMultiwordLoBut( total, n ) 0u
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
+#endif
+
+#ifdef SOFTFLOAT_FAST_INT64
+
+struct uint128
+{
+    uint128() = default;
+    constexpr uint128(uint64_t const& a64,
+                      uint64_t const& a0)
+        : v64(a64)
+        , v0(a0)
+    {}
+
+    explicit constexpr uint128(float128_t const& a)
+        : v64(a.v[indexWordHi(2)])
+        , v0(a.v[indexWordLo(2)])
+    {}
+
+    explicit operator float128_t()const
+    {
+        float128_t ret;
+        ret.v[indexWordHi(2)] = v64;
+        ret.v[indexWordLo(2)] = v0;
+        return ret;
+    }
+
+    uint64_t v64;
+    uint64_t v0;
+};
+
+struct uint64_extra
+{
+    uint64_extra() = default;
+    constexpr uint64_extra(uint64_t const& a_v,
+                           uint64_t const& a_extra)
+        : v(a_v)
+        , extra(a_extra)
+    {}
+
+    uint64_t v;
+    uint64_t extra;
+};
+
+struct uint128_extra
+{
+    uint128_extra() = default;
+    constexpr uint128_extra(uint128 const& a_v, uint64_t const& a_extra)
+        : v(a_v)
+        , extra(a_extra)
+    {}
+    uint128 v;
+    uint64_t extra;
+};
+
 #endif
 
 }  // namespace internals

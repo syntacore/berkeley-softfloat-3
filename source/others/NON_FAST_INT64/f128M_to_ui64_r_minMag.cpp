@@ -49,7 +49,7 @@ f128M_to_ui64_r_minMag(float128_t const* aPtr,
     uint64_t z;
 
 
-    uint32_t const* aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = signF128UI96(uiA96);
     int32_t const exp = expF128UI96(uiA96);
