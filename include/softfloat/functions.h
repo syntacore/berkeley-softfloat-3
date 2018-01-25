@@ -67,6 +67,86 @@ extern "C" {
     uint8_t softfloat_getFlags(void);
     /**@}*/
 
+#ifdef SOFTFLOAT_FAST_INT64
+    extFloat80_t ui32_to_extF80(uint32_t);
+    extFloat80_t ui64_to_extF80(uint64_t);
+    extFloat80_t i32_to_extF80(int32_t);
+    extFloat80_t i64_to_extF80(int64_t);
+    extFloat80_t f16_to_extF80(float16_t);
+    extFloat80_t f32_to_extF80(float32_t);
+    extFloat80_t f64_to_extF80(float64_t);
+
+    uint32_t extF80_to_ui32(extFloat80_t, uint8_t, bool);
+    uint64_t extF80_to_ui64(extFloat80_t, uint8_t, bool);
+    int32_t extF80_to_i32(extFloat80_t, uint8_t, bool);
+    int64_t extF80_to_i64(extFloat80_t, uint8_t, bool);
+    uint32_t extF80_to_ui32_r_minMag(extFloat80_t, bool);
+    uint64_t extF80_to_ui64_r_minMag(extFloat80_t, bool);
+    int32_t extF80_to_i32_r_minMag(extFloat80_t, bool);
+    int64_t extF80_to_i64_r_minMag(extFloat80_t, bool);
+
+    float16_t extF80_to_f16(extFloat80_t);
+    float32_t extF80_to_f32(extFloat80_t);
+    float64_t extF80_to_f64(extFloat80_t);
+    float128_t extF80_to_f128(extFloat80_t);
+
+    extFloat80_t extF80_roundToInt(extFloat80_t, uint8_t, bool);
+    extFloat80_t extF80_add(extFloat80_t, extFloat80_t);
+    extFloat80_t extF80_sub(extFloat80_t, extFloat80_t);
+    extFloat80_t extF80_mul(extFloat80_t, extFloat80_t);
+    extFloat80_t extF80_div(extFloat80_t, extFloat80_t);
+    extFloat80_t extF80_rem(extFloat80_t, extFloat80_t);
+    extFloat80_t extF80_sqrt(extFloat80_t);
+
+    bool extF80_eq(extFloat80_t, extFloat80_t);
+    bool extF80_le(extFloat80_t, extFloat80_t);
+    bool extF80_lt(extFloat80_t, extFloat80_t);
+    bool extF80_eq_signaling(extFloat80_t, extFloat80_t);
+    bool extF80_le_quiet(extFloat80_t, extFloat80_t);
+    bool extF80_lt_quiet(extFloat80_t, extFloat80_t);
+    bool extF80_isSignalingNaN(extFloat80_t);
+
+    float128_t ui32_to_f128(uint32_t);
+    float128_t ui64_to_f128(uint64_t);
+    float128_t i32_to_f128(int32_t);
+    float128_t i64_to_f128(int64_t);
+    float128_t f16_to_f128(float16_t);
+    float128_t f32_to_f128(float32_t);
+    float128_t f64_to_f128(float64_t);
+
+    uint32_t f128_to_ui32(float128_t, uint8_t, bool);
+    uint64_t f128_to_ui64(float128_t, uint8_t, bool);
+    int32_t f128_to_i32(float128_t, uint8_t, bool);
+    int64_t f128_to_i64(float128_t, uint8_t, bool);
+
+    uint32_t f128_to_ui32_r_minMag(float128_t, bool);
+    uint64_t f128_to_ui64_r_minMag(float128_t, bool);
+    int32_t f128_to_i32_r_minMag(float128_t, bool);
+    int64_t f128_to_i64_r_minMag(float128_t, bool);
+
+    float16_t f128_to_f16(float128_t);
+    float32_t f128_to_f32(float128_t);
+    float64_t f128_to_f64(float128_t);
+    extFloat80_t f128_to_extF80(float128_t);
+
+    float128_t f128_roundToInt(float128_t, uint8_t, bool);
+    float128_t f128_add(float128_t, float128_t);
+    float128_t f128_sub(float128_t, float128_t);
+    float128_t f128_mul(float128_t, float128_t);
+    float128_t f128_mulAdd(float128_t, float128_t, float128_t);
+    float128_t f128_div(float128_t, float128_t);
+    float128_t f128_rem(float128_t, float128_t);
+    float128_t f128_sqrt(float128_t);
+
+    bool f128_eq(float128_t, float128_t);
+    bool f128_le(float128_t, float128_t);
+    bool f128_lt(float128_t, float128_t);
+    bool f128_eq_signaling(float128_t, float128_t);
+    bool f128_le_quiet(float128_t, float128_t);
+    bool f128_lt_quiet(float128_t, float128_t);
+    bool f128_isSignalingNaN(float128_t);
+#endif
+
     /**
     Integer-to-floating-point conversion routines.
     */
@@ -74,39 +154,23 @@ extern "C" {
     float16_t ui32_to_f16(uint32_t);
     float32_t ui32_to_f32(uint32_t);
     float64_t ui32_to_f64(uint32_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t ui32_to_extF80(uint32_t);
-    float128_t ui32_to_f128(uint32_t);
-#endif
-    void ui32_to_extF80M(uint32_t, extFloat80_t *);
-    void ui32_to_f128M(uint32_t, float128_t *);
+    void ui32_to_extF80M(uint32_t, extFloat80_t*);
+    void ui32_to_f128M(uint32_t, float128_t*);
     float16_t ui64_to_f16(uint64_t);
     float32_t ui64_to_f32(uint64_t);
     float64_t ui64_to_f64(uint64_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t ui64_to_extF80(uint64_t);
-    float128_t ui64_to_f128(uint64_t);
-#endif
-    void ui64_to_extF80M(uint64_t, extFloat80_t *);
-    void ui64_to_f128M(uint64_t, float128_t *);
+    void ui64_to_extF80M(uint64_t, extFloat80_t*);
+    void ui64_to_f128M(uint64_t, float128_t*);
     float16_t i32_to_f16(int32_t);
     float32_t i32_to_f32(int32_t);
     float64_t i32_to_f64(int32_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t i32_to_extF80(int32_t);
-    float128_t i32_to_f128(int32_t);
-#endif
-    void i32_to_extF80M(int32_t, extFloat80_t *);
-    void i32_to_f128M(int32_t, float128_t *);
+    void i32_to_extF80M(int32_t, extFloat80_t*);
+    void i32_to_f128M(int32_t, float128_t*);
     float16_t i64_to_f16(int64_t);
     float32_t i64_to_f32(int64_t);
     float64_t i64_to_f64(int64_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t i64_to_extF80(int64_t);
-    float128_t i64_to_f128(int64_t);
-#endif
-    void i64_to_extF80M(int64_t, extFloat80_t *);
-    void i64_to_f128M(int64_t, float128_t *);
+    void i64_to_extF80M(int64_t, extFloat80_t*);
+    void i64_to_f128M(int64_t, float128_t*);
     /**@}*/
 
     /**
@@ -123,12 +187,8 @@ extern "C" {
     int64_t f16_to_i64_r_minMag(float16_t, bool);
     float32_t f16_to_f32(float16_t);
     float64_t f16_to_f64(float16_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t f16_to_extF80(float16_t);
-    float128_t f16_to_f128(float16_t);
-#endif
-    void f16_to_extF80M(float16_t, extFloat80_t *);
-    void f16_to_f128M(float16_t, float128_t *);
+    void f16_to_extF80M(float16_t, extFloat80_t*);
+    void f16_to_f128M(float16_t, float128_t*);
     float16_t f16_roundToInt(float16_t, uint8_t, bool);
     float16_t f16_add(float16_t, float16_t);
     float16_t f16_sub(float16_t, float16_t);
@@ -160,12 +220,8 @@ extern "C" {
     int64_t f32_to_i64_r_minMag(float32_t, bool);
     float16_t f32_to_f16(float32_t);
     float64_t f32_to_f64(float32_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t f32_to_extF80(float32_t);
-    float128_t f32_to_f128(float32_t);
-#endif  /* SOFTFLOAT_FAST_INT64 */
-    void f32_to_extF80M(float32_t, extFloat80_t *);
-    void f32_to_f128M(float32_t, float128_t *);
+    void f32_to_extF80M(float32_t, extFloat80_t*);
+    void f32_to_f128M(float32_t, float128_t*);
     float32_t f32_roundToInt(float32_t, uint8_t, bool);
     float32_t f32_add(float32_t, float32_t);
     float32_t f32_sub(float32_t, float32_t);
@@ -195,12 +251,8 @@ extern "C" {
     int64_t f64_to_i64_r_minMag(float64_t, bool);
     float16_t f64_to_f16(float64_t);
     float32_t f64_to_f32(float64_t);
-#ifdef SOFTFLOAT_FAST_INT64
-    extFloat80_t f64_to_extF80(float64_t);
-    float128_t f64_to_f128(float64_t);
-#endif  /* SOFTFLOAT_FAST_INT64 */
-    void f64_to_extF80M(float64_t, extFloat80_t *);
-    void f64_to_f128M(float64_t, float128_t *);
+    void f64_to_extF80M(float64_t, extFloat80_t*);
+    void f64_to_f128M(float64_t, float128_t*);
     float64_t f64_roundToInt(float64_t, uint8_t, bool);
     float64_t f64_add(float64_t, float64_t);
     float64_t f64_sub(float64_t, float64_t);
@@ -223,61 +275,204 @@ extern "C" {
     */
     /**@{*/
 #ifdef SOFTFLOAT_FAST_INT64
-    uint32_t extF80_to_ui32(extFloat80_t, uint8_t, bool);
-    uint64_t extF80_to_ui64(extFloat80_t, uint8_t, bool);
-    int32_t extF80_to_i32(extFloat80_t, uint8_t, bool);
-    int64_t extF80_to_i64(extFloat80_t, uint8_t, bool);
-    uint32_t extF80_to_ui32_r_minMag(extFloat80_t, bool);
-    uint64_t extF80_to_ui64_r_minMag(extFloat80_t, bool);
-    int32_t extF80_to_i32_r_minMag(extFloat80_t, bool);
-    int64_t extF80_to_i64_r_minMag(extFloat80_t, bool);
-    float16_t extF80_to_f16(extFloat80_t);
-    float32_t extF80_to_f32(extFloat80_t);
-    float64_t extF80_to_f64(extFloat80_t);
-    float128_t extF80_to_f128(extFloat80_t);
-    extFloat80_t extF80_roundToInt(extFloat80_t, uint8_t, bool);
-    extFloat80_t extF80_add(extFloat80_t, extFloat80_t);
-    extFloat80_t extF80_sub(extFloat80_t, extFloat80_t);
-    extFloat80_t extF80_mul(extFloat80_t, extFloat80_t);
-    extFloat80_t extF80_div(extFloat80_t, extFloat80_t);
-    extFloat80_t extF80_rem(extFloat80_t, extFloat80_t);
-    extFloat80_t extF80_sqrt(extFloat80_t);
-    bool extF80_eq(extFloat80_t, extFloat80_t);
-    bool extF80_le(extFloat80_t, extFloat80_t);
-    bool extF80_lt(extFloat80_t, extFloat80_t);
-    bool extF80_eq_signaling(extFloat80_t, extFloat80_t);
-    bool extF80_le_quiet(extFloat80_t, extFloat80_t);
-    bool extF80_lt_quiet(extFloat80_t, extFloat80_t);
-    bool extF80_isSignalingNaN(extFloat80_t);
-#endif  /* SOFTFLOAT_FAST_INT64 */
-    uint32_t extF80M_to_ui32(const extFloat80_t *, uint8_t, bool);
-    uint64_t extF80M_to_ui64(const extFloat80_t *, uint8_t, bool);
-    int32_t extF80M_to_i32(const extFloat80_t *, uint8_t, bool);
-    int64_t extF80M_to_i64(const extFloat80_t *, uint8_t, bool);
-    uint32_t extF80M_to_ui32_r_minMag(const extFloat80_t *, bool);
-    uint64_t extF80M_to_ui64_r_minMag(const extFloat80_t *, bool);
-    int32_t extF80M_to_i32_r_minMag(const extFloat80_t *, bool);
-    int64_t extF80M_to_i64_r_minMag(const extFloat80_t *, bool);
-    float16_t extF80M_to_f16(const extFloat80_t *);
-    float32_t extF80M_to_f32(const extFloat80_t *);
-    float64_t extF80M_to_f64(const extFloat80_t *);
-    void extF80M_to_f128M(const extFloat80_t *, float128_t *);
-    void
-        extF80M_roundToInt(
-            const extFloat80_t *, uint8_t, bool, extFloat80_t *);
-    void extF80M_add(const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
-    void extF80M_sub(const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
-    void extF80M_mul(const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
-    void extF80M_div(const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
-    void extF80M_rem(const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
-    void extF80M_sqrt(const extFloat80_t *, extFloat80_t *);
-    bool extF80M_eq(const extFloat80_t *, const extFloat80_t *);
-    bool extF80M_le(const extFloat80_t *, const extFloat80_t *);
-    bool extF80M_lt(const extFloat80_t *, const extFloat80_t *);
-    bool extF80M_eq_signaling(const extFloat80_t *, const extFloat80_t *);
-    bool extF80M_le_quiet(const extFloat80_t *, const extFloat80_t *);
-    bool extF80M_lt_quiet(const extFloat80_t *, const extFloat80_t *);
-    bool extF80M_isSignalingNaN(const extFloat80_t *);
+    static inline uint32_t
+        extF80M_to_ui32(extFloat80_t const * const aPtr,
+                        uint8_t roundingMode,
+                        bool exact)
+    {
+        return extF80_to_ui32(*aPtr, roundingMode, exact);
+    }
+
+    static inline uint64_t
+        extF80M_to_ui64(const extFloat80_t* aPtr,
+                        uint8_t roundingMode,
+                        bool exact)
+    {
+        return extF80_to_ui64(*aPtr, roundingMode, exact);
+    }
+
+    static inline int32_t
+        extF80M_to_i32(extFloat80_t const *const aPtr,
+                       uint8_t const roundingMode,
+                       bool const exact)
+    {
+        return extF80_to_i32(*aPtr, roundingMode, exact);
+    }
+
+    static inline int64_t
+        extF80M_to_i64(extFloat80_t const* const aPtr,
+                       uint8_t const roundingMode,
+                       bool const exact)
+    {
+        return extF80_to_i64(*aPtr, roundingMode, exact);
+    }
+
+    static inline uint32_t
+        extF80M_to_ui32_r_minMag(extFloat80_t const *const aPtr,
+                                 bool const exact)
+    {
+        return extF80_to_ui32_r_minMag(*aPtr, exact);
+    }
+
+    static inline uint64_t
+        extF80M_to_ui64_r_minMag(extFloat80_t const *const aPtr,
+                                 bool const exact)
+    {
+        return extF80_to_ui64_r_minMag(*aPtr, exact);
+    }
+
+    static inline int32_t
+        extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
+                                bool const exact)
+    {
+        return extF80_to_i32_r_minMag(*aPtr, exact);
+    }
+
+    static inline int64_t
+        extF80M_to_i64_r_minMag(extFloat80_t const *const aPtr,
+                                bool const exact)
+    {
+        return extF80_to_i64_r_minMag(*aPtr, exact);
+    }
+
+    static inline float16_t
+        extF80M_to_f16(extFloat80_t const *const aPtr)
+    {
+        return extF80_to_f16(*aPtr);
+    }
+
+    static inline float32_t
+        extF80M_to_f32(extFloat80_t const *const aPtr)
+    {
+        return extF80_to_f32(*aPtr);
+    }
+
+    static inline float64_t
+        extF80M_to_f64(const extFloat80_t *aPtr)
+    {
+        return extF80_to_f64(*aPtr);
+    }
+
+    static inline void
+        extF80M_to_f128M(const extFloat80_t* aPtr, float128_t* zPtr)
+    {
+        *zPtr = extF80_to_f128(*aPtr);
+    }
+
+    static inline void
+        extF80M_roundToInt(extFloat80_t const *aPtr,
+                           uint8_t roundingMode,
+                           bool exact,
+                           extFloat80_t *zPtr)
+    {
+        *zPtr = extF80_roundToInt(*aPtr, roundingMode, exact);
+    }
+
+    static inline void
+        extF80M_mul(extFloat80_t const *const aPtr,
+                    extFloat80_t const *const  bPtr,
+                    extFloat80_t* const zPtr)
+    {
+        *zPtr = extF80_mul(*aPtr, *bPtr);
+    }
+
+    static inline void
+        extF80M_div(extFloat80_t const *const aPtr,
+                    extFloat80_t const *const bPtr,
+                    extFloat80_t *const zPtr)
+    {
+        *zPtr = extF80_div(*aPtr, *bPtr);
+    }
+
+    static inline void
+        extF80M_rem(extFloat80_t const *const aPtr,
+                    extFloat80_t const *const bPtr,
+                    extFloat80_t* const zPtr)
+    {
+        *zPtr = extF80_rem(*aPtr, *bPtr);
+    }
+
+    static inline void
+        extF80M_sqrt(extFloat80_t const *const aPtr,
+                     extFloat80_t *const zPtr)
+    {
+        *zPtr = extF80_sqrt(*aPtr);
+    }
+
+    static inline bool
+        extF80M_eq(extFloat80_t const *const aPtr,
+                   extFloat80_t const *const bPtr)
+    {
+        return extF80_eq(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        extF80M_le(extFloat80_t const* const aPtr,
+                   extFloat80_t const* const bPtr)
+    {
+        return extF80_le(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        extF80M_lt(extFloat80_t const *const aPtr,
+                   extFloat80_t const *const bPtr)
+    {
+        return extF80_lt(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        extF80M_eq_signaling(extFloat80_t const *const aPtr,
+                             extFloat80_t const *const bPtr)
+    {
+        return extF80_eq_signaling(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        extF80M_le_quiet(extFloat80_t const *const aPtr,
+                         extFloat80_t const *const bPtr)
+    {
+        return extF80_le_quiet(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        extF80M_lt_quiet(extFloat80_t const *const aPtr,
+                         extFloat80_t const *const bPtr)
+    {
+        return extF80_lt_quiet(*aPtr, *bPtr);
+    }
+
+#else
+
+    uint32_t extF80M_to_ui32(extFloat80_t const*, uint8_t, bool);
+    uint64_t extF80M_to_ui64(extFloat80_t const*, uint8_t, bool);
+    int32_t extF80M_to_i32(extFloat80_t const*, uint8_t, bool);
+    int64_t extF80M_to_i64(extFloat80_t const *, uint8_t, bool);
+    uint32_t extF80M_to_ui32_r_minMag(extFloat80_t const *, bool);
+    uint64_t extF80M_to_ui64_r_minMag(extFloat80_t const *, bool);
+    int32_t extF80M_to_i32_r_minMag(extFloat80_t const *, bool);
+    int64_t extF80M_to_i64_r_minMag(extFloat80_t const *, bool);
+    float16_t extF80M_to_f16(extFloat80_t const *);
+    float32_t extF80M_to_f32(extFloat80_t const *);
+    float64_t extF80M_to_f64(extFloat80_t const *);
+    void extF80M_to_f128M(extFloat80_t const*, float128_t*);
+    void extF80M_roundToInt(extFloat80_t const*, uint8_t, bool, extFloat80_t*);
+    void extF80M_mul(extFloat80_t const *, extFloat80_t const *, extFloat80_t*);
+    void extF80M_div(extFloat80_t const *, extFloat80_t const *,  extFloat80_t*);
+    void extF80M_rem(extFloat80_t const *, extFloat80_t const *, extFloat80_t*);
+    void extF80M_sqrt(extFloat80_t const *, extFloat80_t*);
+    bool extF80M_eq(extFloat80_t const *, extFloat80_t const *);
+    bool extF80M_le(extFloat80_t const *, extFloat80_t const *);
+    bool extF80M_lt(extFloat80_t const *, extFloat80_t const *);
+    bool extF80M_eq_signaling(const extFloat80_t*, const extFloat80_t*);
+    bool extF80M_le_quiet(const extFloat80_t*, const extFloat80_t*);
+    bool extF80M_lt_quiet(const extFloat80_t*, const extFloat80_t*);
+
+#endif
+
+    bool extF80M_isSignalingNaN(const extFloat80_t*);
+
+    void extF80M_add(const extFloat80_t*, const extFloat80_t*, extFloat80_t*);
+    void extF80M_sub(const extFloat80_t*, const extFloat80_t*, extFloat80_t*);
     /**@}*/
 
     /*
@@ -285,64 +480,202 @@ extern "C" {
     */
     /**@{*/
 #ifdef SOFTFLOAT_FAST_INT64
-    uint32_t f128_to_ui32(float128_t, uint8_t, bool);
-    uint64_t f128_to_ui64(float128_t, uint8_t, bool);
-    int32_t f128_to_i32(float128_t, uint8_t, bool);
-    int64_t f128_to_i64(float128_t, uint8_t, bool);
-    uint32_t f128_to_ui32_r_minMag(float128_t, bool);
-    uint64_t f128_to_ui64_r_minMag(float128_t, bool);
-    int32_t f128_to_i32_r_minMag(float128_t, bool);
-    int64_t f128_to_i64_r_minMag(float128_t, bool);
-    float16_t f128_to_f16(float128_t);
-    float32_t f128_to_f32(float128_t);
-    float64_t f128_to_f64(float128_t);
-    extFloat80_t f128_to_extF80(float128_t);
-    float128_t f128_roundToInt(float128_t, uint8_t, bool);
-    float128_t f128_add(float128_t, float128_t);
-    float128_t f128_sub(float128_t, float128_t);
-    float128_t f128_mul(float128_t, float128_t);
-    float128_t f128_mulAdd(float128_t, float128_t, float128_t);
-    float128_t f128_div(float128_t, float128_t);
-    float128_t f128_rem(float128_t, float128_t);
-    float128_t f128_sqrt(float128_t);
-    bool f128_eq(float128_t, float128_t);
-    bool f128_le(float128_t, float128_t);
-    bool f128_lt(float128_t, float128_t);
-    bool f128_eq_signaling(float128_t, float128_t);
-    bool f128_le_quiet(float128_t, float128_t);
-    bool f128_lt_quiet(float128_t, float128_t);
-    bool f128_isSignalingNaN(float128_t);
-#endif
-    uint32_t f128M_to_ui32(const float128_t *, uint8_t, bool);
-    uint64_t f128M_to_ui64(const float128_t *, uint8_t, bool);
-    int32_t f128M_to_i32(const float128_t *, uint8_t, bool);
-    int64_t f128M_to_i64(const float128_t *, uint8_t, bool);
-    uint32_t f128M_to_ui32_r_minMag(const float128_t *, bool);
-    uint64_t f128M_to_ui64_r_minMag(const float128_t *, bool);
-    int32_t f128M_to_i32_r_minMag(const float128_t *, bool);
-    int64_t f128M_to_i64_r_minMag(const float128_t *, bool);
-    float16_t f128M_to_f16(const float128_t *);
-    float32_t f128M_to_f32(const float128_t *);
-    float64_t f128M_to_f64(const float128_t *);
-    void f128M_to_extF80M(const float128_t *, extFloat80_t *);
-    void f128M_roundToInt(const float128_t *, uint8_t, bool, float128_t *);
-    void f128M_add(const float128_t *, const float128_t *, float128_t *);
-    void f128M_sub(const float128_t *, const float128_t *, float128_t *);
-    void f128M_mul(const float128_t *, const float128_t *, float128_t *);
-    void
-        f128M_mulAdd(
-            const float128_t *, const float128_t *, const float128_t *, float128_t *
-        );
-    void f128M_div(const float128_t *, const float128_t *, float128_t *);
-    void f128M_rem(const float128_t *, const float128_t *, float128_t *);
-    void f128M_sqrt(const float128_t *, float128_t *);
-    bool f128M_eq(const float128_t *, const float128_t *);
-    bool f128M_le(const float128_t *, const float128_t *);
-    bool f128M_lt(const float128_t *, const float128_t *);
-    bool f128M_eq_signaling(const float128_t *, const float128_t *);
-    bool f128M_le_quiet(const float128_t *, const float128_t *);
-    bool f128M_lt_quiet(const float128_t *, const float128_t *);
-    bool f128M_isSignalingNaN(const float128_t *);
+
+    static inline uint32_t
+        f128M_to_ui32(float128_t const *const aPtr,
+                      uint8_t const roundingMode,
+                      bool const exact)
+    {
+        return f128_to_ui32(*aPtr, roundingMode, exact);
+    }
+
+    static inline uint64_t
+        f128M_to_ui64(float128_t const *const aPtr,
+                      uint8_t const roundingMode,
+                      bool const exact)
+    {
+        return f128_to_ui64(*aPtr, roundingMode, exact);
+    }
+
+    static inline int32_t
+        f128M_to_i32(float128_t const *const aPtr,
+                     uint8_t const roundingMode,
+                     bool const exact)
+    {
+        return f128_to_i32(*aPtr, roundingMode, exact);
+    }
+
+    static inline int64_t
+        f128M_to_i64(float128_t const *const aPtr,
+                     uint8_t const roundingMode,
+                     bool const exact)
+    {
+        return f128_to_i64(*aPtr, roundingMode, exact);
+    }
+
+    static inline uint32_t
+        f128M_to_ui32_r_minMag(float128_t const* aPtr,
+                               bool exact)
+    {
+        return f128_to_ui32_r_minMag(*aPtr, exact);
+    }
+
+    static inline uint64_t
+        f128M_to_ui64_r_minMag(const float128_t* aPtr, bool exact)
+    {
+        return f128_to_ui64_r_minMag(*aPtr, exact);
+    }
+
+    static inline int32_t
+        f128M_to_i32_r_minMag(const float128_t* aPtr,
+                              bool exact)
+    {
+        return f128_to_i32_r_minMag(*aPtr, exact);
+    }
+
+    static inline int64_t
+        f128M_to_i64_r_minMag(const float128_t* aPtr,
+                              bool exact)
+    {
+        return f128_to_i64_r_minMag(*aPtr, exact);
+    }
+
+    static inline float16_t
+        f128M_to_f16(const float128_t* aPtr)
+    {
+        return f128_to_f16(*aPtr);
+    }
+
+    static inline float32_t
+        f128M_to_f32(const float128_t* aPtr)
+    {
+        return f128_to_f32(*aPtr);
+    }
+
+    static inline float64_t
+        f128M_to_f64(const float128_t* aPtr)
+    {
+        return f128_to_f64(*aPtr);
+    }
+
+    static inline void
+        f128M_to_extF80M(const float128_t* aPtr,
+                         extFloat80_t* zPtr)
+    {
+        *zPtr = f128_to_extF80(*aPtr);
+    }
+
+    static inline void
+        f128M_roundToInt(float128_t const* aPtr,
+                         uint8_t roundingMode,
+                         bool exact,
+                         float128_t* zPtr)
+    {
+        *zPtr = f128_roundToInt(*aPtr, roundingMode, exact);
+    }
+
+    static inline void
+        f128M_mul(const float128_t* aPtr,
+                  const float128_t* bPtr,
+                  float128_t* zPtr)
+    {
+        *zPtr = f128_mul(*aPtr, *bPtr);
+    }
+
+    static inline void
+        f128M_div(const float128_t* aPtr, const float128_t* bPtr, float128_t* zPtr)
+    {
+        *zPtr = f128_div(*aPtr, *bPtr);
+    }
+
+    static inline void
+        f128M_rem(const float128_t* aPtr,
+                  const float128_t* bPtr,
+                  float128_t* zPtr)
+    {
+        *zPtr = f128_rem(*aPtr, *bPtr);
+    }
+
+    static inline void
+        f128M_sqrt(const float128_t* aPtr,
+                   float128_t* zPtr)
+    {
+        *zPtr = f128_sqrt(*aPtr);
+    }
+
+    static inline bool
+        f128M_eq(const float128_t *aPtr, const float128_t *bPtr)
+    {
+        return f128_eq(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        f128M_le(const float128_t* aPtr,
+                 const float128_t* bPtr)
+    {
+        return f128_le(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        f128M_lt(const float128_t* aPtr,
+                 const float128_t* bPtr)
+    {
+        return f128_lt(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        f128M_eq_signaling(const float128_t* aPtr, const float128_t* bPtr)
+    {
+        return f128_eq_signaling(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        f128M_le_quiet(const float128_t* aPtr,
+                       const float128_t* bPtr)
+    {
+        return f128_le_quiet(*aPtr, *bPtr);
+    }
+
+    static inline bool
+        f128M_lt_quiet(const float128_t* aPtr,
+                       const float128_t* bPtr)
+    {
+        return f128_lt_quiet(*aPtr, *bPtr);
+    }
+
+#else
+
+    uint32_t f128M_to_ui32(float128_t const *, uint8_t, bool);
+    uint64_t f128M_to_ui64(float128_t const *, uint8_t, bool);
+    int32_t f128M_to_i32(float128_t const *, uint8_t, bool);
+    int64_t f128M_to_i64(float128_t const *, uint8_t, bool);
+    uint32_t f128M_to_ui32_r_minMag(const float128_t*, bool);
+    uint64_t f128M_to_ui64_r_minMag(const float128_t*, bool);
+    int32_t f128M_to_i32_r_minMag(const float128_t*, bool);
+    int64_t f128M_to_i64_r_minMag(const float128_t*, bool);
+    float16_t f128M_to_f16(const float128_t*);
+    float32_t f128M_to_f32(const float128_t*);
+    float64_t f128M_to_f64(const float128_t*);
+    void f128M_to_extF80M(const float128_t*, extFloat80_t*);
+    void f128M_roundToInt(const float128_t*, uint8_t, bool, float128_t*);
+    void f128M_mul(const float128_t*, const float128_t*, float128_t*);
+    void f128M_div(const float128_t*, const float128_t*, float128_t*);
+    void f128M_rem(const float128_t*, const float128_t*, float128_t*);
+    void f128M_sqrt(const float128_t*, float128_t*);
+    bool f128M_eq(const float128_t*, const float128_t*);
+    bool f128M_le(const float128_t*, const float128_t*);
+    bool f128M_lt(const float128_t*, const float128_t*);
+    bool f128M_eq_signaling(const float128_t*, const float128_t*);
+    bool f128M_le_quiet(const float128_t*, const float128_t*);
+    bool f128M_lt_quiet(const float128_t*, const float128_t*);
+
+#endif  /* SOFTFLOAT_FAST_INT64 */
+
+    void f128M_add(const float128_t*, const float128_t*, float128_t*);
+    void f128M_sub(const float128_t*, const float128_t*, float128_t*);
+    void f128M_mulAdd(const float128_t*, const float128_t*, const float128_t*, float128_t*);
+    bool f128M_isSignalingNaN(const float128_t*);
+
     /**@}*/
 
 #ifdef __cplusplus
