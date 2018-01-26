@@ -163,12 +163,6 @@ softfloat_subMagsF64(uint64_t,
 
 
 #ifdef SOFTFLOAT_FAST_INT64
-/** @deprecated */
-union ui128_f128
-{
-    uint128 ui;
-    float128_t f;
-};
 
 struct exp32_sig64
 {

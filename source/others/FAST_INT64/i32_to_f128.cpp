@@ -40,17 +40,14 @@ float128_t
 i32_to_f128(int32_t a)
 {
     using namespace softfloat::internals;
-    uint64_t uiZ64 = 0;
 
-    if (a) {
+    if (0 == a) {
+        return static_cast<float128_t>(uint128{0, 0});
+    } else {
         bool const sign = (a < 0);
         uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
         int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 17;
-        uiZ64 = packToF128UI64(sign, 0x402E - shiftDist, static_cast<uint64_t>(absA) << shiftDist);
+        uint64_t const uiZ64 = packToF128UI64(sign, 0x402E - shiftDist, static_cast<uint64_t>(absA) << shiftDist);
+        return static_cast<float128_t>(uint128{uiZ64, 0});
     }
-
-    ui128_f128 uZ;
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0 = 0;
-    return uZ.f;
 }

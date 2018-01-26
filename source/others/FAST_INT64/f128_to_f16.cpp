@@ -37,13 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float16_t
-f128_to_f16(float128_t a)
+f128_to_f16(float128_t const a)
 {
     using namespace softfloat::internals;
-    ui128_f128 uA;
-    uA.f = a;
-    uint64_t const uiA64 = uA.ui.v64;
-    uint64_t const uiA0 = uA.ui.v0;
+    uint128 const uA{a};
+    uint64_t const uiA64 = uA.v64;
+    uint64_t const uiA0 = uA.v0;
     bool const sign = signF128UI64(uiA64);
     int32_t exp = expF128UI64(uiA64);
     uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);

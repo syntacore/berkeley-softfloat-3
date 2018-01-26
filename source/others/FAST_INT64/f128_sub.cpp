@@ -41,21 +41,14 @@ f128_sub(float128_t const a,
          float128_t const b)
 {
     using namespace softfloat::internals;
-    ui128_f128 uA;
-    uint64_t uiA64;
-    uint64_t uiA0;
-    bool signA;
-    ui128_f128 uB;
-    uint64_t uiB64, uiB0;
-    bool signB;
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
-    signA = signF128UI64(uiA64);
-    uB.f = b;
-    uiB64 = uB.ui.v64;
-    uiB0 = uB.ui.v0;
-    signB = signF128UI64(uiB64);
+    uint128 const uA{a};
+    uint64_t const uiA64 = uA.v64;
+    uint64_t const uiA0 = uA.v0;
+    bool const signA = signF128UI64(uiA64);
+    uint128 const uB{b};
+    uint64_t const uiB64 = uB.v64;
+    uint64_t const uiB0 = uB.v0;
+    bool const signB = signF128UI64(uiB64);
     return
         signA == signB ? softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA) :
         softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA);

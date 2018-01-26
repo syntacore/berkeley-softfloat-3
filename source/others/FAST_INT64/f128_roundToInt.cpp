@@ -42,26 +42,23 @@ f128_roundToInt(float128_t a,
                 bool exact)
 {
     using namespace softfloat::internals;
-    ui128_f128 uA;
     uint64_t uiA64, uiA0;
     int32_t exp;
     uint128 uiZ;
     uint64_t lastBitMask, roundBitsMask;
     bool roundNearEven;
-    ui128_f128 uZ;
 
 
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
+    uint128 const uA{a};
+    uiA64 = uA.v64;
+    uiA0 = uA.v0;
     exp = expF128UI64(uiA64);
 
     if (0x402F <= exp) {
 
         if (0x406F <= exp) {
             if ((exp == 0x7FFF) && (fracF128UI64(uiA64) | uiA0)) {
-                uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, 0, 0);
-                goto uiZ;
+                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiA64, uiA0, 0, 0));
             }
 
             return a;
@@ -102,7 +99,6 @@ f128_roundToInt(float128_t a,
 
         uiZ.v0 &= ~roundBitsMask;
     } else {
-
         if (exp < 0x3FFF) {
             if (!((uiA64 & UINT64_C(0x7FFFFFFFFFFFFFFF)) | uiA0)) {
                 return a;
@@ -143,7 +139,7 @@ f128_roundToInt(float128_t a,
                 break;
             }
 
-            goto uiZ;
+            return static_cast<float128_t>(uiZ);
         }
 
         uiZ.v64 = uiA64;
@@ -170,13 +166,9 @@ f128_roundToInt(float128_t a,
         uiZ.v64 &= ~roundBitsMask;
     }
 
-    if (exact && ((uiZ.v64 != uiA64) || (uiZ.v0 != uiA0))) {
+    if (exact && (uiZ.v64 != uiA64 || uiZ.v0 != uiA0)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
-
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return static_cast<float128_t>(uiZ);
 }
 

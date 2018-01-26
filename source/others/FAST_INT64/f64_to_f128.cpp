@@ -54,18 +54,12 @@ f64_to_f128(float64_t a)
             uiZ.v0 = 0;
         }
 
-        ui128_f128 uZ;
-        uZ.ui = uiZ;
-        return uZ.f;
+        return static_cast<float128_t>(uiZ);
     }
 
     if (!exp) {
         if (!frac) {
-            uiZ.v64 = packToF128UI64(sign, 0, 0);
-            uiZ.v0 = 0;
-            ui128_f128 uZ;
-            uZ.ui = uiZ;
-            return uZ.f;
+            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0, 0), 0u});
         }
 
         exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
@@ -74,10 +68,6 @@ f64_to_f128(float64_t a)
     }
 
     uint128 const frac128 = softfloat_shortShiftLeft128(0, frac, 60);
-    uiZ.v64 = packToF128UI64(sign, exp + 0x3C00, frac128.v64);
-    uiZ.v0 = frac128.v0;
-    ui128_f128 uZ;
-    uZ.ui = uiZ;
-    return uZ.f;
+    return static_cast<float128_t>(uint128{packToF128UI64(sign, exp + 0x3C00, frac128.v64),frac128.v0});
 }
 

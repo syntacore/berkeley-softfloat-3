@@ -42,53 +42,41 @@ float128_t
 f128_rem(float128_t a, float128_t b)
 {
     using namespace softfloat::internals;
-    ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    bool signA;
-    int32_t expA;
-    uint128 sigA;
-    ui128_f128 uB;
-    uint64_t uiB64, uiB0;
-    int32_t expB;
-    uint128 sigB;
     exp32_sig128 normExpSig;
     uint128 rem;
     int32_t expDiff;
     uint32_t recip32;
     uint64_t q64;
-    uint128 term, altRem, meanRem;
-    bool signRem;
-    uint128 uiZ;
-    ui128_f128 uZ;
+    uint128 term;
+    uint128 altRem;
 
 
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
-    signA = signF128UI64(uiA64);
-    expA = expF128UI64(uiA64);
-    sigA.v64 = fracF128UI64(uiA64);
-    sigA.v0 = uiA0;
-    uB.f = b;
-    uiB64 = uB.ui.v64;
-    uiB0 = uB.ui.v0;
-    expB = expF128UI64(uiB64);
-    sigB.v64 = fracF128UI64(uiB64);
-    sigB.v0 = uiB0;
+    uint128 const uA{a};
+    uint64_t const uiA64 = uA.v64;
+    uint64_t const uiA0 = uA.v0;
+    bool const signA = signF128UI64(uiA64);
+    int32_t expA = expF128UI64(uiA64);
+    uint128 sigA{fracF128UI64(uiA64), uiA0};
+    uint128 const uB{b};
+    uint64_t const uiB64 = uB.v64;
+    uint64_t const uiB0 = uB.v0;
+    int32_t expB = expF128UI64(uiB64);
+    uint128 sigB{fracF128UI64(uiB64), uiB0};
 
     if (expA == 0x7FFF) {
         if (
             (sigA.v64 | sigA.v0) || ((expB == 0x7FFF) && (sigB.v64 | sigB.v0))
         ) {
-            goto propagateNaN;
+            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
         }
 
-        goto invalid;
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return static_cast<float128_t>(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
     }
 
     if (expB == 0x7FFF) {
         if (sigB.v64 | sigB.v0) {
-            goto propagateNaN;
+            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
         }
 
         return a;
@@ -96,7 +84,8 @@ f128_rem(float128_t a, float128_t b)
 
     if (!expB) {
         if (!(sigB.v64 | sigB.v0)) {
-            goto invalid;
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return static_cast<float128_t>(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
         }
 
         normExpSig = softfloat_normSubnormalF128Sig(sigB.v64, sigB.v0);
@@ -180,16 +169,13 @@ f128_rem(float128_t a, float128_t b)
     } while (!(rem.v64 & UINT64_C(0x8000000000000000)));
 
 selectRem:
-    meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
+    uint128 const meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
 
-    if (
-        (meanRem.v64 & UINT64_C(0x8000000000000000))
-        || (!(meanRem.v64 | meanRem.v0) && (q & 1))
-    ) {
+    if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (0 == (meanRem.v64 | meanRem.v0) && 0 != (q & 1))) {
         rem = altRem;
     }
 
-    signRem = signA;
+    bool signRem = signA;
 
     if (rem.v64 & UINT64_C(0x8000000000000000)) {
         signRem = !signRem;
@@ -197,18 +183,5 @@ selectRem:
     }
 
     return softfloat_normRoundPackToF128(signRem, expB - 1, rem.v64, rem.v0);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-    goto uiZ;
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    uiZ.v64 = defaultNaNF128UI64;
-    uiZ.v0 = defaultNaNF128UI0;
-uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
 }
 

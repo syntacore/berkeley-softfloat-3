@@ -40,13 +40,13 @@ namespace softfloat {
 namespace internals {
 
 float128_t
-softfloat_mulAddF128(uint64_t uiA64,
-                     uint64_t uiA0,
-                     uint64_t uiB64,
-                     uint64_t uiB0,
-                     uint64_t uiC64,
-                     uint64_t uiC0,
-                     Mul_add_operations op)
+softfloat_mulAddF128(uint64_t const uiA64,
+                     uint64_t const uiA0,
+                     uint64_t const uiB64,
+                     uint64_t const uiB0,
+                     uint64_t const uiC64,
+                     uint64_t const uiC0,
+                     Mul_add_operations const op)
 {
     bool signA;
     int32_t expA;
@@ -69,7 +69,6 @@ softfloat_mulAddF128(uint64_t uiA64,
     uint64_t sig256C[4];
     uint64_t zero256[4] = INIT_UINTM4(0, 0, 0, 0);
     uint64_t sigZExtra, sig256Z0;
-    ui128_f128 uZ;
 
 
     signA = signF128UI64(uiA64);
@@ -381,16 +380,12 @@ zeroProd:
 
     if (!(expC | sigC.v64 | sigC.v0) && (signZ != signC)) {
 completeCancellation:
-        uiZ.v64 =
-            packToF128UI64(
-            (softfloat_roundingMode == softfloat_round_min), 0, 0);
+        uiZ.v64 = packToF128UI64((softfloat_roundingMode == softfloat_round_min), 0, 0);
         uiZ.v0 = 0;
     }
 
 uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
-
+    return static_cast<float128_t>(uiZ);
 }
 
 }  // namespace internals

@@ -43,55 +43,39 @@ f128_to_i64(float128_t a,
             bool exact)
 {
     using namespace softfloat::internals;
-    ui128_f128 uA;
-    uint64_t uiA64, uiA0;
-    bool sign;
-    int32_t exp;
-    uint64_t sig64, sig0;
-    int32_t shiftDist;
-    uint128 sig128;
-    uint64_extra sigExtra;
 
+    uint128 const uA{a};
+    uint64_t const uiA64 = uA.v64;
+    uint64_t const uiA0 = uA.v0;
+    bool const sign = signF128UI64(uiA64);
+    int32_t const exp = expF128UI64(uiA64);
+    uint64_t sig64 = fracF128UI64(uiA64);
+    uint64_t sig0 = uiA0;
 
-    uA.f = a;
-    uiA64 = uA.ui.v64;
-    uiA0 = uA.ui.v0;
-    sign = signF128UI64(uiA64);
-    exp = expF128UI64(uiA64);
-    sig64 = fracF128UI64(uiA64);
-    sig0 = uiA0;
-
-    shiftDist = 0x402F - exp;
+    int32_t const shiftDist = 0x402F - exp;
 
     if (shiftDist <= 0) {
-
         if (shiftDist < -15) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                (exp == 0x7FFF) && (sig64 | sig0) ? i64_fromNaN
-                : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+                exp == 0x7FFF && 0 != (sig64 | sig0) ? i64_fromNaN :
+                sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
 
         sig64 |= UINT64_C(0x0001000000000000);
 
         if (shiftDist) {
-            sig128 = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(-shiftDist));
-            sig64 = sig128.v64;
-            sig0 = sig128.v0;
+            uint128 const sig128 = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(-shiftDist));
+            return softfloat_roundPackToI64(sign, sig128.v64, sig128.v0, roundingMode, exact);
         }
-    }
-    else {
-
+        return softfloat_roundPackToI64(sign, sig64, sig0, roundingMode, exact);
+    } else {
         if (exp) {
             sig64 |= UINT64_C(0x0001000000000000);
         }
 
-        sigExtra = softfloat_shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
-        sig64 = sigExtra.v;
-        sig0 = sigExtra.extra;
+        uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
+        return softfloat_roundPackToI64(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
     }
-
-    return softfloat_roundPackToI64(sign, sig64, sig0, roundingMode, exact);
-
 }
 

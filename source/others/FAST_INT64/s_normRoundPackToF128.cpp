@@ -42,8 +42,6 @@ namespace internals {
 float128_t
 softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t sig0)
 {
-    uint64_t sigExtra;
-
     if (!sig64) {
         exp -= 64;
         sig64 = sig0;
@@ -61,21 +59,14 @@ softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t s
         }
 
         if (static_cast<uint32_t>(exp) < 0x7FFD) {
-            ui128_f128 uZ;
-            uZ.ui.v64 = packToF128UI64(sign, sig64 | sig0 ? exp : 0, sig64);
-            uZ.ui.v0 = sig0;
-            return uZ.f;
+            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0 != (sig64 | sig0) ? exp : 0, sig64), sig0});
+        } else {
+            return softfloat_roundPackToF128(sign, exp, sig64, sig0, 0);
         }
-
-        sigExtra = 0;
     } else {
         uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sig64, sig0, 0, static_cast<uint8_t>(-shiftDist));
-        sig64 = sig128Extra.v.v64;
-        sig0 = sig128Extra.v.v0;
-        sigExtra = sig128Extra.extra;
+        return softfloat_roundPackToF128(sign, exp, sig128Extra.v.v64, sig128Extra.v.v0, sig128Extra.extra);
     }
-
-    return softfloat_roundPackToF128(sign, exp, sig64, sig0, sigExtra);
 }
 
 }  // namespace internals

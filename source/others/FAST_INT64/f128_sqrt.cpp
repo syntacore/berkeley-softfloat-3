@@ -40,10 +40,9 @@ float128_t
 f128_sqrt(float128_t a)
 {
     using namespace softfloat::internals;
-    ui128_f128 uA;
-    uA.f = a;
-    uint64_t const uiA64 = uA.ui.v64;
-    uint64_t const uiA0 = uA.ui.v0;
+    uint128 const uA{a};
+    uint64_t const uiA64 = uA.v64;
+    uint64_t const uiA0 = uA.v0;
     bool const signA = signF128UI64(uiA64);
     int32_t expA = expF128UI64(uiA64);
     uint128 sigA;

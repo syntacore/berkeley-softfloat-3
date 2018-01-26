@@ -40,32 +40,21 @@ float128_t
 i64_to_f128(int64_t a)
 {
     using namespace softfloat::internals;
-    uint64_t uiZ64, uiZ0;
-    ui128_f128 uZ;
 
-    if (!a) {
-        uiZ64 = 0;
-        uiZ0 = 0;
+    if (0 == a) {
+        return static_cast<float128_t>(uint128{0, 0});
     } else {
         bool const sign = (a < 0);
         /** @bug for INT64_MIN */
-        uint64_t absA = static_cast<uint64_t>(sign ? -a : a);
+        uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
         int8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 49;
-        uint128 zSig;
 
         if (64 <= shiftDist) {
-            zSig.v64 = absA << (shiftDist - 64);
-            zSig.v0 = 0;
+            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});
         } else {
-            zSig = softfloat_shortShiftLeft128(0, absA, static_cast<uint8_t>(shiftDist));
+            uint128 const zSig = softfloat_shortShiftLeft128(0, absA, static_cast<uint8_t>(shiftDist));
+            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, zSig.v64), zSig.v0});
         }
-
-        uiZ64 = packToF128UI64(sign, 0x406E - shiftDist, zSig.v64);
-        uiZ0 = zSig.v0;
     }
-
-    uZ.ui.v64 = uiZ64;
-    uZ.ui.v0 = uiZ0;
-    return uZ.f;
 }
 
