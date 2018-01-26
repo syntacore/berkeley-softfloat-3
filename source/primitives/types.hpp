@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "softfloat/types.h"
 #include <cstdint>
+#include <climits>
 
 namespace softfloat {
 namespace internals {
@@ -73,6 +74,12 @@ endian and little-endian platforms.
 
 #ifdef SOFTFLOAT_FAST_INT64
 
+static_assert( 16 == CHAR_BIT * sizeof(float16_t), "Bad size of float16_t");
+static_assert( 32 == CHAR_BIT * sizeof(float32_t), "Bad size of float32_t");
+static_assert( 64 == CHAR_BIT * sizeof(float64_t), "Bad size of float64_t");
+static_assert( 80 <= CHAR_BIT * sizeof(extFloat80M) && CHAR_BIT * sizeof(extFloat80M) <= 128, "Bad size of extFloat80M");
+static_assert(128 == CHAR_BIT * sizeof(float128_t), "Bad size of float128_t");
+
 struct uint128
 {
     uint128() = default;
@@ -98,6 +105,8 @@ struct uint128
     uint64_t v64;
     uint64_t v0;
 };
+
+static_assert(sizeof(uint128) == sizeof(float128_t), "sizeof(uint128) != sizeof(float128_t)");
 
 struct uint64_extra
 {
