@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "primitives/functions.hpp"
+#include "target.hpp"
 
 #include <cassert>
 #include <cstring>

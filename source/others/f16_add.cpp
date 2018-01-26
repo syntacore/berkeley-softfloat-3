@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "internals.hpp"
+#include "target.hpp"
 
 float16_t
 f16_add(float16_t a, float16_t b)

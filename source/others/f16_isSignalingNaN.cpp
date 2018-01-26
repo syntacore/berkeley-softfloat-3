@@ -34,12 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "internals.hpp"
 #include "target.hpp"
 
-/** @todo make inline */
 bool
 f16_isSignalingNaN(float16_t a)
 {

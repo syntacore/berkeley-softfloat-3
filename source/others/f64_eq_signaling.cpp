@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "internals.hpp"
+#include "target.hpp"
 
 bool
 f64_eq_signaling(float64_t a,

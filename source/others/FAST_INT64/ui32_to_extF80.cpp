@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "internals.hpp"
-
-#include "softfloat/functions.h"
+#include "target.hpp"
 
 extFloat80_t
 ui32_to_extF80(uint32_t a)

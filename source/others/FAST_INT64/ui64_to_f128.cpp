@@ -34,8 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "internals.hpp"
-#include "softfloat/functions.h"
+#include "target.hpp"
 
 float128_t
 ui64_to_f128(uint64_t a)

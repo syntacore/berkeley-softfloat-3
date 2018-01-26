@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "primitives/functions.hpp"
+#include "target.hpp"
 
 bool
 f128M_isSignalingNaN(float128_t const *aPtr)

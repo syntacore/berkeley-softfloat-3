@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "internals.hpp"
 #include "target.hpp"
-#include "softfloat/functions.h"
 
 #ifndef THREAD_LOCAL
 #define THREAD_LOCAL

@@ -34,9 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "internals.hpp"
 #include "target.hpp"
 
 bool
@@ -53,6 +50,5 @@ f32_eq(float32_t a,
         return false;
     }
     return uiA == uiB || !static_cast<uint32_t>((uiA | uiB) << 1);
-
 }
 

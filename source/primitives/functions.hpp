@@ -42,6 +42,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
+
+/**
+Returns true when 16-bit unsigned integer `uiA' has the bit pattern of a
+16-bit floating-point signaling NaN.
+*/
+inline constexpr bool
+softfloat_isSigNaNF16UI(uint16_t const uiA)
+{
+    return
+        UINT16_C(0x7C00) == (UINT16_C(0x7E00) & uiA) &&
+        0 != (UINT16_C(0x01FF) & uiA);
+}
+
 /**
 Shifts `a' right by the number of bits given in `dist', which must be in
 the range 1 to 63.  If any nonzero bits are shifted off, they are "jammed"

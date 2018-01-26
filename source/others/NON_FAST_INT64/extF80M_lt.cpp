@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
+#include "target.hpp"
 
-#include "internals.hpp"
-
-bool extF80M_lt(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
+bool
+extF80M_lt(const extFloat80_t *aPtr,
+           const extFloat80_t *bPtr)
 {
     using namespace softfloat::internals;
     extFloat80M const *aSPtr;

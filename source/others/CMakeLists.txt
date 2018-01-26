@@ -4,7 +4,6 @@ add_subdirectory(FAST_INT64)
 add_subdirectory(NON_FAST_INT64)
 
 set(SRC_OTHERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/extF80M_isSignalingNaN.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f128M_isSignalingNaN.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f16_add.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f16_div.cpp

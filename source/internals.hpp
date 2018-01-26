@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SOFTFLOAT_INTERNALS_H_
 #define SOFTFLOAT_INTERNALS_H_
 
+#include "softfloat/functions.h"
 #include "primitives/functions.hpp"
-#include "softfloat/types.h"
 
 #include <cassert>
 

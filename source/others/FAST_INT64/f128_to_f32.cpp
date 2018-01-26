@@ -34,12 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "internals.hpp"
 #include "target.hpp"
-
-#include <cassert>
 
 float32_t
 f128_to_f32(float128_t a)

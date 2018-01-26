@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "softfloat/functions.h"
-
-#include "primitives/types.hpp"
+#include "target.hpp"
 
 namespace softfloat {
 namespace internals {

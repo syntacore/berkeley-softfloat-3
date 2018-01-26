@@ -36,9 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
-#include "internals.hpp"
-#include "softfloat/functions.h"
-
 namespace softfloat {
 namespace internals {
 namespace Intel_8086 {

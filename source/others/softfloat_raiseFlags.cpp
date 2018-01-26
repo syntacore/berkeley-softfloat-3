@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "softfloat/functions.h"
+#include "target.hpp"
 
 static THREAD_LOCAL uint8_t softfloat_exceptionFlags = 0;
 

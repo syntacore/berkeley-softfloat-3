@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TARGET_INTEL8086_HPP_
 #define TARGET_INTEL8086_HPP_
 
-#include "softfloat/functions.h"
-#include "primitives/types.hpp"
 #include "internals.hpp"
 
 namespace softfloat {
@@ -96,17 +94,6 @@ struct commonNaN
 The bit pattern for a default generated 16-bit floating-point NaN.
 */
 static uint16_t const defaultNaNF16UI = UINT16_C(0xFE00);
-
-/**
-Returns true when 16-bit unsigned integer `uiA' has the bit pattern of a
-16-bit floating-point signaling NaN.
-Note:  This macro evaluates its argument more than once.
-*/
-inline bool
-softfloat_isSigNaNF16UI(uint16_t uiA)
-{
-    return UINT16_C(0x7C00) == (uiA & UINT16_C(0x7E00)) && 0 != (uiA & 0x01FF);
-}
 
 /**
 Assuming `uiA' has the bit pattern of a 16-bit floating-point NaN, converts

@@ -78,19 +78,6 @@ The bit pattern for a default generated 16-bit floating-point NaN.
 static uint16_t const defaultNaNF16UI = UINT16_C(0x7E00);
 
 /**
-Returns true when 16-bit unsigned integer `uiA' has the bit pattern of a
-16-bit floating-point signaling NaN.
-Note:  This macro evaluates its argument more than once.
-*/
-inline constexpr bool
-softfloat_isSigNaNF16UI(uint16_t uiA)
-{
-    return
-        0x7C00 == (uiA & 0x7E00) &&
-        0 != (uiA & 0x01FF);
-}
-
-/**
 The bit pattern for a default generated 32-bit floating-point NaN.
 */
 static uint32_t const defaultNaNF32UI = UINT32_C(0x7FC00000);
