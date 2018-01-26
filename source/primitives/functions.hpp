@@ -195,12 +195,20 @@ fraction bits.  The approximation returned is never greater than the true
 reciprocal 1/A, and it differs from the true reciprocal by at most 2.006 ulp
 (units in the last place).
 */
+
+#ifdef SOFTFLOAT_FAST_DIV64TO32
+
 inline uint32_t
 softfloat_approxRecip32_1(uint32_t a)
 {
-#ifdef SOFTFLOAT_FAST_DIV64TO32
     return static_cast<uint32_t>(INT64_MAX / static_cast<uint32_t>(a));
+}
+
 #else
+
+inline uint32_t
+softfloat_approxRecip32_1(uint32_t a)
+{
     auto const index = a >> 27 & 0xF;
     uint16_t const eps = static_cast<uint16_t>(a >> 11);
     uint16_t const r0 =
@@ -210,8 +218,9 @@ softfloat_approxRecip32_1(uint32_t a)
     uint32_t r = (static_cast<uint32_t>(r0) << 16) + ((r0 * static_cast<uint64_t>(sigma0)) >> 24);
     uint32_t const sqrSigma0 = (static_cast<uint64_t>(sigma0) * sigma0) >> 32;
     return r + ((static_cast<uint32_t>(r) * static_cast<uint64_t>(sqrSigma0)) >> 48);
-#endif
 }
+
+#endif
 
 extern const uint16_t softfloat_approxRecipSqrt_1k0s[16];
 extern const uint16_t softfloat_approxRecipSqrt_1k1s[16];
