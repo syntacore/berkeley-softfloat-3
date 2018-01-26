@@ -72,13 +72,13 @@ endian and little-endian platforms.
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
 #endif
 
-#ifdef SOFTFLOAT_FAST_INT64
-
-static_assert( 16 == CHAR_BIT * sizeof(float16_t), "Bad size of float16_t");
-static_assert( 32 == CHAR_BIT * sizeof(float32_t), "Bad size of float32_t");
-static_assert( 64 == CHAR_BIT * sizeof(float64_t), "Bad size of float64_t");
-static_assert( 80 <= CHAR_BIT * sizeof(extFloat80M) && CHAR_BIT * sizeof(extFloat80M) <= 128, "Bad size of extFloat80M");
+static_assert(16 == CHAR_BIT * sizeof(float16_t), "Bad size of float16_t");
+static_assert(32 == CHAR_BIT * sizeof(float32_t), "Bad size of float32_t");
+static_assert(64 == CHAR_BIT * sizeof(float64_t), "Bad size of float64_t");
+static_assert(80 <= CHAR_BIT * sizeof(extFloat80M) && CHAR_BIT * sizeof(extFloat80M) <= 128, "Bad size of extFloat80M");
 static_assert(128 == CHAR_BIT * sizeof(float128_t), "Bad size of float128_t");
+
+#ifdef SOFTFLOAT_FAST_INT64
 
 struct uint128
 {
