@@ -46,8 +46,9 @@ softfloat_roundPackToExtF80(bool sign,
                             uint64_t sigExtra,
                             uint8_t roundingPrecision)
 {
-    uint64_t roundIncrement, roundMask, roundBits;
-    bool isTiny, doIncrement;
+    uint64_t roundIncrement;
+    uint64_t roundMask;
+    bool doIncrement;
     uint64_extra sig64Extra;
     extFloat80_t uZ;
 
@@ -55,9 +56,7 @@ softfloat_roundPackToExtF80(bool sign,
 
     if (roundingPrecision == 80) {
         goto precision80;
-    }
-
-    if (roundingPrecision == 64) {
+    } else if (roundingPrecision == 64) {
         roundIncrement = UINT64_C(0x0000000000000400);
         roundMask = UINT64_C(0x00000000000007FF);
     } else if (roundingPrecision == 32) {
@@ -70,18 +69,14 @@ softfloat_roundPackToExtF80(bool sign,
     sig |= (sigExtra != 0);
 
     if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
-        roundIncrement =
-            (softfloat_roundingMode
-             == (sign ? softfloat_round_min : softfloat_round_max))
-            ? roundMask
-            : 0;
+        roundIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) ? roundMask : 0;
     }
 
-    roundBits = sig & roundMask;
+    uint64_t roundBits = sig & roundMask;
 
     if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
         if (exp <= 0) {
-            isTiny = softfloat_tininess_beforeRounding == softfloat_detectTininess || exp < 0 || sig <= static_cast<uint64_t>(sig + roundIncrement);
+            bool isTiny = softfloat_tininess_beforeRounding == softfloat_detectTininess || exp < 0 || sig <= static_cast<uint64_t>(sig + roundIncrement);
             sig = softfloat_shiftRightJam64(sig, 1u - exp);
             roundBits = sig & roundMask;
 
@@ -102,11 +97,12 @@ softfloat_roundPackToExtF80(bool sign,
             }
 
             sig &= ~roundMask;
-            goto packReturn;
+            uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+            uZ.signif = sig;
+            return uZ;
         }
 
-        if (0x7FFE < exp || (0x7FFE == exp  && static_cast<uint64_t>(sig + roundIncrement) < sig)
-           ) {
+        if (0x7FFE < exp || (0x7FFE == exp  && static_cast<uint64_t>(sig + roundIncrement) < sig) ) {
             goto overflow;
         }
     }
@@ -134,24 +130,20 @@ softfloat_roundPackToExtF80(bool sign,
         exp = 0;
     }
 
-    goto packReturn;
+    uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+    uZ.signif = sig;
+    return uZ;
+
 precision80:
-    doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+    doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 
     if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
-        doIncrement =
-            (softfloat_roundingMode
-             == (sign ? softfloat_round_min : softfloat_round_max))
-            && sigExtra;
+        doIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra;
     }
 
     if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
         if (exp <= 0) {
-            isTiny =
-                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
-                exp < 0 ||
-                !doIncrement ||
-                sig < UINT64_C(0xFFFFFFFFFFFFFFFF);
+            bool isTiny = softfloat_detectTininess == softfloat_tininess_beforeRounding || exp < 0 || !doIncrement || sig < UINT64_C(0xFFFFFFFFFFFFFFFF);
             sig64Extra = softfloat_shiftRightJam64Extra(sig, sigExtra, 1u - exp);
             sig = sig64Extra.v;
             sigExtra = sig64Extra.extra;
@@ -164,16 +156,10 @@ precision80:
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+            doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 
-            if (
-                !roundNearEven
-                && (softfloat_roundingMode != softfloat_round_near_maxMag)
-            ) {
-                doIncrement =
-                    (softfloat_roundingMode
-                     == (sign ? softfloat_round_min : softfloat_round_max))
-                    && sigExtra;
+            if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
+                doIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra;
             }
 
             exp = 0;
@@ -184,25 +170,17 @@ precision80:
                 exp = ((sig & UINT64_C(0x8000000000000000)) != 0);
             }
 
-            goto packReturn;
+            uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+            uZ.signif = sig;
+            return uZ;
         }
 
-        if (
-            (0x7FFE < exp)
-            || ((exp == 0x7FFE) && (sig == UINT64_C(0xFFFFFFFFFFFFFFFF))
-            && doIncrement)
-        ) {
+        if (0x7FFE < exp || (exp == 0x7FFE && sig == UINT64_C(0xFFFFFFFFFFFFFFFF) && doIncrement)) {
             roundMask = 0;
 overflow:
-            softfloat_raiseFlags(
-                softfloat_flag_overflow | softfloat_flag_inexact);
+            softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
 
-            if (
-                roundNearEven
-                || (softfloat_roundingMode == softfloat_round_near_maxMag)
-                || (softfloat_roundingMode
-                == (sign ? softfloat_round_min : softfloat_round_max))
-            ) {
+            if (roundNearEven || softfloat_roundingMode == softfloat_round_near_maxMag || softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) {
                 exp = 0x7FFF;
                 sig = UINT64_C(0x8000000000000000);
             } else {
@@ -210,7 +188,9 @@ overflow:
                 sig = ~roundMask;
             }
 
-            goto packReturn;
+            uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+            uZ.signif = sig;
+            return uZ;
         }
     }
 
@@ -233,12 +213,9 @@ overflow:
         }
     }
 
-packReturn:
-    /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
     uZ.signif = sig;
     return uZ;
-
 }
 
 }  // namespace internals

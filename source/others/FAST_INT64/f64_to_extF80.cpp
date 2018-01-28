@@ -37,50 +37,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 extFloat80_t
-f64_to_extF80(float64_t a)
+f64_to_extF80(float64_t const a)
 {
     using namespace softfloat::internals;
-    uint128 uiZ;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-
-
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t exp = expF64UI(uiA);
     uint64_t frac = fracF64UI(uiA);
 
     if (exp == 0x7FF) {
+        extFloat80_t uZ;
+
         if (frac) {
-            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f64UIToCommonNaN(uiA));
-            uiZ64 = static_cast<uint16_t>(uiZ.v64);
-            uiZ0 = uiZ.v0;
-        }
-        else {
-            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
-            uiZ0 = UINT64_C(0x8000000000000000);
+            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f64UIToCommonNaN(uiA));
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
+        } else {
+            uZ.signExp = packToExtF80UI64(sign, 0x7FFF);
+            uZ.signif = UINT64_C(0x8000000000000000);
         }
 
-        goto uiZ;
+        return uZ;
+    } else {
+        if (0 == exp) {
+            if (0 == frac) {
+                extFloat80_t uZ;
+                uZ.signExp = packToExtF80UI64(sign, 0);
+                uZ.signif = 0;
+                return uZ;
+            } else {
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+                exp = normExpSig.exp;
+                frac = normExpSig.sig;
+            }
+        }
+
+        extFloat80_t uZ;
+        uZ.signExp = packToExtF80UI64(sign, exp + 0x3C00u);
+        uZ.signif = (frac | UINT64_C(0x0010000000000000)) << 11;
+        return uZ;
     }
-
-    if (!exp) {
-        if (!frac) {
-            uiZ64 = packToExtF80UI64(sign, 0);
-            uiZ0 = 0;
-            goto uiZ;
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
-    }
-
-    uiZ64 = packToExtF80UI64(sign, exp + 0x3C00u);
-    uiZ0 = (frac | UINT64_C(0x0010000000000000)) << 11;
-uiZ:
-    extFloat80_t uZ;
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
-    return uZ;
 }

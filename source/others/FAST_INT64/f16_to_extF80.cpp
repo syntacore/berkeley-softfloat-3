@@ -40,46 +40,42 @@ extFloat80_t
 f16_to_extF80(float16_t const a)
 {
     using namespace softfloat::internals;
-    uint128 uiZ;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-
 
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = signF16UI(uiA);
     int8_t exp = expF16UI(uiA);
     uint16_t frac = fracF16UI(uiA);
 
-    if (exp == 0x1F) {
-        if (frac) {
-            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(uiA));
-            uiZ64 = static_cast<uint16_t>(uiZ.v64);
-            uiZ0 = uiZ.v0;
+    if (0x1F == exp) {
+        extFloat80_t uZ;
+
+        if (0 != frac) {
+            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(uiA));
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
         } else {
-            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
-            uiZ0 = UINT64_C(0x8000000000000000);
+            uZ.signExp = packToExtF80UI64(sign, 0x7FFF);
+            uZ.signif = UINT64_C(0x8000000000000000);
         }
 
-        goto uiZ;
-    }
-
-    if (!exp) {
-        if (!frac) {
-            uiZ64 = packToExtF80UI64(sign, 0);
-            uiZ0 = 0;
-            goto uiZ;
+        return uZ;
+    } else {
+        if (0 == exp) {
+            if (0 == frac) {
+                extFloat80_t uZ;
+                uZ.signExp = packToExtF80UI64(sign, 0);
+                uZ.signif = 0;
+                return uZ;
+            } else {
+                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+                exp = normExpSig.exp;
+                frac = normExpSig.sig;
+            }
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+        extFloat80_t uZ;
+        uZ.signExp = packToExtF80UI64(sign, exp + 0x3FF0u);
+        uZ.signif = static_cast<uint64_t>(frac | 0x0400) << 53;
+        return uZ;
     }
-
-    uiZ64 = packToExtF80UI64(sign, exp + 0x3FF0u);
-    uiZ0 = static_cast<uint64_t>(frac | 0x0400) << 53;
-uiZ:
-    extFloat80_t uZ;
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
-    return uZ;
 }

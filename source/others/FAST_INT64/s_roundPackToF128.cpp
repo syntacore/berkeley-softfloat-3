@@ -46,10 +46,6 @@ softfloat_roundPackToF128(bool sign,
                           uint64_t sig0,
                           uint64_t sigExtra)
 {
-    uint128_extra sig128Extra;
-    uint64_t uiZ64, uiZ0;
-    uint128 sig128;
-
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
     bool doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 
@@ -68,7 +64,7 @@ softfloat_roundPackToF128(bool sign,
                     sig0,
                     UINT64_C(0x0001FFFFFFFFFFFF),
                     UINT64_MAX);
-            sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, static_cast<uint32_t>(-exp));
+            uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, static_cast<uint32_t>(-exp));
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
@@ -87,11 +83,9 @@ softfloat_roundPackToF128(bool sign,
             }
         } else if (
             0x7FFD < exp ||
-            (
-            exp == 0x7FFD &&
+            (0x7FFD == exp &&
             softfloat_eq128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF)) &&
-            doIncrement
-            )
+            doIncrement)
         ) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
 
@@ -99,14 +93,11 @@ softfloat_roundPackToF128(bool sign,
                     softfloat_roundingMode == softfloat_round_near_maxMag ||
                     softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
                ) {
-                uiZ64 = packToF128UI64(sign, 0x7FFF, 0);
-                uiZ0 = 0;
+                return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
             } else {
-                uiZ64 = packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF));
-                uiZ0 = UINT64_MAX;
+                return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
             }
 
-            goto uiZ;
         }
     }
 
@@ -115,23 +106,17 @@ softfloat_roundPackToF128(bool sign,
     }
 
     if (doIncrement) {
-        sig128 = softfloat_add128(sig64, sig0, 0, 1);
-        sig64 = sig128.v64;
-        sig0 = sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven);
+        uint128 const sig128 = softfloat_add128(sig64, sig0, 0, 1);
+        return u_as_f_128(uint128{
+            packToF128UI64(sign, exp, sig128.v64),
+            sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven)});
     } else {
-        if (!(sig64 | sig0)) {
+        if (0 == (sig64 | sig0)) {
             exp = 0;
         }
-    }
 
-    uiZ64 = packToF128UI64(sign, exp, sig64);
-    uiZ0 = sig0;
-uiZ:
-    ;
-    uint128 uZ;
-    uZ.v64 = uiZ64;
-    uZ.v0 = uiZ0;
-    return u_as_f_128(uZ);
+        return u_as_f_128(uint128{packToF128UI64(sign, exp, sig64), sig0});
+    }
 }
 
 }  // namespace internals

@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-f64_rem(float64_t a,
-        float64_t b)
+f64_rem(float64_t const a,
+        float64_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
@@ -52,39 +52,33 @@ f64_rem(float64_t a,
     if (expA == 0x7FF) {
         if (sigA || ((expB == 0x7FF) && sigB)) {
             return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-        }
-
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_64(defaultNaNF64UI);
-    }
-
-    if (expB == 0x7FF) {
-        return sigB ? u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB)) : a;
-    }
-
-    if (expA < expB - 1) {
-        return a;
-    }
-
-    if (!expB) {
-        if (!sigB) {
+        } else {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_64(defaultNaNF64UI);
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
-        expB = normExpSig.exp;
-        sigB = normExpSig.sig;
+    } else if (expB == 0x7FF) {
+        return sigB ? u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB)) : a;
+    } else if (expA < expB - 1) {
+        return a;
+    } else if (0 == expB) {
+        if (0 == sigB) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_64(defaultNaNF64UI);
+        } else {
+            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+            expB = normExpSig.exp;
+            sigB = normExpSig.sig;
+        }
     }
 
     if (!expA) {
         if (!sigA) {
             return a;
+        } else {
+            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+            expA = normExpSig.exp;
+            sigA = normExpSig.sig;
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
     }
 
     uint64_t rem = sigA | UINT64_C(0x0010000000000000);
@@ -96,19 +90,19 @@ f64_rem(float64_t a,
     if (expDiff < 1) {
         if (expDiff < -1) {
             return a;
-        }
-
-        sigB <<= 9;
-
-        if (expDiff) {
-            rem <<= 8;
-            q = 0;
         } else {
-            rem <<= 9;
-            q = 0u + !!(sigB <= rem);
+            sigB <<= 9;
 
-            if (q) {
-                rem -= sigB;
+            if (expDiff) {
+                rem <<= 8;
+                q = 0;
+            } else {
+                rem <<= 9;
+                q = 0u + !!(sigB <= rem);
+
+                if (q) {
+                    rem -= sigB;
+                }
             }
         }
     } else {
@@ -125,6 +119,7 @@ f64_rem(float64_t a,
         the maximum possible.
         */
         sigB <<= 9;
+
         uint64_t q64;
 
         for (;;) {
@@ -151,7 +146,20 @@ f64_rem(float64_t a,
 
         if (rem & UINT64_C(0x8000000000000000)) {
             altRem = rem + sigB;
-            goto selectRem;
+            uint64_t const meanRem = rem + altRem;
+
+            if ((meanRem & UINT64_C(0x8000000000000000)) || (!meanRem && (q & 1))) {
+                rem = altRem;
+            }
+
+            bool signRem = signA;
+
+            if (rem & UINT64_C(0x8000000000000000)) {
+                signRem = !signRem;
+                rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
+            }
+
+            return softfloat_normRoundPackToF64(signRem, expB, rem);
         }
     }
 
@@ -161,7 +169,7 @@ f64_rem(float64_t a,
         rem -= sigB;
     } while (!(rem & UINT64_C(0x8000000000000000)));
 
-selectRem:
+
     {
         uint64_t const meanRem = rem + altRem;
 
