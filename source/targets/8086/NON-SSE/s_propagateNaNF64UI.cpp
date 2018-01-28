@@ -41,7 +41,8 @@ namespace internals {
 namespace Intel_8086 {
 
 uint64_t
-softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
+softfloat_propagateNaNF64UI(uint64_t uiA,
+                            uint64_t uiB)
 {
     bool const isSigNaNA = softfloat_isSigNaNF64UI(uiA);
     bool const isSigNaNB = softfloat_isSigNaNF64UI(uiB);
@@ -49,26 +50,22 @@ softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
     uint64_t const uiNonsigA = uiA | UINT64_C(0x0008000000000000);
     uint64_t const uiNonsigB = uiB | UINT64_C(0x0008000000000000);
 
-    if (isSigNaNA | isSigNaNB) {
+    if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
-        if (isSigNaNA) {
-            if (isSigNaNB) {
-                goto returnLargerMag;
-            }
-            return isNaNF64UI(uiB) ? uiNonsigB : uiNonsigA;
-        } else {
+
+        if (!isSigNaNA) {
             return isNaNF64UI(uiA) ? uiNonsigA : uiNonsigB;
+        } else if (!isSigNaNB) {
+            return isNaNF64UI(uiB) ? uiNonsigB : uiNonsigA;
         }
     }
-returnLargerMag:
-    {
-        uint64_t const uiMagA = uiNonsigA & UINT64_C(0x7FFFFFFFFFFFFFFF);
-        uint64_t const uiMagB = uiNonsigB & UINT64_C(0x7FFFFFFFFFFFFFFF);
-        return
-            uiMagA < uiMagB ? uiNonsigB :
-            uiMagB < uiMagA ? uiNonsigA :
-            uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
-    }
+
+    uint64_t const uiMagA = uiNonsigA & UINT64_C(0x7FFFFFFFFFFFFFFF);
+    uint64_t const uiMagB = uiNonsigB & UINT64_C(0x7FFFFFFFFFFFFFFF);
+    return
+        uiMagA < uiMagB ? uiNonsigB :
+        uiMagB < uiMagA ? uiNonsigA :
+        uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
 }
 
 }  // namespace Intel_8086
