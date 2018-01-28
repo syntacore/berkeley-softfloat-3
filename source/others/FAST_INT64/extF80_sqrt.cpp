@@ -37,144 +37,121 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 extFloat80_t
-extF80_sqrt(extFloat80_t a)
+extF80_sqrt(extFloat80_t const a)
 {
     using namespace softfloat::internals;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    bool signA;
-    int32_t expA;
-    uint64_t sigA;
-    uint128 uiZ;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-    exp32_sig64 normExpSig;
-    int32_t expZ;
-    uint32_t sig32A, recipSqrt32, sig32Z;
-    uint128 rem;
-    uint64_t q, sigZ, x64;
-    uint128 term;
-    uint64_t sigZExtra;
-    extFloat80_t uZ;
 
+    bool const signA = signExtF80UI64(a.signExp);
+    int32_t expA = expExtF80UI64(a.signExp);
+    uint64_t sigA = a.signif;
 
-    uiA64 = a.signExp;
-    uiA0  = a.signif;
-    signA = signExtF80UI64(uiA64);
-    expA  = expExtF80UI64(uiA64);
-    sigA  = uiA0;
-
-    if (expA == 0x7FFF) {
-        if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, 0, 0);
-            uiZ64 = static_cast<uint16_t>(uiZ.v64);
-            uiZ0  = uiZ.v0;
-            goto uiZ;
-        }
-
-        if (! signA) {
+    if (0x7FFF == expA) {
+        if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigA)) {
+            uint128 const uiZ = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, 0, 0);
+            extFloat80_t uZ;
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
+            return uZ;
+        } else if (!signA) {
             return a;
+        } else {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            extFloat80_t uZ;
+            uZ.signExp = defaultNaNExtF80UI64;
+            uZ.signif = defaultNaNExtF80UI0;
+            return uZ;
+        }
+    } else if (signA) {
+        extFloat80_t uZ;
+
+        if (0 == sigA) {
+            uZ.signExp = packToExtF80UI64(signA, 0);
+            uZ.signif = 0;
+        } else {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            uZ.signExp = defaultNaNExtF80UI64;
+            uZ.signif = defaultNaNExtF80UI0;
         }
 
-        goto invalid;
-    }
+        return uZ;
+    } else {
 
-    if (signA) {
-        if (! sigA) {
-            goto zero;
+        if (!expA) {
+            expA = 1;
         }
 
-        goto invalid;
-    }
-
-    if (! expA) {
-        expA = 1;
-    }
-
-    if (!(sigA & UINT64_C(0x8000000000000000))) {
-        if (! sigA) {
-            goto zero;
+        if (0 == (UINT64_C(0x8000000000000000) & sigA)) {
+            if (!sigA) {
+                extFloat80_t uZ;
+                uZ.signExp = packToExtF80UI64(signA, 0);
+                uZ.signif = 0;
+                return uZ;
+            } else {
+                exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+                expA += normExpSig.exp;
+                sigA = normExpSig.sig;
+            }
         }
 
-        normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
-        expA += normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
+        /*
+        `sig32Z' is guaranteed to be a lower bound on the square root of
+        `sig32A', which makes `sig32Z' also a lower bound on the square root of
+        `sigA'.)
+        */
+        int32_t const expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
+        expA &= 1;
+        uint32_t const sig32A = sigA >> 32;
+        uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+        uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
-    /*
-    `sig32Z' is guaranteed to be a lower bound on the square root of
-    `sig32A', which makes `sig32Z' also a lower bound on the square root of
-    `sigA'.)
-    */
-    expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
-    expA &= 1;
-    sig32A = sigA >> 32;
-    recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
-    sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
+        uint128 rem;
 
-    if (expA) {
-        sig32Z >>= 1;
-        rem = softfloat_shortShiftLeft128(0, sigA, 61);
-    }
-    else {
-        rem = softfloat_shortShiftLeft128(0, sigA, 62);
-    }
+        if (expA) {
+            sig32Z >>= 1;
+            rem = softfloat_shortShiftLeft128(0, sigA, 61);
+        } else {
+            rem = softfloat_shortShiftLeft128(0, sigA, 62);
+        }
 
-    rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
+        rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
 
-    q = (static_cast<uint32_t>(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
-    sigZ = (static_cast<uint64_t>(sig32Z) << 32) + (q << 3);
-    x64 = (static_cast<uint64_t>(sig32Z) << 32) + sigZ;
-    /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
-    term = softfloat_mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
-    rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
-    rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
-
-    q = ((static_cast<uint32_t>(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
-    x64 = sigZ;
-    sigZ = (sigZ << 1) + (q >> 25);
-    sigZExtra = static_cast<uint64_t>(q << 39);
-
-    if ((q & 0xFFFFFF) <= 2) {
-        q &= ~static_cast<uint64_t>(0xFFFF);
-        sigZExtra = static_cast<uint64_t>(q << 39);
+        uint64_t q = (static_cast<uint32_t>(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
+        uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32) + (q << 3);
+        uint64_t x64 = (static_cast<uint64_t>(sig32Z) << 32) + sigZ;
         /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
-        term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
-        x64 = static_cast<uint32_t>(q << 5) * static_cast<uint64_t>(static_cast<uint32_t>(q));
-        term = softfloat_add128(term.v64, term.v0, 0, x64);
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 28);
+        uint128 term = softfloat_mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
+        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
-        if (rem.v64 & UINT64_C(0x8000000000000000)) {
-            if (! sigZExtra) {
-                --sigZ;
-            }
+        q = ((static_cast<uint32_t>(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
+        x64 = sigZ;
+        sigZ = (sigZ << 1) + (q >> 25);
+        uint64_t sigZExtra = static_cast<uint64_t>(q << 39);
 
-            --sigZExtra;
-        }
-        else {
-            if (rem.v64 | rem.v0) {
-                sigZExtra |= 1;
+        if ((q & 0xFFFFFF) <= 2) {
+            q &= ~static_cast<uint64_t>(0xFFFF);
+            sigZExtra = static_cast<uint64_t>(q << 39);
+            /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
+            term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
+            x64 = static_cast<uint32_t>(q << 5) * static_cast<uint64_t>(static_cast<uint32_t>(q));
+            term = softfloat_add128(term.v64, term.v0, 0, x64);
+            rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 28);
+            rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+
+            if (0 != (UINT64_C(0x8000000000000000) & rem.v64)) {
+                if (0 == sigZExtra) {
+                    --sigZ;
+                }
+
+                --sigZExtra;
+            } else {
+                if (rem.v64 | rem.v0) {
+                    sigZExtra |= 1;
+                }
             }
         }
+
+        return softfloat_roundPackToExtF80(0, expZ, sigZ, sigZExtra, extF80_roundingPrecision);
     }
-
-    return
-        softfloat_roundPackToExtF80(
-            0, expZ, sigZ, sigZExtra, extF80_roundingPrecision);
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    uiZ64 = defaultNaNExtF80UI64;
-    uiZ0  = defaultNaNExtF80UI0;
-    goto uiZ;
-
-zero:
-    uiZ64 = packToExtF80UI64(signA, 0);
-    uiZ0  = 0;
-uiZ:
-    uZ.signExp = uiZ64;
-    uZ.signif  = uiZ0;
-    return uZ;
 }
 
