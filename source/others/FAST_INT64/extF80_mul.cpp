@@ -37,125 +37,95 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 extFloat80_t
-extF80_mul(extFloat80_t a,
-           extFloat80_t b)
+extF80_mul(extFloat80_t const a,
+           extFloat80_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t uiA0;
-    bool signA;
-    int32_t expA;
-    uint64_t sigA;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    bool signB;
-    int32_t expB;
-    uint64_t sigB;
-    bool signZ;
-    uint64_t magBits;
-    exp32_sig64 normExpSig;
-    int32_t expZ;
-    uint128 sig128Z, uiZ;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-    extFloat80_t uZ;
 
+    bool const signA = signExtF80UI64(a.signExp);
+    int32_t const expA = expExtF80UI64(a.signExp);
+    uint64_t sigA = a.signif;
+    bool const signB = signExtF80UI64(b.signExp);
+    int32_t const expB = expExtF80UI64(b.signExp);
+    uint64_t sigB = b.signif;
+    bool const signZ = signA ^ signB;
 
-    uint16_t const uiA64 = a.signExp;
-    uiA0  = a.signif;
-    signA = signExtF80UI64(uiA64);
-    expA  = expExtF80UI64(uiA64);
-    sigA  = uiA0;
-    uiB64 = b.signExp;
-    uiB0  = b.signif;
-    signB = signExtF80UI64(uiB64);
-    expB  = expExtF80UI64(uiB64);
-    sigB  = uiB0;
-    signZ = signA ^ signB;
+    if (0x7FFF == expA) {
+        extFloat80_t uZ_1;
 
-    if (expA == 0x7FFF) {
-        if ((sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) || (expB == 0x7FFF && (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))) {
-            goto propagateNaN;
+        if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigA) || (expB == 0x7FFF && 0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigB))) {
+            auto const uiZ_1 = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, b.signExp, b.signif);
+            uZ_1.signExp = static_cast<uint16_t>(uiZ_1.v64);
+            uZ_1.signif = uiZ_1.v0;
+        } else if (0 == (expB | sigB)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            uZ_1.signExp = defaultNaNExtF80UI64;
+            uZ_1.signif = defaultNaNExtF80UI0;
+        } else {
+            uZ_1.signExp = packToExtF80UI64(signZ, 0x7FFF);
+            uZ_1.signif = UINT64_C(0x8000000000000000);
         }
 
-        magBits = expB | sigB;
-        goto infArg;
-    }
+        return uZ_1;
+    } else if (0x7FFF == expB) {
+        extFloat80_t uZ_1;
 
-    if (expB == 0x7FFF) {
-        if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            goto propagateNaN;
+        if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigB)) {
+            auto const uiZ_1 = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, b.signExp, b.signif);
+            uZ_1.signExp = static_cast<uint16_t>(uiZ_1.v64);
+            uZ_1.signif = uiZ_1.v0;
+        } else if (0 == (expA | sigA)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            uZ_1.signExp = defaultNaNExtF80UI64;
+            uZ_1.signif = defaultNaNExtF80UI0;
+        } else {
+            uZ_1.signExp = packToExtF80UI64(signZ, 0x7FFF);
+            uZ_1.signif = UINT64_C(0x8000000000000000);
         }
 
-        magBits = expA | sigA;
-        goto infArg;
-    }
+        return uZ_1;
+    } else {
+        auto expA_1 =  0 == expA ? 1 : expA;
 
-    if (! expA) {
-        expA = 1;
-    }
-
-    if (!(sigA & UINT64_C(0x8000000000000000))) {
-        if (! sigA) {
-            goto zero;
+        if (0 == (sigA & UINT64_C(0x8000000000000000))) {
+            if (0 == sigA) {
+                extFloat80_t uZ_1;
+                uZ_1.signExp = packToExtF80UI64(signZ, 0);
+                uZ_1.signif = 0;
+                return uZ_1;
+            } else {
+                exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+                expA_1 += normExpSig.exp;
+                sigA = normExpSig.sig;
+            }
         }
 
-        normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
-        expA += normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
+        auto expB_1 = 0 == expB ? 1 : expB;
 
-    if (! expB) {
-        expB = 1;
-    }
-
-    if (!(sigB & UINT64_C(0x8000000000000000))) {
-        if (! sigB) {
-            goto zero;
+        if (0 == (UINT64_C(0x8000000000000000) & sigB)) {
+            if (0 == sigB) {
+                extFloat80_t uZ_1;
+                uZ_1.signExp = packToExtF80UI64(signZ, 0);
+                uZ_1.signif = 0;
+                return uZ_1;
+            } else {
+                exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
+                expB_1 += normExpSig.exp;
+                sigB = normExpSig.sig;
+            }
         }
 
-        normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
-        expB += normExpSig.exp;
-        sigB = normExpSig.sig;
+        int32_t const expZ = expA_1 + expB_1 - 0x3FFE;
+        uint128 const sig128Z = softfloat_mul64To128(sigA, sigB);
+
+        if (sig128Z.v64 < UINT64_C(0x8000000000000000)) {
+            auto const sig128Z_1 = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
+            return
+                softfloat_roundPackToExtF80(signZ, expZ - 1, sig128Z_1.v64, sig128Z_1.v0, extF80_roundingPrecision);
+        } else {
+            return
+                softfloat_roundPackToExtF80(signZ, expZ, sig128Z.v64, sig128Z.v0, extF80_roundingPrecision);
+        }
     }
-
-    expZ = expA + expB - 0x3FFE;
-    sig128Z = softfloat_mul64To128(sigA, sigB);
-
-    if (sig128Z.v64 < UINT64_C(0x8000000000000000)) {
-        --expZ;
-        sig128Z = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
-    }
-
-    return
-        softfloat_roundPackToExtF80(
-            signZ, expZ, sig128Z.v64, sig128Z.v0, extF80_roundingPrecision);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    uiZ64 = static_cast<uint16_t>(uiZ.v64);
-    uiZ0  = uiZ.v0;
-    goto uiZ;
-
-infArg:
-
-    if (! magBits) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        uiZ64 = defaultNaNExtF80UI64;
-        uiZ0  = defaultNaNExtF80UI0;
-    }
-    else {
-        uiZ64 = packToExtF80UI64(signZ, 0x7FFF);
-        uiZ0  = UINT64_C(0x8000000000000000);
-    }
-
-    goto uiZ;
-
-zero:
-    uiZ64 = packToExtF80UI64(signZ, 0);
-    uiZ0  = 0;
-uiZ:
-    uZ.signExp = uiZ64;
-    uZ.signif  = uiZ0;
-    return uZ;
 }
 
