@@ -40,12 +40,6 @@ extFloat80_t
 f32_to_extF80(float32_t const a)
 {
     using namespace softfloat::internals;
-    uint128 uiZ;
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-    exp16_sig32 normExpSig;
-    extFloat80_t  uZ;
-
 
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
@@ -53,36 +47,34 @@ f32_to_extF80(float32_t const a)
     uint32_t frac = fracF32UI(uiA);
 
     if (exp == 0xFF) {
+        extFloat80_t uZ;
+
         if (frac) {
-            uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(uiA));
-            uiZ64 = static_cast<uint16_t>(uiZ.v64);
-            uiZ0 = uiZ.v0;
+            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(uiA));
+            uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+            uZ.signif = uiZ.v0;
         } else {
-            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
-            uiZ0 = UINT64_C(0x8000000000000000);
+            uZ.signExp = packToExtF80UI64(sign, 0x7FFF);
+            uZ.signif = UINT64_C(0x8000000000000000);
         }
 
-        goto uiZ;
-    }
-
-    if (!exp) {
-        if (!frac) {
-            uiZ64 = packToExtF80UI64(sign, 0);
-            uiZ0 = 0;
-            goto uiZ;
+        return uZ;
+    } else if (0 == exp) {
+        if (0 == frac) {
+            extFloat80_t uZ;
+            uZ.signExp = packToExtF80UI64(sign, 0);
+            uZ.signif = 0;
+            return uZ;
+        } else {
+            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+            exp = normExpSig.exp;
+            frac = normExpSig.sig;
         }
-
-        normExpSig = softfloat_normSubnormalF32Sig(frac);
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
     }
 
-    uiZ64 = packToExtF80UI64(sign, exp + 0x3F80u);
-    uiZ0 = static_cast<uint64_t>(frac | 0x00800000) << 40;
-uiZ:
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
+    extFloat80_t uZ;
+    uZ.signExp = packToExtF80UI64(sign, exp + 0x3F80u);
+    uZ.signif = static_cast<uint64_t>(frac | 0x00800000) << 40;
     return uZ;
-
 }
 
