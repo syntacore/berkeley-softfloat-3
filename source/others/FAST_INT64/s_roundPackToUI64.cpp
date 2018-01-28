@@ -40,37 +40,32 @@ namespace softfloat {
 namespace internals {
 
 uint64_t
-softfloat_roundPackToUI64(bool sign,
+softfloat_roundPackToUI64(bool const sign,
                           uint64_t sig,
-                          uint64_t sigExtra,
-                          uint8_t roundingMode,
-                          bool exact)
+                          uint64_t const sigExtra,
+                          uint8_t const roundingMode,
+                          bool const exact)
 {
-    bool roundNearEven, doIncrement;
-
-
-    roundNearEven = (roundingMode == softfloat_round_near_even);
-    doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
-
-    if (!roundNearEven && (roundingMode != softfloat_round_near_maxMag)) {
-        doIncrement =
-            (roundingMode
-             == (sign ? softfloat_round_min : softfloat_round_max))
-            && sigExtra;
-    }
+    bool const roundNearEven = softfloat_round_near_even == roundingMode;
+    bool const doIncrement =
+        !roundNearEven && softfloat_round_near_maxMag != roundingMode ?
+        (sign ? softfloat_round_min : softfloat_round_max) == roundingMode && 0 != sigExtra :
+        UINT64_C(0x8000000000000000) <= sigExtra;
 
     if (doIncrement) {
         ++sig;
 
-        if (!sig) {
-            goto invalid;
+        if (0 == sig) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
         }
 
         sig &= ~static_cast<uint64_t>(!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF)) & roundNearEven);
     }
 
-    if (sign && sig) {
-        goto invalid;
+    if (sign && 0 != sig) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
 
     if (exact && sigExtra) {
@@ -78,11 +73,6 @@ softfloat_roundPackToUI64(bool sign,
     }
 
     return sig;
-
-invalid:
-    softfloat_raiseFlags(softfloat_flag_invalid);
-    return sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-
 }
 
 }  // namespace internals
