@@ -36,11 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
-#include <cstdint>
-
 namespace softfloat {
 namespace internals {
 namespace Intel_8086 {
+
+namespace {
+
+static inline void
+result_copy(uint32_t* const zWPtr,
+            uint32_t const* const ptr)
+{
+    zWPtr[indexWordHi(4)] = ptr[indexWordHi(4)] | 0x00008000;
+    zWPtr[indexWord(4, 2)] = ptr[indexWord(4, 2)];
+    zWPtr[indexWord(4, 1)] = ptr[indexWord(4, 1)];
+    zWPtr[indexWord(4, 0)] = ptr[indexWord(4, 0)];
+}
+
+}  // namespace
 
 /**
 Assuming at least one of the two 128-bit floating-point values pointed to by
@@ -51,36 +63,27 @@ and `zWPtr' points to an array of four 32-bit elements that concatenate in
 the platform's normal endian order to form a 128-bit floating-point value.
 */
 void
-softfloat_propagateNaNF128M(const uint32_t* aWPtr,
-                            const uint32_t* bWPtr,
-                            uint32_t* zWPtr)
+softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
+                            uint32_t const* const bWPtr,
+                            uint32_t* const zWPtr)
 {
-    bool isSigNaNA;
-    const uint32_t* ptr;
+    bool const isSigNaNA = f128M_isSignalingNaN(reinterpret_cast<float128_t const*>(aWPtr));
+    bool const isSigNaNB = f128M_isSignalingNaN(reinterpret_cast<float128_t const*>(bWPtr));
 
-    ptr = aWPtr;
-    isSigNaNA = f128M_isSignalingNaN((const float128_t*)aWPtr);
-
-    if (
-        isSigNaNA
-        || (bWPtr && f128M_isSignalingNaN((const float128_t*)bWPtr))
-    ) {
+    if (isSigNaNA || (bWPtr && isSigNaNB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (isSigNaNA) {
-            goto copy;
+            result_copy(zWPtr, aWPtr);
+            return;
         }
     }
 
-    if (!softfloat_isNaNF128M(aWPtr)) {
-        ptr = bWPtr;
+    if (softfloat_isNaNF128M(aWPtr)) {
+        result_copy(zWPtr, aWPtr);
+    } else {
+        result_copy(zWPtr, bWPtr);
     }
-
-copy:
-    zWPtr[indexWordHi(4)] = ptr[indexWordHi(4)] | 0x00008000;
-    zWPtr[indexWord(4, 2)] = ptr[indexWord(4, 2)];
-    zWPtr[indexWord(4, 1)] = ptr[indexWord(4, 1)];
-    zWPtr[indexWord(4, 0)] = ptr[indexWord(4, 0)];
 }
 
 }  // namespace Intel_8086
