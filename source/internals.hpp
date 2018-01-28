@@ -324,7 +324,7 @@ softfloat_roundPackMToI64(bool,
                           bool);
 uint64_t
 softfloat_roundPackMToUI64(bool,
-                           uint32_t*,
+                           uint32_t const*,
                            uint8_t,
                            bool);
 
