@@ -40,135 +40,124 @@ namespace softfloat {
 namespace internals {
 
 extFloat80_t
-softfloat_addMagsExtF80(uint16_t uiA64,
-                        uint64_t uiA0,
-                        uint16_t uiB64,
-                        uint64_t uiB0,
+softfloat_addMagsExtF80(uint16_t const uiA64,
+                        uint64_t const uiA0,
+                        uint16_t const uiB64,
+                        uint64_t const uiB0,
                         bool signZ)
 {
-    int32_t expA;
-    uint64_t sigA;
-    int32_t expB;
-    uint64_t sigB;
-    int32_t expDiff;
-    uint16_t uiZ64;
-    uint64_t uiZ0, sigZ, sigZExtra;
-    exp32_sig64 normExpSig;
-    int32_t expZ;
-    uint64_extra sig64Extra;
-    uint128 uiZ;
-    extFloat80_t uZ;
+    int32_t const expA = expExtF80UI64(uiA64);
+    int32_t const expB = expExtF80UI64(uiB64);
+    int32_t expDiff = expA - expB;
 
+    if (0 == expDiff) {
+        if (0x7FFF == expA) {
+            extFloat80_t uZ;
 
-    expA = expExtF80UI64(uiA64);
-    sigA = uiA0;
-    expB = expExtF80UI64(uiB64);
-    sigB = uiB0;
-
-    expDiff = expA - expB;
-
-    if (!expDiff) {
-        if (expA == 0x7FFF) {
-            if ((sigA | sigB) & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-                goto propagateNaN;
+            if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & (uiA0 | uiB0))) {
+                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+                uZ.signif = uiZ.v0;
+            } else {
+                uZ.signExp = uiA64;
+                uZ.signif = uiA0;
             }
 
-            uiZ64 = uiA64;
-            uiZ0 = uiA0;
-            goto uiZ;
-        }
+            return uZ;
+        } else {
+            auto const sigZ_1 = uiA0 + uiB0;
 
-        sigZ = sigA + sigB;
-        sigZExtra = 0;
-
-        if (!expA) {
-            normExpSig = softfloat_normSubnormalExtF80Sig(sigZ);
-            expZ = normExpSig.exp + 1;
-            sigZ = normExpSig.sig;
-            goto roundAndPack;
-        }
-
-        expZ = expA;
-        goto shiftRight1;
-    }
-
-    if (expDiff < 0) {
-        if (expB == 0x7FFF) {
-            if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-                goto propagateNaN;
-            }
-
-            uiZ64 = packToExtF80UI64(signZ, 0x7FFF);
-            uiZ0 = uiB0;
-            goto uiZ;
-        }
-
-        expZ = expB;
-
-        if (!expA) {
-            ++expDiff;
-            sigZExtra = 0;
-
-            if (!expDiff) {
-                goto newlyAligned;
+            if (0 == expA) {
+                exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigZ_1);
+                return softfloat_roundPackToExtF80(signZ, normExpSig.exp + 1, normExpSig.sig, 0, extF80_roundingPrecision);
+            } else {
+                uint64_extra const sig64Extra = softfloat_shortShiftRightJam64Extra(sigZ_1, 0, 1);
+                return softfloat_roundPackToExtF80(signZ, expA + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_roundingPrecision);
             }
         }
+    } else if (expDiff < 0) {
+        if (0x7FFF == expB) {
+            extFloat80_t uZ;
 
-        sig64Extra = softfloat_shiftRightJam64Extra(sigA, 0, static_cast<uint32_t>(-expDiff));
-        sigA = sig64Extra.v;
-        sigZExtra = sig64Extra.extra;
+            if (uiB0 & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+                uZ.signif = uiZ.v0;
+            } else {
+                uZ.signExp = packToExtF80UI64(signZ, 0x7FFF);
+                uZ.signif = uiB0;
+            }
+
+            return uZ;
+        } else {
+            auto const expZ = expB;
+
+            if (0 == expA) {
+                ++expDiff;
+                if (0 == expDiff) {
+                    auto const sigZ_1 = uiA0 + uiB0;
+
+                    if (0 != (UINT64_C(0x8000000000000000) & sigZ_1)) {
+                        return softfloat_roundPackToExtF80(signZ, expZ, sigZ_1, 0, extF80_roundingPrecision);
+                    } else {
+                        uint64_extra const sig64Extra = softfloat_shortShiftRightJam64Extra(sigZ_1, 0, 1);
+                        return softfloat_roundPackToExtF80(signZ, expZ + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_roundingPrecision);
+                    }
+                }
+            }
+
+            uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(uiA0, 0, static_cast<uint32_t>(-expDiff));
+            auto const sigZ_1 = sig64Extra.v + uiB0;
+
+            if (sigZ_1 & UINT64_C(0x8000000000000000)) {
+                return softfloat_roundPackToExtF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_roundingPrecision);
+            } else {
+                auto const sig64Extra_1 = softfloat_shortShiftRightJam64Extra(sigZ_1, sig64Extra.extra, 1);
+                return softfloat_roundPackToExtF80(signZ, expZ + 1, sig64Extra_1.v | UINT64_C(0x8000000000000000), sig64Extra_1.extra, extF80_roundingPrecision);
+            }
+        }
     } else {
         if (expA == 0x7FFF) {
-            if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-                goto propagateNaN;
+            extFloat80_t uZ;
+
+            if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & uiA0)) {
+                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                uZ.signExp = static_cast<uint16_t>(uiZ.v64);
+                uZ.signif = uiZ.v0;
+            } else {
+                uZ.signExp = uiA64;
+                uZ.signif = uiA0;
             }
 
-            uiZ64 = uiA64;
-            uiZ0 = uiA0;
-            goto uiZ;
-        }
+            return uZ;
+        } else {
+            auto const expZ = expA;
 
-        expZ = expA;
+            if (0 == expB) {
+                --expDiff;
+                if (0 == expDiff) {
+                    auto const sigZ_1 = uiA0 + uiB0;
 
-        if (!expB) {
-            --expDiff;
-            sigZExtra = 0;
+                    if (0 != (UINT64_C(0x8000000000000000) & sigZ_1)) {
+                        return softfloat_roundPackToExtF80(signZ, expZ, sigZ_1, 0, extF80_roundingPrecision);
+                    } else {
+                        uint64_extra const sig64Extra = softfloat_shortShiftRightJam64Extra(sigZ_1, 0, 1);
+                        return softfloat_roundPackToExtF80(signZ, expZ + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_roundingPrecision);
+                    }
+                }
+            }
 
-            if (!expDiff) {
-                goto newlyAligned;
+            uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(uiB0, 0u, static_cast<uint32_t>(expDiff));
+            auto const sigZ_1 = uiA0 + sig64Extra.v;
+
+            if (sigZ_1 & UINT64_C(0x8000000000000000)) {
+                return softfloat_roundPackToExtF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_roundingPrecision);
+            } else {
+                auto const sig64Extra_1 = softfloat_shortShiftRightJam64Extra(sigZ_1, sig64Extra.extra, 1);
+                return softfloat_roundPackToExtF80(signZ, expZ + 1, sig64Extra_1.v | UINT64_C(0x8000000000000000), sig64Extra_1.extra, extF80_roundingPrecision);
             }
         }
-
-        sig64Extra = softfloat_shiftRightJam64Extra(sigB, 0u, static_cast<uint32_t>(expDiff));
-        sigB = sig64Extra.v;
-        sigZExtra = sig64Extra.extra;
     }
-
-newlyAligned:
-    sigZ = sigA + sigB;
-
-    if (sigZ & UINT64_C(0x8000000000000000)) {
-        goto roundAndPack;
-    }
-
-shiftRight1:
-    sig64Extra = softfloat_shortShiftRightJam64Extra(sigZ, sigZExtra, 1);
-    sigZ = sig64Extra.v | UINT64_C(0x8000000000000000);
-    sigZExtra = sig64Extra.extra;
-    ++expZ;
-roundAndPack:
-    return
-        softfloat_roundPackToExtF80(
-            signZ, expZ, sigZ, sigZExtra, extF80_roundingPrecision);
-
-propagateNaN:
-    uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
-    uiZ64 = static_cast<uint16_t>(uiZ.v64);
-    uiZ0 = uiZ.v0;
-uiZ:
-    uZ.signExp = uiZ64;
-    uZ.signif = uiZ0;
-    return uZ;
 }
 
 }  // namespace internals
