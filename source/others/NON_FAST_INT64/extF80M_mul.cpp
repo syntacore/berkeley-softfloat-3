@@ -43,77 +43,66 @@ extF80M_mul(extFloat80_t const* const aPtr,
             extFloat80_t* const zPtr)
 {
     using namespace softfloat::internals;
-    uint64_t sigB;
-    int32_t expZ;
-    uint32_t sigProd[4], *extSigZPtr;
 
     uint16_t const uiA64 = aPtr->signExp;
-    int32_t expA = expExtF80UI64(uiA64);
+    int32_t const expA = expExtF80UI64(uiA64);
     uint16_t const uiB64 = bPtr->signExp;
-    int32_t expB = expExtF80UI64(uiB64);
+    int32_t const expB = expExtF80UI64(uiB64);
     bool const signZ = signExtF80UI64(uiA64) ^ signExtF80UI64(uiB64);
 
-    if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
-        if (softfloat_tryPropagateNaNExtF80M(aPtr, bPtr, zPtr)) {
-            return;
+    if (0x7FFF == expA || 0x7FFF == expB) {
+        if (!softfloat_tryPropagateNaNExtF80M(aPtr, bPtr, zPtr)) {
+            if ((0 == aPtr->signif && 0x7FFF != expA) || (0 == bPtr->signif && 0x7FFF != expB)) {
+                softfloat_invalidExtF80M(zPtr);
+            } else {
+                zPtr->signExp = packToExtF80UI64(signZ, 0x7FFF);
+                zPtr->signif = UINT64_C(0x8000000000000000);
+            }
+        }
+    } else {
+        auto expA_1 = 0 == expA ? 1 : expA;
+
+        uint64_t sigA = aPtr->signif;
+
+        if (0 == (sigA & UINT64_C(0x8000000000000000))) {
+            if (0 == sigA) {
+                zPtr->signExp = packToExtF80UI64(signZ, 0);
+                zPtr->signif = 0;
+                return;
+            } else {
+                expA_1 += softfloat_normExtF80SigM(&sigA);
+            }
         }
 
-        if ((!aPtr->signif && (expA != 0x7FFF)) || (!bPtr->signif && (expB != 0x7FFF))) {
-            softfloat_invalidExtF80M(zPtr);
-            return;
+        auto expB_1 = 0 == expB ? 1 : expB;
+
+        uint64_t sigB = bPtr->signif;
+
+        if (!(sigB & UINT64_C(0x8000000000000000))) {
+            if (!sigB) {
+                zPtr->signExp = packToExtF80UI64(signZ, 0);
+                zPtr->signif = 0;
+                return;
+            } else {
+                expB_1 += softfloat_normExtF80SigM(&sigB);
+            }
+        }
+
+        int32_t const expZ = expA_1 + expB_1 - 0x3FFE;
+        uint32_t sigProd[4];
+        softfloat_mul64To128M(sigA, sigB, sigProd);
+
+        if (0 != sigProd[indexWordLo(4)]) {
+            sigProd[indexWord(4, 1)] |= 1;
+        }
+
+        auto const extSigZPtr = &sigProd[indexMultiwordHi(4, 3)];
+
+        if (sigProd[indexWordHi(4)] < 0x80000000) {
+            softfloat_add96M(extSigZPtr, extSigZPtr, extSigZPtr);
+            softfloat_roundPackMToExtF80M(signZ, expZ - 1, extSigZPtr, extF80_roundingPrecision, zPtr);
         } else {
-            zPtr->signExp = packToExtF80UI64(signZ, 0x7FFF);
-            zPtr->signif = UINT64_C(0x8000000000000000);
-            return;
+            softfloat_roundPackMToExtF80M(signZ, expZ, extSigZPtr, extF80_roundingPrecision, zPtr);
         }
     }
-
-    if (!expA) {
-        expA = 1;
-    }
-
-    uint64_t sigA = aPtr->signif;
-
-    if (0 == (sigA & UINT64_C(0x8000000000000000))) {
-        if (0 == sigA) {
-            zPtr->signExp = packToExtF80UI64(signZ, 0);
-            zPtr->signif = 0;
-            return;
-        }
-
-        expA += softfloat_normExtF80SigM(&sigA);
-    }
-
-    if (!expB) {
-        expB = 1;
-    }
-
-    sigB = bPtr->signif;
-
-    if (!(sigB & UINT64_C(0x8000000000000000))) {
-        if (!sigB) {
-            zPtr->signExp = packToExtF80UI64(signZ, 0);
-            zPtr->signif = 0;
-            return;
-        }
-
-        expB += softfloat_normExtF80SigM(&sigB);
-    }
-
-    expZ = expA + expB - 0x3FFE;
-    softfloat_mul64To128M(sigA, sigB, sigProd);
-
-    if (sigProd[indexWordLo(4)]) {
-        sigProd[indexWord(4, 1)] |= 1;
-    }
-
-    extSigZPtr = &sigProd[indexMultiwordHi(4, 3)];
-
-    if (sigProd[indexWordHi(4)] < 0x80000000) {
-        --expZ;
-        softfloat_add96M(extSigZPtr, extSigZPtr, extSigZPtr);
-    }
-
-    softfloat_roundPackMToExtF80M(signZ, expZ, extSigZPtr, extF80_roundingPrecision, zPtr);
-    return;
 }
