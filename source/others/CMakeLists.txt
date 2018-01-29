@@ -51,7 +51,7 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/f32_to_ui32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f32_to_ui32_r_minMag.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f32_to_ui64_r_minMag.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/f64_add.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/f64_add_sub.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_div.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_eq.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_eq_signaling.cpp
@@ -62,7 +62,6 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_lt_quiet.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_roundToInt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_sqrt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/f64_sub.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_to_f16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_to_f32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/f64_to_i32.cpp
@@ -78,7 +77,6 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF32.cpp
@@ -92,7 +90,6 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToI32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToUI32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_raiseFlags.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_f16.cpp
