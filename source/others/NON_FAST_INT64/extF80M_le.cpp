@@ -38,37 +38,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-extF80M_le(extFloat80_t const* aPtr,
-           extFloat80_t const* bPtr)
+extF80M_le(extFloat80_t const* const aPtr,
+           extFloat80_t const* const bPtr)
 {
     using namespace softfloat::internals;
-    extFloat80M const* const aSPtr = aPtr;
-    extFloat80M const* const bSPtr = bPtr;
-    uint16_t const uiA64 = aSPtr->signExp;
-    uint64_t const uiA0 = aSPtr->signif;
-    uint16_t const uiB64 = bSPtr->signExp;
-    uint64_t const uiB0 = bSPtr->signif;
+    uint16_t const uiA64 = aPtr->signExp;
+    uint64_t const uiA0 = aPtr->signif;
+    uint16_t const uiB64 = bPtr->signExp;
+    uint64_t const uiB0 = bPtr->signif;
 
     if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
+    } else {
+
+        bool const signA = signExtF80UI64(uiA64);
+
+        if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
+            /* Signs are different. */
+            return signA || !(uiA0 | uiB0);
+        } else if (0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+            /* Signs are the same. */
+            return softfloat_compareNonnormExtF80M(aPtr, bPtr) <= 0;
+        } else if (uiA64 == uiB64) {
+            return uiA0 == uiB0 || signA != (uiA0 < uiB0);
+        } else {
+            return signA != (uiA64 < uiB64);
+        }
     }
-
-    bool const signA = signExtF80UI64(uiA64);
-
-    if ((uiA64 ^ uiB64) & 0x8000) {
-        /* Signs are different. */
-        return signA || !(uiA0 | uiB0);
-    }
-
-    if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
-        /* Signs are the same. */
-        return (softfloat_compareNonnormExtF80M(aSPtr, bSPtr) <= 0);
-    }
-
-    if (uiA64 == uiB64) {
-        return uiA0 == uiB0 || signA != (uiA0 < uiB0);
-    }
-
-    return signA != (uiA64 < uiB64);
 }
