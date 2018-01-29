@@ -37,49 +37,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
-bool extF80M_lt_quiet(const extFloat80_t *aPtr, const extFloat80_t *bPtr)
+bool
+extF80M_lt_quiet(extFloat80_t const* const aPtr,
+                 extFloat80_t const* const bPtr)
 {
     using namespace softfloat::internals;
-    extFloat80M const *aSPtr;
-    extFloat80M const *bSPtr;
-    uint16_t uiA64;
-    uint64_t uiA0;
-    uint16_t uiB64;
-    uint64_t uiB0;
-    bool signA, ltMags;
-
-    aSPtr = aPtr;
-    bSPtr = bPtr;
-
-    uiA64 = aSPtr->signExp;
-    uiA0 = aSPtr->signif;
-    uiB64 = bSPtr->signExp;
-    uiB0 = bSPtr->signif;
+    uint16_t const uiA64 = aPtr->signExp;
+    uint64_t const uiA0 = aPtr->signif;
+    uint16_t const uiB64 = bPtr->signExp;
+    uint64_t const uiB0 = bPtr->signif;
 
     if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
-        return false;
-    }
 
-    signA = signExtF80UI64(uiA64);
-    if ((uiA64 ^ uiB64) & 0x8000) {
-        /* Signs are different. */
-        return signA && ((uiA0 | uiB0) != 0);
+        return false;
     } else {
-        /* Signs are the same. */
-        if (!((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
-            return (softfloat_compareNonnormExtF80M(aSPtr, bSPtr) < 0);
-        }
-        if (uiA64 == uiB64) {
-            if (uiA0 == uiB0) {
-                return false;
-            }
-            ltMags = (uiA0 < uiB0);
+        bool const signA = signExtF80UI64(uiA64);
+
+        if ((uiA64 ^ uiB64) & 0x8000) {
+            /* Signs are different. */
+            return signA && ((uiA0 | uiB0) != 0);
+        } else if (0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+            return (softfloat_compareNonnormExtF80M(aPtr, bPtr) < 0);
+        } else if (uiA64 == uiB64) {
+            return uiA0 == uiB0 || (signA ^ (uiA0 < uiB0));
         } else {
-            ltMags = (uiA64 < uiB64);
+            return signA ^ (uiA64 < uiB64);
         }
-        return signA ^ ltMags;
     }
 }
