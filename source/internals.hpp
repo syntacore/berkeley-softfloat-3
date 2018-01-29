@@ -133,13 +133,6 @@ softfloat_normRoundPackToF32(bool,
                              int16_t,
                              uint32_t);
 
-float32_t
-softfloat_addMagsF32(uint32_t,
-                     uint32_t);
-float32_t
-softfloat_subMagsF32(uint32_t,
-                     uint32_t);
-
 exp16_sig64
 softfloat_normSubnormalF64Sig(uint64_t);
 
