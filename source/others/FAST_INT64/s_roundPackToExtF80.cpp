@@ -48,8 +48,6 @@ softfloat_roundPackToExtF80(bool sign,
 {
     uint64_t roundIncrement;
     uint64_t roundMask;
-    bool doIncrement;
-    uint64_extra sig64Extra;
 
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
 
@@ -62,7 +60,7 @@ softfloat_roundPackToExtF80(bool sign,
             roundMask = UINT64_C(0x000000FFFFFFFFFF);
         }
 
-        sig |= (sigExtra != 0);
+        sig |= !!(sigExtra != 0);
 
         if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
             roundIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) ? roundMask : 0;
@@ -138,24 +136,20 @@ softfloat_roundPackToExtF80(bool sign,
             exp = 0;
         }
 
-        {
-            extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
-            uZ.signif = sig;
-            return uZ;
-        }
+        extFloat80_t uZ;
+        uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        uZ.signif = sig;
+        return uZ;
     } else {
-
-        doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
-
-        if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
-            doIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra;
-        }
+        bool doIncrement = 
+            !roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)?
+            (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra :
+            UINT64_C(0x8000000000000000) <= sigExtra;
 
         if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
             if (exp <= 0) {
                 bool isTiny = softfloat_detectTininess == softfloat_tininess_beforeRounding || exp < 0 || !doIncrement || sig < UINT64_C(0xFFFFFFFFFFFFFFFF);
-                sig64Extra = softfloat_shiftRightJam64Extra(sig, sigExtra, 1u - exp);
+                uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig, sigExtra, 1u - exp);
                 sig = sig64Extra.v;
                 sigExtra = sig64Extra.extra;
 
@@ -181,31 +175,24 @@ softfloat_roundPackToExtF80(bool sign,
                     exp = ((sig & UINT64_C(0x8000000000000000)) != 0);
                 }
 
-                {
-                    extFloat80_t uZ;
-                    uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
-                    uZ.signif = sig;
-                    return uZ;
-                }
-            }
-
-            if (0x7FFE < exp || (exp == 0x7FFE && sig == UINT64_C(0xFFFFFFFFFFFFFFFF) && doIncrement)) {
+                extFloat80_t uZ;
+                uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+                uZ.signif = sig;
+                return uZ;
+            } else if (0x7FFE < exp || (exp == 0x7FFE && sig == UINT64_C(0xFFFFFFFFFFFFFFFF) && doIncrement)) {
                 softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
 
+                extFloat80_t uZ;
+
                 if (roundNearEven || softfloat_roundingMode == softfloat_round_near_maxMag || softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) {
-                    exp = 0x7FFF;
-                    sig = UINT64_C(0x8000000000000000);
+                    uZ.signExp = packToExtF80UI64(sign, UINT16_C(0x7FFF));
+                    uZ.signif = UINT64_C(0x8000000000000000);
                 } else {
-                    exp = 0x7FFE;
-                    sig = ~UINT64_C(0);
+                    uZ.signExp = packToExtF80UI64(sign, UINT16_C(0x7FFE));
+                    uZ.signif = ~UINT64_C(0);
                 }
 
-                {
-                    extFloat80_t uZ;
-                    uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
-                    uZ.signif = sig;
-                    return uZ;
-                }
+                return uZ;
             }
         }
 
@@ -222,18 +209,14 @@ softfloat_roundPackToExtF80(bool sign,
             } else {
                 sig &= ~static_cast<uint64_t>(!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF)) & roundNearEven);
             }
-        } else {
-            if (!sig) {
-                exp = 0;
-            }
+        } else if (!sig) {
+            exp = 0;
         }
 
-        {
-            extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
-            uZ.signif = sig;
-            return uZ;
-        }
+        extFloat80_t uZ;
+        uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        uZ.signif = sig;
+        return uZ;
     }
 }
 
