@@ -37,39 +37,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 int32_t
-f32_to_i32(float32_t a,
-           uint8_t roundingMode,
-           bool exact)
+f32_to_i32(float32_t const a,
+           uint8_t const roundingMode,
+           bool const exact)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
-    bool sign = signF32UI(uiA);
-    int16_t const exp = expF32UI(uiA);
-    uint32_t sig = fracF32UI(uiA);
+    bool const isNaN = isNaNF32UI(uiA);
 
-    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
-        if (exp == 0xFF && sig) {
-            if (i32_fromNaN == i32_fromPosOverflow) {
-                sign = 0;
-            } else if (i32_fromNaN == i32_fromNegOverflow) {
-                sign = 1;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return i32_fromNaN;
-            }
+    if (isNaN) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return i32_fromNaN;
+    } else {
+        int16_t const exp = expF32UI(uiA);
+        bool const sign = signF32UI(uiA);
+        if (255 == exp) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+        } else if (isZero32UI(uiA)) {
+            return 0;
+        } else {
+            uint64_t const sig64 = static_cast<uint64_t>(fracF32UI(uiA) | 0x00800000) << 32;
+            int16_t const shiftDist = 0xAA - exp;
+            return softfloat_roundPackToI32(sign, 0 < shiftDist? softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
         }
     }
-
-    if (exp) {
-        sig |= 0x00800000;
-    }
-
-    uint64_t sig64 = static_cast<uint64_t>(sig) << 32;
-    int16_t const shiftDist = 0xAA - exp;
-
-    if (0 < shiftDist) {
-        sig64 = softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
-    }
-
-    return softfloat_roundPackToI32(sign, sig64, roundingMode, exact);
 }
