@@ -46,11 +46,10 @@ softfloat_roundPackToI32(bool sign,
                          bool exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
-    uint16_t roundIncrement = 0x800u;
-
-    if (!roundNearEven && (softfloat_round_near_maxMag != roundingMode)) {
-        roundIncrement = roundingMode == (sign ? softfloat_round_min : softfloat_round_max) ? 0xFFFu : 0u;
-    }
+    uint16_t roundIncrement =
+        !roundNearEven && softfloat_round_near_maxMag != roundingMode ?
+        ((sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0xFFFu : 0u) :
+        0x800u;
 
     uint16_t const roundBits = sig & 0xFFFu;
     sig += roundIncrement;
@@ -58,21 +57,21 @@ softfloat_roundPackToI32(bool sign,
     if (sig & UINT64_C(0xFFFFF00000000000)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    } else {
+        uint32_t sig32 = (sig >> 12) & (~static_cast<uint32_t>(!(roundBits ^ 0x800) & roundNearEven));
+        int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
+
+        if (z && ((z < 0) ^ sign)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+        } else {
+            if (exact && roundBits) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+
+            return z;
+        }
     }
-
-    uint32_t sig32 = (sig >> 12) & (~static_cast<uint32_t>(!(roundBits ^ 0x800) & roundNearEven));
-    int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
-
-    if (z && ((z < 0) ^ sign)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-    }
-
-    if (exact && roundBits) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-
-    return z;
 }
 
 }  // namespace internals
