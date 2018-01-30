@@ -37,12 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 int32_t
-f32_to_i32_r_minMag(float32_t a, bool exact)
+f32_to_i32_r_minMag(float32_t const a,
+                    bool const exact)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
-    uint32_t sig = fracF32UI(uiA);
+    uint32_t const sig = fracF32UI(uiA);
     int16_t const shiftDist = 0x9E - exp;
 
     if (32 <= shiftDist) {
@@ -51,27 +52,27 @@ f32_to_i32_r_minMag(float32_t a, bool exact)
         }
 
         return 0;
-    }
+    } else {
+        bool const sign = signF32UI(uiA);
 
-    bool const sign = signF32UI(uiA);
+        if (shiftDist <= 0) {
+            if (uiA == packToF32UI(true, 0x9E, 0)) {
+                return INT32_MIN;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return
+                    0xFF == exp && sig ? i32_fromNaN :
+                    sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+            }
+        } else {
+            auto const sig_1 = (sig | 0x00800000) << 8;
+            int32_t const absZ = static_cast<int32_t>(sig_1 >> shiftDist);
 
-    if (shiftDist <= 0) {
-        if (uiA == packToF32UI(true, 0x9E, 0)) {
-            return INT32_MIN;
+            if (exact && (static_cast<uint32_t>(absZ) << shiftDist != sig_1)) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+
+            return sign ? -absZ : absZ;
         }
-
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return
-            exp == 0xFF && sig ? i32_fromNaN :
-            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
-
-    sig = (sig | 0x00800000) << 8;
-    int32_t absZ = static_cast<int32_t>(sig >> shiftDist);
-
-    if (exact && (static_cast<uint32_t>(absZ) << shiftDist != sig)) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-
-    return sign ? -absZ : absZ;
 }

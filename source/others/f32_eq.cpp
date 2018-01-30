@@ -48,7 +48,8 @@ f32_eq(float32_t a,
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
         return false;
+    } else {
+        return uiA == uiB || !static_cast<uint32_t>((uiA | uiB) << 1);
     }
-    return uiA == uiB || !static_cast<uint32_t>((uiA | uiB) << 1);
 }
 

@@ -46,39 +46,33 @@ f32_sqrt(float32_t a)
     int16_t expA = expF32UI(uiA);
     uint32_t sigA = fracF32UI(uiA);
 
-    if (expA == 0xFF) {
-        if (sigA) {
+    if (0xFF == expA) {
+        if (0 != sigA) {
             return u_as_f_32(softfloat_propagateNaNF32UI(uiA, 0));
-        }
-
-        if (!signA) {
+        } else if (!signA) {
             return a;
+        } else {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_32(defaultNaNF32UI);
         }
-
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_32(defaultNaNF32UI);
+    } else if (signA) {
+        if (0 == (expA | sigA)) {
+            return a;
+        } else {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_32(defaultNaNF32UI);
+        }
+    } else if (0 == expA) {
+        if (0 == sigA) {
+            return a;
+        } else {
+            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+            expA = normExpSig.exp;
+            sigA = normExpSig.sig;
+        }
     }
 
-    if (signA) {
-        if (!(expA | sigA)) {
-            return a;
-        }
-
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_32(defaultNaNF32UI);
-    }
-
-    if (!expA) {
-        if (!sigA) {
-            return a;
-        }
-
-        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-
-    int16_t expZ = ((expA - 0x7F) >> 1) + 0x7E;
+    int16_t const expZ = ((expA - 0x7F) >> 1) + 0x7E;
     expA &= 1;
     sigA = (sigA | 0x00800000) << 8;
     uint32_t sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sigA)) >> 32;

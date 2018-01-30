@@ -37,31 +37,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-f32_to_f64(float32_t a)
+f32_to_f64(float32_t const a)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     bool const sign = signF32UI(uiA);
-    int16_t exp = expF32UI(uiA);
-    uint32_t frac = fracF32UI(uiA);
+    int16_t const exp = expF32UI(uiA);
+    uint32_t const frac = fracF32UI(uiA);
 
-    if (exp == 0xFF) {
+    if (0xFF == exp) {
         if (frac) {
             return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(uiA)));
+        } else {
+            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-
-        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
-    }
-
-    if (!exp) {
-        if (!frac) {
+    } else if (0 == exp) {
+        if (0 == frac) {
             return u_as_f_64(packToF64UI(sign, 0, 0));
+        } else {
+            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+            return u_as_f_64(packToF64UI(sign, normExpSig.exp - 1 + 0x380, static_cast<uint64_t>(normExpSig.sig) << 29));
         }
-
-        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
-        exp = normExpSig.exp - 1;
-        frac = normExpSig.sig;
+    } else {
+        return u_as_f_64(packToF64UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
     }
-
-    return u_as_f_64(packToF64UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
 }
