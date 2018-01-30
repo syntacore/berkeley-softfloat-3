@@ -37,20 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float32_t
-f32_roundToInt(float32_t a,
-               uint8_t roundingMode,
-               bool exact)
+f32_roundToInt(float32_t const a,
+               uint8_t const roundingMode,
+               bool const exact)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
 
     if (exp <= 0x7E) {
-        if (!static_cast<uint32_t>(uiA << 1)) {
+        if (0 == static_cast<uint32_t>(uiA << 1)) {
             return a;
-        }
-
-        if (exact) {
+        } else if (exact) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -58,26 +56,26 @@ f32_roundToInt(float32_t a,
 
         switch (roundingMode) {
         case softfloat_round_near_even:
-            if (!fracF32UI(uiA)) {
+            if (0 == fracF32UI(uiA)) {
                 break;
             }
 
         case softfloat_round_near_maxMag:
-            if (exp == 0x7E) {
+            if (0x7E == exp) {
                 return u_as_f_32(uiZ | packToF32UI(false, 0x7F, 0));
             }
 
             break;
 
         case softfloat_round_min:
-            if (uiZ) {
+            if (0 != uiZ) {
                 return u_as_f_32(packToF32UI(true, 0x7F, 0));
             }
 
             break;
 
         case softfloat_round_max:
-            if (!uiZ) {
+            if (0 == uiZ) {
                 return u_as_f_32(packToF32UI(false, 0x7F, 0));
             }
 
@@ -85,36 +83,31 @@ f32_roundToInt(float32_t a,
         }
 
         return u_as_f_32(uiZ);
-    }
+    } else if (0x96 <= exp) {
+        return exp == 0xFF && fracF32UI(uiA) ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, 0)) : a;
+    } else {
+        uint32_t uiZ = uiA;
+        uint32_t const lastBitMask = static_cast<uint32_t>(1) << (0x96 - exp);
+        uint32_t const roundBitsMask = lastBitMask - 1;
 
-    if (0x96 <= exp) {
-        return
-            exp == 0xFF && fracF32UI(uiA) ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, 0)) : a;
-    }
+        if (softfloat_round_near_maxMag == roundingMode) {
+            uiZ += lastBitMask >> 1;
+        } else if (roundingMode == softfloat_round_near_even) {
+            uiZ += lastBitMask >> 1;
 
-    uint32_t uiZ = uiA;
-    uint32_t const lastBitMask = static_cast<uint32_t>(1) << (0x96 - exp);
-    uint32_t const roundBitsMask = lastBitMask - 1;
-
-    if (roundingMode == softfloat_round_near_maxMag) {
-        uiZ += lastBitMask >> 1;
-    } else if (roundingMode == softfloat_round_near_even) {
-        uiZ += lastBitMask >> 1;
-
-        if (!(uiZ & roundBitsMask)) {
-            uiZ &= ~lastBitMask;
-        }
-    } else if (roundingMode != softfloat_round_minMag) {
-        if (signF32UI(uiZ) ^ (roundingMode == softfloat_round_max)) {
+            if (0 == (uiZ & roundBitsMask)) {
+                uiZ &= ~lastBitMask;
+            }
+        } else if (softfloat_round_minMag != roundingMode && (signF32UI(uiZ) ^ (roundingMode == softfloat_round_max))) {
             uiZ += roundBitsMask;
         }
+
+        uiZ &= ~roundBitsMask;
+
+        if (exact && uiZ != uiA) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
+
+        return u_as_f_32(uiZ);
     }
-
-    uiZ &= ~roundBitsMask;
-
-    if (exact && (uiZ != uiA)) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-
-    return u_as_f_32(uiZ);
 }
