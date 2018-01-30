@@ -43,8 +43,8 @@ f32_to_ui64_r_minMag(float32_t a,
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     int16_t const exp = expF32UI(uiA);
-    uint32_t sig = fracF32UI(uiA);
-    int16_t shiftDist = 0xBE - exp;
+    uint32_t const sig = fracF32UI(uiA);
+    int16_t const shiftDist = 0xBE - exp;
 
     if (64 <= shiftDist) {
         if (exact && (exp | sig)) {
@@ -52,28 +52,25 @@ f32_to_ui64_r_minMag(float32_t a,
         }
 
         return 0;
+    } else {
+        bool const sign = signF32UI(uiA);
+
+        if (sign || shiftDist < 0) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                exp == 0xFF && sig ? ui64_fromNaN :
+                sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+        } else {
+            uint64_t sig64 = static_cast<uint64_t>(sig | 0x00800000) << 40;
+            uint64_t const z = sig64 >> shiftDist;
+            auto const shiftDist_1 = 40 - shiftDist;
+
+            if (exact && shiftDist_1 < 0 && 0 != static_cast<uint32_t>(sig << (shiftDist_1 & 31))) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+
+            return z;
+        }
     }
-
-    bool const sign = signF32UI(uiA);
-
-    if (sign || (shiftDist < 0)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return
-            exp == 0xFF && sig ? ui64_fromNaN :
-            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-    }
-
-    uint64_t sig64;
-    uint64_t z;
-    sig |= 0x00800000;
-    sig64 = static_cast<uint64_t>(sig) << 40;
-    z = sig64 >> shiftDist;
-    shiftDist = 40 - shiftDist;
-
-    if (exact && (shiftDist < 0) && static_cast<uint32_t>(sig << (shiftDist & 31))) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-
-    return z;
 }
 
