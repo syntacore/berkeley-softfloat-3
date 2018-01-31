@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float16_t
-f16_mulAdd(float16_t a,
-           float16_t b,
-           float16_t c)
+f16_mulAdd(float16_t const a,
+           float16_t const b,
+           float16_t const c)
 {
     using namespace softfloat::internals;
+    /// @todo make softfloat_mulAddF16 local
     return softfloat_mulAddF16(f_as_u_16(a), f_as_u_16(b), f_as_u_16(c), softfloat_mulAdd_madd);
 }
