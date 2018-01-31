@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-f16_eq(float16_t a, float16_t b)
+f16_eq(float16_t const a,
+       float16_t const b)
 {
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
@@ -49,7 +50,7 @@ f16_eq(float16_t a, float16_t b)
         }
 
         return false;
+    } else {
+        return uiA == uiB || !static_cast<uint16_t>((uiA | uiB) << 1);
     }
-
-    return uiA == uiB || !static_cast<uint16_t>((uiA | uiB) << 1);
 }
