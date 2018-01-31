@@ -36,10 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
-namespace softfloat {
-namespace internals {
 namespace {
 
+using namespace softfloat::internals;
 static inline float32_t
 softfloat_mulAddF32(uint32_t const uiA,
                     uint32_t const uiB,
@@ -190,8 +189,6 @@ softfloat_mulAddF32(uint32_t const uiA,
 }
 
 }  // namespace
-}  // namespace internals
-}  // namespace softfloat
 
 float32_t
 f32_mulAdd(float32_t a,
