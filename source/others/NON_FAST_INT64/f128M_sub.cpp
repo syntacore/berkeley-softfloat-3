@@ -37,11 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 void
-f128M_sub(const float128_t* aPtr,
-          const float128_t* bPtr,
-          float128_t* zPtr)
+f128M_sub(float128_t const *const aPtr,
+          float128_t const *const bPtr,
+          float128_t* const zPtr)
 {
-
     using namespace softfloat::internals;
-    softfloat_addF128M((const uint32_t*)aPtr, (const uint32_t*)bPtr, (uint32_t*)zPtr, true);
+    softfloat_addF128M(reinterpret_cast<uint32_t const *>(aPtr), reinterpret_cast<uint32_t const *>(bPtr), reinterpret_cast<uint32_t*>(zPtr), true);
 }
