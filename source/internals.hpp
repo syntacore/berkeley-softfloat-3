@@ -96,9 +96,6 @@ softfloat_roundPackToI32(bool, uint64_t, uint8_t, bool);
 uint32_t
 softfloat_roundPackToUI32(bool, uint64_t, uint8_t, bool);
 
-exp8_sig16
-softfloat_normSubnormalF16Sig(uint16_t);
-
 float16_t
 softfloat_roundPackToF16(bool,
                          int16_t,
@@ -121,29 +118,15 @@ softfloat_mulAddF16(uint16_t,
                     uint16_t,
                     Mul_add_operations);
 
-exp16_sig32
-softfloat_normSubnormalF32Sig(uint32_t);
-
 float32_t
 softfloat_roundPackToF32(bool,
                          int16_t,
                          uint32_t);
-float32_t
-softfloat_normRoundPackToF32(bool,
-                             int16_t,
-                             uint32_t);
-
-exp16_sig64
-softfloat_normSubnormalF64Sig(uint64_t);
 
 float64_t
 softfloat_roundPackToF64(bool,
                          int16_t,
                          uint64_t);
-float64_t
-softfloat_normRoundPackToF64(bool,
-                             int16_t,
-                             uint64_t);
 
 #ifdef SOFTFLOAT_FAST_INT64
 
@@ -667,6 +650,57 @@ softfloat_isSigNaNF32UI(uint32_t uiA)
     return
         (~(~UINT32_C(0) << 8) << 23) == (((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22)) & uiA) &&
         0 != (~(~UINT32_C(0) << 23) & uiA);
+}
+
+inline float64_t
+softfloat_normRoundPackToF64(bool const sign,
+                             int16_t const exp,
+                             uint64_t const sig)
+{
+    int8_t const shiftDist = softfloat_countLeadingZeros64(sig) - 1;
+    int16_t const exp_1 = exp - shiftDist;
+
+    if (10 <= shiftDist && static_cast<uint16_t>(exp_1) < 0x7FD) {
+        return u_as_f_64(packToF64UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 10)));
+    } else {
+        return softfloat_roundPackToF64(sign, exp_1, sig << shiftDist);
+    }
+}
+
+inline float32_t
+softfloat_normRoundPackToF32(bool const sign,
+                             int16_t const exp,
+                             uint32_t const sig)
+{
+    int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 1;
+    int16_t const exp_1 = exp - shiftDist;
+
+    if (7 <= shiftDist && static_cast<uint16_t>(exp_1) < 0xFD) {
+        return u_as_f_32(packToF32UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 7)));
+    } else {
+        return softfloat_roundPackToF32(sign, exp_1, sig << shiftDist);
+    }
+}
+
+inline exp8_sig16
+softfloat_normSubnormalF16Sig(uint16_t const sig)
+{
+    int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 5;
+    return exp8_sig16{static_cast<int8_t>(1 - shiftDist), static_cast<uint16_t>(sig << shiftDist)};
+}
+
+inline exp16_sig32
+softfloat_normSubnormalF32Sig(uint32_t const sig)
+{
+    int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 8;
+    return exp16_sig32{static_cast<int16_t>(1 - shiftDist), sig << shiftDist};
+}
+
+inline exp16_sig64
+softfloat_normSubnormalF64Sig(uint64_t const sig)
+{
+    int8_t const shiftDist = softfloat_countLeadingZeros64(sig) - 11;
+    return exp16_sig64{static_cast<int16_t>(1 - shiftDist),sig << shiftDist};
 }
 
 }  // namespace internals
