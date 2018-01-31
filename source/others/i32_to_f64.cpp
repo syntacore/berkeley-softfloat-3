@@ -37,15 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-i32_to_f64(int32_t a)
+i32_to_f64(int32_t const a)
 {
     using namespace softfloat::internals;
-    if (!a) {
+    if (0 == a) {
         return u_as_f_64(0);
+    } else {
+        bool const sign = a < 0;
+        uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
+        int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 21;
+        return u_as_f_64(packToF64UI(sign, 0x432 - shiftDist, static_cast<uint64_t>(absA) << shiftDist));
     }
-
-    bool const sign = a < 0;
-    uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
-    int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 21;
-    return u_as_f_64(packToF64UI(sign, 0x432 - shiftDist, static_cast<uint64_t>(absA) << shiftDist));
 }

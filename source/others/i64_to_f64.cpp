@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-i64_to_f64(int64_t a)
+i64_to_f64(int64_t const a)
 {
     using namespace softfloat::internals;
     bool const sign = a < 0;

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-ui64_to_f64(uint64_t a)
+ui64_to_f64(uint64_t const a)
 {
     using namespace softfloat::internals;
     return

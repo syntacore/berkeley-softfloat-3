@@ -43,7 +43,7 @@ f64_to_i32_r_minMag(float64_t a,
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     int16_t const exp = expF64UI(uiA);
-    uint64_t sig = fracF64UI(uiA);
+    uint64_t const sig = fracF64UI(uiA);
     int16_t const shiftDist = 0x433 - exp;
 
     if (53 <= shiftDist) {
@@ -52,31 +52,31 @@ f64_to_i32_r_minMag(float64_t a,
         }
 
         return 0;
-    }
+    } else {
+        bool const sign = signF64UI(uiA);
 
-    bool const sign = signF64UI(uiA);
+        if (shiftDist < 22) {
+            if (sign && 0x41E == exp && sig < UINT64_C(0x0000000000200000)) {
+                if (exact && 0 != sig) {
+                    softfloat_raiseFlags(softfloat_flag_inexact);
+                }
 
-    if (shiftDist < 22) {
-        if (sign && exp == 0x41E && sig < UINT64_C(0x0000000000200000)) {
-            if (exact && sig) {
+                return INT32_MIN;
+            } else {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return
+                    0x7FF == exp && sig ? i32_fromNaN :
+                    sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+            }
+        } else {
+            auto const sig_1 = sig | UINT64_C(0x0010000000000000);
+            int32_t const absZ = static_cast<int32_t>(sig_1 >> shiftDist);
+
+            if (exact && (static_cast<uint64_t>(static_cast<uint32_t>(absZ)) << shiftDist != sig_1)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            return INT32_MIN;
+            return sign ? -absZ : absZ;
         }
-
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return
-            exp == 0x7FF && sig ? i32_fromNaN :
-            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
-
-    sig |= UINT64_C(0x0010000000000000);
-    int32_t const absZ = static_cast<int32_t>(sig >> shiftDist);
-
-    if (exact && (static_cast<uint64_t>(static_cast<uint32_t>(absZ)) << shiftDist != sig)) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-
-    return sign ? -absZ : absZ;
 }

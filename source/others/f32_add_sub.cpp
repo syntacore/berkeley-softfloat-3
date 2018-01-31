@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
-namespace softfloat {
-namespace internals {
 namespace {
+using namespace softfloat::internals;
+
 static float32_t
-softfloat_addMagsF32(uint32_t uiA,
-                     uint32_t uiB)
+softfloat_addMagsF32(uint32_t const uiA,
+                     uint32_t const uiB)
 {
     assert(!isNaNF32UI(uiA) && !isNaNF32UI(uiB));
     if (isInf32UI(uiA) || isInf32UI(uiB)) {
@@ -112,14 +112,14 @@ softfloat_addMagsF32(uint32_t uiA,
 }
 
 static float32_t
-softfloat_subMagsF32(uint32_t uiA,
-                     uint32_t uiB)
+softfloat_subMagsF32(uint32_t const uiA,
+                     uint32_t const uiB)
 {
     assert(!isNaNF32UI(uiA) && !isNaNF32UI(uiB));
     int16_t expA = expF32UI(uiA);
-    uint32_t sigA = fracF32UI(uiA);
+    uint32_t const sigA = fracF32UI(uiA);
     int16_t const expB = expF32UI(uiB);
-    uint32_t sigB = fracF32UI(uiB);
+    uint32_t const sigB = fracF32UI(uiB);
 
     int16_t const expDiff = expA - expB;
 
@@ -153,31 +153,29 @@ softfloat_subMagsF32(uint32_t uiA,
         }
     } else {
         bool const signZ = signF32UI(uiA);
-        sigA <<= 7;
-        sigB <<= 7;
+        auto const sigA_1 = sigA << 7;
+        auto const sigB_1 = sigB << 7;
 
         if (expDiff < 0) {
             return
-                0xFF != expB ? softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB | 0x40000000) - softfloat_shiftRightJam32(sigA + (expA ? 0x40000000 : sigA), static_cast<uint16_t>(-expDiff))) :
-                0 == sigB ? signed_inf_F32(!signZ) : u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+                0xFF != expB ? softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
+                0 == sigB_1 ? signed_inf_F32(!signZ) : u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
         } else {
             return
-                0xFF == expA ? u_as_f_32(0 != sigA ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA) :
+                0xFF == expA ? u_as_f_32(0 != sigA_1 ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA) :
                 softfloat_normRoundPackToF32(signZ,
                                              expA - 1,
-                                             (sigA | 0x40000000) -
-                                             softfloat_shiftRightJam32(sigB + (expB ? 0x40000000 : sigB), static_cast<uint16_t>(expDiff)));
+                                             (sigA_1 | 0x40000000) -
+                                             softfloat_shiftRightJam32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
         }
     }
 }
 
 }  // namespace
-}  // namespace internals
-}  // namespace softfloat
 
 float32_t
-f32_add(float32_t a,
-        float32_t b)
+f32_add(float32_t const a,
+        float32_t const b)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
@@ -192,8 +190,8 @@ f32_add(float32_t a,
 }
 
 float32_t
-f32_sub(float32_t a,
-        float32_t b)
+f32_sub(float32_t const a,
+        float32_t const b)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
@@ -205,4 +203,3 @@ f32_sub(float32_t a,
         return signF32UI(uiA) == signF32UI(uiB) ? softfloat_subMagsF32(uiA, uiB) : softfloat_addMagsF32(uiA, uiB);
     }
 }
-

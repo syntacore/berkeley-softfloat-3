@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float32_t
-i32_to_f32(int32_t a)
+i32_to_f32(int32_t const a)
 {
     using namespace softfloat::internals;
     bool const sign = a < 0;

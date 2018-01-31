@@ -37,18 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float32_t
-ui64_to_f32(uint64_t a)
+ui64_to_f32(uint64_t const a)
 {
     using namespace softfloat::internals;
-    int8_t shiftDist = softfloat_countLeadingZeros64(a) - 40;
+    int8_t const shiftDist = softfloat_countLeadingZeros64(a) - 40;
 
-    if (0 <= shiftDist) {
+    if (0 > shiftDist) {
+        int8_t const shiftDist_1 = shiftDist + 7;
+        uint32_t const sig =
+            shiftDist_1 < 0 ? static_cast<uint32_t>(softfloat_shortShiftRightJam64(a, static_cast<uint8_t>(-shiftDist_1))) :
+            static_cast<uint32_t>(a) << shiftDist_1;
+        return softfloat_roundPackToF32(0, 0x9C - shiftDist_1, sig);
+    } else {
         return u_as_f_32(a ? packToF32UI(0, 0x95 - shiftDist, static_cast<uint32_t>(a) << shiftDist) : 0);
     }
-
-    shiftDist += 7;
-    uint32_t const sig =
-        shiftDist < 0 ? static_cast<uint32_t>(softfloat_shortShiftRightJam64(a, static_cast<uint8_t>(-shiftDist))) :
-        static_cast<uint32_t>(a) << shiftDist;
-    return softfloat_roundPackToF32(0, 0x9C - shiftDist, sig);
 }

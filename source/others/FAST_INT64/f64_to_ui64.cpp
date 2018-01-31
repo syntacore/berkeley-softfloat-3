@@ -37,37 +37,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 uint64_t
-f64_to_ui64(float64_t a,
-            uint8_t roundingMode,
-            bool exact)
+f64_to_ui64(float64_t const a,
+            uint8_t const roundingMode,
+            bool const exact)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = signF64UI(uiA);
     int16_t const exp = expF64UI(uiA);
-    uint64_t sig = fracF64UI(uiA);
-
-    if (exp) {
-        sig |= UINT64_C(0x0010000000000000);
-    }
-
+    uint64_t const sig = fracF64UI(uiA) | (0 != exp? UINT64_C(0x0010000000000000) :UINT64_C(0));
     int16_t const shiftDist = 0x433 - exp;
-    uint64_extra sigExtra;
 
     if (shiftDist <= 0) {
         if (shiftDist < -11) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                exp == 0x7FF && fracF64UI(uiA) ? ui64_fromNaN :
+                0x7FF == exp && 0 != fracF64UI(uiA) ? ui64_fromNaN :
                 sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+        } else {
+            return softfloat_roundPackToUI64(sign, sig << -shiftDist, 0, roundingMode, exact);
         }
-
-        sigExtra.v = sig << -shiftDist;
-        sigExtra.extra = 0;
     } else {
-        sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
+        uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
+        return softfloat_roundPackToUI64(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
     }
-
-    return
-        softfloat_roundPackToUI64(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 }

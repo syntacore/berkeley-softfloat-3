@@ -45,19 +45,17 @@ f64_to_f32(float64_t a)
     int16_t const exp = expF64UI(uiA);
     uint64_t const frac = fracF64UI(uiA);
 
-    if (exp != 0x7FF) {
+    if (0x7FF != exp) {
         uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac, 22));
 
         if (0 != (exp | frac32)) {
             return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
+        } else {
+            return signed_zero_F32(sign);
         }
-
-        return signed_zero_F32(sign);
-    }
-
-    if (0 != frac) {
+    } else if (0 != frac) {
         return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(uiA)));
+    } else {
+        return signed_inf_F32(sign);
     }
-
-    return signed_inf_F32(sign);
 }

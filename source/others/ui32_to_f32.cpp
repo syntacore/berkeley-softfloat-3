@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float32_t
-ui32_to_f32(uint32_t a)
+ui32_to_f32(uint32_t const a)
 {
     using namespace softfloat::internals;
     return
@@ -45,4 +45,3 @@ ui32_to_f32(uint32_t a)
         0 != (a & 0x80000000) ? softfloat_roundPackToF32(0, 0x9D, a >> 1 | (a & 1)) :
         softfloat_normRoundPackToF32(0, 0x9C, a);
 }
-
