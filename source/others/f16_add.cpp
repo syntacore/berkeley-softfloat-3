@@ -42,6 +42,7 @@ f16_add(float16_t a, float16_t b)
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
     uint16_t const uiB = f_as_u_16(b);
+    /// @todo Merge with f16_sub, make softfloat_subMagsF16 and softfloat_addMagsF16 local
     return
         signF16UI(static_cast<uint16_t>(uiA ^ uiB)) ?
         softfloat_subMagsF16(uiA, uiB) :
