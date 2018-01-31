@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-f64_div(float64_t a,
-        float64_t b)
+f64_div(float64_t const a,
+        float64_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
@@ -52,89 +52,85 @@ f64_div(float64_t a,
     bool const signZ = signA ^ signB;
 
     if (expA == 0x7FF) {
-        if (sigA) {
+        if (0 != sigA) {
             return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-        }
-
-        if (expB == 0x7FF) {
-            if (sigB) {
+        } else if (0x7FF == expB) {
+            if (0 != sigB) {
                 return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-            }
-
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
-        }
-
-        return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
-    }
-
-    if (expB == 0x7FF) {
-        return u_as_f_64(sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : packToF64UI(signZ, 0, 0));
-    }
-
-    if (!expB) {
-        if (!sigB) {
-            if (!(expA | sigA)) {
+            } else {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return u_as_f_64(defaultNaNF64UI);
             }
-
-            softfloat_raiseFlags(softfloat_flag_infinite);
+        } else {
             return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
         }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
-        expB = normExpSig.exp;
-        sigB = normExpSig.sig;
-    }
-
-    if (!expA) {
-        if (!sigA) {
-            return u_as_f_64(packToF64UI(signZ, 0, 0));
-        }
-
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-
-    int16_t expZ = expA - expB + 0x3FE;
-    sigA |= UINT64_C(0x0010000000000000);
-    sigB |= UINT64_C(0x0010000000000000);
-
-    if (sigA < sigB) {
-        --expZ;
-        sigA <<= 11;
+    } else if (0x7FF == expB) {
+        return u_as_f_64(sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : packToF64UI(signZ, 0, 0));
     } else {
-        sigA <<= 10;
-    }
-
-    sigB <<= 11;
-    uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32) - 2;
-    uint32_t const sig32Z = (static_cast<uint32_t>(sigA >> 32) * static_cast<uint64_t>(recip32)) >> 32;
-    uint32_t doubleTerm = sig32Z << 1;
-    uint64_t rem =
-        ((sigA - static_cast<uint64_t>(doubleTerm) * static_cast<uint32_t>(sigB >> 32)) << 28) -
-        static_cast<uint64_t>(doubleTerm) * (static_cast<uint32_t>(sigB) >> 4);
-    uint32_t q = ((static_cast<uint32_t>(rem >> 32) * static_cast<uint64_t>(recip32)) >> 32) + 4;
-    uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32) + (static_cast<uint64_t>(q) << 4);
-
-    if ((sigZ & 0x1FF) < 4 << 4) {
-        q &= ~7;
-        sigZ &= ~static_cast<uint64_t>(0x7F);
-        doubleTerm = q << 1;
-        rem =
-            ((rem - static_cast<uint64_t>(doubleTerm) * static_cast<uint32_t>(sigB >> 32)) << 28)
-            - static_cast<uint64_t>(doubleTerm) * (static_cast<uint32_t>(sigB) >> 4);
-
-        if (rem & UINT64_C(0x8000000000000000)) {
-            sigZ -= 1 << 7;
-        } else {
-            if (rem) {
-                sigZ |= 1;
+        if (0 == expB) {
+            if (0 == sigB) {
+                if (0 == (expA | sigA)) {
+                    softfloat_raiseFlags(softfloat_flag_invalid);
+                    return u_as_f_64(defaultNaNF64UI);
+                } else {
+                    softfloat_raiseFlags(softfloat_flag_infinite);
+                    return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
+                }
+            } else {
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                expB = normExpSig.exp;
+                sigB = normExpSig.sig;
             }
         }
-    }
 
-    return softfloat_roundPackToF64(signZ, expZ, sigZ);
+        if (0 == expA) {
+            if (0 == sigA) {
+                return u_as_f_64(packToF64UI(signZ, 0, 0));
+            } else {
+                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                expA = normExpSig.exp;
+                sigA = normExpSig.sig;
+            }
+        }
+
+        int16_t expZ = expA - expB + 0x3FE;
+        sigA |= UINT64_C(0x0010000000000000);
+        sigB |= UINT64_C(0x0010000000000000);
+
+        if (sigA < sigB) {
+            --expZ;
+            sigA <<= 11;
+        } else {
+            sigA <<= 10;
+        }
+
+        sigB <<= 11;
+        uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32) - 2;
+        uint32_t const sig32Z = (static_cast<uint32_t>(sigA >> 32) * static_cast<uint64_t>(recip32)) >> 32;
+        uint32_t doubleTerm = sig32Z << 1;
+        uint64_t rem =
+            ((sigA - static_cast<uint64_t>(doubleTerm) * static_cast<uint32_t>(sigB >> 32)) << 28) -
+            static_cast<uint64_t>(doubleTerm) * (static_cast<uint32_t>(sigB) >> 4);
+        uint32_t q = ((static_cast<uint32_t>(rem >> 32) * static_cast<uint64_t>(recip32)) >> 32) + 4;
+        uint64_t sigZ = (static_cast<uint64_t>(sig32Z) << 32) + (static_cast<uint64_t>(q) << 4);
+
+        if ((sigZ & 0x1FF) < 4 << 4) {
+            q &= ~7;
+            sigZ &= ~static_cast<uint64_t>(0x7F);
+            doubleTerm = q << 1;
+            rem =
+                ((rem - static_cast<uint64_t>(doubleTerm) * static_cast<uint32_t>(sigB >> 32)) << 28)
+                - static_cast<uint64_t>(doubleTerm) * (static_cast<uint32_t>(sigB) >> 4);
+
+            if (rem & UINT64_C(0x8000000000000000)) {
+                sigZ -= 1 << 7;
+            } else {
+                if (rem) {
+                    sigZ |= 1;
+                }
+            }
+        }
+
+        return softfloat_roundPackToF64(signZ, expZ, sigZ);
+    }
 }

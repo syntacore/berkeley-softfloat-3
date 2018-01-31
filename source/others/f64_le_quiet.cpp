@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-f64_le_quiet(float64_t a,
-             float64_t b)
+f64_le_quiet(float64_t const a,
+             float64_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
@@ -50,11 +50,11 @@ f64_le_quiet(float64_t a,
         }
 
         return false;
+    } else {
+        bool const signA = signF64UI(uiA);
+        bool const signB = signF64UI(uiB);
+        return
+            signA != signB ? signA || 0 == ((uiA | uiB) & static_cast<uint64_t>(INT64_MAX)) :
+            uiA == uiB || (signA ^ (uiA < uiB));
     }
-
-    bool const signA = signF64UI(uiA);
-    bool const signB = signF64UI(uiB);
-    return
-        signA != signB ? signA || !((uiA | uiB) & static_cast<uint64_t>(INT64_MAX)) :
-        uiA == uiB || (signA ^ (uiA < uiB));
 }

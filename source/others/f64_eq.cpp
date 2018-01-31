@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-f64_eq(float64_t a,
-       float64_t b)
+f64_eq(float64_t const a,
+       float64_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
@@ -50,8 +50,7 @@ f64_eq(float64_t a,
         }
 
         return false;
+    } else {
+        return uiA == uiB || !((uiA | uiB) & static_cast<uint64_t>(INT64_MAX));
     }
-
-    return uiA == uiB || !((uiA | uiB) & static_cast<uint64_t>(INT64_MAX));
 }
-

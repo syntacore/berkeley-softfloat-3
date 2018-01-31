@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-f64_lt(float64_t a, float64_t b)
+f64_lt(float64_t const a,
+       float64_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
@@ -46,12 +47,11 @@ f64_lt(float64_t a, float64_t b)
     if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
+    } else {
+        bool const signA = signF64UI(uiA);
+        bool const signB = signF64UI(uiB);
+        return
+            signA != signB ? signA && 0 != ((uiA | uiB) & INT64_MAX) :
+            uiA != uiB && (signA ^ (uiA < uiB));
     }
-
-    bool const signA = signF64UI(uiA);
-    bool const signB = signF64UI(uiB);
-    return
-        signA != signB ? signA && ((uiA | uiB) & INT64_MAX) :
-        uiA != uiB && (signA ^ (uiA < uiB));
 }
-
