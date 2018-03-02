@@ -47,7 +47,7 @@ softfloat_negXM(uint8_t size_words,
     bool carry = 1;
 
     for (auto index = indexWordLo(size_words);;) {
-        uint32_t const word = ~zPtr[index] + carry;
+        uint32_t const word = ~zPtr[index] + !!(carry);
         zPtr[index] = word;
 
         if (index == lastIndex) {
