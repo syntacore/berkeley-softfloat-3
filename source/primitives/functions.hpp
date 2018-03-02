@@ -215,7 +215,9 @@ softfloat_approxRecip32_1(uint32_t a)
         softfloat_approxRecip_1k0s[index] -
         ((softfloat_approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
     uint32_t const sigma0 = ~static_cast<uint32_t>((r0 * static_cast<uint64_t>(a)) >> 7);
-    uint32_t r = (static_cast<uint32_t>(r0) << 16) + ((r0 * static_cast<uint64_t>(sigma0)) >> 24);
+    uint32_t r =
+        (static_cast<uint32_t>(r0) << 16) +
+        static_cast<uint32_t>(static_cast<uint64_t>(r0) * sigma0 >> 24);
     uint32_t const sqrSigma0 = (static_cast<uint64_t>(sigma0) * sigma0) >> 32;
     return r + ((static_cast<uint32_t>(r) * static_cast<uint64_t>(sqrSigma0)) >> 48);
 }
