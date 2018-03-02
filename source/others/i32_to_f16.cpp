@@ -51,7 +51,8 @@ i32_to_f16(int32_t a)
 
     int8_t const shiftDist1 = shiftDist + 4;
     uint16_t const sig =
-        shiftDist1 < 0 ? static_cast<uint16_t>(absA >> -shiftDist1 | !!(0 != (absA << (shiftDist1 & 31)))) :
-        static_cast<uint16_t>(absA << shiftDist1);
+        static_cast<uint16_t>(
+            shiftDist1 < 0 ? absA >> -shiftDist1 | !!(0 != (absA << (shiftDist1 & 0x1F))) :
+            absA << shiftDist1);
     return softfloat_roundPackToF16(sign, 0x1C - shiftDist1, sig);
 }
