@@ -116,6 +116,7 @@ f128_roundToInt(float128_t a,
                 if (!(fracF128UI64(uiA64) | uiA0)) {
                     break;
                 }
+                [[fallthrough]];
 
             case softfloat_round_near_maxMag:
                 if (exp == 0x3FFE) {
