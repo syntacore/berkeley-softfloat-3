@@ -59,6 +59,7 @@ f32_roundToInt(float32_t const a,
             if (0 == fracF32UI(uiA)) {
                 break;
             }
+            [[fallthrough]];
 
         case softfloat_round_near_maxMag:
             if (0x7E == exp) {
