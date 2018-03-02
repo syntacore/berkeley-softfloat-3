@@ -49,7 +49,7 @@ softfloat_subMagsF16(uint16_t const uiA,
     uint16_t const sigB = fracF16UI(uiB);
     int8_t expDiff = expA - expB;
 
-    if (0 != expDiff) {
+    if (0 == expDiff) {
         if (expA == 0x1F) {
             if (0 != (sigA | sigB)) {
                 return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
