@@ -80,49 +80,46 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
     if (shiftDist < 0) {
         if (sig >> 32 || (shiftDist <= -31)) {
             return invalid(sign, exp, sig);
+        } else {
+            uint64_t const shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(sig)) << -shiftDist;
+
+            if (shiftedSig >> 32) {
+                return invalid(sign, exp, sig);
+            }
+
+            absZ = static_cast<uint32_t>(shiftedSig);
         }
-
-        uint64_t const shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(sig)) << -shiftDist;
-
-        if (shiftedSig >> 32) {
-            return invalid(sign, exp, sig);
-        }
-
-        absZ = static_cast<uint32_t>(shiftedSig);
     } else {
-        assert(0 <= shiftDist);
         uint64_t const shiftedSig = sig >> shiftDist;
 
         if (0 != (shiftedSig >> 32)) {
             return invalid(sign, exp, sig);
-        }
+        } else {
+            absZ = static_cast<uint32_t>(shiftedSig);
 
-        absZ = static_cast<uint32_t>(shiftedSig);
-
-        if (exact && 0 != shiftDist) {
-            raiseInexact = static_cast<uint64_t>(absZ) << shiftDist != sig;
+            if (exact && 0 != shiftDist) {
+                raiseInexact = static_cast<uint64_t>(absZ) << shiftDist != sig;
+            }
         }
     }
 
     if (sign) {
         if (0x80000000 < absZ) {
             return invalid(sign, exp, sig);
-        }
+        } else {
+            if (raiseInexact) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
 
+            return -static_cast<int32_t>(absZ);
+        }
+    } else if (0x80000000 <= absZ) {
+        return invalid(sign, exp, sig);
+    } else {
         if (raiseInexact) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        return -static_cast<int32_t>(absZ);
+        return static_cast<int32_t>(absZ);
     }
-
-    if (0x80000000 <= absZ) {
-        return invalid(sign, exp, sig);
-    }
-
-    if (raiseInexact) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
-    }
-
-    return static_cast<int32_t>(absZ);
 }
