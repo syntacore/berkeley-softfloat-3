@@ -153,7 +153,6 @@ softfloat_mulAddF16(uint16_t uiA,
     if (!expC) {
         if (!sigC) {
             expZ = expProd - 1;
-            /** @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint16_t', possible loss of data */
             sigZ = static_cast<uint16_t>(sigProd >> 15 | !!(0 != (sigProd & 0x7FFF)));
             return softfloat_roundPackToF16(signZ, expZ, sigZ);
         }
@@ -212,9 +211,10 @@ softfloat_mulAddF16(uint16_t uiA,
         expZ -= shiftDist;
         shiftDist -= 16;
 
-        sigZ = shiftDist < 0 ?
-            static_cast<uint16_t>(sig32Z >> (-shiftDist) | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist & 31)))) :
-            static_cast<uint16_t>(sig32Z << shiftDist);
+        sigZ = static_cast<uint16_t>(
+            shiftDist < 0 ?
+            sig32Z >> -shiftDist | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist & 31))) :
+            sig32Z << shiftDist);
     }
 
     return softfloat_roundPackToF16(signZ, expZ, sigZ);
