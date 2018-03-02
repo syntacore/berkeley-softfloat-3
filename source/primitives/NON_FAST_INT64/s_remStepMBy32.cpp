@@ -66,7 +66,7 @@ softfloat_remStepMBy32(uint8_t size_words,
             wordRem = remPtr[index];
             wordShiftedRem |= wordRem << dist;
             wordProd = static_cast<uint32_t>(dwordProd);
-            zPtr[index] = wordShiftedRem - wordProd - borrow;
+            zPtr[index] = wordShiftedRem - wordProd - !!(borrow);
 
             if (index == lastIndex) {
                 break;
