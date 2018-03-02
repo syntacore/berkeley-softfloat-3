@@ -129,7 +129,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
                                        &extSigZ[indexMultiword(5, 3, 1)],
                                        carry,
                                        &extSigZ[indexMultiword(5, 3, 1)]);
-        wordSigZ = sig96A + sig96B + carry;
+        wordSigZ = sig96A + sig96B + !!(carry);
     } else {
         extSigZ[indexWordLo(5)] = 0;
         carry = (*addCarryMRoutinePtr)(3,
