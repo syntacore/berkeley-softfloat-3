@@ -52,7 +52,7 @@ softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
     uint32_t const sigma0 = ~static_cast<uint32_t>((static_cast<uint32_t>(ESqrR0) * static_cast<uint64_t>(a)) >> 23);
     uint32_t r =
         (static_cast<uint32_t>(r0) << 16) +
-        ((r0 * static_cast<uint64_t>(sigma0)) >> 25);
+        static_cast<uint32_t>((static_cast<uint64_t>(r0) * sigma0) >> 25);
     uint32_t const sqrSigma0 = (static_cast<uint64_t>(sigma0) * sigma0) >> 32;
     r += (static_cast<uint32_t>((r >> 1) + (r >> 3) - (static_cast<uint32_t>(r0) << 14)) * static_cast<uint64_t>(sqrSigma0)) >> 48;
     return !(r & 0x80000000) ? 0x80000000 : r;
