@@ -61,6 +61,7 @@ f16_roundToInt(float16_t a,
             if (!fracF16UI(uiA)) {
                 return u_as_f_16(uiZ);
             }
+            [[fallthrough]];
 
         case softfloat_round_near_maxMag:
             if (exp == 0xE) {
