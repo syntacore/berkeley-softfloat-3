@@ -84,6 +84,8 @@ f128M_roundToInt(float128_t const* aPtr,
                 break;
             }
 
+            [[fallthrough]];
+
         case softfloat_round_near_maxMag:
             if (exp == 0x3FFE) {
                 zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x3FFF, 0);
