@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 void
-extF80M_roundToInt(extFloat80_t const *const aPtr,
+extF80M_roundToInt(extFloat80_t const* const aPtr,
                    uint8_t roundingMode,
                    bool exact,
-                   extFloat80_t *const zPtr)
+                   extFloat80_t* const zPtr)
 {
     using namespace softfloat::internals;
     uint16_t const uiA64 = aPtr->signExp;
@@ -55,6 +55,7 @@ extF80M_roundToInt(extFloat80_t const *const aPtr,
             zPtr->signif = 0;
             return;
         }
+
         exp += softfloat_normExtF80SigM(&sigA);
     }
 
@@ -68,28 +69,37 @@ extF80M_roundToInt(extFloat80_t const *const aPtr,
             if (0 == (sigA & INT64_MAX)) {
                 break;
             }
+
+            [[fallthrough]];
+
         case softfloat_round_near_maxMag:
             if (0x3FFE == exp) {
                 zPtr->signExp = uint16_t(signUI64 | 0x3FFF);
                 zPtr->signif = static_cast<uint64_t>(INT64_MIN);
                 return;
             }
+
             break;
+
         case softfloat_round_min:
             if (signUI64) {
                 zPtr->signExp = static_cast<uint16_t>(signUI64 | UINT16_C(0x3FFF));
                 zPtr->signif = static_cast<uint64_t>(INT64_MIN);
                 return;
             }
+
             break;
+
         case softfloat_round_max:
             if (!signUI64) {
                 zPtr->signExp = static_cast<uint16_t>(signUI64 | UINT16_C(0x3FFF));
                 zPtr->signif = static_cast<uint64_t>(INT64_MIN);
                 return;
             }
+
             break;
         }
+
         zPtr->signExp = signUI64;
         zPtr->signif = 0;
         return;
@@ -97,44 +107,53 @@ extF80M_roundToInt(extFloat80_t const *const aPtr,
 
     if (0x403E <= exp) {
         uint64_t sigZ;
+
         if (INT16_MAX == exp) {
             if (0 != (sigA & INT64_MAX)) {
                 softfloat_propagateNaNExtF80M(aPtr, 0, zPtr);
                 return;
             }
+
             sigZ = static_cast<uint64_t>(INT64_MIN);
         } else {
             sigZ = sigA;
         }
-        /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
+
+        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
         zPtr->signExp = static_cast<uint16_t>(signUI64 | exp);
         zPtr->signif = sigZ;
         return;
     }
 
-    /** @todo Warning	C4244	'=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
+    /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data */
     uint16_t uiZ64 = static_cast<uint16_t>(signUI64 | exp);
     uint64_t const lastBitMask = static_cast<uint64_t>(1) << (0x403E - exp);
     uint64_t const roundBitsMask = lastBitMask - 1;
     uint64_t sigZ = sigA;
+
     if (softfloat_round_near_maxMag == roundingMode) {
         sigZ += lastBitMask >> 1;
     } else if (softfloat_round_near_even == roundingMode) {
         sigZ += lastBitMask >> 1;
+
         if (0 == (sigZ & roundBitsMask)) {
             sigZ &= ~lastBitMask;
         }
     } else if (softfloat_round_minMag != roundingMode && ((0 != signUI64) != (softfloat_round_max == roundingMode))) {
         sigZ += roundBitsMask;
     }
+
     sigZ &= ~roundBitsMask;
+
     if (!sigZ) {
         ++uiZ64;
         sigZ = UINT64_C(0x8000000000000000);
     }
+
     if (exact && (sigZ != sigA)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     zPtr->signExp = uiZ64;
     zPtr->signif = sigZ;
     return;
