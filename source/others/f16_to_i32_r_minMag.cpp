@@ -58,7 +58,7 @@ f16_to_i32_r_minMag(float16_t a, bool exact)
     if (exp == 0x1F) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0x1F && frac ? i32_fromNaN :
+            frac ? i32_fromNaN :
             sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
 
