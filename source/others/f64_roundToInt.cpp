@@ -61,6 +61,7 @@ f64_roundToInt(float64_t const a,
                     return u_as_f_64(uiZ);
                     break;
                 }
+                [[fallthrough]];
 
             case softfloat_round_near_maxMag:
                 if (exp == 0x3FE) {
