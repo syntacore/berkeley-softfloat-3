@@ -56,7 +56,7 @@ softfloat_addMagsF64(uint64_t const uiA,
         if (0 == expA) {
             return u_as_f_64(uiA + sigB);
         } else if (0x7FF == expA) {
-            return u_as_f_64(sigA | sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
+            return u_as_f_64(0 != (sigA | sigB) ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
         } else {
             return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
         }
