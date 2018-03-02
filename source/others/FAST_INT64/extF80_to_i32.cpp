@@ -42,21 +42,23 @@ extF80_to_i32(extFloat80_t a,
               bool exact)
 {
     using namespace softfloat::internals;
+
+    static bool const fromNaN_is_same_as_pos_overflow = i32_fromNaN == i32_fromPosOverflow;
+    static bool const fromNaN_is_same_as_neg_overflow = i32_fromNaN == i32_fromNegOverflow;
+    static bool const fromNaN_is_same_as_both_overflow = fromNaN_is_same_as_pos_overflow && fromNaN_is_same_as_neg_overflow;
+    static bool const fromNaN_is_same_as_any_overflow = fromNaN_is_same_as_pos_overflow || fromNaN_is_same_as_neg_overflow;
+
     uint16_t const uiA64 = a.signExp;
     bool sign = signExtF80UI64(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);
     uint64_t sig = a.signif;
 
-    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
-        if (0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            if (i32_fromNaN == i32_fromPosOverflow) {
-                sign = false;
-            } else if (i32_fromNaN == i32_fromNegOverflow) {
-                sign = true;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return i32_fromNaN;
-            }
+    if (!fromNaN_is_same_as_both_overflow && 0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+        if (!fromNaN_is_same_as_any_overflow) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return i32_fromNaN;
+        } else {
+            sign = fromNaN_is_same_as_neg_overflow;
         }
     }
 

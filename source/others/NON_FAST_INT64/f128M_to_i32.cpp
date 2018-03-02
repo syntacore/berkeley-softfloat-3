@@ -42,6 +42,11 @@ f128M_to_i32(float128_t const* const aPtr,
              bool const exact)
 {
     using namespace softfloat::internals;
+    static bool const fromNaN_same_as_neg_overflow = i32_fromNaN == i32_fromNegOverflow;
+    static bool const fromNaN_same_as_pos_overflow = i32_fromNaN == i32_fromPosOverflow;
+    static bool const fromNaN_same_as_both_overflow = fromNaN_same_as_pos_overflow && fromNaN_same_as_neg_overflow;
+    static bool const fromNaN_same_as_any_overflow = fromNaN_same_as_pos_overflow || fromNaN_same_as_neg_overflow;
+
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool sign = signF128UI96(uiA96);
@@ -52,28 +57,20 @@ f128M_to_i32(float128_t const* const aPtr,
         sig64 |= 1;
     }
 
-    if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
-        if (0x7FFF == exp && 0 != sig64) {
-            if (i32_fromNaN == i32_fromPosOverflow) {
-                sign = 0;
-            } else if (i32_fromNaN == i32_fromNegOverflow) {
-                sign = 1;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return i32_fromNaN;
-            }
+    // TODO: check and re-factor
+    if (!fromNaN_same_as_both_overflow && 0x7FFF == exp && 0 != sig64) {
+        if (!fromNaN_same_as_any_overflow) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return i32_fromNaN;
+        } else {
+            sign = fromNaN_same_as_neg_overflow;
         }
     }
 
-    if (exp) {
+    if (0 != exp) {
         sig64 |= UINT64_C(0x0001000000000000);
     }
 
     int32_t const shiftDist = 0x4023 - exp;
-
-    if (0 < shiftDist) {
-        sig64 = softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
-    }
-
-    return softfloat_roundPackToI32(sign, sig64, roundingMode, exact);
+    return softfloat_roundPackToI32(sign, 0 < shiftDist? softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
 }

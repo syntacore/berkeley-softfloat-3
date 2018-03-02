@@ -42,21 +42,22 @@ f64_to_ui32(float64_t const a,
             bool const exact)
 {
     using namespace softfloat::internals;
+    static bool const fromNaN_is_same_as_pos_overflow = ui32_fromNaN == ui32_fromPosOverflow;
+    static bool const fromNaN_is_same_as_neg_overflow = ui32_fromNaN == ui32_fromNegOverflow;
+    static bool const fromNaN_is_same_as_both_overflow = fromNaN_is_same_as_pos_overflow && fromNaN_is_same_as_neg_overflow;
+    static bool const fromNaN_is_same_as_any_overflow = fromNaN_is_same_as_pos_overflow || fromNaN_is_same_as_neg_overflow;
     uint64_t const uiA = f_as_u_64(a);
     bool sign = signF64UI(uiA);
     int16_t const exp = expF64UI(uiA);
     uint64_t sig = fracF64UI(uiA);
 
-    if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {
-        if (0x7FF == exp && 0 != sig) {
-            if (ui32_fromNaN == ui32_fromPosOverflow) {
-                sign = 0;
-            } else if (ui32_fromNaN == ui32_fromNegOverflow) {
-                sign = 1;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return ui32_fromNaN;
-            }
+    // TODO: check and re-factor
+    if (!fromNaN_is_same_as_both_overflow && 0x7FF == exp && 0 != sig) {
+        if (!fromNaN_is_same_as_any_overflow) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return ui32_fromNaN;
+        } else {
+            sign = fromNaN_is_same_as_neg_overflow;
         }
     }
 
@@ -65,10 +66,5 @@ f64_to_ui32(float64_t const a,
     }
 
     int16_t const shiftDist = 0x427 - exp;
-
-    if (0 < shiftDist) {
-        sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
-    }
-
-    return softfloat_roundPackToUI32(sign, sig, roundingMode, exact);
+    return softfloat_roundPackToUI32(sign, 0 < shiftDist ? softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist)) : sig, roundingMode, exact);
 }
