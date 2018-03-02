@@ -53,7 +53,7 @@ softfloat_addMagsF16(uint16_t const uiA,
         if (0 == expA) {
             return u_as_f_16(static_cast<uint16_t>(uiA + sigB));
         } else if (0x1F == expA) {
-            return u_as_f_16(sigA | sigB ? softfloat_propagateNaNF16UI(uiA, uiB) : uiA);
+            return u_as_f_16(0 != (sigA | sigB) ? softfloat_propagateNaNF16UI(uiA, uiB) : uiA);
         } else {
             bool const signZ = signF16UI(uiA);
             int8_t const expZ = expA;
