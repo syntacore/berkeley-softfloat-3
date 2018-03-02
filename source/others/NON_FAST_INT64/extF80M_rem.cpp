@@ -89,15 +89,8 @@ extF80M_rem(extFloat80_t const* const aPtr,
 
     if (0 == (sigA & UINT64_C(0x8000000000000000))) {
         if (0 == sigA) {
-            expA = 0;
-
-            if (expA < 1) {
-                sigA >>= 1 - expA;
-                expA = 0;
-            }
-
-            zPtr->signExp = packToExtF80UI64(signRem, static_cast<uint16_t>(expA));
-            zPtr->signif = sigA;
+            zPtr->signExp = packToExtF80UI64(signRem, 0);
+            zPtr->signif = sigA >> 1;
             return;
         } else {
             expA += softfloat_normExtF80SigM(&sigA);
