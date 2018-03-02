@@ -300,6 +300,7 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
                 softfloat_shortShiftRight160M(sigX, shiftDist, sigX);
             }
 
+            //TODO: V610 Unspecified behavior. Check the shift operator '>>='. The left operand is negative ('expDiff' = [-127..-1]). https://www.viva64.com/en/w/v610/
             expDiff >>= 5;
             extSigPtr = &sigProd[indexMultiwordLo(8, 5)] - wordIncr + expDiff * -wordIncr;
             carry = (*addCarryMRoutinePtr)(5, extSigPtr, sigX, doSub, extSigPtr);
