@@ -94,6 +94,7 @@ extF80_roundToInt(extFloat80_t const a,
             if (0 == (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
                 break;
             }
+            [[fallthrough]];
 
         case softfloat_round_near_maxMag:
             if (0x3FFE == exp) {
