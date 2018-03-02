@@ -62,7 +62,7 @@ f16_to_ui64(float16_t a,
         shiftDist = exp - 0x19;
 
         if ((0 <= shiftDist) && !sign) {
-            return sig32 << shiftDist;
+            return static_cast<uint64_t>(sig32) << shiftDist;
         }
 
         shiftDist = exp - 0x0D;
