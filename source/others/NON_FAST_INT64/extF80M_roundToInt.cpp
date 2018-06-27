@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
+#ifdef _MSC_VER
+#pragma warning( disable : 5030)
+#endif
+
 void
 extF80M_roundToInt(extFloat80_t const* const aPtr,
                    uint8_t roundingMode,

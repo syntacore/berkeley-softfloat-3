@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
+#ifdef _MSC_VER
+#pragma warning( disable : 5030)
+#endif
+
 float16_t
 f16_roundToInt(float16_t a,
                uint8_t roundingMode,
