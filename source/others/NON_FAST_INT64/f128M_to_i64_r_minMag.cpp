@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace {
 
-static int64_t
+static inline int64_t
 invalid(bool const sign,
         int32_t const exp,
         uint32_t sig96,
