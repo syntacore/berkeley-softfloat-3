@@ -50,10 +50,6 @@ eliminates all dependencies on compile-time macros.
 #include "softfloat/types.h"
 #include <stdbool.h>
 
-#ifndef THREAD_LOCAL
-#define THREAD_LOCAL
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
