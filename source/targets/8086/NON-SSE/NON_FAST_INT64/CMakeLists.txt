@@ -1,54 +1,13 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 
-set(TARGET_NAME 8086)
+set(TARGET_PLATFORM_NAME 8086)
 
 set(SRC_TARGET_NON_FAST_INT64
     ${SRC_TARGET-8086_NON_FAST_INT64}
     ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128M.cpp
 )
 
-source_group(include
-FILES
-    ${INC_SOFTFLOAT}
-)
-source_group(primitives
-FILES
-    ${INC_PRIMITIVES}
-)
-source_group(primitives\\common
-FILES
-    ${SRC_PRIMITIVES}
-)
-source_group(primitives\\NonFastInt64
-FILES
-    ${SRC_PRIMITIVES_NON_FAST_INT64}
-)
-source_group(others
-FILES
-    ${INC_OTHERS}
-)
-source_group(others\\common
-FILES
-    ${SRC_OTHERS}
-)
-source_group(others\\NonFastInt64
-FILES
-    ${SRC_OTHERS_NON_FAST_INT64}
-)
-source_group(specialize
-FILES
-    ${INC_TARGET}
-)
-source_group(specialize\\8086_NON-SSE
-FILES
-    ${SRC_TARGET-8086_NON-SSE}
-)
-source_group(specialize\\NonFastInt64
-FILES
-    ${SRC_TARGET_NON_FAST_INT64}
-)
-
-add_library(softfloat-${TARGET_NAME}-nfi64 EXCLUDE_FROM_ALL
+set(ALL_SRC
     ${INC_SOFTFLOAT}
     ${INC_OTHERS}
     ${SRC_OTHERS}
@@ -60,4 +19,7 @@ add_library(softfloat-${TARGET_NAME}-nfi64 EXCLUDE_FROM_ALL
     ${INC_TARGET}
     ${SRC_TARGET_NON_FAST_INT64}
 )
-set_target_properties(softfloat-${TARGET_NAME}-nfi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
+source_group(TREE ${SOFTFLOAT_ROOT} FILES ${ALL_SRC})
+add_library(softfloat-${TARGET_PLATFORM_NAME}-nfi64 EXCLUDE_FROM_ALL ${ALL_SRC})
+target_include_directories(softfloat-${TARGET_PLATFORM_NAME}-nfi64 PUBLIC ${SOFTFLOAT_INCLUDE})
+set_target_properties(softfloat-${TARGET_PLATFORM_NAME}-nfi64 PROPERTIES FOLDER "softfloat/${TARGET_PLATFORM_NAME}")

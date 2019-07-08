@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -7,17 +7,6 @@ set(TARGET_NAME RISCV)
 add_definitions(-DSOFTFLOAT_FAST_DIV32TO16)
 
 set(INC_TARGET ${CMAKE_CURRENT_SOURCE_DIR}/target.hpp)
-
-source_group(include                  FILES ${INC_SOFTFLOAT})
-source_group(primitives               FILES ${INC_PRIMITIVES})
-source_group(primitives\\common       FILES ${SRC_PRIMITIVES})
-source_group(primitives\\FastInt64    FILES ${SRC_PRIMITIVES_FAST_INT64})
-source_group(primitives\\NonFastInt64 FILES ${SRC_PRIMITIVES_NON_FAST_INT64})
-source_group(others                   FILES ${INC_OTHERS})
-source_group(others\\common           FILES ${SRC_OTHERS})
-source_group(others\\FastInt64        FILES ${SRC_OTHERS_FAST_INT64})
-source_group(others\\NonFastInt64     FILES ${SRC_OTHERS_NON_FAST_INT64})
-source_group(specialize               FILES ${INC_TARGET})
 
 set(COMMON
     ${INC_SOFTFLOAT}
@@ -33,16 +22,25 @@ add_library(softfloat-${TARGET_NAME}-fi64 EXCLUDE_FROM_ALL
     ${SRC_OTHERS_FAST_INT64}
     ${SRC_PRIMITIVES_FAST_INT64}
 )
+target_include_directories(softfloat-${TARGET_NAME}-fi64 PUBLIC ${SOFTFLOAT_INCLUDE})
 set_target_properties(softfloat-${TARGET_NAME}-fi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
+target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
+if(SOFTFLOAT_FAST_DIV64TO32)
+    target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_DIV64TO32)
+endif(SOFTFLOAT_FAST_DIV64TO32)
 
 add_library(softfloat-${TARGET_NAME}-nfi64 EXCLUDE_FROM_ALL
     ${COMMON}
     ${SRC_OTHERS_NON_FAST_INT64}
     ${SRC_PRIMITIVES_NON_FAST_INT64}
 )
+target_include_directories(softfloat-${TARGET_NAME}-nfi64 PUBLIC ${SOFTFLOAT_INCLUDE})
 set_target_properties(softfloat-${TARGET_NAME}-nfi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
 
-target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
-if(${SOFTFLOAT_FAST_DIV64TO32})
-    target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_DIV64TO32)
-endif(${SOFTFLOAT_FAST_DIV64TO32})
+source_group(TREE ${SOFTFLOAT_ROOT} FILES
+    ${COMMON}
+    ${SRC_OTHERS_FAST_INT64}
+    ${SRC_OTHERS_NON_FAST_INT64}
+    ${SRC_PRIMITIVES_FAST_INT64}
+    ${SRC_PRIMITIVES_NON_FAST_INT64}
+)
