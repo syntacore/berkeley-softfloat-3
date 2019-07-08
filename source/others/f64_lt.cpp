@@ -51,7 +51,8 @@ f64_lt(float64_t const a,
         bool const signA = signF64UI(uiA);
         bool const signB = signF64UI(uiB);
         return
-            signA != signB ? signA && 0 != ((uiA | uiB) & INT64_MAX) :
-            uiA != uiB && (signA ^ (uiA < uiB));
+            signA != signB ?
+            signA && 0 != static_cast<uint64_t>((uiA | uiB) << 1) :
+            uiA != uiB && ((uiA < uiB) != signA);
     }
 }
