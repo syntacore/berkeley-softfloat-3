@@ -51,7 +51,8 @@ f32_lt(float32_t a,
         bool const signA = signF32UI(uiA);
         bool const signB = signF32UI(uiB);
         return
-            signA != signB ? signA && (static_cast<uint32_t>((uiA | uiB) << 1) != 0) :
-            uiA != uiB && (signA ^ (uiA < uiB));
+            signA != signB ?
+            signA && 0 != static_cast<uint32_t>((uiA | uiB) << 1) :
+            uiA != uiB && ((uiA < uiB) != signA);
     }
 }
