@@ -51,7 +51,7 @@ void
 softfloat_normRoundPackMToExtF80M(bool sign,
                                   int32_t exp,
                                   uint32_t* extSigPtr,
-                                  uint8_t roundingPrecision,
+                                  uint8_t const& roundingPrecision,
                                   extFloat80M* zSPtr)
 {
     int16_t shiftDist = 0;

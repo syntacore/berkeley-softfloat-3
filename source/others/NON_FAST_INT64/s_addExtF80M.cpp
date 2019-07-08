@@ -96,7 +96,7 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
     uint64_t sigZ = aSPtr->signif;
     uint64_t sigB = bSPtr->signif;
 
-    void(*roundPackRoutinePtr)(bool, int32_t, uint32_t*, uint8_t, extFloat80M*) = softfloat_roundPackMToExtF80M;
+    void(*roundPackRoutinePtr)(bool, int32_t, uint32_t*, uint8_t const&, extFloat80M*) = softfloat_roundPackMToExtF80M;
     int32_t const expDiff = expA - expB;
     uint32_t sigZExtra;
     uint32_t extSigX[3];

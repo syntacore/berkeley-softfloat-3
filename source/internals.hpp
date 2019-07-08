@@ -312,12 +312,16 @@ softfloat_normExtF80SigM(uint64_t*);
 
 void
 softfloat_roundPackMToExtF80M(bool,
-                              int32_t const&,
+                              int32_t,
                               uint32_t* const,
                               uint8_t const&,
                               extFloat80M* const);
 void
-softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t*, uint8_t, extFloat80M*);
+softfloat_normRoundPackMToExtF80M(bool,
+                                  int32_t,
+                                  uint32_t*,
+                                  uint8_t const&,
+                                  extFloat80M*);
 
 void
 softfloat_addExtF80M(extFloat80M const* const,
