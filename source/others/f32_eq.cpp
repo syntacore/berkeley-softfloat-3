@@ -43,13 +43,14 @@ f32_eq(float32_t a,
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
+
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
         return false;
     } else {
-        return uiA == uiB || !static_cast<uint32_t>((uiA | uiB) << 1);
+        return uiA == uiB || 0 == static_cast<uint32_t>((uiA | uiB) << 1);
     }
 }
 
