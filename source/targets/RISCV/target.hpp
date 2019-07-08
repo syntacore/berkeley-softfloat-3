@@ -90,8 +90,8 @@ struct commonNaN
 {
     commonNaN() = default;
     constexpr commonNaN(bool a_sign,
-                        uint64_t a_v64,
-                        uint64_t a_v0)
+                        uint64_t const& a_v64,
+                        uint64_t const& a_v0)
         : sign(a_sign)
         , v64(a_v64)
         , v0(a_v0)
@@ -110,7 +110,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_f16UIToCommonNaN(uint16_t uiA)
+softfloat_f16UIToCommonNaN(uint16_t const& uiA)
 {
     if (0 == (uiA & 0x0200)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -136,8 +136,8 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint16_t
-softfloat_propagateNaNF16UI(uint16_t uiA,
-                            uint16_t uiB)
+softfloat_propagateNaNF16UI(uint16_t const& uiA,
+                            uint16_t const& uiB)
 {
     if (softfloat_isSigNaNF16UI(uiA) || softfloat_isSigNaNF16UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -153,7 +153,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_f32UIToCommonNaN(uint32_t uiA)
+softfloat_f32UIToCommonNaN(uint32_t const& uiA)
 {
     if (0 == (uiA & 0x00400000)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -167,7 +167,7 @@ Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
 inline constexpr uint32_t
-softfloat_commonNaNToF32UI(commonNaN)
+softfloat_commonNaNToF32UI(commonNaN const&)
 {
     return defaultNaNF32UI;
 }
@@ -183,7 +183,7 @@ Returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
 Note:  This macro evaluates its argument more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNF64UI(uint64_t uiA)
+softfloat_isSigNaNF64UI(uint64_t const& uiA)
 {
     return
         UINT64_C(0x7FF0000000000000) == (uiA & UINT64_C(0x7FF8000000000000)) &&
@@ -197,7 +197,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_f64UIToCommonNaN(uint64_t uiA)
+softfloat_f64UIToCommonNaN(uint64_t const& uiA)
 {
     if (0 == (uiA & UINT64_C(0x0008000000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -229,8 +229,8 @@ floating-point signaling NaN.
 Note:  This macro evaluates its arguments more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNExtF80UI(uint16_t uiA64,
-                           uint64_t uiA0)
+softfloat_isSigNaNExtF80UI(uint16_t const& uiA64,
+                           uint64_t const& uiA0)
 {
     return
         UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & uiA64) &&
@@ -245,8 +245,8 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint32_t
-softfloat_propagateNaNF32UI(uint32_t uiA,
-                            uint32_t uiB)
+softfloat_propagateNaNF32UI(uint32_t const& uiA,
+                            uint32_t const& uiB)
 {
     if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -262,7 +262,8 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 static inline uint64_t
-softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
+softfloat_propagateNaNF64UI(uint64_t const& uiA,
+                            uint64_t const& uiB)
 {
     if (softfloat_isSigNaNF64UI(uiA) || softfloat_isSigNaNF64UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -273,7 +274,7 @@ softfloat_propagateNaNF64UI(uint64_t uiA, uint64_t uiB)
 
 #ifdef SOFTFLOAT_FAST_INT64
 
-/**
+/*
 The following functions are needed only when `SOFTFLOAT_FAST_INT64' is
 defined.
 */
@@ -286,8 +287,8 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_extF80UIToCommonNaN(uint64_t,
-                              uint64_t uiA0)
+softfloat_extF80UIToCommonNaN(uint64_t const&,
+                              uint64_t const& uiA0)
 {
     if (0 == (uiA0 & UINT64_C(0x4000000000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -309,8 +310,8 @@ point signaling NaN.
 Note:  This macro evaluates its arguments more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNF128UI(uint64_t uiA64,
-                         uint64_t uiA0)
+softfloat_isSigNaNF128UI(uint64_t const& uiA64,
+                         uint64_t const& uiA0)
 {
     return
         UINT64_C(0x7FFF000000000000) == (uiA64 & UINT64_C(0x7FFF800000000000)) &&
@@ -325,8 +326,8 @@ pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid exception
 is raised.
 */
 inline commonNaN
-softfloat_f128UIToCommonNaN(uint64_t const uiA64,
-                            uint64_t)
+softfloat_f128UIToCommonNaN(uint64_t const& uiA64,
+                            uint64_t const&)
 {
     if (0 == (uiA64 & UINT64_C(0x0000800000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -356,10 +357,10 @@ result.  If either original floating-point value is a signaling NaN, the
 invalid exception is raised.
 */
 inline uint128
-softfloat_propagateNaNExtF80UI(uint16_t uiA64,
-                               uint64_t uiA0,
-                               uint16_t uiB64,
-                               uint64_t uiB0)
+softfloat_propagateNaNExtF80UI(uint16_t const& uiA64,
+                               uint64_t const& uiA0,
+                               uint16_t const& uiB64,
+                               uint64_t const& uiB0)
 {
 
     if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
@@ -389,10 +390,10 @@ If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
 inline uint128
-softfloat_propagateNaNF128UI(uint64_t uiA64,
-                             uint64_t uiA0,
-                             uint64_t uiB64,
-                             uint64_t uiB0)
+softfloat_propagateNaNF128UI(uint64_t const& uiA64,
+                             uint64_t const& uiA0,
+                             uint64_t const& uiB64,
+                             uint64_t const& uiB0)
 {
     if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -418,7 +419,7 @@ common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
 NaN, the invalid exception is raised.
 */
 inline commonNaN
-softfloat_extF80MToCommonNaN(extFloat80_t a)
+softfloat_extF80MToCommonNaN(extFloat80_t const& a)
 {
     if (0 == (a.signif & UINT64_C(0x4000000000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -487,8 +488,8 @@ NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
 platform's normal endian order to form a 128-bit floating-point value.
 */
 inline void
-softfloat_commonNaNToF128M(commonNaN,
-                           uint32_t* zWPtr)
+softfloat_commonNaNToF128M(commonNaN const&,
+                           uint32_t* const zWPtr)
 {
     zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
     zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;

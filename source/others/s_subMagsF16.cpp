@@ -40,8 +40,8 @@ namespace softfloat {
 namespace internals {
 
 float16_t
-softfloat_subMagsF16(uint16_t const uiA,
-                     uint16_t const uiB)
+softfloat_subMagsF16(uint16_t const& uiA,
+                     uint16_t const& uiB)
 {
     int8_t expA = expF16UI(uiA);
     uint16_t const sigA = fracF16UI(uiA);
@@ -74,7 +74,7 @@ softfloat_subMagsF16(uint16_t const uiA,
                     sigDiff = -sigDiff;
                 }
 
-                int8_t shiftDist = softfloat_countLeadingZeros16(static_cast<uint16_t>(sigDiff)) - 5;
+                int8_t const shiftDist = softfloat_countLeadingZeros16(static_cast<uint16_t>(sigDiff)) - 5;
                 int8_t const expZ = expA - shiftDist;
 
                 if (expZ < 0) {

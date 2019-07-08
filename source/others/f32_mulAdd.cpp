@@ -40,10 +40,10 @@ namespace {
 
 using namespace softfloat::internals;
 static inline float32_t
-softfloat_mulAddF32(uint32_t const uiA,
-                    uint32_t const uiB,
-                    uint32_t const uiC,
-                    Mul_add_operations const op)
+softfloat_mulAddF32(Mul_add_operations const op,
+                    uint32_t const& uiA,
+                    uint32_t const& uiB,
+                    uint32_t const& uiC)
 {
     if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB) || softfloat_isNaNF32UI(uiC)) {
         return u_as_f_32(softfloat_propagateNaNF32UI(softfloat_propagateNaNF32UI(uiA, uiB), uiC));
@@ -196,6 +196,6 @@ f32_mulAdd(float32_t a,
            float32_t c)
 {
     using namespace softfloat::internals;
-    return softfloat_mulAddF32(f_as_u_32(a), f_as_u_32(b), f_as_u_32(c), softfloat_mulAdd_madd);
+    return softfloat_mulAddF32(softfloat_mulAdd_madd, f_as_u_32(a), f_as_u_32(b), f_as_u_32(c));
 }
 

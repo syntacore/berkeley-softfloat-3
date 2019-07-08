@@ -42,7 +42,7 @@ namespace internals {
 float16_t
 softfloat_normRoundPackToF16(bool sign,
                              int16_t exp,
-                             uint16_t sig)
+                             uint16_t const& sig)
 {
     int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 1;
     exp -= shiftDist;

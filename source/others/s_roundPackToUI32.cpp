@@ -42,7 +42,7 @@ namespace internals {
 uint32_t
 softfloat_roundPackToUI32(bool sign,
                           uint64_t sig,
-                          uint8_t roundingMode,
+                          uint8_t const& roundingMode,
                           bool exact)
 {
     uint16_t const roundIncrement =

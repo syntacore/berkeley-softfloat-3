@@ -55,7 +55,7 @@ enum Mul_add_operations
 struct exp8_sig16
 {
     exp8_sig16() = default;
-    exp8_sig16(int8_t a_exp,
+    constexpr exp8_sig16(int8_t a_exp,
                uint16_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
@@ -68,7 +68,7 @@ struct exp8_sig16
 struct exp16_sig32
 {
     exp16_sig32() = default;
-    exp16_sig32(int16_t a_exp,
+    constexpr exp16_sig32(int16_t a_exp,
                 uint32_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
@@ -81,7 +81,7 @@ struct exp16_sig32
 struct exp16_sig64
 {
     exp16_sig64() = default;
-    exp16_sig64(int16_t a_exp,
+    constexpr exp16_sig64(int16_t a_exp,
                 uint64_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
@@ -92,9 +92,15 @@ struct exp16_sig64
 };
 
 int32_t
-softfloat_roundPackToI32(bool, uint64_t, uint8_t, bool);
+softfloat_roundPackToI32(bool,
+                         uint64_t,
+                         uint8_t const&,
+                         bool);
 uint32_t
-softfloat_roundPackToUI32(bool, uint64_t, uint8_t, bool);
+softfloat_roundPackToUI32(bool,
+                          uint64_t,
+                          uint8_t const&,
+                          bool);
 
 float16_t
 softfloat_roundPackToF16(bool,
@@ -103,20 +109,20 @@ softfloat_roundPackToF16(bool,
 float16_t
 softfloat_normRoundPackToF16(bool,
                              int16_t,
-                             uint16_t);
+                             uint16_t const&);
 
 float16_t
-softfloat_addMagsF16(uint16_t,
-                     uint16_t);
+softfloat_addMagsF16(uint16_t const&,
+                     uint16_t const&);
 float16_t
-softfloat_subMagsF16(uint16_t,
-                     uint16_t);
+softfloat_subMagsF16(uint16_t const&,
+                     uint16_t const&);
 
 float16_t
-softfloat_mulAddF16(uint16_t,
-                    uint16_t,
-                    uint16_t,
-                    Mul_add_operations);
+softfloat_mulAddF16(Mul_add_operations,
+                    uint16_t const&,
+                    uint16_t const&,
+                    uint16_t const&);
 
 float32_t
 softfloat_roundPackToF32(bool,
@@ -255,15 +261,15 @@ expF128UI64(uint64_t a64)
 }
 
 inline constexpr uint64_t
-fracF128UI64(uint64_t a64)
+fracF128UI64(uint64_t const& a64)
 {
     return a64 & UINT64_C(0x0000FFFFFFFFFFFF);
 }
 
 inline constexpr uint64_t
 packToF128UI64(bool sign,
-               int32_t exp,
-               uint64_t sig64)
+               int32_t const& exp,
+               uint64_t const& sig64)
 {
     return
         (static_cast<uint64_t>(sign) << 63) +
@@ -305,14 +311,18 @@ int
 softfloat_normExtF80SigM(uint64_t*);
 
 void
-softfloat_roundPackMToExtF80M(bool, int32_t, uint32_t*, uint8_t, extFloat80M*);
+softfloat_roundPackMToExtF80M(bool,
+                              int32_t const&,
+                              uint32_t* const,
+                              uint8_t const&,
+                              extFloat80M* const);
 void
 softfloat_normRoundPackMToExtF80M(bool, int32_t, uint32_t*, uint8_t, extFloat80M*);
 
 void
-softfloat_addExtF80M(extFloat80M const*,
-                     extFloat80M const*,
-                     extFloat80M*,
+softfloat_addExtF80M(extFloat80M const* const,
+                     extFloat80M const* const,
+                     extFloat80M* const,
                      bool);
 
 int
@@ -358,25 +368,27 @@ softfloat_mulAddF128M(uint32_t const*,
                       Mul_add_operations);
 
 inline constexpr bool
-signF128UI96(uint32_t a96)
+signF128UI96(uint32_t const& a96)
 {
     return static_cast<int32_t>(a96) < 0;
 }
 
 inline constexpr uint16_t
-expF128UI96(uint32_t a96)
+expF128UI96(uint32_t const& a96)
 {
     return static_cast<uint16_t>((a96 >> 16) & UINT16_C(0x7FFF));
 }
 
 inline constexpr uint32_t
-fracF128UI96(uint32_t a96)
+fracF128UI96(uint32_t const& a96)
 {
     return a96 & 0x0000FFFF;
 }
 
 inline constexpr uint32_t
-packToF128UI96(bool sign, unsigned const expnt, uint32_t const sig96)
+packToF128UI96(bool sign,
+               unsigned const expnt,
+               uint32_t const& sig96)
 {
     return (static_cast<uint32_t>((!!sign) << 31) + (static_cast<uint32_t>(expnt) << 16)) + sig96;
 }
@@ -385,13 +397,13 @@ packToF128UI96(bool sign, unsigned const expnt, uint32_t const sig96)
 
 
 inline constexpr bool
-signF16UI(uint16_t a)
+signF16UI(uint16_t const& a)
 {
     return static_cast<int16_t>(a) < 0;
 }
 
 inline constexpr int8_t
-expF16UI(uint16_t a)
+expF16UI(uint16_t const& a)
 {
     return static_cast<int8_t>((a >> 10) & 0x1F);
 }
@@ -404,8 +416,8 @@ fracF16UI(uint16_t a)
 
 inline constexpr uint16_t
 packToF16UI(bool sign,
-            int8_t expnt,
-            uint16_t sig)
+            int8_t const& expnt,
+            uint16_t const& sig)
 {
     return
         static_cast<uint16_t>(
@@ -466,21 +478,21 @@ signF32UI(uint32_t a)
 
 /** @bug return signed 16-bits value instead unsigned 8-bits value */
 inline constexpr int16_t
-expF32UI(uint32_t a)
+expF32UI(uint32_t const& a)
 {
     return static_cast<int16_t>((a >> 23) & ~(~UINT32_C(0) << 8));
 }
 
 inline constexpr uint32_t
-fracF32UI(uint32_t a)
+fracF32UI(uint32_t const& a)
 {
     return a & ~(~UINT32_C(0) << 23);
 }
 
 inline constexpr uint32_t
 packToF32UI(bool sign,
-            int16_t expnt,
-            uint32_t sgnf)
+            int16_t const& expnt,
+            uint32_t const& sgnf)
 {
     return
         (static_cast<uint32_t>(!!sign) << 31) |
@@ -512,7 +524,7 @@ signed_inf_F32(bool sign)
 }
 
 inline constexpr bool
-isNaNF32UI(uint32_t a)
+isNaNF32UI(uint32_t const& a)
 {
     return
         255 == expF32UI(a) &&
@@ -520,7 +532,7 @@ isNaNF32UI(uint32_t a)
 }
 
 inline constexpr bool
-isInf32UI(uint32_t a)
+isInf32UI(uint32_t const& a)
 {
     return
         255 == expF32UI(a) &&
@@ -528,7 +540,7 @@ isInf32UI(uint32_t a)
 }
 
 inline constexpr bool
-isZero32UI(uint32_t a)
+isZero32UI(uint32_t const& a)
 {
     return
         0 == expF32UI(a) &&
@@ -536,7 +548,7 @@ isZero32UI(uint32_t a)
 }
 
 inline constexpr bool
-isSubnormal32UI(uint32_t a)
+isSubnormal32UI(uint32_t const& a)
 {
     return
         0 == expF32UI(a) &&
@@ -544,13 +556,13 @@ isSubnormal32UI(uint32_t a)
 }
 
 inline constexpr bool
-signF64UI(uint64_t a)
+signF64UI(uint64_t const& a)
 {
     return static_cast<int64_t>(a) < 0;
 }
 
 inline constexpr int16_t
-expF64UI(uint64_t a)
+expF64UI(uint64_t const& a)
 {
     return static_cast<int16_t>((a >> 52) & ~(~UINT32_C(0) << 11));
 }
@@ -562,7 +574,7 @@ fracF64UI(uint64_t a)
 }
 
 inline constexpr uint64_t
-packToF64UI(bool sign, int16_t expnt, uint64_t sgnf)
+packToF64UI(bool sign, int16_t const& expnt, uint64_t const& sgnf)
 {
     return
         (static_cast<uint64_t>(!!sign) << 63) |
@@ -570,7 +582,7 @@ packToF64UI(bool sign, int16_t expnt, uint64_t sgnf)
 }
 
 inline constexpr bool
-isNaNF64UI(uint64_t a)
+isNaNF64UI(uint64_t const& a)
 {
     return
         2047 == expF64UI(a) &&
@@ -578,7 +590,7 @@ isNaNF64UI(uint64_t a)
 }
 
 inline constexpr bool
-isInf64UI(uint64_t a)
+isInf64UI(uint64_t const& a)
 {
     return (~(~UINT64_C(0) << 11) << 52) == (~(~UINT64_C(0) << 63) & a);
 }
@@ -596,7 +608,7 @@ signExtF80UI64(uint16_t a64)
 }
 
 inline constexpr uint16_t
-expExtF80UI64(uint16_t a64)
+expExtF80UI64(uint16_t const& a64)
 {
     return static_cast<uint16_t>(0x7FFF & a64);
 }
@@ -609,8 +621,8 @@ packToExtF80UI64(bool sign,
 }
 
 inline constexpr bool
-isNaNExtF80UI(uint16_t a64,
-              uint64_t a0)
+isNaNExtF80UI(uint16_t const& a64,
+              uint64_t const& a0)
 {
     return
         UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & a64) &&
@@ -622,7 +634,7 @@ isNaNExtF80UI(uint16_t a64,
 32-bit floating-point NaN.
 */
 inline constexpr bool
-softfloat_isNaNF32UI(uint32_t uiA)
+softfloat_isNaNF32UI(uint32_t const& uiA)
 {
     return
         (~(~UINT32_C(0) << 8) << 23) == (uiA & (~(~UINT32_C(0) << 8) << 23)) &&
@@ -634,7 +646,7 @@ softfloat_isNaNF32UI(uint32_t uiA)
 64-bit floating-point NaN.
 */
 inline constexpr bool
-softfloat_isNaNF64UI(uint64_t uiA)
+softfloat_isNaNF64UI(uint64_t const& uiA)
 {
     return
         (~(~UINT64_C(0) << 11) << 52) == ((~(~UINT64_C(0) << 11) << 52) & uiA) &&
@@ -645,7 +657,7 @@ Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point signaling NaN.
 */
 inline constexpr bool
-softfloat_isSigNaNF32UI(uint32_t uiA)
+softfloat_isSigNaNF32UI(uint32_t const& uiA)
 {
     return
         (~(~UINT32_C(0) << 8) << 23) == (((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22)) & uiA) &&

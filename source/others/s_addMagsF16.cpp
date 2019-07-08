@@ -40,8 +40,8 @@ namespace softfloat {
 namespace internals {
 
 float16_t
-softfloat_addMagsF16(uint16_t const uiA,
-                     uint16_t const uiB)
+softfloat_addMagsF16(uint16_t const& uiA,
+                     uint16_t const& uiB)
 {
     int8_t const expA = expF16UI(uiA);
     uint16_t const sigA = fracF16UI(uiA);
