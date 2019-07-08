@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef softfloat_types_h
-#define softfloat_types_h 1
+#ifndef SOFTFLOAT_TYPES_H
+#define SOFTFLOAT_TYPES_H
 
 #include <stdint.h>
 
@@ -154,4 +154,4 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#endif
+#endif  // SOFTFLOAT_TYPES_H
