@@ -36,17 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
-#ifndef THREAD_LOCAL
-#define THREAD_LOCAL
-#endif
-
 THREAD_LOCAL enum softfloat_round_mode softfloat_roundingMode = softfloat_round_near_even;
 THREAD_LOCAL enum softfloat_tininess softfloat_detectTininess = softfloat::internals::init_detectTininess;
-
-namespace softfloat {
-namespace internals {
-
 THREAD_LOCAL uint8_t extF80_roundingPrecision = 80;
-
-}  // namespace internals
-}  // namespace softfloat
