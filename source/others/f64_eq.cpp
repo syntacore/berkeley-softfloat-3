@@ -51,6 +51,8 @@ f64_eq(float64_t const a,
 
         return false;
     } else {
-        return uiA == uiB || !((uiA | uiB) & static_cast<uint64_t>(INT64_MAX));
+        return
+            uiA == uiB ||
+            0 == static_cast<uint64_t>((uiA | uiB) << 1);
     }
 }
