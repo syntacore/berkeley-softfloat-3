@@ -57,7 +57,7 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     if (0xFD <= static_cast<uint16_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_detectTininess == softfloat_tininess_beforeRounding ||
+                softfloat_tininess_beforeRounding == softfloat_detectTininess ||
                 exp < -1 ||
                 sig + roundIncrement < 0x80000000;
             sig = softfloat_shiftRightJam32(sig, static_cast<uint16_t>(-exp));
