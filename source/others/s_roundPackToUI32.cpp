@@ -40,10 +40,10 @@ namespace softfloat {
 namespace internals {
 
 uint32_t
-softfloat_roundPackToUI32(bool sign,
+softfloat_roundPackToUI32(bool const sign,
                           uint64_t sig,
-                          uint8_t const& roundingMode,
-                          bool exact)
+                          softfloat_round_mode const roundingMode,
+                          bool const exact)
 {
     uint16_t const roundIncrement =
         softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x800u :

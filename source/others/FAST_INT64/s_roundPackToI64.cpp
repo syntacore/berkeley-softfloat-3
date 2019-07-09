@@ -43,12 +43,13 @@ int64_t
 softfloat_roundPackToI64(bool sign,
                          uint64_t sig,
                          uint64_t sigExtra,
-                         uint8_t roundingMode,
-                         bool exact)
+                         softfloat_round_mode const roundingMode,
+                         bool const exact)
 {
-    bool const roundNearEven = (roundingMode == softfloat_round_near_even);
+    bool const roundNearEven = softfloat_round_near_even == roundingMode;
     bool const doIncrement =
-        !roundNearEven && (roundingMode != softfloat_round_near_maxMag) ? (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra :
+        !roundNearEven && (softfloat_round_near_maxMag != roundingMode) ?
+        (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra :
         UINT64_C(0x8000000000000000) <= sigExtra;
 
     if (doIncrement) {

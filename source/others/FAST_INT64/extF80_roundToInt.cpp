@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extFloat80_t
 extF80_roundToInt(extFloat80_t const a,
-                  uint8_t const roundingMode,
+                  softfloat_round_mode const roundingMode,
                   bool const exact)
 {
     using namespace softfloat::internals;
@@ -142,16 +142,16 @@ extF80_roundToInt(extFloat80_t const a,
     uint64_t const roundBitsMask = lastBitMask - 1;
     uint64_t sigZ = sigA;
 
-    if (roundingMode == softfloat_round_near_maxMag) {
+    if (softfloat_round_near_maxMag == roundingMode) {
         sigZ += lastBitMask >> 1;
-    } else if (roundingMode == softfloat_round_near_even) {
+    } else if (softfloat_round_near_even == roundingMode) {
         sigZ += lastBitMask >> 1;
 
         if (!(sigZ & roundBitsMask)) {
             sigZ &= ~lastBitMask;
         }
-    } else if (roundingMode != softfloat_round_minMag) {
-        if ((0 != signUI64) != (roundingMode == softfloat_round_max)) {
+    } else if (softfloat_round_minMag != roundingMode) {
+        if ((0 != signUI64) != (softfloat_round_max == roundingMode)) {
             sigZ += roundBitsMask;
         }
     }

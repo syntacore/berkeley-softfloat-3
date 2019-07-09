@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int32_t
 f64_to_i32(float64_t const a,
-           uint8_t const roundingMode,
+           softfloat_round_mode const roundingMode,
            bool const exact)
 {
     using namespace softfloat::internals;

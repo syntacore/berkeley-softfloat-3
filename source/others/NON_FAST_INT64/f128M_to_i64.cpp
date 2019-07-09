@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 int64_t
-f128M_to_i64(const float128_t* aPtr,
-             uint8_t roundingMode,
-             bool exact)
+f128M_to_i64(float128_t const* aPtr,
+             softfloat_round_mode const roundingMode,
+             bool const exact)
 {
     using namespace softfloat::internals;
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);

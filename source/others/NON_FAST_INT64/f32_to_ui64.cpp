@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** @todo split to different implementations */
 uint64_t
 f32_to_ui64(float32_t const a,
-            uint8_t const roundingMode,
+            softfloat_round_mode const roundingMode,
             bool const exact)
 {
     using namespace softfloat::internals;

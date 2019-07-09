@@ -42,7 +42,7 @@ namespace internals {
 int64_t
 softfloat_roundPackMToI64(bool sign,
                           uint32_t* extSigPtr,
-                          uint8_t roundingMode,
+                          softfloat_round_mode const roundingMode,
                           bool exact)
 {
     int64_t z;

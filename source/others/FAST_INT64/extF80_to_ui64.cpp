@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 uint64_t
-extF80_to_ui64(extFloat80_t a,
-               uint8_t roundingMode,
-               bool exact)
+extF80_to_ui64(extFloat80_t const a,
+               softfloat_round_mode const roundingMode,
+               bool const exact)
 {
     using namespace softfloat::internals;
 

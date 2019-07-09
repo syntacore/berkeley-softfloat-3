@@ -88,10 +88,10 @@ extern "C" {
     16-bit (half-precision) floating-point operations.
     */
     /**@{*/
-    uint32_t f16_to_ui32(float16_t, uint8_t, bool);
-    uint64_t f16_to_ui64(float16_t, uint8_t, bool);
-    int32_t f16_to_i32(float16_t, uint8_t, bool);
-    int64_t f16_to_i64(float16_t, uint8_t, bool);
+    uint32_t f16_to_ui32(float16_t, softfloat_round_mode, bool);
+    uint64_t f16_to_ui64(float16_t, softfloat_round_mode, bool);
+    int32_t f16_to_i32(float16_t, softfloat_round_mode, bool);
+    int64_t f16_to_i64(float16_t, softfloat_round_mode, bool);
     uint32_t f16_to_ui32_r_minMag(float16_t, bool);
     uint64_t f16_to_ui64_r_minMag(float16_t, bool);
     int32_t f16_to_i32_r_minMag(float16_t, bool);
@@ -119,10 +119,10 @@ extern "C" {
     32-bit (single-precision) floating-point operations.
     */
     /**@{*/
-    uint32_t f32_to_ui32(float32_t, uint8_t, bool);
-    uint64_t f32_to_ui64(float32_t, uint8_t, bool);
-    int32_t f32_to_i32(float32_t, uint8_t, bool);
-    int64_t f32_to_i64(float32_t, uint8_t, bool);
+    uint32_t f32_to_ui32(float32_t, softfloat_round_mode, bool);
+    uint64_t f32_to_ui64(float32_t, softfloat_round_mode, bool);
+    int32_t f32_to_i32(float32_t, softfloat_round_mode, bool);
+    int64_t f32_to_i64(float32_t, softfloat_round_mode, bool);
     uint32_t f32_to_ui32_r_minMag(float32_t, bool);
     uint64_t f32_to_ui64_r_minMag(float32_t, bool);
     int32_t f32_to_i32_r_minMag(float32_t, bool);
@@ -148,10 +148,10 @@ extern "C" {
 
     /** 64-bit (double-precision) floating-point operations. */
     /**@{*/
-    uint32_t f64_to_ui32(float64_t, uint8_t, bool);
-    uint64_t f64_to_ui64(float64_t, uint8_t, bool);
-    int32_t f64_to_i32(float64_t, uint8_t, bool);
-    int64_t f64_to_i64(float64_t, uint8_t, bool);
+    uint32_t f64_to_ui32(float64_t, softfloat_round_mode, bool);
+    uint64_t f64_to_ui64(float64_t, softfloat_round_mode, bool);
+    int32_t f64_to_i32(float64_t, softfloat_round_mode, bool);
+    int64_t f64_to_i64(float64_t, softfloat_round_mode, bool);
     uint32_t f64_to_ui32_r_minMag(float64_t, bool);
     uint64_t f64_to_ui64_r_minMag(float64_t, bool);
     int32_t f64_to_i32_r_minMag(float64_t, bool);
@@ -201,10 +201,10 @@ extern "C" {
     void i64_to_f128M(int64_t, float128_t*);
     void ui32_to_f128M(uint32_t, float128_t*);
     void ui32_to_extF80M(uint32_t, extFloat80_t*);
-    uint32_t extF80M_to_ui32(extFloat80_t const*, uint8_t, bool);
-    uint64_t extF80M_to_ui64(extFloat80_t const*, uint8_t, bool);
-    int32_t extF80M_to_i32(extFloat80_t const*, uint8_t, bool);
-    int64_t extF80M_to_i64(extFloat80_t const*, uint8_t, bool);
+    uint32_t extF80M_to_ui32(extFloat80_t const*, softfloat_round_mode, bool);
+    uint64_t extF80M_to_ui64(extFloat80_t const*, softfloat_round_mode, bool);
+    int32_t extF80M_to_i32(extFloat80_t const*, softfloat_round_mode, bool);
+    int64_t extF80M_to_i64(extFloat80_t const*, softfloat_round_mode, bool);
     uint32_t extF80M_to_ui32_r_minMag(extFloat80_t const*, bool);
     uint64_t extF80M_to_ui64_r_minMag(extFloat80_t const*, bool);
     int32_t extF80M_to_i32_r_minMag(extFloat80_t const*, bool);
@@ -225,10 +225,10 @@ extern "C" {
     bool extF80M_le_quiet(const extFloat80_t*, const extFloat80_t*);
     bool extF80M_lt_quiet(const extFloat80_t*, const extFloat80_t*);
 
-    uint32_t f128M_to_ui32(float128_t const*, uint8_t, bool);
-    uint64_t f128M_to_ui64(float128_t const*, uint8_t, bool);
-    int32_t f128M_to_i32(float128_t const*, uint8_t, bool);
-    int64_t f128M_to_i64(float128_t const*, uint8_t, bool);
+    uint32_t f128M_to_ui32(float128_t const*, softfloat_round_mode, bool);
+    uint64_t f128M_to_ui64(float128_t const*, softfloat_round_mode, bool);
+    int32_t f128M_to_i32(float128_t const*, softfloat_round_mode, bool);
+    int64_t f128M_to_i64(float128_t const*, softfloat_round_mode, bool);
     uint32_t f128M_to_ui32_r_minMag(const float128_t*, bool);
     uint64_t f128M_to_ui64_r_minMag(const float128_t*, bool);
     int32_t f128M_to_i32_r_minMag(const float128_t*, bool);
@@ -259,10 +259,10 @@ extern "C" {
     extFloat80_t f32_to_extF80(float32_t);
     extFloat80_t f64_to_extF80(float64_t);
 
-    uint32_t extF80_to_ui32(extFloat80_t, uint8_t, bool);
-    uint64_t extF80_to_ui64(extFloat80_t, uint8_t, bool);
-    int32_t extF80_to_i32(extFloat80_t, uint8_t, bool);
-    int64_t extF80_to_i64(extFloat80_t, uint8_t, bool);
+    uint32_t extF80_to_ui32(extFloat80_t, softfloat_round_mode, bool);
+    uint64_t extF80_to_ui64(extFloat80_t, softfloat_round_mode, bool);
+    int32_t extF80_to_i32(extFloat80_t, softfloat_round_mode, bool);
+    int64_t extF80_to_i64(extFloat80_t, softfloat_round_mode, bool);
     uint32_t extF80_to_ui32_r_minMag(extFloat80_t, bool);
     uint64_t extF80_to_ui64_r_minMag(extFloat80_t, bool);
     int32_t extF80_to_i32_r_minMag(extFloat80_t, bool);
@@ -273,7 +273,7 @@ extern "C" {
     float64_t extF80_to_f64(extFloat80_t);
     float128_t extF80_to_f128(extFloat80_t);
 
-    extFloat80_t extF80_roundToInt(extFloat80_t, uint8_t, bool);
+    extFloat80_t extF80_roundToInt(extFloat80_t, softfloat_round_mode, bool);
     extFloat80_t extF80_add(extFloat80_t, extFloat80_t);
     extFloat80_t extF80_sub(extFloat80_t, extFloat80_t);
     extFloat80_t extF80_mul(extFloat80_t, extFloat80_t);
@@ -297,10 +297,10 @@ extern "C" {
     float128_t f32_to_f128(float32_t);
     float128_t f64_to_f128(float64_t);
 
-    uint32_t f128_to_ui32(float128_t, uint8_t, bool);
-    uint64_t f128_to_ui64(float128_t, uint8_t, bool);
-    int32_t f128_to_i32(float128_t, uint8_t, bool);
-    int64_t f128_to_i64(float128_t, uint8_t, bool);
+    uint32_t f128_to_ui32(float128_t, softfloat_round_mode, bool);
+    uint64_t f128_to_ui64(float128_t, softfloat_round_mode, bool);
+    int32_t f128_to_i32(float128_t, softfloat_round_mode, bool);
+    int64_t f128_to_i64(float128_t, softfloat_round_mode, bool);
 
     uint32_t f128_to_ui32_r_minMag(float128_t, bool);
     uint64_t f128_to_ui64_r_minMag(float128_t, bool);
@@ -312,7 +312,7 @@ extern "C" {
     float64_t f128_to_f64(float128_t);
     extFloat80_t f128_to_extF80(float128_t);
 
-    float128_t f128_roundToInt(float128_t, uint8_t, bool);
+    float128_t f128_roundToInt(float128_t, softfloat_round_mode, bool);
     float128_t f128_add(float128_t, float128_t);
     float128_t f128_sub(float128_t, float128_t);
     float128_t f128_mul(float128_t, float128_t);
@@ -415,7 +415,7 @@ extern "C" {
 
     static inline uint32_t
         extF80M_to_ui32(extFloat80_t const* const aPtr,
-                        uint8_t roundingMode,
+                        softfloat_round_mode const roundingMode,
                         bool exact)
     {
         return extF80_to_ui32(*aPtr, roundingMode, exact);
@@ -423,7 +423,7 @@ extern "C" {
 
     static inline uint64_t
         extF80M_to_ui64(const extFloat80_t* aPtr,
-                        uint8_t roundingMode,
+                        softfloat_round_mode const roundingMode,
                         bool exact)
     {
         return extF80_to_ui64(*aPtr, roundingMode, exact);
@@ -431,7 +431,7 @@ extern "C" {
 
     static inline int32_t
         extF80M_to_i32(extFloat80_t const* const aPtr,
-                       uint8_t const roundingMode,
+                       softfloat_round_mode const roundingMode,
                        bool const exact)
     {
         return extF80_to_i32(*aPtr, roundingMode, exact);
@@ -439,7 +439,7 @@ extern "C" {
 
     static inline int64_t
         extF80M_to_i64(extFloat80_t const* const aPtr,
-                       uint8_t const roundingMode,
+                       softfloat_round_mode const roundingMode,
                        bool const exact)
     {
         return extF80_to_i64(*aPtr, roundingMode, exact);
@@ -499,8 +499,8 @@ extern "C" {
 
     static inline void
         extF80M_roundToInt(extFloat80_t const* aPtr,
-                           uint8_t roundingMode,
-                           bool exact,
+                           softfloat_round_mode const roundingMode,
+                           bool const exact,
                            extFloat80_t* zPtr)
     {
         *zPtr = extF80_roundToInt(*aPtr, roundingMode, exact);
@@ -582,7 +582,7 @@ extern "C" {
 
     static inline uint32_t
         f128M_to_ui32(float128_t const* const aPtr,
-                      uint8_t const roundingMode,
+                      softfloat_round_mode const roundingMode,
                       bool const exact)
     {
         return f128_to_ui32(*aPtr, roundingMode, exact);
@@ -590,7 +590,7 @@ extern "C" {
 
     static inline uint64_t
         f128M_to_ui64(float128_t const* const aPtr,
-                      uint8_t const roundingMode,
+                      softfloat_round_mode const roundingMode,
                       bool const exact)
     {
         return f128_to_ui64(*aPtr, roundingMode, exact);
@@ -598,7 +598,7 @@ extern "C" {
 
     static inline int32_t
         f128M_to_i32(float128_t const* const aPtr,
-                     uint8_t const roundingMode,
+                     softfloat_round_mode const roundingMode,
                      bool const exact)
     {
         return f128_to_i32(*aPtr, roundingMode, exact);
@@ -606,7 +606,7 @@ extern "C" {
 
     static inline int64_t
         f128M_to_i64(float128_t const* const aPtr,
-                     uint8_t const roundingMode,
+                     softfloat_round_mode const roundingMode,
                      bool const exact)
     {
         return f128_to_i64(*aPtr, roundingMode, exact);
@@ -666,8 +666,8 @@ extern "C" {
 
     static inline void
         f128M_roundToInt(float128_t const* aPtr,
-                         uint8_t roundingMode,
-                         bool exact,
+                         softfloat_round_mode const roundingMode,
+                         bool const exact,
                          float128_t* zPtr)
     {
         *zPtr = f128_roundToInt(*aPtr, roundingMode, exact);

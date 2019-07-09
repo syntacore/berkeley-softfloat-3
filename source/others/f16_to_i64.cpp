@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 int64_t
-f16_to_i64(float16_t a, uint8_t roundingMode, bool exact)
+f16_to_i64(float16_t const a,
+           softfloat_round_mode const roundingMode,
+           bool const exact)
 {
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);

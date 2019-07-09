@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int32_t
 extF80M_to_i32(extFloat80_t const* const aPtr,
-               uint8_t const roundingMode,
+               softfloat_round_mode const roundingMode,
                bool const exact)
 {
     using namespace softfloat::internals;

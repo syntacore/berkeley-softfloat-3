@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 uint64_t
-extF80M_to_ui64(const extFloat80_t *aSPtr, 
-                uint8_t roundingMode, bool exact)
+extF80M_to_ui64(extFloat80_t const *const aSPtr,
+                softfloat_round_mode const roundingMode,
+                bool const exact)
 {
     using namespace softfloat::internals;
     uint16_t const uiA64 = aSPtr->signExp;

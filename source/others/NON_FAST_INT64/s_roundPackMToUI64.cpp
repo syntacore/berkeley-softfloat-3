@@ -42,7 +42,7 @@ namespace internals {
 uint64_t
 softfloat_roundPackMToUI64(bool const sign,
                            uint32_t const* const extSigPtr,
-                           uint8_t const roundingMode,
+                           softfloat_round_mode const roundingMode,
                            bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;

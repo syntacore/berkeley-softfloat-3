@@ -43,7 +43,7 @@ uint64_t
 softfloat_roundPackToUI64(bool const sign,
                           uint64_t sig,
                           uint64_t const sigExtra,
-                          uint8_t const roundingMode,
+                          softfloat_round_mode const roundingMode,
                           bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;

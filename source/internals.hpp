@@ -101,12 +101,12 @@ extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
 int32_t
 softfloat_roundPackToI32(bool,
                          uint64_t,
-                         uint8_t const&,
+                         softfloat_round_mode,
                          bool);
 uint32_t
 softfloat_roundPackToUI32(bool,
                           uint64_t,
-                          uint8_t const&,
+                          softfloat_round_mode,
                           bool);
 
 float16_t
@@ -173,13 +173,13 @@ int64_t
 softfloat_roundPackToI64(bool,
                          uint64_t,
                          uint64_t,
-                         uint8_t,
+                         softfloat_round_mode,
                          bool);
 uint64_t
 softfloat_roundPackToUI64(bool,
                           uint64_t,
                           uint64_t,
-                          uint8_t,
+                          softfloat_round_mode,
                           bool);
 
 exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
@@ -299,12 +299,12 @@ isNaNF128UI(uint64_t a64,
 int64_t
 softfloat_roundPackMToI64(bool,
                           uint32_t*,
-                          uint8_t,
+                          softfloat_round_mode,
                           bool);
 uint64_t
 softfloat_roundPackMToUI64(bool,
                            uint32_t const*,
-                           uint8_t,
+                           softfloat_round_mode,
                            bool);
 
 bool
