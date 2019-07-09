@@ -78,6 +78,7 @@ softfloat_subMagsF128(uint64_t const uiA64,
                     uint128 const sigZ = softfloat_sub128(sigB.v64, sigB.v0, sigA.v64, sigA.v0);
                     return softfloat_normRoundPackToF128(!signZ, expZ - 5, sigZ.v64, sigZ.v0);
                 } else {
+                    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
                     return u_as_f_128(uint128{packToF128UI64(softfloat_roundingMode == softfloat_round_min, 0, 0), 0});
                 }
             }

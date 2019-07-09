@@ -110,6 +110,7 @@ softfloat_mulAddF16(Mul_add_operations op,
     } else if (expC == 0x1F) {
         return u_as_f_16(sigC ? softfloat_propagateNaNF16UI(0, uiC) : uiC);
     } else {
+        softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
         if (!expA) {
             if (!sigA) {

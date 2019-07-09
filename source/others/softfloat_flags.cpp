@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
+namespace {
 static THREAD_LOCAL uint8_t softfloat_exceptionFlags = 0;
+}  // namespace
 
 /**
 Raises the exceptions specified by `flags'.  Floating-point traps can be

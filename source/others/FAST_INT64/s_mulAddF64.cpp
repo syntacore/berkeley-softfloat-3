@@ -92,6 +92,8 @@ softfloat_mulAddF64(uint64_t uiA,
         return u_as_f_64(uiC);
     }
 
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
     if (0 == expA) {
         // subnormal or zero A
         if (0 == sigA) {
@@ -188,7 +190,7 @@ softfloat_mulAddF64(uint64_t uiA,
         sig128Z.v64 = sig128Z.v64 - sigC;
 
         if (0 == (sig128Z.v64 | sig128Z.v0)) {
-            return u_as_f_64(packToF64UI((softfloat_roundingMode == softfloat_round_min), 0, 0));
+            return u_as_f_64(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
         }
 
         if (sig128Z.v64 & UINT64_C(0x8000000000000000)) {

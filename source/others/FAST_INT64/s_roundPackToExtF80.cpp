@@ -49,6 +49,8 @@ softfloat_roundPackToExtF80(bool sign,
     uint64_t roundIncrement;
     uint64_t roundMask;
 
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
 
     if (64 == roundingPrecision || 32 == roundingPrecision) {

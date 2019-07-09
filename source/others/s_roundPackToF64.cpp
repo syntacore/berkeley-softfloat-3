@@ -52,6 +52,7 @@ softfloat_roundPackToF64(bool sign,
                          int16_t exp,
                          uint64_t sig)
 {
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     uint16_t const roundIncrement =
         softfloat_round_near_even == softfloat_roundingMode || softfloat_round_near_maxMag == softfloat_roundingMode ? 0x200u :
         (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode ? 0x3FFu :

@@ -47,6 +47,8 @@ softfloat_roundPackMToF128M(bool sign,
 {
     static const uint32_t maxSig[4] = INIT_UINTM4(0x0001FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
 
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
     bool roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
     uint32_t sigExtra = extSigPtr[indexWordLo(5)];
     bool doIncrement = (0x80000000 <= sigExtra);

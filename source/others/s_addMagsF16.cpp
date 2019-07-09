@@ -71,6 +71,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
         uint16_t sigY;
         uint16_t sigX;
         int8_t expZ;
+        softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
         if (expDiff < 0) {
             if (expB == 0x1F) {

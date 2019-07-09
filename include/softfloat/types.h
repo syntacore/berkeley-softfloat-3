@@ -148,7 +148,6 @@ extern "C" {
     */
     extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
     extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
-    extern THREAD_LOCAL softfloat_round_mode softfloat_roundingMode;
 
 #ifdef __cplusplus
 }  // extern "C"

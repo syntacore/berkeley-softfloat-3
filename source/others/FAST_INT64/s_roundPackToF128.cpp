@@ -46,6 +46,7 @@ softfloat_roundPackToF128(bool sign,
                           uint64_t sig0,
                           uint64_t sigExtra)
 {
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
     bool doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 

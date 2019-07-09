@@ -111,6 +111,8 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
 
     uint32_t sigA[4];
 
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
     if (0 == expA) {
         sigA[indexWordHi(4)] = fracF128UI96(uiA96) | 0x00010000;
         sigA[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];

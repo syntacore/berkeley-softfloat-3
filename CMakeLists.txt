@@ -7,15 +7,22 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(SOFTFLOAT_FAST_DIV64TO32 OFF CACHE BOOL "SOFTFLOAT_FAST_DIV64TO32")
 
 set(SOFTFLOAT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-set(SOFTFLOAT_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(INC_SOFTFLOAT
-    ${SOFTFLOAT_INCLUDE}/softfloat/functions.h
-    ${SOFTFLOAT_INCLUDE}/softfloat/types.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/softfloat/functions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/softfloat/types.h
 )
 
-add_compile_options(-Wall)
+add_library(softfloat-build-defs INTERFACE)
+target_compile_features(softfloat-build-defs INTERFACE
+    cxx_constexpr
+)
+target_include_directories(softfloat-build-defs INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_compile_options(softfloat-build-defs INTERFACE -Wall)
+
 if(MSVC) 
-    add_compile_options(/wd4820 /wd4514 /MP)
+    target_compile_options(softfloat-build-defs INTERFACE /wd4820 /wd4514 /MP)
 endif()
 
 add_subdirectory(source)

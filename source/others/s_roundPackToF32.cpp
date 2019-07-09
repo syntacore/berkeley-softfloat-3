@@ -47,6 +47,7 @@ namespace internals {
 float32_t
 softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
 {
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     assert(softfloat_round_near_even <= softfloat_roundingMode && softfloat_roundingMode <= softfloat_round_near_maxMag);
     enum softfloat_round_mode const roundingMode = (enum softfloat_round_mode)softfloat_roundingMode;
     uint8_t const roundIncrement =

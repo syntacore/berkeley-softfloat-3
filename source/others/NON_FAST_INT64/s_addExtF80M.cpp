@@ -149,7 +149,8 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
                 sigZ -= sigB;
 
                 if (!sigZ) {
-                    signZ = (softfloat_roundingMode == softfloat_round_min);
+                    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+                    signZ = softfloat_roundingMode == softfloat_round_min;
                     zSPtr->signExp = packToExtF80UI64(signZ, 0);
                     zSPtr->signif = 0;
                     return;

@@ -150,6 +150,7 @@ softfloat_addF128M(uint32_t const* aWPtr,
                 wordSigZ = sig96B + ~sig96A + !!carry;
             } else {
                 if (0 == wordSigZ && 0 == extSigZ[indexWord(5, 3)] && 0 == (extSigZ[indexWord(5, 2)] | extSigZ[indexWord(5, 1)] | extSigZ[indexWord(5, 0)])) {
+                    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
                     signZ = softfloat_round_min == softfloat_roundingMode;
                     zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
                     zWPtr[indexWord(4, 2)] = 0;

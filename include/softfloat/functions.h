@@ -63,6 +63,9 @@ extern "C" {
     uint8_t softfloat_getFlags(void);
     /**@}*/
 
+    softfloat_round_mode softfloat_get_roundingMode(void);
+    void softfloat_set_roundingMode(softfloat_round_mode);
+
     /**
     Integer-to-floating-point conversion routines.
     */

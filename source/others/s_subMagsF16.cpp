@@ -48,6 +48,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
     int8_t const expB = expF16UI(uiB);
     uint16_t const sigB = fracF16UI(uiB);
     int8_t expDiff = expA - expB;
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
     if (0 == expDiff) {
         if (expA == 0x1F) {

@@ -118,6 +118,8 @@ softfloat_mulAddF128(uint64_t const uiA64,
             return static_cast<float128_t>(uint128{uiC64, uiC0});
         }
     } else {
+        softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
         if (!expA) {
             if (0 == (sigA.v64 | sigA.v0)) {
                 if (!(expC | sigC.v64 | sigC.v0) && (signZ != signC)) {

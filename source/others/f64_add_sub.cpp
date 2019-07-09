@@ -132,6 +132,7 @@ softfloat_subMagsF64(uint64_t const uiA,
             int64_t sigDiff = static_cast<int64_t>(sigA - sigB);
 
             if (0 == sigDiff) {
+                softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
                 return u_as_f_64(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
             } else {
                 if (0 != expA) {

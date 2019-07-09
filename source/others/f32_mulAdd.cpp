@@ -86,6 +86,8 @@ softfloat_mulAddF32(Mul_add_operations const op,
         } else if (expC == 0xFF) {
             return u_as_f_32(uiC);
         } else {
+            softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
             if (0 == expA) {
                 /* a is zero or subnormal */
                 if (0 == sigA) {

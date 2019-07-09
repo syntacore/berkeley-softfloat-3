@@ -92,6 +92,8 @@ softfloat_mulAddF64(uint64_t uiA,
 
     int16_t expA = expF64UI(uiA);
 
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
     if (0 == expA) {
         if (!sigA) {
             return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);

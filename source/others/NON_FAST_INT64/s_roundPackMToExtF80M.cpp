@@ -57,6 +57,8 @@ softfloat_roundPackMToExtF80M(bool sign,
         static_cast<uint64_t>(extSigPtr[indexWord(3, 2)]) << 32 |
         extSigPtr[indexWord(3, 1)];
 
+    softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+
     if (64 == roundingPrecision || 32 == roundingPrecision) {
         uint64_t roundIncrement;
         uint64_t roundMask;

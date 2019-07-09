@@ -136,6 +136,7 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
         } else {
             /* uiA0 == uiB0 */
             extFloat80_t uZ;
+            softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
             uZ.signExp = packToExtF80UI64(softfloat_round_min == softfloat_roundingMode, 0);
             uZ.signif = 0;
             return uZ;

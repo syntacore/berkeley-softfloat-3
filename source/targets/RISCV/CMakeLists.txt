@@ -22,7 +22,7 @@ add_library(softfloat-${TARGET_NAME}-fi64 EXCLUDE_FROM_ALL
     ${SRC_OTHERS_FAST_INT64}
     ${SRC_PRIMITIVES_FAST_INT64}
 )
-target_include_directories(softfloat-${TARGET_NAME}-fi64 PUBLIC ${SOFTFLOAT_INCLUDE})
+target_link_libraries(softfloat-${TARGET_NAME}-fi64 PRIVATE softfloat-build-defs)
 set_target_properties(softfloat-${TARGET_NAME}-fi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
 target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
 if(SOFTFLOAT_FAST_DIV64TO32)
@@ -34,7 +34,7 @@ add_library(softfloat-${TARGET_NAME}-nfi64 EXCLUDE_FROM_ALL
     ${SRC_OTHERS_NON_FAST_INT64}
     ${SRC_PRIMITIVES_NON_FAST_INT64}
 )
-target_include_directories(softfloat-${TARGET_NAME}-nfi64 PUBLIC ${SOFTFLOAT_INCLUDE})
+target_link_libraries(softfloat-${TARGET_NAME}-nfi64 PRIVATE softfloat-build-defs)
 set_target_properties(softfloat-${TARGET_NAME}-nfi64 PROPERTIES FOLDER "softfloat/${TARGET_NAME}")
 
 source_group(TREE ${SOFTFLOAT_ROOT} FILES

@@ -135,6 +135,7 @@ softfloat_subMagsF32(uint32_t const uiA,
             int32_t const sigDiff = static_cast<int32_t>(sigA - sigB);
 
             if (0 == sigDiff) {
+                softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
                 return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
             } else {
                 if (expA) {

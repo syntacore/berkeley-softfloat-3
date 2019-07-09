@@ -85,7 +85,8 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToI32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToUI32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_raiseFlags.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_flags.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_rounding_mode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/softfloat_state.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_f16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_f32.cpp
