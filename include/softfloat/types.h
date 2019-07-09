@@ -142,13 +142,6 @@ extern "C" {
         softfloat_round_near_maxMag = 4
     } softfloat_round_mode;
 
-    /**
-    Rounding precision for 80-bit extended double-precision floating-point.
-    Valid values are 32, 64, and 80.
-    */
-    extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
-    extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
-
 #ifdef __cplusplus
 }  // extern "C"
 #endif

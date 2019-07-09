@@ -91,6 +91,13 @@ struct exp16_sig64
     uint64_t sig;
 };
 
+/**
+Rounding precision for 80-bit extended double-precision floating-point.
+Valid values are 32, 64, and 80.
+*/
+extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
+extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
+
 int32_t
 softfloat_roundPackToI32(bool,
                          uint64_t,
