@@ -471,9 +471,9 @@ an array of four 64-bit elements that concatenate in the platform's normal
 endian order to form a 256-bit integer.
 */
 inline void
-softfloat_add256M(uint64_t const* aPtr,
-                  uint64_t const* bPtr,
-                  uint64_t* zPtr)
+softfloat_add256M(uint64_t const* const aPtr,
+                  uint64_t const* const bPtr,
+                  uint64_t* const zPtr)
 {
     bool carry = false;
 
