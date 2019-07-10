@@ -44,8 +44,8 @@ eliminates all dependencies on compile-time macros.
 */
 
 
-#ifndef SOFTFLOAT_H_
-#define SOFTFLOAT_H_
+#ifndef SOFTFLOAT_FUNCTIONS_H_
+#define SOFTFLOAT_FUNCTIONS_H_
 
 #include "softfloat/types.h"
 #include <stdbool.h>
@@ -757,5 +757,5 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#endif  /* SOFTFLOAT_H_ */
+#endif  /* SOFTFLOAT_FUNCTIONS_H_ */
 
