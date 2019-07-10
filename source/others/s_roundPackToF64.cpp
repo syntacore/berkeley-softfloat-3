@@ -82,7 +82,7 @@ softfloat_roundPackToF64(bool sign,
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    sig = ((sig + roundIncrement) >> 10) & (~static_cast<uint64_t>(!(roundBits ^ 0x200) && softfloat_round_near_even == softfloat_roundingMode));
+    sig = ((sig + roundIncrement) >> 10) & (~static_cast<uint64_t>(0 == (roundBits ^ 0x200) && softfloat_round_near_even == softfloat_roundingMode));
     return u64_as_f64(packToF64UI(sign, 0 != sig ? exp : 0, sig));
 }
 
