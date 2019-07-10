@@ -57,8 +57,8 @@ softfloat_compareNonnormExtF80M(extFloat80M const* aSPtr,
     signB = signExtF80UI64(uiB64);
     sigB = bSPtr->signif;
 
-    if ((uiA64 ^ uiB64) & 0x8000) {
-        if (!(sigA | sigB)) {
+    if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
+        if (0 == (sigA | sigB)) {
             return 0;
         }
 
