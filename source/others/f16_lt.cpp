@@ -51,6 +51,7 @@ f16_lt(float16_t a, float16_t b)
     bool const signA = signF16UI(uiA);
     bool const signB = signF16UI(uiB);
     return
-        signA != signB ? signA && static_cast<uint16_t>((uiA | uiB) << 1) != 0 :
-        uiA != uiB && (signA ^ (uiA < uiB));
+        signA != signB ?
+        signA && 0 != static_cast<uint16_t>((uiA | uiB) << 1):
+        uiA != uiB && (uiA < uiB) != signA;
 }

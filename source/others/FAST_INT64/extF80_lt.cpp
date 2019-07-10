@@ -37,14 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-extF80_lt(extFloat80_t a,
-          extFloat80_t b)
+extF80_lt(extFloat80_t const a,
+          extFloat80_t const b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0  = a.signif;
-    uint16_t const uiB64 = b.signExp;
-    uint64_t const uiB0  = b.signif;
+    auto const uiA64 = a.signExp;
+    auto const uiA0  = a.signif;
+    auto const uiB64 = b.signExp;
+    auto const uiB0  = b.signif;
 
     if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -53,8 +53,10 @@ extF80_lt(extFloat80_t a,
 
     bool const signA = signExtF80UI64(uiA64);
     bool const signB = signExtF80UI64(uiB64);
+    typedef typename std::conditional<(sizeof uiA0 < sizeof uiA64), decltype(uiA64), decltype(uiA0)>::type largest_type;
     return
-        signA != signB ? signA && (((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) : 
-        (uiA64 != uiB64 || uiA0 != uiB0) && (signA ^ softfloat_lt128(uiA64, uiA0, uiB64, uiB0));
+        signA != signB ?
+        signA && 0 != static_cast<largest_type>(((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) :
+        (uiA64 != uiB64 || uiA0 != uiB0) && softfloat_lt128(uiA64, uiA0, uiB64, uiB0) != signA;
 }
 

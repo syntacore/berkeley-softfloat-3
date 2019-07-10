@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-f16_le(float16_t a,
-       float16_t b)
+f16_le(float16_t const a,
+       float16_t const b)
 {
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
@@ -52,6 +52,7 @@ f16_le(float16_t a,
     bool const signA = signF16UI(uiA);
     bool const signB = signF16UI(uiB);
     return
-        signA != signB ? signA || !static_cast<uint16_t>((uiA | uiB) << 1) :
-        uiA == uiB || (signA ^ (uiA < uiB));
+        signA != signB ?
+        signA || 0 == static_cast<uint16_t>((uiA | uiB) << 1) :
+        uiA == uiB || (uiA < uiB) != signA;
 }

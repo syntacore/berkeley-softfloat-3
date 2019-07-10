@@ -66,7 +66,7 @@ roundPackTo<int64_t>(bool const sign,
 
     int64_t const z = sign ? -static_cast<int64_t>(sig) : static_cast<int64_t>(sig);
 
-    if (z && ((z < 0) ^ sign)) {
+    if (z && (z < 0) != sign) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }

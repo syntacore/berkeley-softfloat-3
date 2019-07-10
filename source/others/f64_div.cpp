@@ -49,7 +49,7 @@ f64_div(float64_t const a,
     bool const signB = is_sign(uiB);
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
-    bool const signZ = signA ^ signB;
+    bool const signZ = signA != signB;
 
     if (expA == 0x7FF) {
         if (0 != sigA) {

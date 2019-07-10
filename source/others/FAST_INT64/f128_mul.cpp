@@ -68,7 +68,7 @@ f128_mul(float128_t a,
     sigB.v64 = fracF128UI64(uiB64);
     sigB.v0 = uiB0;
 
-    bool signZ = signA ^ signB;
+    bool signZ = signA != signB;
 
     if (expA == 0x7FFF) {
         if (

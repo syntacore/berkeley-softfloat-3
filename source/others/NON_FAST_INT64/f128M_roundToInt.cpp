@@ -186,7 +186,7 @@ f128M_roundToInt(float128_t const* aPtr,
         wordZ = wordA;
         carry = false;
 
-        if (softfloat_round_minMag != roundingMode && (signF128UI96(ui96) ^ (roundingMode == softfloat_round_max))) {
+        if (softfloat_round_minMag != roundingMode && signF128UI96(ui96) != (softfloat_round_max == roundingMode)) {
             if (extra || (wordA & extrasMask)) {
                 wordZ += bit;
                 carry = wordZ < wordA;

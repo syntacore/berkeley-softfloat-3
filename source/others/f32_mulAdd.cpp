@@ -56,7 +56,7 @@ mulAdd(Mul_add_operations const op,
     bool const signB = signF32UI(uiB);
     int16_t expB = expF32UI(uiB);
     uint32_t sigB = fracF32UI(uiB);
-    bool const signC = signF32UI(uiC) ^ (op == softfloat_mulAdd_subC);
+    bool const signC = signF32UI(uiC) != (softfloat_mulAdd_subC == op);
     int16_t expC = expF32UI(uiC);
     uint32_t sigC = fracF32UI(uiC);
     bool const signProd = (signA != signB) != (op == softfloat_mulAdd_subProd);

@@ -125,7 +125,7 @@ f16_div(float16_t const a,
     bool const signB = signF16UI(uiB);
     int8_t expB = expF16UI(uiB);
     uint16_t sigB = fracF16UI(uiB);
-    bool const signZ = signA ^ signB;
+    bool const signZ = signA != signB;
 
     if (0x1F == expA) {
         if (0 != sigA) {

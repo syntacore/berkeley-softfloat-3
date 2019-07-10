@@ -56,8 +56,10 @@ extF80_lt_quiet(extFloat80_t a,
 
     bool const signA = signExtF80UI64(uiA64);
     bool const signB = signExtF80UI64(uiB64);
+    typedef typename std::conditional<(sizeof uiA0 < sizeof uiA64), decltype(uiA64), decltype(uiA0)>::type largest_type;
     return
-        signA != signB ? signA && (((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) : 
-        (uiA64 != uiB64 || uiA0 != uiB0) && (signA ^ softfloat_lt128(uiA64, uiA0, uiB64, uiB0));
+        signA != signB ?
+        signA && 0 != static_cast<largest_type>(((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) :
+        (uiA64 != uiB64 || uiA0 != uiB0) && softfloat_lt128(uiA64, uiA0, uiB64, uiB0) != signA;
 }
 

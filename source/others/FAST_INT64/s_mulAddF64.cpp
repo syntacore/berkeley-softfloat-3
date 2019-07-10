@@ -57,10 +57,10 @@ mulAdd(Mul_add_operations op,
     bool const signB = is_sign(uiB);
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
-    bool const signC = is_sign(uiC) ^ (op == softfloat_mulAdd_subC);
+    bool const signC = is_sign(uiC) != (softfloat_mulAdd_subC == op);
     int16_t expC = expF64UI(uiC);
     uint64_t sigC = fracF64UI(uiC);
-    bool signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
+    bool signZ = (signA != signB) != (softfloat_mulAdd_subProd == op);
 
     if (isInf64UI(uiA) || isInf64UI(uiB)) {
         /* a or b is inf, product is inf or undefined, check other operand for zero */

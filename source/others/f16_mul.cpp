@@ -49,7 +49,7 @@ f16_mul(float16_t a,
     bool const signB = signF16UI(uiB);
     int8_t expB = expF16UI(uiB);
     uint16_t sigB = fracF16UI(uiB);
-    bool const signZ = signA ^ signB;
+    bool const signZ = signA != signB;
 
     if (expA == 0x1F) {
         if (sigA || ((expB == 0x1F) && sigB)) {

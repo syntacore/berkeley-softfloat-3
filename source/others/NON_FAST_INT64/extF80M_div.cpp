@@ -47,7 +47,7 @@ extF80M_div(extFloat80_t const* const aSPtr,
     int32_t expA = expExtF80UI64(uiA64);
     uint16_t const uiB64 = bSPtr->signExp;
     int32_t expB = expExtF80UI64(uiB64);
-    bool const signZ = signExtF80UI64(uiA64) ^ signExtF80UI64(uiB64);
+    bool const signZ = signExtF80UI64(uiA64) != signExtF80UI64(uiB64);
 
     if (expA == INT16_MAX || expB == INT16_MAX) {
         if (softfloat_tryPropagateNaNExtF80M(aSPtr, bSPtr, zSPtr)) {

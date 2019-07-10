@@ -50,7 +50,7 @@ f64_mul(float64_t a,
     bool const signB = is_sign(uiB);
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
-    bool const signZ = signA ^ signB;
+    bool const signZ = signA != signB;
 
     if (expA == 0x7FF) {
         if (sigA || ((expB == 0x7FF) && sigB)) {

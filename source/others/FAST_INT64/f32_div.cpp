@@ -116,7 +116,7 @@ f32_div(float32_t a,
     bool const signB = signF32UI(uiB);
     int16_t expB = expF32UI(uiB);
     uint32_t sigB = fracF32UI(uiB);
-    bool const signZ = signA ^ signB;
+    bool const signZ = signA != signB;
 
     if (0xFF == expA) {
         if (0 != sigA) {

@@ -65,6 +65,7 @@ f16_roundToInt(float16_t a,
             if (!fracF16UI(uiA)) {
                 return u_as_f_16(uiZ);
             }
+
             [[fallthrough]];
 
         case softfloat_round_near_maxMag:
@@ -90,35 +91,35 @@ f16_roundToInt(float16_t a,
         }
 
         return u_as_f_16(uiZ);
-    } else if (0x19 <= exp) {
+    }
+
+    if (0x19 <= exp) {
         return
             exp == 0x1F && 0 != fracF16UI(uiA) ?
             u_as_f_16(softfloat_propagateNaNF16UI(uiA, 0)) : a;
-    } else {
-        uint16_t uiZ = uiA;
-        uint16_t const lastBitMask = static_cast<uint16_t>(1 << (0x19 - exp));
-        uint16_t const roundBitsMask = lastBitMask - 1u;
-
-        if (roundingMode == softfloat_round_near_maxMag) {
-            uiZ += lastBitMask >> 1;
-        } else if (roundingMode == softfloat_round_near_even) {
-            uiZ += lastBitMask >> 1;
-
-            if (!(uiZ & roundBitsMask)) {
-                uiZ &= ~lastBitMask;
-            }
-        } else if (roundingMode != softfloat_round_minMag) {
-            if (signF16UI(uiZ) ^ (roundingMode == softfloat_round_max)) {
-                uiZ += roundBitsMask;
-            }
-        }
-
-        uiZ &= ~roundBitsMask;
-
-        if (exact && (uiZ != uiA)) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-
-        return u_as_f_16(uiZ);
     }
+
+    uint16_t uiZ = uiA;
+    uint16_t const lastBitMask = static_cast<uint16_t>(1 << (0x19 - exp));
+    uint16_t const roundBitsMask = lastBitMask - 1u;
+
+    if (roundingMode == softfloat_round_near_maxMag) {
+        uiZ += lastBitMask >> 1;
+    } else if (roundingMode == softfloat_round_near_even) {
+        uiZ += lastBitMask >> 1;
+
+        if (!(uiZ & roundBitsMask)) {
+            uiZ &= ~lastBitMask;
+        }
+    } else if (softfloat_round_minMag != roundingMode && signF16UI(uiZ) != (softfloat_round_max == roundingMode)) {
+        uiZ += roundBitsMask;
+    }
+
+    uiZ &= ~roundBitsMask;
+
+    if (exact && (uiZ != uiA)) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return u_as_f_16(uiZ);
 }

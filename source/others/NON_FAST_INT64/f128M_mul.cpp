@@ -65,7 +65,7 @@ f128M_mul(const float128_t* aPtr,
     expA = expF128UI96(uiA96);
     uiB96 = bWPtr[indexWordHi(4)];
     expB = expF128UI96(uiB96);
-    signZ = signF128UI96(uiA96) ^ signF128UI96(uiB96);
+    signZ = signF128UI96(uiA96) != signF128UI96(uiB96);
 
     if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
         if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {

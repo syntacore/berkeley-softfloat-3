@@ -73,7 +73,7 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
     }
 
     bool signZ = signExtF80UI64(uiA64);
-    bool const signB = signExtF80UI64(uiB64) ^ negateB;
+    bool const signB = signExtF80UI64(uiB64) != negateB;
     negateB = signZ != signB;
 
     if (expA < expB) {

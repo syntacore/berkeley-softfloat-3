@@ -48,7 +48,7 @@ extF80_mul(extFloat80_t const a,
     bool const signB = signExtF80UI64(b.signExp);
     int32_t const expB = expExtF80UI64(b.signExp);
     uint64_t sigB = b.signif;
-    bool const signZ = signA ^ signB;
+    bool const signZ = signA != signB;
 
     if (0x7FFF == expA) {
         extFloat80_t uZ_1;

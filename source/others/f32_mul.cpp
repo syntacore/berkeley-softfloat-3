@@ -55,7 +55,7 @@ f32_mul(float32_t a,
         int16_t expB = expF32UI(uiB);
         uint32_t sigB = fracF32UI(uiB);
 
-        bool const signZ = signA ^ signB;
+        bool const signZ = signA != signB;
 
         if (expA == 0xFF || expB == 0xFF) {
             bool const is_undefined =

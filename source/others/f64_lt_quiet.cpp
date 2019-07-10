@@ -41,8 +41,8 @@ f64_lt_quiet(float64_t const a,
              float64_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
-    uint64_t const uiB = f_as_u_64(b);
+    auto const uiA = f_as_u_64(a);
+    auto const uiB = f_as_u_64(b);
 
     if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
         if (softfloat_isSigNaNF64UI(uiA) || softfloat_isSigNaNF64UI(uiB)) {
@@ -50,11 +50,12 @@ f64_lt_quiet(float64_t const a,
         }
 
         return false;
-    } else {
-        bool const signA = is_sign(uiA);
-        bool const signB = is_sign(uiB);
-        return
-            signA != signB ? signA && 0 != ((uiA | uiB) & INT64_MAX) :
-            uiA != uiB && (signA ^ (uiA < uiB));
     }
+
+    bool const signA = is_sign(uiA);
+    bool const signB = is_sign(uiB);
+    return
+        signA != signB ?
+        signA && 0 != static_cast<decltype(uiA)>((uiA | uiB) << 1) :
+        uiA != uiB && (uiA < uiB) != signA;
 }

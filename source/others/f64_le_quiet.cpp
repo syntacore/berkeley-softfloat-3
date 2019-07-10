@@ -50,11 +50,12 @@ f64_le_quiet(float64_t const a,
         }
 
         return false;
-    } else {
-        bool const signA = is_sign(uiA);
-        bool const signB = is_sign(uiB);
-        return
-            signA != signB ? signA || 0 == ((uiA | uiB) & static_cast<uint64_t>(INT64_MAX)) :
-            uiA == uiB || (signA ^ (uiA < uiB));
     }
+
+    bool const signA = is_sign(uiA);
+    bool const signB = is_sign(uiB);
+    return
+        signA != signB ?
+        signA || 0 == static_cast<decltype(uiA)>((uiA | uiB) << 1) :
+        uiA == uiB || (uiA < uiB) != signA;
 }

@@ -52,9 +52,9 @@ softfloat_mulAddF128M(uint32_t const* const aWPtr,
     uint32_t const uiB96 = bWPtr[indexWordHi(4)];
     int32_t expB = expF128UI96(uiB96);
     uint32_t const uiC96 = cWPtr[indexWordHi(4)];
-    bool const signC = signF128UI96(uiC96) ^ (op == softfloat_mulAdd_subC);
+    bool const signC = signF128UI96(uiC96) != (softfloat_mulAdd_subC == op);
     int32_t expC = expF128UI96(uiC96);
-    bool signProd = signF128UI96(uiA96) ^ signF128UI96(uiB96) ^ (softfloat_mulAdd_subProd == op);
+    bool signProd = (signF128UI96(uiA96) != signF128UI96(uiB96)) != (softfloat_mulAdd_subProd == op);
 
     bool prodIsInfinite = false;
 
