@@ -48,20 +48,14 @@ f32_to_f128(float32_t a)
     if (exp == 0xFF) {
         if (frac) {
             return u_as_f_128(softfloat_commonNaNToF128UI(softfloat_f32UIToCommonNaN(uiA)));
+        } else {
+            return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0),0});
         }
-
-        uint128 uiZ;
-        uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
-        uiZ.v0 = 0;
-        return u_as_f_128(uiZ);
     }
 
     if (0 == exp) {
         if (0 == frac) {
-            uint128 uiZ;
-            uiZ.v64 = packToF128UI64(sign, 0, 0);
-            uiZ.v0 = 0;
-            return u_as_f_128(uiZ);
+            return u_as_f_128(uint128{packToF128UI64(sign, 0, 0), 0});
         }
 
         exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
@@ -69,9 +63,6 @@ f32_to_f128(float32_t a)
         frac = normExpSig.sig;
     }
 
-    uint128 uiZ;
-    uiZ.v64 = packToF128UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25);
-    uiZ.v0 = 0;
-    return u_as_f_128(uiZ);
+    return u_as_f_128(uint128{packToF128UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25), 0});
 }
 
