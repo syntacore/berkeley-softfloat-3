@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(TARGET_NAME 8086)
+set(SOFTFLOAT_MODEL 8086)
 set(SRC_TARGET_FAST_INT64
     ${SRC_TARGET-8086_FAST_INT64}
     ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNF128UI.cpp
@@ -20,10 +20,10 @@ set(ALL_SRC
 )
 source_group(TREE ${SOFTFLOAT_ROOT} FILES ${ALL_SRC})
 
-add_library(softfloat-${TARGET_NAME}-fi64 EXCLUDE_FROM_ALL ${ALL_SRC} )
-target_link_libraries(softfloat-${TARGET_NAME}-fi64 PRIVATE softfloat-build-defs)
-set_target_properties(softfloat-${TARGET_NAME}-fi64  PROPERTIES FOLDER "softfloat/${TARGET_NAME}"   )
-target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
+add_library(softfloat-${SOFTFLOAT_MODEL}-fi64 EXCLUDE_FROM_ALL ${ALL_SRC} )
+target_link_libraries(softfloat-${SOFTFLOAT_MODEL}-fi64 PRIVATE softfloat-build-defs)
+set_target_properties(softfloat-${SOFTFLOAT_MODEL}-fi64  PROPERTIES FOLDER "softfloat/${SOFTFLOAT_MODEL}"   )
+target_compile_definitions(softfloat-${SOFTFLOAT_MODEL}-fi64 PRIVATE SOFTFLOAT_FAST_INT64)
 if(${SOFTFLOAT_FAST_DIV64TO32})
-    target_compile_definitions(softfloat-${TARGET_NAME}-fi64 PRIVATE SOFTFLOAT_FAST_DIV64TO32)
+    target_compile_definitions(softfloat-${SOFTFLOAT_MODEL}-fi64 PRIVATE SOFTFLOAT_FAST_DIV64TO32)
 endif(${SOFTFLOAT_FAST_DIV64TO32})
