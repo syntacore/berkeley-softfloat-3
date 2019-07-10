@@ -127,7 +127,7 @@ inline constexpr
 typename std::enable_if<std::is_integral<Ty>::value,bool>::type
 is_sign(Ty const& v)
 {
-    return static_cast<typename std::make_unsigned<Ty>::type>(v) < 0;
+    return static_cast<typename std::make_signed<Ty>::type>(v) < 0;
 }
 
 template<typename Ty>
