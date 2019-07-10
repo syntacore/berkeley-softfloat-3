@@ -45,7 +45,7 @@ f32_mul(float32_t a,
     uint32_t const uiB = f_as_u_32(b);
 
     if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB)) {
-        return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+        return u_as_f_32(propagate_NaN(uiA, uiB));
     } else {
         bool const signA = signF32UI(uiA);
         int16_t expA = expF32UI(uiA);

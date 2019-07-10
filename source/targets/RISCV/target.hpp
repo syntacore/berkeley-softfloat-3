@@ -89,9 +89,11 @@ to another.
 struct commonNaN
 {
     commonNaN() = default;
-    constexpr commonNaN(bool a_sign,
-                        uint64_t const& a_v64,
-                        uint64_t const& a_v0)
+
+    constexpr
+    commonNaN(bool a_sign,
+              uint64_t const& a_v64,
+              uint64_t const& a_v0)
         : sign(a_sign)
         , v64(a_v64)
         , v0(a_v0)
@@ -238,15 +240,22 @@ softfloat_isSigNaNExtF80UI(uint16_t const& uiA64,
         0 != (UINT64_C(0x3FFFFFFFFFFFFFFF) & uiA0);
 }
 
+template<typename Ty>
+inline Ty
+propagate_NaN(Ty const& uiA,
+              Ty const& uiB);
+
+
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
 point values, at least one of which is a NaN, returns the bit pattern of
 the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
+template<>
 inline uint32_t
-softfloat_propagateNaNF32UI(uint32_t const& uiA,
-                            uint32_t const& uiB)
+propagate_NaN<uint32_t>(uint32_t const& uiA,
+                        uint32_t const& uiB)
 {
     if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);

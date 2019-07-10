@@ -45,7 +45,7 @@ f32_rem(float32_t const a,
     uint32_t const uiB = f_as_u_32(b);
 
     if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB)) {
-        return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+        return u_as_f_32(propagate_NaN(uiA, uiB));
     } else {
         bool const signA = signF32UI(uiA);
         int16_t expA = expF32UI(uiA);
@@ -55,7 +55,7 @@ f32_rem(float32_t const a,
 
         if (expA == 0xFF) {
             if (sigA || ((expB == 0xFF) && sigB)) {
-                return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+                return u_as_f_32(propagate_NaN(uiA, uiB));
             } else {
                 /** @todo check */
                 softfloat_raiseFlags(softfloat_flag_invalid);
@@ -63,7 +63,7 @@ f32_rem(float32_t const a,
             }
         } else if (expB == 0xFF) {
             if (sigB) {
-                return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+                return u_as_f_32(propagate_NaN(uiA, uiB));
             } else {
                 /** @todo check */
                 return a;

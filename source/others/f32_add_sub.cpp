@@ -40,80 +40,82 @@ namespace {
 using namespace softfloat::internals;
 
 static float32_t
-softfloat_addMagsF32(uint32_t const uiA,
-                     uint32_t const uiB)
+addMags(uint32_t const uiA,
+        uint32_t const uiB)
 {
     assert(!isNaNF32UI(uiA) && !isNaNF32UI(uiB));
+
     if (isInf32UI(uiA) || isInf32UI(uiB)) {
         /** propagate infinity if operand(s) is infinity */
         return signed_inf_F32(signF32UI(uiA));
-    } else {
-        static uint32_t const hidden_bit = UINT32_C(1) << 23;
-        int16_t const expA = expF32UI(uiA);
-        uint32_t const sigA = fracF32UI(uiA);
-        int16_t const expB = expF32UI(uiB);
-        uint32_t const sigB = fracF32UI(uiB);
-        int16_t const expDiff = expA - expB;
+    }
 
-        if (0 == expDiff) {
-            /* if same exponent, fractional are aligned */
-            if (0 == expA) {
-                /** if a and b are subnormal(s) or zero(s), result is simple sum, possible carry of high sum bit to exponent is valid */
-                return u_as_f_32(uiA + sigB);
-            } else {
-                /** add hidden bits to operands if fractional are normal aligned */
-                uint32_t const sigZ = (sigA + hidden_bit) + (sigB + hidden_bit);
-                bool const signA = signF32UI(uiA);
+    static uint32_t const hidden_bit = UINT32_C(1) << 23;
+    int16_t const expA = expF32UI(uiA);
+    uint32_t const sigA = fracF32UI(uiA);
+    int16_t const expB = expF32UI(uiB);
+    uint32_t const sigB = fracF32UI(uiB);
+    int16_t const expDiff = expA - expB;
 
-                /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
-                if (0 == (sigZ & 1) && expA < 0xFE) {
-                    return u_as_f_32(packToF32UI(signA, expA, sigZ >> 1));
-                } else {
-                    return softfloat_roundPackToF32(signA, expA, sigZ << 6);
-                }
-            }
-        } else {
-            /* fractional bits before shift are [22..0] and after shift are [28..6] */
-            assert(0 == ((sigA | sigB) & (~UINT32_C(0) << 23)));
-            uint32_t sigA_scaled = sigA << 6;
-            uint32_t sigB_scaled = sigB << 6;
-            /* bit before point is [29] */
-            uint32_t const hidden_bit_scaled = hidden_bit << 6;
-            assert(0 == ((sigA_scaled | sigB_scaled) & (~UINT32_C(0) << 29)));
-
-            /* unaligned fractional */
-            int16_t expZ;
-            if (expDiff < 0) {
-                /* magnitude b greater than magnitude a */
-                expZ = expB;
-                /* add hidden bit and shift */
-                sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
-                sigB_scaled += hidden_bit_scaled;
-            } else {
-                /* magnitude a greater than magnitude b */
-                expZ = expA;
-                /* add hidden bit and shift */
-                sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
-                sigA_scaled += hidden_bit_scaled;
-            }
-
-            /* mantissa bits are [29..0] with 1 digit before point */
-            uint32_t const sigZ = sigA_scaled + sigB_scaled;
-
-            /* mantissa bits are [30..0] with up to 2 digits before point */
-            /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
-            if (sigZ < 2 * hidden_bit_scaled) {
-                return softfloat_roundPackToF32(signF32UI(uiA), expZ - 1, sigZ << 1);
-            } else {
-                return softfloat_roundPackToF32(signF32UI(uiA), expZ, sigZ);
-            }
+    if (0 == expDiff) {
+        /* if same exponent, fractional are aligned */
+        if (0 == expA) {
+            /** if a and b are subnormal(s) or zero(s), result is simple sum, possible carry of high sum bit to exponent is valid */
+            return u_as_f_32(uiA + sigB);
         }
+
+        /** add hidden bits to operands if fractional are normal aligned */
+        uint32_t const sigZ = (sigA + hidden_bit) + (sigB + hidden_bit);
+        bool const signA = signF32UI(uiA);
+
+        /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
+        if (0 == (sigZ & 1) && expA < 0xFE) {
+            return u_as_f_32(packToF32UI(signA, expA, sigZ >> 1));
+        } else {
+            return softfloat_roundPackToF32(signA, expA, sigZ << 6);
+        }
+    }
+
+    /* fractional bits before shift are [22..0] and after shift are [28..6] */
+    assert(0 == ((sigA | sigB) & (~UINT32_C(0) << 23)));
+    uint32_t sigA_scaled = sigA << 6;
+    uint32_t sigB_scaled = sigB << 6;
+    /* bit before point is [29] */
+    uint32_t const hidden_bit_scaled = hidden_bit << 6;
+    assert(0 == ((sigA_scaled | sigB_scaled) & (~UINT32_C(0) << 29)));
+
+    /* unaligned fractional */
+    int16_t expZ;
+
+    if (expDiff < 0) {
+        /* magnitude b greater than magnitude a */
+        expZ = expB;
+        /* add hidden bit and shift */
+        sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
+        sigB_scaled += hidden_bit_scaled;
+    } else {
+        /* magnitude a greater than magnitude b */
+        expZ = expA;
+        /* add hidden bit and shift */
+        sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
+        sigA_scaled += hidden_bit_scaled;
+    }
+
+    /* mantissa bits are [29..0] with 1 digit before point */
+    uint32_t const sigZ = sigA_scaled + sigB_scaled;
+
+    /* mantissa bits are [30..0] with up to 2 digits before point */
+    /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
+    if (sigZ < 2 * hidden_bit_scaled) {
+        return softfloat_roundPackToF32(signF32UI(uiA), expZ - 1, sigZ << 1);
+    } else {
+        return softfloat_roundPackToF32(signF32UI(uiA), expZ, sigZ);
     }
 }
 
 static float32_t
-softfloat_subMagsF32(uint32_t const uiA,
-                     uint32_t const uiB)
+subMags(uint32_t const uiA,
+        uint32_t const uiB)
 {
     assert(!isNaNF32UI(uiA) && !isNaNF32UI(uiB));
     int16_t expA = expF32UI(uiA);
@@ -122,54 +124,58 @@ softfloat_subMagsF32(uint32_t const uiA,
     uint32_t const sigB = fracF32UI(uiB);
 
     int16_t const expDiff = expA - expB;
+    static int16_t const max_exp = 0xFF;
 
     if (0 == expDiff) {
-        if (0xFF == expA) {
+        if (max_exp == expA) {
             if (0 != sigA || 0 != sigB) {
-                return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_32(defaultNaNF32UI);
+                return u_as_f_32(propagate_NaN(uiA, uiB));
             }
-        } else {
-            int32_t const sigDiff = static_cast<int32_t>(sigA - sigB);
 
-            if (0 == sigDiff) {
-                softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-                return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
-            } else {
-                if (expA) {
-                    --expA;
-                }
-
-                bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
-                int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
-                int8_t const shiftDist = softfloat_countLeadingZeros32(static_cast<uint32_t>(sigAbsDiff)) - 8;
-                int16_t const expZ = expA - shiftDist;
-                return
-                    u_as_f_32(
-                    expZ < 0 ? packToF32UI(signZ, 0, static_cast<uint32_t>(sigAbsDiff << expA)) :
-                    packToF32UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
-            }
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_32(defaultNaNF32UI);
         }
-    } else {
-        bool const signZ = signF32UI(uiA);
-        auto const sigA_1 = sigA << 7;
-        auto const sigB_1 = sigB << 7;
 
-        if (expDiff < 0) {
-            return
-                0xFF != expB ? softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
-                0 == sigB_1 ? signed_inf_F32(!signZ) : u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-        } else {
-            return
-                0xFF == expA ? u_as_f_32(0 != sigA_1 ? softfloat_propagateNaNF32UI(uiA, uiB) : uiA) :
-                softfloat_normRoundPackToF32(signZ,
-                                             expA - 1,
-                                             (sigA_1 | 0x40000000) -
-                                             softfloat_shiftRightJam32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
+        int32_t const sigDiff = static_cast<int32_t>(sigA - sigB);
+
+        if (0 == sigDiff) {
+            softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+            return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
         }
+
+        if (expA) {
+            --expA;
+        }
+
+        bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
+        int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
+        int8_t const shiftDist = softfloat_countLeadingZeros32(static_cast<uint32_t>(sigAbsDiff)) - 8;
+        int16_t const expZ = expA - shiftDist;
+        return
+            u_as_f_32(expZ < 0 ?
+                      packToF32UI(signZ, 0, static_cast<uint32_t>(sigAbsDiff << expA)) :
+                      packToF32UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
     }
+
+    bool const signZ = signF32UI(uiA);
+    auto const sigA_1 = sigA << 7;
+    auto const sigB_1 = sigB << 7;
+
+    if (expDiff < 0) {
+        return
+            max_exp != expB ?
+            softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
+            0 == sigB_1 ?
+            signed_inf_F32(!signZ) :
+            u_as_f_32(propagate_NaN(uiA, uiB));
+    }
+
+    return
+        max_exp == expA ?
+        u_as_f_32(0 != sigA_1 ? propagate_NaN(uiA, uiB) : uiA) :
+        softfloat_normRoundPackToF32(signZ,
+                                     expA - 1,
+                                     (sigA_1 | 0x40000000) - softfloat_shiftRightJam32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
 }
 
 }  // namespace
@@ -181,13 +187,14 @@ f32_add(float32_t const a,
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
+
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
-        return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-    } else {
-        return
-            signF32UI(uiA) == signF32UI(uiB) ? softfloat_addMagsF32(uiA, uiB) : softfloat_subMagsF32(uiA, uiB);
+        return u_as_f_32(propagate_NaN(uiA, uiB));
     }
+
+    return
+        (signF32UI(uiA) == signF32UI(uiB) ? addMags : subMags)(uiA, uiB);
 }
 
 float32_t
@@ -195,12 +202,14 @@ f32_sub(float32_t const a,
         float32_t const b)
 {
     using namespace softfloat::internals;
+
     uint32_t const uiA = f_as_u_32(a);
     uint32_t const uiB = f_as_u_32(b);
+
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
-        return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
-    } else {
-        return signF32UI(uiA) == signF32UI(uiB) ? softfloat_subMagsF32(uiA, uiB) : softfloat_addMagsF32(uiA, uiB);
+        return u_as_f_32(propagate_NaN(uiA, uiB));
     }
+
+    return (signF32UI(uiA) == signF32UI(uiB) ? subMags : addMags)(uiA, uiB);
 }

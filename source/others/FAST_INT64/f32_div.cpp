@@ -120,17 +120,17 @@ f32_div(float32_t a,
 
     if (0xFF == expA) {
         if (0 != sigA) {
-            return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+            return u_as_f_32(propagate_NaN(uiA, uiB));
         } else if (0xFF != expB) {
             return signed_inf_F32(signZ);
         } else if (0 != sigB) {
-            return u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB));
+            return u_as_f_32(propagate_NaN(uiA, uiB));
         } else {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_32(defaultNaNF32UI);
         }
     } else if (0xFF == expB) {
-        return sigB ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, uiB)) : signed_zero_F32(signZ);
+        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : signed_zero_F32(signZ);
     } else {
         if (0 == expB) {
             if (0 == sigB) {
