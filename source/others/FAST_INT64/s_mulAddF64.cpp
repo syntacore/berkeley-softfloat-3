@@ -40,11 +40,12 @@ namespace softfloat {
 namespace internals {
 
 namespace {
+
 static inline float64_t
-softfloat_mulAddF64(uint64_t uiA,
-                    uint64_t uiB,
-                    uint64_t uiC,
-                    Mul_add_operations op)
+mulAdd(Mul_add_operations op,
+       uint64_t uiA,
+       uint64_t uiB,
+       uint64_t uiC)
 {
     if (softfloat_isNaNF64UI(uiC) || softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB)) {
         return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));
@@ -236,6 +237,6 @@ f64_mulAdd(float64_t a,
            float64_t c)
 {
     using namespace softfloat::internals;
-    return softfloat_mulAddF64(f_as_u_64(a), f_as_u_64(b), f_as_u_64(c), softfloat_mulAdd_madd);
+    return mulAdd(softfloat_mulAdd_madd, f_as_u_64(a), f_as_u_64(b), f_as_u_64(c));
 }
 
