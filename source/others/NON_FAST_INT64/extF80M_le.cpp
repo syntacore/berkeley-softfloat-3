@@ -50,20 +50,23 @@ extF80M_le(extFloat80_t const* const aPtr,
     if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-
-        bool const signA = signExtF80UI64(uiA64);
-
-        if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
-            /* Signs are different. */
-            return signA || !(uiA0 | uiB0);
-        } else if (0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
-            /* Signs are the same. */
-            return softfloat_compareNonnormExtF80M(aPtr, bPtr) <= 0;
-        } else if (uiA64 == uiB64) {
-            return uiA0 == uiB0 || signA != (uiA0 < uiB0);
-        } else {
-            return signA != (uiA64 < uiB64);
-        }
     }
+
+    bool const signA = signExtF80UI64(uiA64);
+
+    if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
+        /* Signs are different. */
+        return signA || 0 == (uiA0 | uiB0);
+    }
+
+    if (0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+        /* Signs are the same. */
+        return softfloat_compareNonnormExtF80M(aPtr, bPtr) <= 0;
+    }
+
+    if (uiA64 == uiB64) {
+        return uiA0 == uiB0 || (uiA0 < uiB0) != signA;
+    }
+
+    return (uiA64 < uiB64) != signA;
 }
