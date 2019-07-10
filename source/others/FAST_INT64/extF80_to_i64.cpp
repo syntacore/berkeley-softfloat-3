@@ -66,7 +66,7 @@ extF80_to_i64(extFloat80_t const a,
     }
 
     return
-        softfloat_roundPackToI64(sign, sig, sigExtra, roundingMode, exact);
+        roundPackTo<int64_t>(sign, sig, sigExtra, roundingMode, exact);
 
 }
 

@@ -72,6 +72,6 @@ f16_to_ui64(float16_t const a,
         }
     }
 
-    return softfloat_roundPackToUI32(sign, sig32, roundingMode, exact);
+    return roundPackTo<uint32_t>(sign, sig32, roundingMode, exact);
 }
 

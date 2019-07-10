@@ -39,20 +39,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
+template<>
 int64_t
-softfloat_roundPackMToI64(bool sign,
-                          uint32_t* extSigPtr,
-                          softfloat_round_mode const roundingMode,
-                          bool exact)
+roundPackMTo<int64_t>(bool const sign,
+                      uint32_t const *const extSigPtr,
+                      softfloat_round_mode const roundingMode,
+                      bool const exact)
 {
-    int64_t z;
-
-
     bool const roundNearEven = (roundingMode == softfloat_round_near_even);
     uint32_t const sigExtra = extSigPtr[indexWordLo(3)];
-    bool doIncrement =
-        !roundNearEven &&  softfloat_round_near_maxMag != roundingMode ? (roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra :
+    bool const doIncrement =
+        !roundNearEven && softfloat_round_near_maxMag != roundingMode ?
+        ((sign ? softfloat_round_min : softfloat_round_max) == roundingMode) && sigExtra :
         0x80000000 <= sigExtra;
+
     uint64_t sig = static_cast<uint64_t>(extSigPtr[indexWord(3, 2)]) << 32 | extSigPtr[indexWord(3, 1)];
 
     if (doIncrement) {
@@ -68,19 +68,26 @@ softfloat_roundPackMToI64(bool sign,
         }
     }
 
-    z = sign ? -static_cast<int64_t>(sig) : static_cast<int64_t>(sig);
+    int64_t const z = sign ? -static_cast<int64_t>(sig) : static_cast<int64_t>(sig);
 
-    if (z && ((z < 0) ^ sign)) {
+    if (z && ((z < 0) != sign)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-    }
+    } else {
+        if (exact && sigExtra) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
 
-    if (exact && sigExtra) {
-        softfloat_raiseFlags(softfloat_flag_inexact);
+        return z;
     }
-
-    return z;
 }
+
+template
+int64_t
+roundPackMTo<int64_t>(bool const sign,
+                      uint32_t const *const extSigPtr,
+                      softfloat_round_mode const roundingMode,
+                      bool const exact);
 
 }  // namespace internals
 }  // namespace softfloat

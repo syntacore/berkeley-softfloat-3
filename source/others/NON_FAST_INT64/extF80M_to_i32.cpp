@@ -71,5 +71,5 @@ extF80M_to_i32(extFloat80_t const* const aPtr,
         sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
     }
 
-    return softfloat_roundPackToI32(sign, sig, roundingMode, exact);
+    return roundPackTo<int32_t>(sign, sig, roundingMode, exact);
 }

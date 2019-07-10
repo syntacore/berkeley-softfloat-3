@@ -51,16 +51,19 @@ f32_to_ui64(float32_t const a,
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0xFF && sig ? ui64_fromNaN :
-            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+            exp == 0xFF && sig ?
+            ui64_fromNaN :
+            sign ?
+            ui64_fromNegOverflow :
+            ui64_fromPosOverflow;
     } else {
         uint64_t const sig64 = static_cast<uint64_t>(sig|(0 != exp? 0x00800000 :0)) << 40;
 
-        if (shiftDist) {
+        if (0 != shiftDist) {
             uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0, static_cast<uint32_t>(shiftDist));
-            return softfloat_roundPackToUI64(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
+            return roundPackTo<uint64_t>(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
         } else {
-            return softfloat_roundPackToUI64(sign, sig64, 0, roundingMode, exact);
+            return roundPackTo<uint64_t>(sign, sig64, 0, roundingMode, exact);
         }
     }
 }

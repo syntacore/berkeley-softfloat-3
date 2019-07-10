@@ -64,6 +64,6 @@ extF80_to_ui64(extFloat80_t const a,
         sigExtra = sig64Extra.extra;
     }
 
-    return softfloat_roundPackToUI64(sign, sig, sigExtra, roundingMode, exact);
+    return roundPackTo<uint64_t>(sign, sig, sigExtra, roundingMode, exact);
 }
 

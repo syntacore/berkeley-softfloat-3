@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SOFTFLOAT_INTERNALS_H_
-#define SOFTFLOAT_INTERNALS_H_
+#ifndef SOFTFLOAT_INTERNALS_HPP_
+#define SOFTFLOAT_INTERNALS_HPP_
 
 #include "softfloat/functions.h"
 #include "primitives/functions.hpp"
@@ -55,8 +55,10 @@ enum Mul_add_operations
 struct exp8_sig16
 {
     exp8_sig16() = default;
-    constexpr exp8_sig16(int8_t a_exp,
-               uint16_t a_sig)
+
+    constexpr
+    exp8_sig16(int8_t a_exp,
+                uint16_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
     {}
@@ -68,8 +70,10 @@ struct exp8_sig16
 struct exp16_sig32
 {
     exp16_sig32() = default;
-    constexpr exp16_sig32(int16_t a_exp,
-                uint32_t a_sig)
+
+    constexpr
+        exp16_sig32(int16_t a_exp,
+                    uint32_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
     {}
@@ -98,16 +102,12 @@ Valid values are 32, 64, and 80.
 extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
 extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
 
-int32_t
-softfloat_roundPackToI32(bool,
-                         uint64_t,
-                         softfloat_round_mode,
-                         bool);
-uint32_t
-softfloat_roundPackToUI32(bool,
-                          uint64_t,
-                          softfloat_round_mode,
-                          bool);
+template<typename Ty>
+Ty
+roundPackTo(bool,
+            uint64_t,
+            softfloat_round_mode,
+            bool);
 
 float16_t
 softfloat_roundPackToF16(bool,
@@ -146,6 +146,8 @@ softfloat_roundPackToF64(bool,
 struct exp32_sig64
 {
     exp32_sig64() = default;
+
+    constexpr
     exp32_sig64(int32_t a_exp,
                 uint64_t a_sig)
         : exp(a_exp)
@@ -159,6 +161,8 @@ struct exp32_sig64
 struct exp32_sig128
 {
     exp32_sig128() = default;
+
+    constexpr
     exp32_sig128(int32_t a_exp,
                  uint128 const& a_sig)
         : exp(a_exp)
@@ -169,20 +173,16 @@ struct exp32_sig128
     uint128 sig;
 };
 
-int64_t
-softfloat_roundPackToI64(bool,
-                         uint64_t,
-                         uint64_t,
-                         softfloat_round_mode,
-                         bool);
-uint64_t
-softfloat_roundPackToUI64(bool,
-                          uint64_t,
-                          uint64_t,
-                          softfloat_round_mode,
-                          bool);
+template<typename Ty>
+Ty
+roundPackTo(bool,
+            uint64_t,
+            uint64_t,
+            softfloat_round_mode,
+            bool);
 
-exp32_sig64 softfloat_normSubnormalExtF80Sig(uint64_t);
+exp32_sig64
+softfloat_normSubnormalExtF80Sig(uint64_t);
 
 extFloat80_t
 softfloat_roundPackToExtF80(bool,
@@ -228,6 +228,7 @@ softfloat_normRoundPackToF128(bool,
 
 float128_t
 softfloat_addMagsF128(uint64_t, uint64_t, uint64_t, uint64_t, bool);
+
 float128_t
 softfloat_subMagsF128(uint64_t,
                       uint64_t,
@@ -296,16 +297,12 @@ isNaNF128UI(uint64_t a64,
 
 #else
 
-int64_t
-softfloat_roundPackMToI64(bool,
-                          uint32_t*,
-                          softfloat_round_mode,
-                          bool);
-uint64_t
-softfloat_roundPackMToUI64(bool,
-                           uint32_t const*,
-                           softfloat_round_mode,
-                           bool);
+template<typename Ty>
+Ty
+roundPackMTo(bool,
+             uint32_t const*,
+             softfloat_round_mode,
+             bool);
 
 bool
 softfloat_tryPropagateNaNExtF80M(extFloat80M const*,
@@ -522,16 +519,10 @@ signed_zero_F32(bool sign)
     return u_as_f_32(signed_zero_F32UI(sign));
 }
 
-inline constexpr uint32_t
-signed_inf_F32UI(bool sign)
-{
-    return packToF32UI(sign, 0xFF, 0u);
-}
-
 inline constexpr float32_t
 signed_inf_F32(bool sign)
 {
-    return u_as_f_32(signed_inf_F32UI(sign));
+    return u_as_f_32(packToF32UI(sign, 0xFF, 0u));
 }
 
 inline constexpr bool
@@ -729,4 +720,4 @@ softfloat_normSubnormalF64Sig(uint64_t const sig)
 }  // namespace internals
 }  // namespace softfloat
 
-#endif  /* SOFTFLOAT_INTERNALS_H_ */
+#endif  /* SOFTFLOAT_INTERNALS_HPP_ */

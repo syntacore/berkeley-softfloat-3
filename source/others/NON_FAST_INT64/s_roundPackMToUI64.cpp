@@ -39,11 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
+template<>
 uint64_t
-softfloat_roundPackMToUI64(bool const sign,
-                           uint32_t const* const extSigPtr,
-                           softfloat_round_mode const roundingMode,
-                           bool const exact)
+roundPackMTo<uint64_t>(bool const sign,
+                       uint32_t const* const extSigPtr,
+                       softfloat_round_mode const roundingMode,
+                       bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
     uint32_t const sigExtra = extSigPtr[indexWordLo(3)];
@@ -79,5 +80,11 @@ softfloat_roundPackMToUI64(bool const sign,
     }
 }
 
+template
+uint64_t
+roundPackMTo<uint64_t>(bool const sign,
+                       uint32_t const* const extSigPtr,
+                       softfloat_round_mode const roundingMode,
+                       bool const exact);
 }  // namespace internals
 }  // namespace softfloat

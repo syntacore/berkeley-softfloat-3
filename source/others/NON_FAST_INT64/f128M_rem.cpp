@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "target.hpp"
 
+using namespace softfloat::internals;
 namespace {
 static inline void
 copyA(uint32_t const uiA96,
@@ -54,7 +55,6 @@ f128M_rem(const float128_t* aPtr,
           const float128_t* bPtr,
           float128_t* zPtr)
 {
-    using namespace softfloat::internals;
     uint32_t x[4];
     uint32_t* remPtr;
     int32_t expDiff;

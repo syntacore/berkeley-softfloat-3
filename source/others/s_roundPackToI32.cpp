@@ -39,11 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
+template<>
 int32_t
-softfloat_roundPackToI32(bool sign,
-                         uint64_t sig,
-                         softfloat_round_mode const roundingMode,
-                         bool exact)
+roundPackTo<int32_t>(bool const sign,
+            uint64_t sig,
+            softfloat_round_mode const roundingMode,
+            bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
     uint16_t roundIncrement =
@@ -59,7 +60,7 @@ softfloat_roundPackToI32(bool sign,
         return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     } else {
         // TODO: check
-        uint32_t sig32 = (sig >> 12) & ~(!(roundBits ^ 0x800) & !!(roundNearEven));
+        uint32_t const sig32 = (sig >> 12) & ~(!(roundBits ^ 0x800) & !!(roundNearEven));
         int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
 
         if (z && ((z < 0) != sign)) {
@@ -74,6 +75,12 @@ softfloat_roundPackToI32(bool sign,
         }
     }
 }
+template
+int32_t
+roundPackTo<int32_t>(bool const sign,
+                     uint64_t sig,
+                     softfloat_round_mode const roundingMode,
+                     bool const exact);
 
 }  // namespace internals
 }  // namespace softfloat

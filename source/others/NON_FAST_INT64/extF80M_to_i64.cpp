@@ -65,6 +65,6 @@ extF80M_to_i64(const extFloat80_t* const aPtr,
         softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
 
-    return softfloat_roundPackMToI64(sign, extSig, roundingMode, exact);
+    return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
 
 }

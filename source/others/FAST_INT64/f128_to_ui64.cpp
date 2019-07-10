@@ -76,5 +76,5 @@ f128_to_ui64(float128_t a,
         sig0 = sigExtra.extra;
     }
 
-    return softfloat_roundPackToUI64(sign, sig64, sig0, roundingMode, exact);
+    return roundPackTo<uint64_t>(sign, sig64, sig0, roundingMode, exact);
 }

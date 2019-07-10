@@ -68,6 +68,6 @@ f128M_to_i64(float128_t const* aPtr,
     sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
     softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist), sig);
     return
-        softfloat_roundPackMToI64(sign, sig + indexMultiwordLo(4, 3), roundingMode, exact);
+        roundPackMTo<int64_t>(sign, sig + indexMultiwordLo(4, 3), roundingMode, exact);
 
 }

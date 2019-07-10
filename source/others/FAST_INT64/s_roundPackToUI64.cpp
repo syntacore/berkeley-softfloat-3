@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
+template<>
 uint64_t
-softfloat_roundPackToUI64(bool const sign,
-                          uint64_t sig,
-                          uint64_t const sigExtra,
-                          softfloat_round_mode const roundingMode,
-                          bool const exact)
+roundPackTo<uint64_t>(bool const sign,
+              uint64_t sig,
+              uint64_t const sigExtra,
+              softfloat_round_mode const roundingMode,
+              bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
     bool const doIncrement =
@@ -75,5 +76,12 @@ softfloat_roundPackToUI64(bool const sign,
     return sig;
 }
 
+template
+uint64_t
+roundPackTo<uint64_t>(bool const sign,
+                      uint64_t sig,
+                      uint64_t const sigExtra,
+                      softfloat_round_mode const roundingMode,
+                      bool const exact);
 }  // namespace internals
 }  // namespace softfloat

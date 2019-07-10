@@ -64,7 +64,7 @@ f32_to_i64(float32_t const a,
             softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
         }
 
-        return softfloat_roundPackMToI64(sign, extSig, roundingMode, exact);
+        return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
     }
 }
 

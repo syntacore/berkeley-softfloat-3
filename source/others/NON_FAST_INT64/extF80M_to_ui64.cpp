@@ -61,5 +61,5 @@ extF80M_to_ui64(extFloat80_t const *const aSPtr,
     if (shiftDist) {
         softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
-    return softfloat_roundPackMToUI64(sign, extSig, roundingMode, exact);
+    return roundPackMTo<uint64_t>(sign, extSig, roundingMode, exact);
 }

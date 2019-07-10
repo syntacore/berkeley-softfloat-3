@@ -55,10 +55,10 @@ f64_to_i64(float64_t const a,
                 0x7FF == exp && 0 != fracF64UI(uiA) ? i64_fromNaN :
                 sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         } else {
-            return softfloat_roundPackToI64(sign, sig << -shiftDist, 0, roundingMode, exact);
+            return roundPackTo<int64_t>(sign, sig << -shiftDist, 0, roundingMode, exact);
         }
     } else {
         uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
-        return softfloat_roundPackToI64(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
+        return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
     }
 }
