@@ -46,124 +46,127 @@ f32_rem(float32_t const a,
 
     if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB)) {
         return u_as_f_32(propagate_NaN(uiA, uiB));
-    } else {
-        bool const signA = is_sign(uiA);
-        int16_t expA = expF32UI(uiA);
-        uint32_t sigA = fracF32UI(uiA);
-        int16_t expB = expF32UI(uiB);
-        uint32_t sigB = fracF32UI(uiB);
-
-        if (expA == 0xFF) {
-            if (sigA || ((expB == 0xFF) && sigB)) {
-                return u_as_f_32(propagate_NaN(uiA, uiB));
-            } else {
-                /** @todo check */
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_32(defaultNaNF32UI);
-            }
-        } else if (expB == 0xFF) {
-            if (sigB) {
-                return u_as_f_32(propagate_NaN(uiA, uiB));
-            } else {
-                /** @todo check */
-                return a;
-            }
-        } else {
-            if (0 == expB) {
-                if (0 == sigB) {
-                    /** @todo check */
-                    softfloat_raiseFlags(softfloat_flag_invalid);
-                    return u_as_f_32(defaultNaNF32UI);
-                } else {
-                    exp16_sig32 const normExpSig(sigB);
-                    expB = normExpSig.exp;
-                    sigB = normExpSig.sig;
-                }
-            }
-
-            if (0 == expA) {
-                if (0 == sigA) {
-                    return a;
-                } else {
-                    exp16_sig32 const normExpSig(sigA);
-                    expA = normExpSig.exp;
-                    sigA = normExpSig.sig;
-                }
-            }
-
-            uint32_t rem = sigA | 0x00800000;
-            sigB |= 0x00800000;
-            int16_t expDiff = expA - expB;
-
-            uint32_t q;
-            if (expDiff < 1) {
-                if (expDiff < -1) {
-                    return a;
-                } else {
-                    sigB <<= 6;
-
-                    if (expDiff) {
-                        rem <<= 5;
-                        q = 0;
-                    } else {
-                        rem <<= 6;
-                        q = 0u + !!(sigB <= rem);
-
-                        if (0 != q) {
-                            rem -= sigB;
-                        }
-                    }
-                }
-            } else {
-                uint32_t const recip32 = softfloat_approxRecip32_1(sigB << 8);
-                /*
-                 Changing the shift of `rem' here requires also changing the initial
-                 subtraction from `expDiff'.
-                */
-                rem <<= 7;
-                expDiff -= 31;
-                /*
-                The scale of `sigB' affects how many bits are obtained during each
-                cycle of the loop.  Currently this is 29 bits per loop iteration,
-                which is believed to be the maximum possible.
-                */
-                sigB <<= 6;
-
-                for (;;) {
-                    q = (rem * static_cast<uint64_t>(recip32)) >> 32;
-
-                    if (expDiff < 0) {
-                        break;
-                    } else {
-                        rem = static_cast<uint32_t>(-static_cast<int32_t>(q * sigB));
-                        expDiff -= 29;
-                    }
-                }
-
-                /* `expDiff' cannot be less than -30 here. */
-                q >>= ~expDiff & 31;
-                rem = (rem << (expDiff + 30)) - q * static_cast<uint32_t>(sigB);
-            }
-
-            uint32_t altRem;
-            do {
-                altRem = rem;
-                ++q;
-                rem -= sigB;
-            } while (0 == (rem & 0x80000000));
-
-            uint32_t const meanRem = rem + altRem;
-
-            if (0 != (meanRem & 0x80000000) || (0 == meanRem && 0 != (q & 1))) {
-                rem = altRem;
-            }
-
-            if (0x80000000 <= rem) {
-                return softfloat_normRoundPackToF32(!signA, expB, static_cast<uint32_t>(-static_cast<int32_t>(rem)));
-            } else {
-                return softfloat_normRoundPackToF32(signA, expB, rem);
-            }
-
-        }
     }
+
+    bool const signA = is_sign(uiA);
+    int16_t expA = expF32UI(uiA);
+    uint32_t sigA = fracF32UI(uiA);
+    int16_t expB = expF32UI(uiB);
+    uint32_t sigB = fracF32UI(uiB);
+
+    if (expA == 0xFF) {
+        if (sigA || ((expB == 0xFF) && sigB)) {
+            return u_as_f_32(propagate_NaN(uiA, uiB));
+        }
+
+        /** @todo check */
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_32(defaultNaNF32UI);
+    }
+
+    if (expB == 0xFF) {
+        if (sigB) {
+            return u_as_f_32(propagate_NaN(uiA, uiB));
+        }
+
+        /** @todo check */
+        return a;
+    }
+
+    if (0 == expB) {
+        if (0 == sigB) {
+            /** @todo check */
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_32(defaultNaNF32UI);
+        }
+
+        exp16_sig32 const normExpSig(sigB);
+        expB = normExpSig.exp;
+        sigB = normExpSig.sig;
+    }
+
+    if (0 == expA) {
+        if (0 == sigA) {
+            return a;
+        }
+
+        exp16_sig32 const normExpSig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
+    }
+
+    uint32_t rem = sigA | 0x00800000;
+    sigB |= 0x00800000;
+    int16_t expDiff = expA - expB;
+
+    uint32_t q;
+
+    if (expDiff < 1) {
+        if (expDiff < -1) {
+            return a;
+        }
+
+        sigB <<= 6;
+
+        if (expDiff) {
+            rem <<= 5;
+            q = 0;
+        } else {
+            rem <<= 6;
+            q = 0u + !!(sigB <= rem);
+
+            if (0 != q) {
+                rem -= sigB;
+            }
+        }
+    } else {
+        uint32_t const recip32 = softfloat_approxRecip32_1(sigB << 8);
+        /*
+         Changing the shift of `rem' here requires also changing the initial
+         subtraction from `expDiff'.
+        */
+        rem <<= 7;
+        expDiff -= 31;
+        /*
+        The scale of `sigB' affects how many bits are obtained during each
+        cycle of the loop.  Currently this is 29 bits per loop iteration,
+        which is believed to be the maximum possible.
+        */
+        sigB <<= 6;
+
+        for (;;) {
+            q = (rem * static_cast<uint64_t>(recip32)) >> 32;
+
+            if (expDiff < 0) {
+                break;
+            } else {
+                rem = static_cast<uint32_t>(-static_cast<int32_t>(q * sigB));
+                expDiff -= 29;
+            }
+        }
+
+        /* `expDiff' cannot be less than -30 here. */
+        q >>= ~expDiff & 31;
+        rem = (rem << (expDiff + 30)) - q * static_cast<uint32_t>(sigB);
+    }
+
+    uint32_t altRem;
+
+    do {
+        altRem = rem;
+        ++q;
+        rem -= sigB;
+    } while (0 == (rem & 0x80000000));
+
+    uint32_t const meanRem = rem + altRem;
+
+    if (0 != (meanRem & 0x80000000) || (0 == meanRem && 0 != (q & 1))) {
+        rem = altRem;
+    }
+
+    if (0x80000000 <= rem) {
+        return softfloat_normRoundPackToF32(!signA, expB, static_cast<uint32_t>(-static_cast<int32_t>(rem)));
+    }
+
+    return softfloat_normRoundPackToF32(signA, expB, rem);
 }

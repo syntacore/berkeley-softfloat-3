@@ -56,9 +56,9 @@ f64_to_i32(float64_t const a,
         if (!fromNaN_is_same_as_any_overflow) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return i32_fromNaN;
-        } else {
-            sign = fromNaN_is_same_as_neg_overflow;
         }
+
+        sign = fromNaN_is_same_as_neg_overflow;
     }
 
     if (0 != exp) {

@@ -38,36 +38,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float32_t
-extF80M_to_f32(const extFloat80_t *aPtr)
+extF80M_to_f32(const extFloat80_t* aPtr)
 {
     using namespace softfloat::internals;
-    extFloat80M const *aSPtr = aPtr;
+    extFloat80M const* aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 
-    if (exp == 0x7FFF) {
-        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+    if (0x7FFF == exp) {
+        if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_extF80MToCommonNaN(*aSPtr)));
-        } else {
-            return signed_inf_F32(sign);
-        }
-    } else {
-        if (!(sig & UINT64_C(0x8000000000000000))) {
-            if (!sig) {
-                return signed_zero_F32(sign);
-            } else {
-                exp += softfloat_normExtF80SigM(&sig);
-            }
         }
 
-        uint32_t const sig32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(sig, 33));
-        exp -= 0x3F81;
-        if (exp < -0x1000) {
-            exp = -0x1000;
-        }
-        assert(INT16_MIN <= exp && exp <= INT16_MAX);
-        return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
+        return signed_inf_F32(sign);
     }
+
+    if (0 == (sig & UINT64_C(0x8000000000000000))) {
+        if (0 == sig) {
+            return signed_zero_F32(sign);
+        }
+
+        exp += softfloat_normExtF80SigM(&sig);
+    }
+
+    uint32_t const sig32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(sig, 33));
+    exp -= 0x3F81;
+
+    if (exp < -0x1000) {
+        exp = -0x1000;
+    }
+
+    assert(INT16_MIN <= exp && exp <= INT16_MAX);
+    return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
 }

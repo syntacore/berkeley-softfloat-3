@@ -43,18 +43,17 @@ i64_to_f128(int64_t a)
 
     if (0 == a) {
         return static_cast<float128_t>(uint128{0, 0});
-    } else {
-        bool const sign = (a < 0);
-        /** @bug for INT64_MIN */
-        uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
-        int8_t const shiftDist = count_leading_zeros(absA) + 49;
-
-        if (64 <= shiftDist) {
-            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});
-        } else {
-            uint128 const zSig = softfloat_shortShiftLeft128(0, absA, static_cast<uint8_t>(shiftDist));
-            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, zSig.v64), zSig.v0});
-        }
     }
-}
 
+    bool const sign = (a < 0);
+    /** @bug for INT64_MIN */
+    uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
+    int8_t const shiftDist = count_leading_zeros(absA) + 49;
+
+    if (64 <= shiftDist) {
+        return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});
+    }
+
+    uint128 const zSig = softfloat_shortShiftLeft128(0, absA, static_cast<uint8_t>(shiftDist));
+    return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, zSig.v64), zSig.v0});
+}

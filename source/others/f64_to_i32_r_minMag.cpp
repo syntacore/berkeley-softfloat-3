@@ -52,31 +52,31 @@ f64_to_i32_r_minMag(float64_t a,
         }
 
         return 0;
-    } else {
-        bool const sign = is_sign(uiA);
+    }
 
-        if (shiftDist < 22) {
-            if (sign && 0x41E == exp && sig < UINT64_C(0x0000000000200000)) {
-                if (exact && 0 != sig) {
-                    softfloat_raiseFlags(softfloat_flag_inexact);
-                }
+    bool const sign = is_sign(uiA);
 
-                return INT32_MIN;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return
-                    0x7FF == exp && sig ? i32_fromNaN :
-                    sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-            }
-        } else {
-            auto const sig_1 = sig | UINT64_C(0x0010000000000000);
-            int32_t const absZ = static_cast<int32_t>(sig_1 >> shiftDist);
-
-            if (exact && (static_cast<uint64_t>(static_cast<uint32_t>(absZ)) << shiftDist != sig_1)) {
+    if (shiftDist < 22) {
+        if (sign && 0x41E == exp && sig < UINT64_C(0x0000000000200000)) {
+            if (exact && 0 != sig) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            return sign ? -absZ : absZ;
+            return INT32_MIN;
         }
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            0x7FF == exp && sig ? i32_fromNaN :
+            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
+
+    auto const sig_1 = sig | UINT64_C(0x0010000000000000);
+    int32_t const absZ = static_cast<int32_t>(sig_1 >> shiftDist);
+
+    if (exact && (static_cast<uint64_t>(static_cast<uint32_t>(absZ)) << shiftDist != sig_1)) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return sign ? -absZ : absZ;
 }

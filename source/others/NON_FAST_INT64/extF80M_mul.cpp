@@ -69,9 +69,9 @@ extF80M_mul(extFloat80_t const* const aPtr,
                 zPtr->signExp = packToExtF80UI64(signZ, 0);
                 zPtr->signif = 0;
                 return;
-            } else {
-                expA_1 += softfloat_normExtF80SigM(&sigA);
             }
+
+            expA_1 += softfloat_normExtF80SigM(&sigA);
         }
 
         auto expB_1 = 0 == expB ? 1 : expB;
@@ -83,9 +83,9 @@ extF80M_mul(extFloat80_t const* const aPtr,
                 zPtr->signExp = packToExtF80UI64(signZ, 0);
                 zPtr->signif = 0;
                 return;
-            } else {
-                expB_1 += softfloat_normExtF80SigM(&sigB);
             }
+
+            expB_1 += softfloat_normExtF80SigM(&sigB);
         }
 
         int32_t const expZ = expA_1 + expB_1 - 0x3FFE;

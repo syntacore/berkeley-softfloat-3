@@ -50,9 +50,13 @@ extF80M_eq_signaling(extFloat80_t const* const aPtr,
     if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else if (uiA0 == uiB0) {
-        return (uiA64 == uiB64) || !uiA0;
-    } else {
-        return 0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000)) && !softfloat_compareNonnormExtF80M(aPtr, bPtr);
     }
+
+    if (uiA0 == uiB0) {
+        return uiA64 == uiB64 || 0 == uiA0;
+    }
+
+    return
+        0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000)) &&
+        0 == softfloat_compareNonnormExtF80M(aPtr, bPtr);
 }

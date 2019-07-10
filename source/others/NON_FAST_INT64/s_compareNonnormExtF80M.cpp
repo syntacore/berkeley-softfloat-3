@@ -41,68 +41,52 @@ namespace internals {
 
 /** @bug use extFloat80_t */
 int
-softfloat_compareNonnormExtF80M(extFloat80M const* aSPtr,
-                                extFloat80M const* bSPtr)
+softfloat_compareNonnormExtF80M(extFloat80M const* const aSPtr,
+                                extFloat80M const* const bSPtr)
 {
-    uint16_t uiA64, uiB64;
-    uint64_t sigA;
-    bool signB;
-    uint64_t sigB;
-    int32_t expA, expB;
-
-
-    uiA64 = aSPtr->signExp;
-    uiB64 = bSPtr->signExp;
-    sigA = aSPtr->signif;
-    signB = is_sign(uiB64);
-    sigB = bSPtr->signif;
+    uint16_t const uiA64 = aSPtr->signExp;
+    uint16_t const uiB64 = bSPtr->signExp;
+    uint64_t sigA = aSPtr->signif;
+    bool signB = is_sign(uiB64);
+    uint64_t sigB = bSPtr->signif;
 
     if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
         if (0 == (sigA | sigB)) {
             return 0;
         }
 
-        goto resultFromSignB;
+        return signB ? 1 : -1;
     }
 
-    expA = expExtF80UI64(uiA64);
-    expB = expExtF80UI64(uiB64);
+    int32_t expA = expExtF80UI64(uiA64);
+    int32_t expB = expExtF80UI64(uiB64);
 
-    if (expA == 0x7FFF) {
-        if (expB == 0x7FFF) {
+    if (0x7FFF == expA) {
+        if (0x7FFF == expB) {
             return 0;
         }
 
-        signB = !signB;
-        goto resultFromSignB;
+        return signB ? -1 : 1;
     }
 
-    if (expB == 0x7FFF) {
-        goto resultFromSignB;
+    if (0x7FFF == expB) {
+        return signB ? 1 : -1;
     }
 
-    if (!expA) {
+    if (0 == expA) {
         expA = 1;
     }
 
-    if (!(sigA & UINT64_C(0x8000000000000000))) {
-        if (sigA) {
-            expA += softfloat_normExtF80SigM(&sigA);
-        } else {
-            expA = -128;
-        }
+    if (0 == (sigA & UINT64_C(0x8000000000000000))) {
+        expA = 0 != sigA ? expA + softfloat_normExtF80SigM(&sigA) : -128;
     }
 
-    if (!expB) {
+    if (0 == expB) {
         expB = 1;
     }
 
-    if (!(sigB & UINT64_C(0x8000000000000000))) {
-        if (sigB) {
-            expB += softfloat_normExtF80SigM(&sigB);
-        } else {
-            expB = -128;
-        }
+    if (0 == (sigB & UINT64_C(0x8000000000000000))) {
+        expB = 0 != sigB ? expB + softfloat_normExtF80SigM(&sigB) : -128;
     }
 
     if (signB) {
@@ -110,7 +94,7 @@ softfloat_compareNonnormExtF80M(extFloat80M const* aSPtr,
             return 1;
         }
 
-        if ((expB < expA) || (sigB < sigA)) {
+        if (expB < expA || sigB < sigA) {
             return -1;
         }
     } else {
@@ -118,16 +102,12 @@ softfloat_compareNonnormExtF80M(extFloat80M const* aSPtr,
             return 1;
         }
 
-        if ((expA < expB) || (sigA < sigB)) {
+        if (expA < expB || sigA < sigB) {
             return -1;
         }
     }
 
-    return (sigA != sigB);
-
-resultFromSignB:
-    return signB ? 1 : -1;
-
+    return !!(sigA != sigB);
 }
 
 }  // namespace internals

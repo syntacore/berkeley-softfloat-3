@@ -47,7 +47,7 @@ f64_eq_signaling(float64_t const a,
     if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        return uiA == uiB || 0 == ((uiA | uiB) & INT64_MAX);
     }
+
+    return uiA == uiB || 0 == ((uiA | uiB) & INT64_MAX);
 }

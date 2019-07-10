@@ -96,7 +96,9 @@ propagate_NaN<uint32_t>(uint32_t const& uiA,
 
         if (!isSigNaNA) {
             return isNaNF32UI(uiA) ? uiNonsigA : uiNonsigB;
-        } else if (!isSigNaNB) {
+        }
+
+        if (!isSigNaNB) {
             return isNaNF32UI(uiB) ? uiNonsigB : uiNonsigA;
         }
     }

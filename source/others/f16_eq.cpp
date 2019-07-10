@@ -50,7 +50,7 @@ f16_eq(float16_t const a,
         }
 
         return false;
-    } else {
-        return uiA == uiB || !static_cast<uint16_t>((uiA | uiB) << 1);
     }
+
+    return uiA == uiB || 0 == static_cast<uint16_t>((uiA | uiB) << 1);
 }

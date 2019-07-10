@@ -50,18 +50,20 @@ extF80M_rem(extFloat80_t const* const aPtr,
     if (0x7FFF == expA || 0x7FFF == expB) {
         if (softfloat_tryPropagateNaNExtF80M(aPtr, bPtr, zPtr)) {
             return;
-        } else if (0x7FFF == expA) {
+        }
+
+        if (0x7FFF == expA) {
             softfloat_invalidExtF80M(zPtr);
             return;
-        } else {
-            /*
-            If we get here, then argument b is an infinity and `expB' is 0x7FFF;
-            Doubling `expB' is an easy way to ensure that `expDiff' later is
-            less than -1, which will result in returning a canonicalized version
-            of argument a.
-            */
-            expB += expB;
         }
+
+        /*
+        If we get here, then argument b is an infinity and `expB' is 0x7FFF;
+        Doubling `expB' is an easy way to ensure that `expDiff' later is
+        less than -1, which will result in returning a canonicalized version
+        of argument a.
+        */
+        expB += expB;
     }
 
     if (0 == expB) {
@@ -74,9 +76,9 @@ extF80M_rem(extFloat80_t const* const aPtr,
         if (0 == x64) {
             softfloat_invalidExtF80M(zPtr);
             return;
-        } else {
-            expB += softfloat_normExtF80SigM(&x64);
         }
+
+        expB += softfloat_normExtF80SigM(&x64);
     }
 
     bool signRem = is_sign(uiA64);
@@ -92,9 +94,9 @@ extF80M_rem(extFloat80_t const* const aPtr,
             zPtr->signExp = packToExtF80UI64(signRem, 0);
             zPtr->signif = sigA >> 1;
             return;
-        } else {
-            expA += softfloat_normExtF80SigM(&sigA);
         }
+
+        expA += softfloat_normExtF80SigM(&sigA);
     }
 
     int32_t expDiff = expA - expB;
@@ -121,6 +123,7 @@ extF80M_rem(extFloat80_t const* const aPtr,
         x[indexWord(3, 1)] = static_cast<uint32_t>(x64);
 
         uint32_t q;
+
         if (expDiff < 1) {
             if (expDiff) {
                 --expB;

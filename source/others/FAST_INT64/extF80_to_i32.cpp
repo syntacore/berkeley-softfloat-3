@@ -51,15 +51,15 @@ extF80_to_i32(extFloat80_t a,
     uint16_t const uiA64 = a.signExp;
     bool sign = is_sign(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);
-    uint64_t sig = a.signif;
+    uint64_t const sig = a.signif;
 
     if (!fromNaN_is_same_as_both_overflow && 0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
         if (!fromNaN_is_same_as_any_overflow) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return i32_fromNaN;
-        } else {
-            sign = fromNaN_is_same_as_neg_overflow;
         }
+
+        sign = fromNaN_is_same_as_neg_overflow;
     }
 
     auto const shiftDist = 0x4032 - exp;

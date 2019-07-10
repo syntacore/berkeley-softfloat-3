@@ -42,9 +42,9 @@ namespace internals {
 template<>
 int32_t
 roundPackTo<int32_t>(bool const sign,
-            uint64_t sig,
-            softfloat_round_mode const roundingMode,
-            bool const exact)
+                     uint64_t sig,
+                     softfloat_round_mode const roundingMode,
+                     bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
     uint16_t roundIncrement =
@@ -58,23 +58,24 @@ roundPackTo<int32_t>(bool const sign,
     if (sig & UINT64_C(0xFFFFF00000000000)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-    } else {
-        // TODO: check
-        uint32_t const sig32 = (sig >> 12) & ~(!(roundBits ^ 0x800) & !!(roundNearEven));
-        int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
-
-        if (z && ((z < 0) != sign)) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-        } else {
-            if (exact && roundBits) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
-            }
-
-            return z;
-        }
     }
+
+    // TODO: check
+    uint32_t const sig32 = (sig >> 12) & ~(!(roundBits ^ 0x800) & !!(roundNearEven));
+    int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
+
+    if (z && ((z < 0) != sign)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    }
+
+    if (exact && roundBits) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return z;
 }
+
 template
 int32_t
 roundPackTo<int32_t>(bool const sign,

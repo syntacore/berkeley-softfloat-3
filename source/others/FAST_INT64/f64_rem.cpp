@@ -49,36 +49,42 @@ f64_rem(float64_t const a,
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
 
-    if (expA == 0x7FF) {
+    if (0x7FF == expA) {
         if (sigA || ((expB == 0x7FF) && sigB)) {
             return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
         }
-    } else if (expB == 0x7FF) {
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_64(defaultNaNF64UI);
+    }
+
+    if (0x7FF == expB) {
         return sigB ? u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB)) : a;
-    } else if (expA < expB - 1) {
+    }
+
+    if (expA < expB - 1) {
         return a;
-    } else if (0 == expB) {
+    }
+
+    if (0 == expB) {
         if (0 == sigB) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_64(defaultNaNF64UI);
-        } else {
-            exp16_sig64 const normExpSig(sigB);
-            expB = normExpSig.exp;
-            sigB = normExpSig.sig;
         }
+
+        exp16_sig64 const normExpSig(sigB);
+        expB = normExpSig.exp;
+        sigB = normExpSig.sig;
     }
 
-    if (!expA) {
-        if (!sigA) {
+    if (0 == expA) {
+        if (0 == sigA) {
             return a;
-        } else {
-            exp16_sig64 const normExpSig(sigA);
-            expA = normExpSig.exp;
-            sigA = normExpSig.sig;
         }
+
+        exp16_sig64 const normExpSig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
     }
 
     uint64_t rem = sigA | UINT64_C(0x0010000000000000);
@@ -90,19 +96,19 @@ f64_rem(float64_t const a,
     if (expDiff < 1) {
         if (expDiff < -1) {
             return a;
+        }
+
+        sigB <<= 9;
+
+        if (0 != expDiff) {
+            rem <<= 8;
+            q = 0;
         } else {
-            sigB <<= 9;
+            rem <<= 9;
+            q = 0u + !!(sigB <= rem);
 
-            if (expDiff) {
-                rem <<= 8;
-                q = 0;
-            } else {
-                rem <<= 9;
-                q = 0u + !!(sigB <= rem);
-
-                if (q) {
-                    rem -= sigB;
-                }
+            if (q) {
+                rem -= sigB;
             }
         }
     } else {
@@ -144,7 +150,7 @@ f64_rem(float64_t const a,
         q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         rem = (rem << (expDiff + 30)) - q * static_cast<uint64_t>(sigB);
 
-        if (rem & UINT64_C(0x8000000000000000)) {
+        if (0 != (rem & UINT64_C(0x8000000000000000))) {
             altRem = rem + sigB;
             uint64_t const meanRem = rem + altRem;
 
@@ -154,7 +160,7 @@ f64_rem(float64_t const a,
 
             bool signRem = signA;
 
-            if (rem & UINT64_C(0x8000000000000000)) {
+            if (0 != (rem & UINT64_C(0x8000000000000000))) {
                 signRem = !signRem;
                 rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
             }
@@ -167,23 +173,21 @@ f64_rem(float64_t const a,
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while (!(rem & UINT64_C(0x8000000000000000)));
+    } while (0 == (rem & UINT64_C(0x8000000000000000)));
 
 
-    {
-        uint64_t const meanRem = rem + altRem;
+    uint64_t const meanRem = rem + altRem;
 
-        if ((meanRem & UINT64_C(0x8000000000000000)) || (!meanRem && (q & 1))) {
-            rem = altRem;
-        }
-
-        bool signRem = signA;
-
-        if (rem & UINT64_C(0x8000000000000000)) {
-            signRem = !signRem;
-            rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
-        }
-
-        return softfloat_normRoundPackToF64(signRem, expB, rem);
+    if (0 != (meanRem & UINT64_C(0x8000000000000000)) || (0 == meanRem && 0 != (q & 1))) {
+        rem = altRem;
     }
+
+    bool signRem = signA;
+
+    if (rem & UINT64_C(0x8000000000000000)) {
+        signRem = !signRem;
+        rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
+    }
+
+    return softfloat_normRoundPackToF64(signRem, expB, rem);
 }

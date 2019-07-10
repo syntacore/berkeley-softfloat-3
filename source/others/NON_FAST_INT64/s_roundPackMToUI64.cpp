@@ -71,13 +71,13 @@ roundPackMTo<uint64_t>(bool const sign,
     if (sign && 0 != sig) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-    } else {
-        if (exact && sigExtra) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-
-        return sig;
     }
+
+    if (exact && sigExtra) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return sig;
 }
 
 template

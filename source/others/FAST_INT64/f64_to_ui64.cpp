@@ -45,7 +45,7 @@ f64_to_ui64(float64_t const a,
     uint64_t const uiA = f_as_u_64(a);
     bool const sign = is_sign(uiA);
     int16_t const exp = expF64UI(uiA);
-    uint64_t const sig = fracF64UI(uiA) | (0 != exp? UINT64_C(0x0010000000000000) :UINT64_C(0));
+    uint64_t const sig = fracF64UI(uiA) | (0 != exp ? UINT64_C(0x0010000000000000) : UINT64_C(0));
     int16_t const shiftDist = 0x433 - exp;
 
     if (shiftDist <= 0) {
@@ -54,11 +54,11 @@ f64_to_ui64(float64_t const a,
             return
                 0x7FF == exp && 0 != fracF64UI(uiA) ? ui64_fromNaN :
                 sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-        } else {
-            return roundPackTo<uint64_t>(sign, sig << -shiftDist, 0, roundingMode, exact);
         }
-    } else {
-        uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
-        return roundPackTo<uint64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
+
+        return roundPackTo<uint64_t>(sign, sig << -shiftDist, 0, roundingMode, exact);
     }
+
+    uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
+    return roundPackTo<uint64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 }

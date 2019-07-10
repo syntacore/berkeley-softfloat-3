@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 int64_t
-f128_to_i64_r_minMag(float128_t a,
-                     bool exact)
+f128_to_i64_r_minMag(float128_t const a,
+                     bool const exact)
 {
     using namespace softfloat::internals;
     uint128 const uA{a};
@@ -59,40 +59,43 @@ f128_to_i64_r_minMag(float128_t a,
                 }
 
                 return INT64_MIN;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return
-                    0x7FFF == exp && 0 != (sig64 | sig0) ? i64_fromNaN :
-                    sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-            }
-        } else {
-            sig64 |= UINT64_C(0x0001000000000000);
-            /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data */
-            auto const negShiftDist = -shiftDist;
-            int64_t const absZ = static_cast<int64_t>(sig64 << negShiftDist | sig0 >> (shiftDist & 63u));
-
-            if (exact && static_cast<uint64_t>(sig0 << negShiftDist)) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            return sign ? -absZ : absZ;
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                0x7FFF == exp && 0 != (sig64 | sig0) ?
+                i64_fromNaN :
+                sign ?
+                i64_fromNegOverflow :
+                i64_fromPosOverflow;
         }
-    } else {
-        if (49 <= shiftDist) {
-            if (exact && (exp | sig64 | sig0)) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
-            }
 
-            return 0;
-        } else {
-            sig64 |= UINT64_C(0x0001000000000000);
-            int64_t const absZ = static_cast<int64_t>(sig64 >> shiftDist);
+        sig64 |= UINT64_C(0x0001000000000000);
+        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data */
+        auto const negShiftDist = -shiftDist;
+        int64_t const absZ = static_cast<int64_t>(sig64 << negShiftDist | sig0 >>(shiftDist & 63u));
 
-            if (exact && (sig0 || static_cast<uint64_t>(absZ << shiftDist) != sig64)) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
-            }
-
-            return sign ? -absZ : absZ;
+        if (exact && static_cast<uint64_t>(sig0 << negShiftDist)) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
+        return sign ? -absZ : absZ;
     }
+
+    if (49 <= shiftDist) {
+        if (exact && (exp | sig64 | sig0)) {
+            softfloat_raiseFlags(softfloat_flag_inexact);
+        }
+
+        return 0;
+    }
+
+    sig64 |= UINT64_C(0x0001000000000000);
+    int64_t const absZ = static_cast<int64_t>(sig64 >> shiftDist);
+
+    if (exact && (0 != sig0 || static_cast<uint64_t>(absZ << shiftDist) != sig64)) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return sign ? -absZ : absZ;
 }

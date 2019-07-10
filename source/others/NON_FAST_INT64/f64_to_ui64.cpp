@@ -55,20 +55,20 @@ f64_to_ui64(float64_t const a,
             return
                 exp == 0x7FF && fracF64UI(uiA) ? ui64_fromNaN :
                 sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-        } else {
-            auto const sig_1 = sig << -shiftDist;
-            uint32_t extSig[3];
-            extSig[indexWord(3, 0)] = 0;
-            extSig[indexWord(3, 2)] = sig_1 >> 32;
-            extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig_1);
-            return roundPackMTo<uint64_t>(sign, extSig, roundingMode, exact);
         }
-    } else {
+
+        auto const sig_1 = sig << -shiftDist;
         uint32_t extSig[3];
         extSig[indexWord(3, 0)] = 0;
-        extSig[indexWord(3, 2)] = sig >> 32;
-        extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
-        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+        extSig[indexWord(3, 2)] = sig_1 >> 32;
+        extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig_1);
         return roundPackMTo<uint64_t>(sign, extSig, roundingMode, exact);
     }
+
+    uint32_t extSig[3];
+    extSig[indexWord(3, 0)] = 0;
+    extSig[indexWord(3, 2)] = sig >> 32;
+    extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
+    softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+    return roundPackMTo<uint64_t>(sign, extSig, roundingMode, exact);
 }

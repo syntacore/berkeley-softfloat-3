@@ -62,9 +62,9 @@ f128M_to_i32(float128_t const* const aPtr,
         if (!fromNaN_same_as_any_overflow) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return i32_fromNaN;
-        } else {
-            sign = fromNaN_same_as_neg_overflow;
         }
+
+        sign = fromNaN_same_as_neg_overflow;
     }
 
     if (0 != exp) {

@@ -42,7 +42,7 @@ namespace internals {
 template<>
 int64_t
 roundPackMTo<int64_t>(bool const sign,
-                      uint32_t const *const extSigPtr,
+                      uint32_t const* const extSigPtr,
                       softfloat_round_mode const roundingMode,
                       bool const exact)
 {
@@ -73,19 +73,19 @@ roundPackMTo<int64_t>(bool const sign,
     if (z && ((z < 0) != sign)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-    } else {
-        if (exact && sigExtra) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-
-        return z;
     }
+
+    if (exact && sigExtra) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return z;
 }
 
 template
 int64_t
 roundPackMTo<int64_t>(bool const sign,
-                      uint32_t const *const extSigPtr,
+                      uint32_t const* const extSigPtr,
                       softfloat_round_mode const roundingMode,
                       bool const exact);
 

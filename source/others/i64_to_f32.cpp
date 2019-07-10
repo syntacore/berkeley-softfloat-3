@@ -46,12 +46,12 @@ i64_to_f32(int64_t const a)
 
     if (0 <= shiftDist) {
         return u_as_f_32(a ? packToF32UI(sign, 0x95 - shiftDist, static_cast<uint32_t>(absA) << shiftDist) : 0);
-    } else {
-        int8_t const shiftDist_1 = shiftDist + 7;
-        uint32_t const sig =
-            static_cast<uint32_t>(
-                shiftDist_1 < 0 ? softfloat_shortShiftRightJam64(absA, static_cast<uint8_t>(-shiftDist_1)) :
-                absA << shiftDist_1);
-        return softfloat_roundPackToF32(sign, 0x9C - shiftDist_1, sig);
     }
+
+    int8_t const shiftDist_1 = shiftDist + 7;
+    uint32_t const sig =
+        static_cast<uint32_t>(
+            shiftDist_1 < 0 ? softfloat_shortShiftRightJam64(absA, static_cast<uint8_t>(-shiftDist_1)) :
+            absA << shiftDist_1);
+    return softfloat_roundPackToF32(sign, 0x9C - shiftDist_1, sig);
 }

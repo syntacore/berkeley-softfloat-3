@@ -76,13 +76,17 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
 
         result_copy(zWPtr, aWPtr);
         return;
-    } else if (isSigNaNA || isSigNaNB) {
+    }
+
+    if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (!isSigNaNA) {
             result_copy(zWPtr, softfloat_isNaNF128M(aWPtr) ? aWPtr : bWPtr);
             return;
-        } else if (!isSigNaNB) {
+        }
+
+        if (!isSigNaNB) {
             result_copy(zWPtr, softfloat_isNaNF128M(bWPtr) ? bWPtr : aWPtr);
             return;
         }
@@ -102,8 +106,8 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
         !(wordMagA_3 < wordMagB_3) && wordMagB_3 < wordMagA_3 ||
         !(wordMagA_2 < wordMagB_2) && (wordMagB_2 < wordMagA_2 ||
                                        !(wordMagA_1 < wordMagB_1) && (wordMagB_1 < wordMagA_1 ||
-                                       !(wordMagA_0 < wordMagB_0) && (wordMagB_0 < wordMagA_0 ||
-                                       uiA96 < uiB96)));
+                                               !(wordMagA_0 < wordMagB_0) && (wordMagB_0 < wordMagA_0 ||
+                                                       uiA96 < uiB96)));
     result_copy(zWPtr, isA ? aWPtr : bWPtr);
 }
 

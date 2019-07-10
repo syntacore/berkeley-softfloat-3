@@ -48,18 +48,21 @@ f32_to_i32(float32_t const a,
     if (isNaN) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return i32_fromNaN;
-    } else {
-        int16_t const exp = expF32UI(uiA);
-        bool const sign = is_sign(uiA);
-        if (255 == exp) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
-        } else if (isZero32UI(uiA)) {
-            return 0;
-        } else {
-            uint64_t const sig64 = static_cast<uint64_t>(fracF32UI(uiA) | 0x00800000) << 32;
-            int16_t const shiftDist = 0xAA - exp;
-            return roundPackTo<int32_t>(sign, 0 < shiftDist? softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
-        }
     }
+
+    int16_t const exp = expF32UI(uiA);
+    bool const sign = is_sign(uiA);
+
+    if (255 == exp) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    }
+
+    if (isZero32UI(uiA)) {
+        return 0;
+    }
+
+    uint64_t const sig64 = static_cast<uint64_t>(fracF32UI(uiA) | 0x00800000) << 32;
+    int16_t const shiftDist = 0xAA - exp;
+    return roundPackTo<int32_t>(sign, 0 < shiftDist ? softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
 }

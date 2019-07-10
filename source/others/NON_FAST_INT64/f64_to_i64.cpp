@@ -56,20 +56,20 @@ f64_to_i64(float64_t const a,
             return
                 exp == 0x7FF && fracF64UI(uiA) ? i64_fromNaN :
                 sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-        } else {
-            sig <<= -shiftDist;
-            uint32_t extSig[3];
-            extSig[indexWord(3, 0)] = 0;
-            extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
-            extSig[indexWord(3, 2)] = sig >> 32;
-            return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
         }
-    } else {
+
+        sig <<= -shiftDist;
         uint32_t extSig[3];
         extSig[indexWord(3, 0)] = 0;
         extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
         extSig[indexWord(3, 2)] = sig >> 32;
-        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
         return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
     }
+
+    uint32_t extSig[3];
+    extSig[indexWord(3, 0)] = 0;
+    extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
+    extSig[indexWord(3, 2)] = sig >> 32;
+    softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+    return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
 }

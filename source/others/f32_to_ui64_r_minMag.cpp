@@ -52,25 +52,24 @@ f32_to_ui64_r_minMag(float32_t a,
         }
 
         return 0;
-    } else {
-        bool const sign = is_sign(uiA);
-
-        if (sign || shiftDist < 0) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                exp == 0xFF && sig ? ui64_fromNaN :
-                sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-        } else {
-            uint64_t sig64 = static_cast<uint64_t>(sig | 0x00800000) << 40;
-            uint64_t const z = sig64 >> shiftDist;
-            auto const shiftDist_1 = 40 - shiftDist;
-
-            if (exact && shiftDist_1 < 0 && 0 != static_cast<uint32_t>(sig << (shiftDist_1 & 31))) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
-            }
-
-            return z;
-        }
     }
-}
 
+    bool const sign = is_sign(uiA);
+
+    if (sign || shiftDist < 0) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == 0xFF && sig ? ui64_fromNaN :
+            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+    }
+
+    uint64_t const sig64 = static_cast<uint64_t>(sig | 0x00800000) << 40;
+    uint64_t const z = sig64 >> shiftDist;
+    auto const shiftDist_1 = 40 - shiftDist;
+
+    if (exact && shiftDist_1 < 0 && 0 != static_cast<uint32_t>(sig << (shiftDist_1 & 31))) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return z;
+}

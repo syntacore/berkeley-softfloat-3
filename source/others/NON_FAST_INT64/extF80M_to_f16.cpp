@@ -38,35 +38,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float16_t
-extF80M_to_f16(const extFloat80_t *aPtr)
+extF80M_to_f16(const extFloat80_t* aPtr)
 {
     using namespace softfloat::internals;
-    extFloat80M const *const aSPtr = aPtr;
+    extFloat80M const* const aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 
-    if (exp == 0x7FFF) {
-        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+    if (0x7FFF == exp) {
+        if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_extF80MToCommonNaN(*aSPtr)));
-        } else {
-            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
-    } else {
-        if (!(sig & INT64_MIN)) {
-            if (!sig) {
-                return u_as_f_16(packToF16UI(sign, 0, 0));
-            } else {
-                exp += softfloat_normExtF80SigM(&sig);
-            }
-        }
-        uint16_t const sig16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(sig, 49));
-        exp -= 0x3FF1;
-        if (exp < -0x40) {
-            exp = -0x40;
-        }
-        /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
-        return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
+
+        return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
+
+    if (0 == (sig & INT64_MIN)) {
+        if (0 == sig) {
+            return u_as_f_16(packToF16UI(sign, 0, 0));
+        }
+
+        exp += softfloat_normExtF80SigM(&sig);
+    }
+
+    uint16_t const sig16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(sig, 49));
+    exp -= 0x3FF1;
+
+    if (exp < -0x40) {
+        exp = -0x40;
+    }
+
+    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+    return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
 }

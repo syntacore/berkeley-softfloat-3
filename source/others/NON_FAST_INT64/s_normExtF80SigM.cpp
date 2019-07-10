@@ -40,7 +40,7 @@ namespace softfloat {
 namespace internals {
 
 int
-softfloat_normExtF80SigM(uint64_t* sigPtr)
+softfloat_normExtF80SigM(uint64_t* const sigPtr)
 {
     uint64_t const sig = *sigPtr;
     auto const shiftDist = count_leading_zeros(sig);

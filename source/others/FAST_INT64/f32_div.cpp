@@ -56,8 +56,8 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
 
     sigZ = sig64A / sigB;
 
-    if (!(sigZ & 0x3F)) {
-        sigZ |= (static_cast<uint64_t>(sigB) * sigZ != sig64A);
+    if (0 == (sigZ & 0x3F)) {
+        sigZ |= !!(static_cast<uint64_t>(sigB) * sigZ != sig64A);
     }
 
     return softfloat_roundPackToF32(signZ, expZ, sigZ);
@@ -71,6 +71,7 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
     using namespace softfloat::internals;
     uint32_t sigZ;
     uint64_t rem;
+
     if (sigA < sigB) {
         --expZ;
         sigA <<= 8;
@@ -89,10 +90,8 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
 
         if (rem & UINT64_C(0x8000000000000000)) {
             sigZ -= 4;
-        } else {
-            if (rem) {
-                sigZ |= 1;
-            }
+        } else if (rem) {
+            sigZ |= 1;
         }
     }
 
@@ -104,8 +103,8 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
 }  // namespace
 
 float32_t
-f32_div(float32_t a,
-        float32_t b)
+f32_div(float32_t const a,
+        float32_t const b)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
@@ -121,43 +120,49 @@ f32_div(float32_t a,
     if (0xFF == expA) {
         if (0 != sigA) {
             return u_as_f_32(propagate_NaN(uiA, uiB));
-        } else if (0xFF != expB) {
+        }
+
+        if (0xFF != expB) {
             return signed_inf_F32(signZ);
-        } else if (0 != sigB) {
+        }
+
+        if (0 != sigB) {
             return u_as_f_32(propagate_NaN(uiA, uiB));
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_32(defaultNaNF32UI);
-        }
-    } else if (0xFF == expB) {
-        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : signed_zero_F32(signZ);
-    } else {
-        if (0 == expB) {
-            if (0 == sigB) {
-                if (0 == (expA | sigA)) {
-                    softfloat_raiseFlags(softfloat_flag_invalid);
-                    return u_as_f_32(defaultNaNF32UI);
-                } else {
-                    softfloat_raiseFlags(softfloat_flag_infinite);
-                    return signed_inf_F32(signZ);
-                }
-            } else {
-                exp16_sig32 const normExpSig(sigB);
-                expB = normExpSig.exp;
-                sigB = normExpSig.sig;
-            }
         }
 
-        if (0 == expA) {
-            if (!sigA) {
-                return signed_zero_F32(signZ);
-            } else {
-                exp16_sig32 const normExpSig(sigA);
-                expA = normExpSig.exp;
-                sigA = normExpSig.sig;
-            }
-        }
-
-        return make_result(sigA | 0x00800000, sigB | 0x00800000, expA - expB + 0x7E, signZ);
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_32(defaultNaNF32UI);
     }
+
+    if (0xFF == expB) {
+        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : signed_zero_F32(signZ);
+    }
+
+    if (0 == expB) {
+        if (0 == sigB) {
+            if (0 == (expA | sigA)) {
+                softfloat_raiseFlags(softfloat_flag_invalid);
+                return u_as_f_32(defaultNaNF32UI);
+            }
+
+            softfloat_raiseFlags(softfloat_flag_infinite);
+            return signed_inf_F32(signZ);
+        }
+
+        exp16_sig32 const normExpSig(sigB);
+        expB = normExpSig.exp;
+        sigB = normExpSig.sig;
+    }
+
+    if (0 == expA) {
+        if (0 == sigA) {
+            return signed_zero_F32(signZ);
+        }
+
+        exp16_sig32 const normExpSig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
+    }
+
+    return make_result(sigA | 0x00800000, sigB | 0x00800000, expA - expB + 0x7E, signZ);
 }

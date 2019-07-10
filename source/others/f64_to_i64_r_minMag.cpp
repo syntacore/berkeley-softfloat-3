@@ -51,30 +51,32 @@ f64_to_i64_r_minMag(float64_t const a,
         if (shiftDist < -10) {
             if (uiA == packToF64UI(1, 0x43E, 0)) {
                 return INT64_MIN;
-            } else {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return
-                    exp == 0x7FF && sig ? i64_fromNaN :
-                    sign ? i64_fromNegOverflow : i64_fromPosOverflow;
             }
-        } else {
-            int64_t const absZ = static_cast<int64_t>((sig | UINT64_C(0x0010000000000000)) << -shiftDist);
-            return sign ? -absZ : absZ;
+
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return
+                exp == 0x7FF && sig ? i64_fromNaN :
+                sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
-    } else if (53 <= shiftDist) {
+
+        int64_t const absZ = static_cast<int64_t>((sig | UINT64_C(0x0010000000000000)) << -shiftDist);
+        return sign ? -absZ : absZ;
+    }
+
+    if (53 <= shiftDist) {
         if (exact && 0 != (exp | sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
         return 0;
-    } else {
-        uint64_t sig1 = sig | UINT64_C(0x0010000000000000);
-        uint64_t const absZ = sig1 >> shiftDist;
-
-        if (exact && (absZ << shiftDist) != sig1) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-
-        return sign ? -static_cast<int64_t>(absZ) : static_cast<int64_t>(absZ);
     }
+
+    uint64_t sig1 = sig | UINT64_C(0x0010000000000000);
+    uint64_t const absZ = sig1 >> shiftDist;
+
+    if (exact && (absZ << shiftDist) != sig1) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return sign ? -static_cast<int64_t>(absZ) : static_cast<int64_t>(absZ);
 }

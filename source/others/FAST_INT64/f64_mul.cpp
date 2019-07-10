@@ -55,60 +55,62 @@ f64_mul(float64_t a,
     if (0x7FF == expA) {
         if (sigA || (0x7FF == expB && 0 != sigB)) {
             return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-        } else {
-            uint64_t const magBits = expB | sigB;
-
-            if (0 == magBits) {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_64(defaultNaNF64UI);
-            } else {
-                return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
-            }
         }
-    } else if (0x7FF == expB) {
+
+        uint64_t const magBits = expB | sigB;
+
+        if (0 == magBits) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_64(defaultNaNF64UI);
+        }
+
+        return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
+    }
+
+    if (0x7FF == expB) {
         if (0 != sigB) {
             return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
-        } else {
-            uint64_t const magBits = expA | sigA;
-
-            if (0 == magBits) {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_64(defaultNaNF64UI);
-            } else {
-                return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
-            }
-        }
-    } else {
-        if (0 == expA) {
-            if (0 == sigA) {
-                return u_as_f_64(packToF64UI(signZ, 0, 0));
-            } else {
-                exp16_sig64 const normExpSig(sigA);
-                expA = normExpSig.exp;
-                sigA = normExpSig.sig;
-            }
         }
 
-        if (0 == expB) {
-            if (0 == sigB) {
-                return u_as_f_64(packToF64UI(signZ, 0, 0));
-            } else {
-                exp16_sig64 const normExpSig(sigB);
-                expB = normExpSig.exp;
-                sigB = normExpSig.sig;
-            }
+        uint64_t const magBits = expA | sigA;
+
+        if (0 == magBits) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_64(defaultNaNF64UI);
         }
 
-        int16_t const expZ = expA + expB - 0x3FF;
-        auto const sigA_1 = (sigA | UINT64_C(0x0010000000000000)) << 10;
-        auto const sigB_1 = (sigB | UINT64_C(0x0010000000000000)) << 11;
-        uint128 const sig128Z = softfloat_mul64To128(sigA_1, sigB_1);
-        uint64_t const sigZ = sig128Z.v64 | !!(0 != sig128Z.v0);
-
-        if (sigZ < UINT64_C(0x4000000000000000)) {
-            return softfloat_roundPackToF64(signZ, expZ - 1, sigZ << 1);
-        } else {
-            return softfloat_roundPackToF64(signZ, expZ, sigZ);
-        }
+        return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
     }
+
+    if (0 == expA) {
+        if (0 == sigA) {
+            return u_as_f_64(packToF64UI(signZ, 0, 0));
+        }
+
+        exp16_sig64 const normExpSig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
+    }
+
+    if (0 == expB) {
+        if (0 == sigB) {
+            return u_as_f_64(packToF64UI(signZ, 0, 0));
+        }
+
+        exp16_sig64 const normExpSig(sigB);
+        expB = normExpSig.exp;
+        sigB = normExpSig.sig;
+    }
+
+    int16_t const expZ = expA + expB - 0x3FF;
+    auto const sigA_1 = (sigA | UINT64_C(0x0010000000000000)) << 10;
+    auto const sigB_1 = (sigB | UINT64_C(0x0010000000000000)) << 11;
+    uint128 const sig128Z = softfloat_mul64To128(sigA_1, sigB_1);
+    uint64_t const sigZ = sig128Z.v64 | !!(0 != sig128Z.v0);
+
+    if (sigZ < UINT64_C(0x4000000000000000)) {
+        return softfloat_roundPackToF64(signZ, expZ - 1, sigZ << 1);
+    }
+
+    return softfloat_roundPackToF64(signZ, expZ, sigZ);
 }

@@ -53,9 +53,13 @@ extF80M_eq(extFloat80_t const* const aPtr,
         }
 
         return false;
-    } else if (uiA0 == uiB0) {
-        return uiA64 == uiB64 || !uiA0;
-    } else {
-        return 0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000)) && !softfloat_compareNonnormExtF80M(aPtr, bPtr);
     }
+
+    if (uiA0 == uiB0) {
+        return uiA64 == uiB64 || 0 == uiA0;
+    }
+
+    return
+        0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000)) &&
+        0 == softfloat_compareNonnormExtF80M(aPtr, bPtr);
 }

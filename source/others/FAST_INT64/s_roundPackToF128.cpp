@@ -50,8 +50,10 @@ softfloat_roundPackToF128(bool sign,
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
     bool doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 
-    if (!roundNearEven && (softfloat_roundingMode != softfloat_round_near_maxMag)) {
-        doIncrement = (softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)) && sigExtra;
+    if (!roundNearEven && softfloat_round_near_maxMag != softfloat_roundingMode) {
+        doIncrement =
+            (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode &&
+            0 != sigExtra;
     }
 
     if (0x7FFD <= static_cast<uint32_t>(exp)) {
@@ -60,49 +62,48 @@ softfloat_roundPackToF128(bool sign,
                 softfloat_tininess_beforeRounding == softfloat_detectTininess ||
                 exp < -1 ||
                 !doIncrement ||
-                softfloat_lt128(
-                    sig64,
-                    sig0,
-                    UINT64_C(0x0001FFFFFFFFFFFF),
-                    UINT64_MAX);
+                softfloat_lt128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_MAX);
+
             uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, static_cast<uint32_t>(-exp));
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
             exp = 0;
 
-            if (isTiny && sigExtra) {
+            if (isTiny && 0 != sigExtra) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
 
-            doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
+            doIncrement = UINT64_C(0x8000000000000000) <= sigExtra;
 
-            if (!roundNearEven && softfloat_roundingMode != softfloat_round_near_maxMag) {
+            if (!roundNearEven && softfloat_round_near_maxMag != softfloat_roundingMode) {
                 doIncrement =
-                    softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max) &&
+                    (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode &&
                     sigExtra;
             }
         } else if (
             0x7FFD < exp ||
-            (0x7FFD == exp &&
-            softfloat_eq128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF)) &&
-            doIncrement)
+            (
+                0x7FFD == exp &&
+                doIncrement &&
+                softfloat_eq128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF))
+            )
         ) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
 
-            if (roundNearEven ||
-                    softfloat_roundingMode == softfloat_round_near_maxMag ||
-                    softfloat_roundingMode == (sign ? softfloat_round_min : softfloat_round_max)
-               ) {
+            if (
+                roundNearEven ||
+                softfloat_round_near_maxMag == softfloat_roundingMode ||
+                (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode
+            ) {
                 return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
-            } else {
-                return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
             }
 
+            return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
         }
     }
 
-    if (sigExtra) {
+    if (0 != sigExtra) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
@@ -111,13 +112,13 @@ softfloat_roundPackToF128(bool sign,
         return u_as_f_128(uint128{
             packToF128UI64(sign, exp, sig128.v64),
             sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven)});
-    } else {
-        if (0 == (sig64 | sig0)) {
-            exp = 0;
-        }
-
-        return u_as_f_128(uint128{packToF128UI64(sign, exp, sig64), sig0});
     }
+
+    if (0 == (sig64 | sig0)) {
+        exp = 0;
+    }
+
+    return u_as_f_128(uint128{packToF128UI64(sign, exp, sig64), sig0});
 }
 
 }  // namespace internals

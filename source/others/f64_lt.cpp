@@ -47,12 +47,12 @@ f64_lt(float64_t const a,
     if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        bool const signA = is_sign(uiA);
-        bool const signB = is_sign(uiB);
-        return
-            signA != signB ?
-            signA && 0 != static_cast<uint64_t>((uiA | uiB) << 1) :
-            uiA != uiB && ((uiA < uiB) != signA);
     }
+
+    bool const signA = is_sign(uiA);
+    bool const signB = is_sign(uiB);
+    return
+        signA != signB ?
+        signA && 0 != static_cast<uint64_t>((uiA | uiB) << 1) :
+        uiA != uiB && ((uiA < uiB) != signA);
 }

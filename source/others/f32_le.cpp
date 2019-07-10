@@ -47,13 +47,12 @@ f32_le(float32_t a,
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        bool const signA = is_sign(uiA);
-        bool const signB = is_sign(uiB);
-        return
-            signA != signB ?
-                signA || 0 == static_cast<uint32_t>((uiA | uiB) << 1) :
-                uiA == uiB || ((uiA < uiB) != signA);
     }
-}
 
+    bool const signA = is_sign(uiA);
+    bool const signB = is_sign(uiB);
+    return
+        signA != signB ?
+        signA || 0 == static_cast<uint32_t>((uiA | uiB) << 1) :
+        uiA == uiB || (uiA < uiB) != signA;
+}

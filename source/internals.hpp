@@ -58,18 +58,17 @@ struct exp8_sig16
     exp8_sig16() = default;
 
     constexpr
-    exp8_sig16(int8_t a_exp,
-                uint16_t a_sig)
+        exp8_sig16(int8_t a_exp,
+                   uint16_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
     {}
 
     explicit
-    exp8_sig16(uint16_t const sig)
+        exp8_sig16(uint16_t const sig)
         : exp(static_cast<int8_t>(1 - (count_leading_zeros(sig) - 5)))
         , sig(static_cast<uint16_t>(sig << (count_leading_zeros(sig) - 5)))
-    {
-    }
+    {}
 
     int8_t exp;
     uint16_t sig;
@@ -87,7 +86,7 @@ struct exp16_sig32
     {}
 
     explicit
-    exp16_sig32(uint32_t const sig)
+        exp16_sig32(uint32_t const sig)
         : exp{static_cast<int16_t>(1 - (count_leading_zeros(sig) - 8))}
         , sig{sig << (count_leading_zeros(sig) - 8)}
     {}
@@ -100,7 +99,7 @@ struct exp16_sig64
 {
     exp16_sig64() = default;
     constexpr exp16_sig64(int16_t a_exp,
-                uint64_t a_sig)
+                          uint64_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
     {}
@@ -108,8 +107,7 @@ struct exp16_sig64
     explicit exp16_sig64(uint64_t const sig)
         : exp{static_cast<int16_t>(1 - (count_leading_zeros(sig) - 11))}
         , sig{sig << (count_leading_zeros(sig) - 11)}
-    {
-    }
+    {}
 
     int16_t exp;
     uint64_t sig;
@@ -124,7 +122,7 @@ extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
 
 template<typename Ty>
 inline constexpr
-typename std::enable_if<std::is_integral<Ty>::value,bool>::type
+typename std::enable_if<std::is_integral<Ty>::value, bool>::type
 is_sign(Ty const& v)
 {
     return static_cast<typename std::make_signed<Ty>::type>(v) < 0;
@@ -176,8 +174,8 @@ struct exp32_sig64
     exp32_sig64() = default;
 
     constexpr
-    exp32_sig64(int32_t a_exp,
-                uint64_t a_sig)
+        exp32_sig64(int32_t a_exp,
+                    uint64_t a_sig)
         : exp(a_exp)
         , sig(a_sig)
     {}
@@ -191,8 +189,8 @@ struct exp32_sig128
     exp32_sig128() = default;
 
     constexpr
-    exp32_sig128(int32_t a_exp,
-                 uint128 const& a_sig)
+        exp32_sig128(int32_t a_exp,
+                     uint128 const& a_sig)
         : exp(a_exp)
         , sig(a_sig)
     {}
@@ -668,9 +666,9 @@ softfloat_normRoundPackToF64(bool const sign,
 
     if (10 <= shiftDist && static_cast<uint16_t>(exp_1) < 0x7FD) {
         return u_as_f_64(packToF64UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 10)));
-    } else {
-        return softfloat_roundPackToF64(sign, exp_1, sig << shiftDist);
     }
+
+    return softfloat_roundPackToF64(sign, exp_1, sig << shiftDist);
 }
 
 inline float32_t
@@ -683,9 +681,9 @@ softfloat_normRoundPackToF32(bool const sign,
 
     if (7 <= shiftDist && static_cast<uint16_t>(exp_1) < 0xFD) {
         return u_as_f_32(packToF32UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 7)));
-    } else {
-        return softfloat_roundPackToF32(sign, exp_1, sig << shiftDist);
     }
+
+    return softfloat_roundPackToF32(sign, exp_1, sig << shiftDist);
 }
 
 }  // namespace internals

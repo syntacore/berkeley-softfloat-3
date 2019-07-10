@@ -38,35 +38,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float64_t
-extF80M_to_f64(extFloat80_t const *aPtr)
+extF80M_to_f64(extFloat80_t const* const aPtr)
 {
     using namespace softfloat::internals;
-    extFloat80M const *aSPtr = aPtr;
+    extFloat80M const* aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 
-    if (exp == 0x7FFF) {
-        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+    if (0x7FFF == exp) {
+        if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_extF80MToCommonNaN(*aSPtr)));
-        } else {
-            return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
         }
-    } else {
-        if (!(sig & UINT64_C(0x8000000000000000))) {
-            if (!sig) {
-                return u_as_f_64(packToF64UI(sign, 0, 0));
-            } else {
-                exp += softfloat_normExtF80SigM(&sig);
-            }
-        }
-        sig = softfloat_shortShiftRightJam64(sig, 1);
-        exp -= 0x3C01;
-        if (exp < -0x1000) {
-            exp = -0x1000;
-        }
-        /** @todo Warning	C4242	'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
-        return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
+
+        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
     }
+
+    if (0 == (sig & UINT64_C(0x8000000000000000))) {
+        if (0 == sig) {
+            return u_as_f_64(packToF64UI(sign, 0, 0));
+        }
+
+        exp += softfloat_normExtF80SigM(&sig);
+    }
+
+    sig = softfloat_shortShiftRightJam64(sig, 1);
+    exp -= 0x3C01;
+
+    if (exp < -0x1000) {
+        exp = -0x1000;
+    }
+
+    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+    return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
 }

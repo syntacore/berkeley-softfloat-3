@@ -54,17 +54,17 @@ f32_to_i64(float32_t const a,
         return
             0xFF == exp && 0 != sig ? i64_fromNaN :
             sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-    } else {
-        uint32_t extSig[3];
-        extSig[indexWord(3, 2)] = (sig | (0 != exp ? 0x00800000 : 0)) << 8;
-        extSig[indexWord(3, 1)] = 0;
-        extSig[indexWord(3, 0)] = 0;
-
-        if (shiftDist) {
-            softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
-        }
-
-        return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
     }
+
+    uint32_t extSig[3];
+    extSig[indexWord(3, 2)] = (sig | (0 != exp ? 0x00800000 : 0)) << 8;
+    extSig[indexWord(3, 1)] = 0;
+    extSig[indexWord(3, 0)] = 0;
+
+    if (shiftDist) {
+        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+    }
+
+    return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
 }
 

@@ -58,11 +58,11 @@ extF80_roundToInt(extFloat80_t const a,
             uZ.signExp = signUI64;
             uZ.signif = 0;
             return uZ;
-        } else {
-            exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
-            exp += normExpSig.exp;
-            sigA = normExpSig.sig;
         }
+
+        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+        exp += normExpSig.exp;
+        sigA = normExpSig.sig;
     }
 
     if (0x403E <= exp) {
@@ -98,6 +98,7 @@ extF80_roundToInt(extFloat80_t const a,
             if (0 == (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
                 break;
             }
+
             [[fallthrough]];
 
         case softfloat_round_near_maxMag:

@@ -51,31 +51,33 @@ f64_to_ui64_r_minMag(float64_t a, bool exact)
         }
 
         return 0;
-    } else {
-        bool const sign = is_sign(uiA);
+    }
 
-        if (sign) {
+    bool const sign = is_sign(uiA);
+
+    if (sign) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return
+            exp == 0x7FF && 0 != sig ? ui64_fromNaN :
+            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+    }
+
+    if (shiftDist <= 0) {
+        if (shiftDist < -11) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
                 exp == 0x7FF && 0 != sig ? ui64_fromNaN :
                 sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-        } else if (shiftDist <= 0) {
-            if (shiftDist < -11) {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return
-                    exp == 0x7FF && 0 != sig ? ui64_fromNaN :
-                    sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-            } else {
-                return (sig | UINT64_C(0x0010000000000000)) << -shiftDist;
-            }
-        } else {
-            auto const sig_1 = sig | UINT64_C(0x0010000000000000);
-
-            if (exact && static_cast<uint64_t>(sig_1 << (-shiftDist & 63))) {
-                softfloat_raiseFlags(softfloat_flag_inexact);
-            }
-
-            return sig_1 >> shiftDist;
         }
+
+        return (sig | UINT64_C(0x0010000000000000)) << -shiftDist;
     }
+
+    auto const sig_1 = sig | UINT64_C(0x0010000000000000);
+
+    if (exact && static_cast<uint64_t>(sig_1 << (-shiftDist & 63))) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return sig_1 >> shiftDist;
 }

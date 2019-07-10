@@ -58,23 +58,23 @@ f64_to_extF80(float64_t const a)
         }
 
         return uZ;
-    } else {
-        if (0 == exp) {
-            if (0 == frac) {
-                extFloat80_t uZ;
-                uZ.signExp = packToExtF80UI64(sign, 0);
-                uZ.signif = 0;
-                return uZ;
-            } else {
-                exp16_sig64 const normExpSig(frac);
-                exp = normExpSig.exp;
-                frac = normExpSig.sig;
-            }
+    }
+
+    if (0 == exp) {
+        if (0 == frac) {
+            extFloat80_t uZ;
+            uZ.signExp = packToExtF80UI64(sign, 0);
+            uZ.signif = 0;
+            return uZ;
         }
 
-        extFloat80_t uZ;
-        uZ.signExp = packToExtF80UI64(sign, exp + 0x3C00u);
-        uZ.signif = (frac | UINT64_C(0x0010000000000000)) << 11;
-        return uZ;
+        exp16_sig64 const normExpSig(frac);
+        exp = normExpSig.exp;
+        frac = normExpSig.sig;
     }
+
+    extFloat80_t uZ;
+    uZ.signExp = packToExtF80UI64(sign, exp + 0x3C00u);
+    uZ.signif = (frac | UINT64_C(0x0010000000000000)) << 11;
+    return uZ;
 }

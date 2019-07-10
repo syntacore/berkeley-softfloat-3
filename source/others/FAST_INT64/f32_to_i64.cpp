@@ -52,18 +52,20 @@ f32_to_i64(float32_t const a,
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0xFF && sig ? i64_fromNaN :
-            sign ? i64_fromNegOverflow : i64_fromPosOverflow;
-    } else {
-        uint64_t sig64 = static_cast<uint64_t>(sig | (0 != exp? 0x00800000:0)) << 40;
-
-        if (shiftDist) {
-            uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0u, static_cast<uint32_t>(shiftDist));
-            return roundPackTo<int64_t>(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
-        } else {
-            return roundPackTo<int64_t>(sign, sig64, 0, roundingMode, exact);
-        }
-
+            exp == 0xFF && sig ?
+            i64_fromNaN :
+            sign ?
+            i64_fromNegOverflow :
+            i64_fromPosOverflow;
     }
+
+    uint64_t const sig64 = static_cast<uint64_t>(sig | (0 != exp ? 0x00800000 : 0)) << 40;
+
+    if (0 != shiftDist) {
+        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0u, static_cast<uint32_t>(shiftDist));
+        return roundPackTo<int64_t>(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
+    }
+
+    return roundPackTo<int64_t>(sign, sig64, 0, roundingMode, exact);
 }
 

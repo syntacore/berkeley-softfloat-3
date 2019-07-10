@@ -46,7 +46,7 @@ f32_eq_signaling(float32_t a, float32_t b)
     if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
-    } else {
-        return uiA == uiB || 0 == static_cast<uint32_t>((uiA | uiB) << 1);
     }
+
+    return uiA == uiB || 0 == static_cast<uint32_t>((uiA | uiB) << 1);
 }

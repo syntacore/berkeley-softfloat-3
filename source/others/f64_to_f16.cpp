@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 float16_t
-f64_to_f16(float64_t a)
+f64_to_f16(float64_t const a)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
@@ -48,14 +48,16 @@ f64_to_f16(float64_t a)
     if (exp == 0x7FF) {
         if (frac) {
             return u_as_f_16(softfloat_commonNaNToF16UI(softfloat_f64UIToCommonNaN(uiA)));
-        } else {
-            return u_as_f_16(packToF16UI(sign, 0x1F, 0));
         }
+
+        return u_as_f_16(packToF16UI(sign, 0x1F, 0));
     }
 
     uint16_t const frac16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(frac, 38));
+
     if (0 == (exp | frac16)) {
         return u_as_f_16(packToF16UI(sign, 0, 0));
     }
+
     return softfloat_roundPackToF16(sign, exp - 0x3F1, frac16 | 0x4000u);
 }

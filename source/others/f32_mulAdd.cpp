@@ -76,7 +76,9 @@ mulAdd(Mul_add_operations const op,
             if (expC != max_exp) {
                 /* summand c is finite, return product as result */
                 return uiZ;
-            } else if (signProd == signC) {
+            }
+
+            if (signProd == signC) {
                 /* summands are same sign inf */
                 return uiZ;
             }

@@ -47,8 +47,11 @@ invalid(bool const sign,
     using namespace softfloat::internals;
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
-        exp == 0x7FFF && (sig96 || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) ? i64_fromNaN :
-        sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        exp == 0x7FFF && (0 != sig96 || 0 != (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) ?
+        i64_fromNaN :
+        sign ?
+        i64_fromNegOverflow :
+        i64_fromPosOverflow;
 }
 
 }  // namespace

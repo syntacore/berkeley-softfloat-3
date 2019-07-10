@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @todo refactoring */
 int64_t
-f128_to_i64(float128_t a,
+f128_to_i64(float128_t const a,
             softfloat_round_mode const roundingMode,
-            bool exact)
+            bool const exact)
 {
     using namespace softfloat::internals;
 
@@ -68,14 +68,15 @@ f128_to_i64(float128_t a,
             uint128 const sig128 = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(-shiftDist));
             return roundPackTo<int64_t>(sign, sig128.v64, sig128.v0, roundingMode, exact);
         }
-        return roundPackTo<int64_t>(sign, sig64, sig0, roundingMode, exact);
-    } else {
-        if (exp) {
-            sig64 |= UINT64_C(0x0001000000000000);
-        }
 
-        uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
-        return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
+        return roundPackTo<int64_t>(sign, sig64, sig0, roundingMode, exact);
     }
+
+    if (exp) {
+        sig64 |= UINT64_C(0x0001000000000000);
+    }
+
+    uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
+    return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 }
 

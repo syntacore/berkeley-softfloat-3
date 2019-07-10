@@ -71,9 +71,9 @@ addMags(uint32_t const uiA,
         /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
         if (0 == (sigZ & 1) && expA < 0xFE) {
             return u_as_f_32(packToF32UI(signA, expA, sigZ >> 1));
-        } else {
-            return softfloat_roundPackToF32(signA, expA, sigZ << 6);
         }
+
+        return softfloat_roundPackToF32(signA, expA, sigZ << 6);
     }
 
     /* fractional bits before shift are [22..0] and after shift are [28..6] */
@@ -108,9 +108,9 @@ addMags(uint32_t const uiA,
     /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
     if (sigZ < 2 * hidden_bit_scaled) {
         return softfloat_roundPackToF32(is_sign(uiA), expZ - 1, sigZ << 1);
-    } else {
-        return softfloat_roundPackToF32(is_sign(uiA), expZ, sigZ);
     }
+
+    return softfloat_roundPackToF32(is_sign(uiA), expZ, sigZ);
 }
 
 static float32_t

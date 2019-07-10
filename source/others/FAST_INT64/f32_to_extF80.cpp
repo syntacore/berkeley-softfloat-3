@@ -46,35 +46,38 @@ f32_to_extF80(float32_t const a)
     int16_t exp = expF32UI(uiA);
     uint32_t frac = fracF32UI(uiA);
 
-    if (exp == 0xFF) {
-        extFloat80_t uZ;
-
+    if (0xFF == exp) {
         if (frac) {
             uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(uiA));
+            extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
+            return uZ;
         } else {
+            extFloat80_t uZ;
             uZ.signExp = packToExtF80UI64(sign, 0x7FFF);
             uZ.signif = UINT64_C(0x8000000000000000);
+            return uZ;
         }
+    }
 
-        return uZ;
-    } else if (0 == exp) {
+    if (0 == exp) {
         if (0 == frac) {
             extFloat80_t uZ;
             uZ.signExp = packToExtF80UI64(sign, 0);
             uZ.signif = 0;
             return uZ;
-        } else {
-            exp16_sig32 const normExpSig(frac);
-            exp = normExpSig.exp;
-            frac = normExpSig.sig;
         }
+
+        exp16_sig32 const normExpSig(frac);
+        exp = normExpSig.exp;
+        frac = normExpSig.sig;
     }
 
-    extFloat80_t uZ;
-    uZ.signExp = packToExtF80UI64(sign, exp + 0x3F80u);
-    uZ.signif = static_cast<uint64_t>(frac | 0x00800000) << 40;
-    return uZ;
+    {
+        extFloat80_t uZ;
+        uZ.signExp = packToExtF80UI64(sign, exp + 0x3F80u);
+        uZ.signif = static_cast<uint64_t>(frac | 0x00800000) << 40;
+        return uZ;
+    }
 }
-

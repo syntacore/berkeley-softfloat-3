@@ -49,27 +49,33 @@ f32_sqrt(float32_t a)
     if (0xFF == expA) {
         if (0 != sigA) {
             return u_as_f_32(propagate_NaN(uiA, UINT32_C(0)));
-        } else if (!signA) {
-            return a;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_32(defaultNaNF32UI);
         }
-    } else if (signA) {
+
+        if (!signA) {
+            return a;
+        }
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_32(defaultNaNF32UI);
+    }
+
+    if (signA) {
         if (0 == (expA | sigA)) {
             return a;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_32(defaultNaNF32UI);
         }
-    } else if (0 == expA) {
+
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_32(defaultNaNF32UI);
+    }
+
+    if (0 == expA) {
         if (0 == sigA) {
             return a;
-        } else {
-            exp16_sig32 const normExpSig(sigA);
-            expA = normExpSig.exp;
-            sigA = normExpSig.sig;
         }
+
+        exp16_sig32 const normExpSig(sigA);
+        expA = normExpSig.exp;
+        sigA = normExpSig.sig;
     }
 
     int16_t const expZ = ((expA - 0x7F) >> 1) + 0x7E;

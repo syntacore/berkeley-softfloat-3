@@ -45,12 +45,12 @@ f32_to_f128(float32_t a)
     int16_t exp = expF32UI(uiA);
     uint32_t frac = fracF32UI(uiA);
 
-    if (exp == 0xFF) {
-        if (frac) {
+    if (0xFF == exp) {
+        if (0 != frac) {
             return u_as_f_128(softfloat_commonNaNToF128UI(softfloat_f32UIToCommonNaN(uiA)));
-        } else {
-            return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0),0});
         }
+
+        return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
     }
 
     if (0 == exp) {

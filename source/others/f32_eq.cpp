@@ -48,9 +48,9 @@ f32_eq(float32_t a,
         if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
-        return false;
-    } else {
-        return uiA == uiB || 0 == static_cast<uint32_t>((uiA | uiB) << 1);
-    }
-}
 
+        return false;
+    }
+
+    return uiA == uiB || 0 == static_cast<uint32_t>((uiA | uiB) << 1);
+}

@@ -49,20 +49,24 @@ f32_to_ui32(float32_t const a,
     if (isNaNF32UI(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return ui32_fromNaN;
-    } else if (isZero32UI(uiA)) {
+    }
+
+    if (isZero32UI(uiA)) {
         return 0u;
-    } else if (isInf32UI(uiA)) {
+    }
+
+    if (isInf32UI(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
-    } else {
-        uint64_t const sig64 = static_cast<uint64_t>(fracF32UI(uiA) | (0 != exp? 0x00800000: 0) ) << 32;
-        int16_t const shiftDist = 0xAA - exp;
-        return
-            roundPackTo<uint32_t>(sign,
-                                  0 < shiftDist ?
-                                  softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) :
-                                  sig64,
-                                  roundingMode,
-                                  exact);
     }
+
+    uint64_t const sig64 = static_cast<uint64_t>(fracF32UI(uiA) | (0 != exp ? 0x00800000 : 0)) << 32;
+    int16_t const shiftDist = 0xAA - exp;
+    return
+        roundPackTo<uint32_t>(sign,
+                              0 < shiftDist ?
+                              softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) :
+                              sig64,
+                              roundingMode,
+                              exact);
 }
