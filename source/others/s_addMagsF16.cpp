@@ -55,7 +55,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
         } else if (0x1F == expA) {
             return u_as_f_16(0 != (sigA | sigB) ? softfloat_propagateNaNF16UI(uiA, uiB) : uiA);
         } else {
-            bool const signZ = signF16UI(uiA);
+            bool const signZ = is_sign(uiA);
             int8_t const expZ = expA;
             uint16_t const sigZ = 0x0800u + sigA + sigB;
 
@@ -66,7 +66,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
             }
         }
     } else {
-        bool const signZ = signF16UI(uiA);
+        bool const signZ = is_sign(uiA);
         int8_t shiftDist;
         uint16_t sigY;
         uint16_t sigX;
@@ -82,7 +82,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
                 if (0 != (expA | sigA)) {
                     softfloat_raiseFlags(softfloat_flag_inexact);
 
-                    if (softfloat_round_near_even != softfloat_roundingMode && (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
+                    if (softfloat_round_near_even != softfloat_roundingMode && (is_sign(uiZ) ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
                         ++uiZ;
 
                         if (static_cast<uint16_t>(uiZ << 1) == UINT16_C(0xF800)) {
@@ -107,7 +107,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
                 if (0 != (expB | sigB)) {
                     softfloat_raiseFlags(softfloat_flag_inexact);
 
-                    if (softfloat_round_near_even != softfloat_roundingMode && (signF16UI(uiZ) ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
+                    if (softfloat_round_near_even != softfloat_roundingMode && (is_sign(uiZ) ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
                         ++uiZ;
 
                         if (UINT16_C(0xF800) == static_cast<uint16_t>(uiZ << 1)) {

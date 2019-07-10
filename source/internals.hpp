@@ -426,12 +426,6 @@ packToF128UI96(bool sign,
 #endif
 
 
-inline constexpr bool
-signF16UI(uint16_t const& a)
-{
-    return static_cast<int16_t>(a) < 0;
-}
-
 inline constexpr int8_t
 expF16UI(uint16_t const& a)
 {

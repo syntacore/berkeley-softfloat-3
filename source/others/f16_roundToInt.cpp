@@ -111,7 +111,7 @@ f16_roundToInt(float16_t a,
         if (!(uiZ & roundBitsMask)) {
             uiZ &= ~lastBitMask;
         }
-    } else if (softfloat_round_minMag != roundingMode && signF16UI(uiZ) != (softfloat_round_max == roundingMode)) {
+    } else if (softfloat_round_minMag != roundingMode && is_sign(uiZ) != (softfloat_round_max == roundingMode)) {
         uiZ += roundBitsMask;
     }
 

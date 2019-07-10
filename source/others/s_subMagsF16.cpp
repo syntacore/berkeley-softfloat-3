@@ -68,7 +68,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
                     --expA;
                 }
 
-                bool signZ = signF16UI(uiA);
+                bool signZ = is_sign(uiA);
 
                 if (sigDiff < 0) {
                     signZ = !signZ;
@@ -86,7 +86,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
             }
         }
     } else {
-        bool signZ = signF16UI(uiA);
+        bool signZ = is_sign(uiA);
         uint16_t sigY;
         uint16_t sigX;
         int8_t expZ;
@@ -104,7 +104,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
 
                     if (
                         softfloat_round_near_even != softfloat_roundingMode &&
-                        (softfloat_round_minMag == softfloat_roundingMode || (signF16UI(uiZ_1) ? softfloat_round_max : softfloat_round_min) == softfloat_roundingMode)
+                        (softfloat_round_minMag == softfloat_roundingMode || (is_sign(uiZ_1) ? softfloat_round_max : softfloat_round_min) == softfloat_roundingMode)
                     ) {
                         return u_as_f_16(uiZ_1 - 1u);
                     }
@@ -126,7 +126,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
 
                     if (
                         softfloat_round_near_even != softfloat_roundingMode &&
-                        (softfloat_round_minMag == softfloat_roundingMode || (signF16UI(uiA) ? softfloat_round_max : softfloat_round_min) == softfloat_roundingMode)
+                        (softfloat_round_minMag == softfloat_roundingMode || (is_sign(uiA) ? softfloat_round_max : softfloat_round_min) == softfloat_roundingMode)
                     ) {
                         return u_as_f_16(uiA - 1u);
                     }

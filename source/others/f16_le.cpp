@@ -49,8 +49,8 @@ f16_le(float16_t const a,
         return false;
     }
 
-    bool const signA = signF16UI(uiA);
-    bool const signB = signF16UI(uiB);
+    bool const signA = is_sign(uiA);
+    bool const signB = is_sign(uiB);
     return
         signA != signB ?
         signA || 0 == static_cast<uint16_t>((uiA | uiB) << 1) :

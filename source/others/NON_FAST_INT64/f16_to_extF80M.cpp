@@ -46,7 +46,7 @@ f16_to_extF80M(float16_t a,
 
     extFloat80M* const zSPtr = zPtr;
     uint16_t const uiA = f_as_u_16(a);
-    bool const sign = signF16UI(uiA);
+    bool const sign = is_sign(uiA);
     int8_t exp = expF16UI(uiA);
     uint16_t frac = fracF16UI(uiA);
 

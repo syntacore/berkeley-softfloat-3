@@ -42,7 +42,7 @@ f16_rem(float16_t const a,
 {
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
-    bool const signA = signF16UI(uiA);
+    bool const signA = is_sign(uiA);
     int8_t expA = expF16UI(uiA);
     uint16_t sigA = fracF16UI(uiA);
     uint16_t const uiB = f_as_u_16(b);

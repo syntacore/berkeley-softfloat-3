@@ -53,7 +53,7 @@ f16_to_ui64_r_minMag(float16_t a, bool exact)
         return 0;
     }
 
-    bool const sign = signF16UI(uiA);
+    bool const sign = is_sign(uiA);
 
     if (sign || (exp == 0x1F)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
