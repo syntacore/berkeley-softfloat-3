@@ -40,10 +40,11 @@ namespace softfloat {
 namespace internals {
 
 namespace {
+
 static float64_t
-softfloat_addMagsF64(uint64_t const uiA,
-                     uint64_t const uiB,
-                     bool const signZ)
+addMags(uint64_t const uiA,
+        uint64_t const uiB,
+        bool const signZ)
 {
     using namespace softfloat::internals;
     int16_t const expA = expF64UI(uiA);
@@ -108,9 +109,9 @@ softfloat_addMagsF64(uint64_t const uiA,
 }
 
 static float64_t
-softfloat_subMagsF64(uint64_t const uiA,
-                     uint64_t const uiB,
-                     bool signZ)
+subMags(uint64_t const uiA,
+        uint64_t const uiB,
+        bool signZ)
 {
     int16_t expA = expF64UI(uiA);
     uint64_t const sigA = fracF64UI(uiA);
@@ -128,12 +129,10 @@ softfloat_subMagsF64(uint64_t const uiA,
                 return u_as_f_64(defaultNaNF64UI);
             }
         } else {
-
             int64_t sigDiff = static_cast<int64_t>(sigA - sigB);
 
             if (0 == sigDiff) {
-                softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-                return u_as_f_64(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
+                return u_as_f_64(packToF64UI(softfloat_round_min == softfloat_get_roundingMode(), 0, 0));
             } else {
                 if (0 != expA) {
                     --expA;
@@ -199,7 +198,7 @@ f64_add(float64_t a,
     uint64_t const uiB = f_as_u_64(b);
     bool signB = signF64UI(uiB);
     return
-        signA == signB ? softfloat_addMagsF64(uiA, uiB, signA) : softfloat_subMagsF64(uiA, uiB, signA);
+        (signA == signB ? addMags : subMags)(uiA, uiB, signA);
 }
 
 float64_t
@@ -211,5 +210,5 @@ f64_sub(float64_t a, float64_t b)
     uint64_t const uiB = f_as_u_64(b);
     bool const signB = signF64UI(uiB);
     return
-        signA == signB ? softfloat_subMagsF64(uiA, uiB, signA) : softfloat_addMagsF64(uiA, uiB, signA);
+        (signA == signB ? subMags : addMags)(uiA, uiB, signA);
 }
