@@ -51,36 +51,38 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
     int32_t expDiff = expA - expB;
 
     if (0 < expDiff) {
-        if (expA == 0x7FFF) {
+        if (0x7FFF == expA) {
             if (0 != (uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
                 uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
                 extFloat80_t uZ;
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
                 return uZ;
-            } else {
-                extFloat80_t uZ;
-                uZ.signExp = uiA64;
-                uZ.signif = uiA0;
-                return uZ;
-            }
-        } else {
-            if (0 == expB) {
-                --expDiff;
-
-                if (0 == expDiff) {
-                    uint128 const sig128_6 = softfloat_sub128(uiA0, 0, uiB0, 0);
-                    return
-                        softfloat_normRoundPackToExtF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_roundingPrecision);
-                }
             }
 
-            uint128 const sig128_2 = softfloat_shiftRightJam128(uiB0, 0, static_cast<uint32_t>(expDiff));
-            uint128 const sig128_1 = softfloat_sub128(uiA0, 0, sig128_2.v64, sig128_2.v0);
-            return
-                softfloat_normRoundPackToExtF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_roundingPrecision);
+            extFloat80_t uZ;
+            uZ.signExp = uiA64;
+            uZ.signif = uiA0;
+            return uZ;
         }
-    } else if (expDiff < 0) {
+
+        if (0 == expB) {
+            --expDiff;
+
+            if (0 == expDiff) {
+                uint128 const sig128_6 = softfloat_sub128(uiA0, 0, uiB0, 0);
+                return
+                    softfloat_normRoundPackToExtF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_roundingPrecision);
+            }
+        }
+
+        uint128 const sig128_2 = softfloat_shiftRightJam128(uiB0, 0, static_cast<uint32_t>(expDiff));
+        uint128 const sig128_1 = softfloat_sub128(uiA0, 0, sig128_2.v64, sig128_2.v0);
+        return
+            softfloat_normRoundPackToExtF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_roundingPrecision);
+    }
+
+    if (expDiff < 0) {
         if (expB == 0x7FFF) {
             if (0 != (uiB0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
                 uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
@@ -88,60 +90,63 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
                 return uZ;
-            } else {
-                extFloat80_t uZ;
-                uZ.signExp = packToExtF80UI64(signZ ^ 1, 0x7FFF);
-                uZ.signif = UINT64_C(0x8000000000000000);
-                return uZ;
-            }
-        } else {
-            if (0 == expA) {
-                ++expDiff;
-
-                if (0 == expDiff) {
-                    uint128 const sig128_7 = softfloat_sub128(uiB0, 0, uiA0, 0);
-                    return
-                        softfloat_normRoundPackToExtF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_roundingPrecision);
-                }
             }
 
-            uint128 const sig128_4 = softfloat_shiftRightJam128(uiA0, 0, static_cast<uint32_t>(-expDiff));
-            uint128 const sig128_3 = softfloat_sub128(uiB0, 0, sig128_4.v64, sig128_4.v0);
-            return
-                softfloat_normRoundPackToExtF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_roundingPrecision);
+            extFloat80_t uZ;
+            uZ.signExp = packToExtF80UI64(!signZ, 0x7FFF);
+            uZ.signif = UINT64_C(0x8000000000000000);
+            return uZ;
         }
-    } else if (0x7FFF == expA) {
+
+        if (0 == expA) {
+            ++expDiff;
+
+            if (0 == expDiff) {
+                uint128 const sig128_7 = softfloat_sub128(uiB0, 0, uiA0, 0);
+                return
+                    softfloat_normRoundPackToExtF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_roundingPrecision);
+            }
+        }
+
+        uint128 const sig128_4 = softfloat_shiftRightJam128(uiA0, 0, static_cast<uint32_t>(-expDiff));
+        uint128 const sig128_3 = softfloat_sub128(uiB0, 0, sig128_4.v64, sig128_4.v0);
+        return
+            softfloat_normRoundPackToExtF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_roundingPrecision);
+    }
+
+    if (0x7FFF == expA) {
         if (0 != ((uiA0 | uiB0) & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
             return uZ;
-        } else {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            extFloat80_t uZ;
-            uZ.signExp = defaultNaNExtF80UI64;
-            uZ.signif = defaultNaNExtF80UI0;
-            return uZ;
         }
-    } else {
-        int32_t const expZ = 0 == expA ? 1 : expA;
 
-        if (uiA0 > uiB0) {
-            uint128 const sig128 = softfloat_sub128(uiA0, 0, uiB0, 0);
-            return softfloat_normRoundPackToExtF80(signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
-        } else if (uiA0 < uiB0) {
-            uint128 const sig128 = softfloat_sub128(uiB0, 0, uiA0, 0);
-            return softfloat_normRoundPackToExtF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
-        } else {
-            /* uiA0 == uiB0 */
-            extFloat80_t uZ;
-            softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-            uZ.signExp = packToExtF80UI64(softfloat_round_min == softfloat_roundingMode, 0);
-            uZ.signif = 0;
-            return uZ;
-        }
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        extFloat80_t uZ;
+        uZ.signExp = defaultNaNExtF80UI64;
+        uZ.signif = defaultNaNExtF80UI0;
+        return uZ;
     }
+
+    int32_t const expZ = 0 == expA ? 1 : expA;
+
+    if (uiA0 > uiB0) {
+        uint128 const sig128 = softfloat_sub128(uiA0, 0, uiB0, 0);
+        return softfloat_normRoundPackToExtF80(signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
+    }
+
+    if (uiA0 < uiB0) {
+        uint128 const sig128 = softfloat_sub128(uiB0, 0, uiA0, 0);
+        return softfloat_normRoundPackToExtF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
+    }
+
+    /* uiA0 == uiB0 */
+    extFloat80_t uZ;
+    uZ.signExp = packToExtF80UI64(softfloat_round_min == softfloat_get_roundingMode(), 0);
+    uZ.signif = 0;
+    return uZ;
 }
 
 }  // namespace internals
