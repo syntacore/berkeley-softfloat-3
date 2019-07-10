@@ -45,7 +45,7 @@ ui64_to_extF80M(uint64_t a,
     uint64_t sigZ = 0;
 
     if (0 != a) {
-        auto const shiftDist = softfloat_countLeadingZeros64(a);
+        auto const shiftDist = count_leading_zeros(a);
         uiZ64 = packToExtF80UI64(false, static_cast<uint16_t>(UINT16_C(0x403E) - shiftDist));
         sigZ = a << shiftDist;
     }

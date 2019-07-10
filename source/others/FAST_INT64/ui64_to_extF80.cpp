@@ -44,7 +44,7 @@ ui64_to_extF80(uint64_t a)
     uint16_t uiZ64 = 0;
 
     if (a) {
-        auto const shiftDist = softfloat_countLeadingZeros64(a);
+        auto const shiftDist = count_leading_zeros(a);
         uiZ64 = 0x403Eu - shiftDist;
         a <<= shiftDist;
     }

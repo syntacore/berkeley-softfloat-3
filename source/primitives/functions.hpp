@@ -115,10 +115,15 @@ integer.  For integer zero (index 0), the corresponding table element is 8.
 extern const uint_least8_t softfloat_countLeadingZeros8[256];
 
 /**
-@returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, 16 is returned.
+@returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, sizeof(Ty) * CHAR_BIT is returned.
 */
+template<typename Ty>
+uint8_t
+count_leading_zeros(Ty);
+
+template<>
 inline uint8_t
-softfloat_countLeadingZeros16(uint16_t a)
+count_leading_zeros<uint16_t>(uint16_t a)
 {
     uint8_t count = 8;
 
@@ -130,11 +135,9 @@ softfloat_countLeadingZeros16(uint16_t a)
     return static_cast<uint8_t>(count + softfloat_countLeadingZeros8[a]);
 }
 
-/**
-@returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, 32 is returned.
-*/
+template<>
 inline uint8_t
-softfloat_countLeadingZeros32(uint32_t a)
+count_leading_zeros<uint32_t>(uint32_t a)
 {
     uint8_t count = 0;
 
@@ -151,12 +154,9 @@ softfloat_countLeadingZeros32(uint32_t a)
     return static_cast<uint8_t>(count + softfloat_countLeadingZeros8[a >> 24]);
 }
 
-/**
-Returns the number of leading 0 bits before the most-significant 1 bit of
-`a'.  If `a' is zero, 64 is returned.
-*/
+template<>
 inline uint8_t
-softfloat_countLeadingZeros64(uint64_t a)
+count_leading_zeros<uint64_t>(uint64_t a)
 {
     uint8_t count = 0;
     uint32_t a32 = a >> 32;

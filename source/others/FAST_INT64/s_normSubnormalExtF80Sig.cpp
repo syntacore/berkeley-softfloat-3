@@ -42,7 +42,7 @@ namespace internals {
 exp32_sig64
 softfloat_normSubnormalExtF80Sig(uint64_t sig)
 {
-    auto const shiftDist = softfloat_countLeadingZeros64(sig);
+    auto const shiftDist = count_leading_zeros(sig);
     exp32_sig64 z;
     z.exp = -shiftDist;
     z.sig = sig << shiftDist;

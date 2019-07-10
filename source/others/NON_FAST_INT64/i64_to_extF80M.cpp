@@ -45,7 +45,7 @@ i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
     if (0 != a) {
         bool const sign = a < 0;
         uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
-        auto const shiftDist = softfloat_countLeadingZeros64(absA);
+        auto const shiftDist = count_leading_zeros(absA);
         uiZ64 = packToExtF80UI64(sign, 0x403Eu - shiftDist);
         sigZ = absA << shiftDist;
     }

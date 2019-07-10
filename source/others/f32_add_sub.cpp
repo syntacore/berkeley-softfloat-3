@@ -149,7 +149,7 @@ subMags(uint32_t const uiA,
 
         bool const signZ = sigDiff < 0 ? !is_sign(uiA) : is_sign(uiA);
         int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
-        int8_t const shiftDist = softfloat_countLeadingZeros32(static_cast<uint32_t>(sigAbsDiff)) - 8;
+        int8_t const shiftDist = count_leading_zeros(static_cast<uint32_t>(sigAbsDiff)) - 8;
         int16_t const expZ = expA - shiftDist;
         return
             u_as_f_32(expZ < 0 ?

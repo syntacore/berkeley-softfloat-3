@@ -45,7 +45,7 @@ softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
     exp32_sig128 z;
 
     if (!sig64) {
-        int8_t const shiftDist = softfloat_countLeadingZeros64(sig0) - 15;
+        int8_t const shiftDist = count_leading_zeros(sig0) - 15;
         z.exp = -63 - shiftDist;
 
         if (shiftDist < 0) {
@@ -56,7 +56,7 @@ softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
             z.sig.v0 = 0;
         }
     } else {
-        int8_t const shiftDist = softfloat_countLeadingZeros64(sig64) - 15;
+        int8_t const shiftDist = count_leading_zeros(sig64) - 15;
         z.exp = 1 - shiftDist;
         z.sig = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(shiftDist));
     }

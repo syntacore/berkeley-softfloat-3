@@ -143,7 +143,7 @@ subMags(uint64_t const uiA,
                     sigDiff = -sigDiff;
                 }
 
-                int8_t const shiftDist = softfloat_countLeadingZeros64(static_cast<uint64_t>(sigDiff)) - 11;
+                int8_t const shiftDist = count_leading_zeros(static_cast<uint64_t>(sigDiff)) - 11;
                 int16_t const expZ = expA - shiftDist;
                 return
                     u_as_f_64(expZ < 0 ?

@@ -52,7 +52,7 @@ softfloat_normRoundPackToExtF80(bool sign,
         sigExtra = 0;
     }
 
-    auto const shiftDist = softfloat_countLeadingZeros64(sig);
+    auto const shiftDist = count_leading_zeros(sig);
     exp -= shiftDist;
 
     if (shiftDist) {

@@ -194,7 +194,7 @@ mulAdd(Mul_add_operations const op,
         sig64Z = sigProd - softfloat_shiftRightJam64(sig64C, static_cast<uint32_t>(expDiff));
     }
 
-    int8_t shiftDist = softfloat_countLeadingZeros64(sig64Z) - 1;
+    int8_t shiftDist = count_leading_zeros(sig64Z) - 1;
     expZ -= shiftDist;
     shiftDist -= 32;
 

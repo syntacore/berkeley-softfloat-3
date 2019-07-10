@@ -43,7 +43,7 @@ i32_to_f16(int32_t a)
     bool const sign = a < 0;
     /** @bug INT32_MIN */
     uint32_t absA = static_cast<uint32_t>(sign ? -a : a);
-    int8_t const shiftDist = softfloat_countLeadingZeros32(absA) - 21;
+    int8_t const shiftDist = count_leading_zeros(absA) - 21;
 
     if (0 <= shiftDist) {
         return u_as_f_16(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : 0u);

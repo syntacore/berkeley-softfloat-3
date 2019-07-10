@@ -75,7 +75,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
                     sigDiff = -sigDiff;
                 }
 
-                int8_t const shiftDist = softfloat_countLeadingZeros16(static_cast<uint16_t>(sigDiff)) - 5;
+                int8_t const shiftDist = count_leading_zeros(static_cast<uint16_t>(sigDiff)) - 5;
                 int8_t const expZ = expA - shiftDist;
 
                 if (expZ < 0) {
@@ -141,7 +141,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
         }
 
         uint32_t const sig32Z = (static_cast<uint32_t>(sigX) << expDiff) - sigY;
-        int8_t const shiftDist = softfloat_countLeadingZeros32(sig32Z) - 1;
+        int8_t const shiftDist = count_leading_zeros(sig32Z) - 1;
         uint32_t const sig32Z_1 = sig32Z << shiftDist;
         int8_t const expZ_1 = expZ - shiftDist;
         uint16_t const sigZ = sig32Z_1 >> 16;

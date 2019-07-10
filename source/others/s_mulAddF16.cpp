@@ -204,7 +204,7 @@ softfloat_mulAddF16(Mul_add_operations op,
                 sig32Z = sigProd - softfloat_shiftRightJam32(sig32C, static_cast<uint16_t>(expDiff));
             }
 
-            int8_t shiftDist = softfloat_countLeadingZeros32(sig32Z) - 1;
+            int8_t shiftDist = count_leading_zeros(sig32Z) - 1;
             expZ -= shiftDist;
             shiftDist -= 16;
 

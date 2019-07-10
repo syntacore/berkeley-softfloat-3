@@ -72,7 +72,7 @@ softfloat_normRoundPackMToF128M(bool sign,
         ptr -= wordIncr;
     }
 
-    shiftDist += softfloat_countLeadingZeros32(wordSig) - 15;
+    shiftDist += count_leading_zeros(wordSig) - 15;
 
     if (shiftDist) {
         exp -= shiftDist;

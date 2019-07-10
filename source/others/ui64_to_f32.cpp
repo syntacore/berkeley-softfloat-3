@@ -40,7 +40,7 @@ float32_t
 ui64_to_f32(uint64_t const a)
 {
     using namespace softfloat::internals;
-    int8_t const shiftDist = softfloat_countLeadingZeros64(a) - 40;
+    int8_t const shiftDist = count_leading_zeros(a) - 40;
 
     if (0 > shiftDist) {
         int8_t const shiftDist_1 = shiftDist + 7;

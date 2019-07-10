@@ -40,7 +40,7 @@ float16_t
 ui32_to_f16(uint32_t a)
 {
     using namespace softfloat::internals;
-    int8_t const shiftDist = softfloat_countLeadingZeros32(a) - 21;
+    int8_t const shiftDist = count_leading_zeros(a) - 21;
 
     if (0 <= shiftDist) {
         return u_as_f_16(a ? packToF16UI(false, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : 0u);

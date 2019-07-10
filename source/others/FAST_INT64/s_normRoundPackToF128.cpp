@@ -48,7 +48,7 @@ softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t s
         sig0 = 0;
     }
 
-    auto const shiftDist = softfloat_countLeadingZeros64(sig64) - 15;
+    auto const shiftDist = count_leading_zeros(sig64) - 15;
     exp -= shiftDist;
 
     if (0 <= shiftDist) {

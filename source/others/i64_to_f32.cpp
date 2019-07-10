@@ -42,7 +42,7 @@ i64_to_f32(int64_t const a)
     using namespace softfloat::internals;
     bool const sign = (a < 0);
     uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
-    int8_t shiftDist = softfloat_countLeadingZeros64(absA) - 40;
+    int8_t shiftDist = count_leading_zeros(absA) - 40;
 
     if (0 <= shiftDist) {
         return u_as_f_32(a ? packToF32UI(sign, 0x95 - shiftDist, static_cast<uint32_t>(absA) << shiftDist) : 0);

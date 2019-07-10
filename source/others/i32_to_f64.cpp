@@ -45,7 +45,7 @@ i32_to_f64(int32_t const a)
     } else {
         bool const sign = a < 0;
         uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
-        int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 21;
+        int8_t const shiftDist = count_leading_zeros(absA) + 21;
         return u_as_f_64(packToF64UI(sign, 0x432 - shiftDist, static_cast<uint64_t>(absA) << shiftDist));
     }
 }

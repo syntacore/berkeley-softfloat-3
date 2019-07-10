@@ -79,7 +79,7 @@ softfloat_shiftNormSigF128M(
             }
         }
 
-        exp -= softfloat_countLeadingZeros32(wordSig);
+        exp -= count_leading_zeros(wordSig);
         softfloat_shiftLeft128M(wPtr, static_cast<uint32_t>(1 - exp + shiftDist), sigPtr);
     }
 

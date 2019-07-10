@@ -48,7 +48,7 @@ ui64_to_f128M(uint64_t a,
     zWPtr[indexWord(4, 0)] = 0;
 
     if (a) {
-        uint8_t const shiftDist = softfloat_countLeadingZeros64(a) + 17u;
+        uint8_t const shiftDist = count_leading_zeros(a) + 17u;
 
         if (shiftDist < 32) {
             uint32_t* const ptr = zWPtr + indexMultiwordHi(4, 3);

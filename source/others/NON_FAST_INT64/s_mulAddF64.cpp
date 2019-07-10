@@ -259,7 +259,7 @@ mulAdd(Mul_add_operations op,
             sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 1)]) << 32 | sig128Z[indexWord(4, 0)];
         }
 
-        shiftDist += softfloat_countLeadingZeros64(sigZ) - 1;
+        shiftDist += count_leading_zeros(sigZ) - 1;
 
         if (0 != shiftDist) {
             expZ -= shiftDist;

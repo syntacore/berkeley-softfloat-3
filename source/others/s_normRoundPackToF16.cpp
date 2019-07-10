@@ -44,7 +44,7 @@ softfloat_normRoundPackToF16(bool sign,
                              int16_t exp,
                              uint16_t const& sig)
 {
-    int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 1;
+    int8_t const shiftDist = count_leading_zeros(sig) - 1;
     exp -= shiftDist;
     exp = sig ? exp : 0;
 

@@ -45,7 +45,7 @@ ui64_to_f128(uint64_t a)
         return u_as_f_128(uint128{0u, 0u});
     }
 
-    int8_t const shiftDist = softfloat_countLeadingZeros64(a) + 49;
+    int8_t const shiftDist = count_leading_zeros(a) + 49;
     uint128 zSig;
 
     if (64 <= shiftDist) {

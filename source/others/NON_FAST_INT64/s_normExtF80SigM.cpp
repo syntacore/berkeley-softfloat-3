@@ -43,7 +43,7 @@ int
 softfloat_normExtF80SigM(uint64_t* sigPtr)
 {
     uint64_t const sig = *sigPtr;
-    auto const shiftDist = softfloat_countLeadingZeros64(sig);
+    auto const shiftDist = count_leading_zeros(sig);
     *sigPtr = sig << shiftDist;
     return -shiftDist;
 }

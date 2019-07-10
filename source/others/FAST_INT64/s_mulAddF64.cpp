@@ -210,7 +210,7 @@ mulAdd(Mul_add_operations op,
         sig128Z.v0 = 0;
     }
 
-    int16_t const shiftDist = softfloat_countLeadingZeros64(sig128Z.v64) - 1;
+    int16_t const shiftDist = count_leading_zeros(sig128Z.v64) - 1;
     expZ -= shiftDist;
 
     if (shiftDist < 0) {

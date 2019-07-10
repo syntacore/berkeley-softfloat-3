@@ -47,7 +47,7 @@ i64_to_f128(int64_t a)
         bool const sign = (a < 0);
         /** @bug for INT64_MIN */
         uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
-        int8_t const shiftDist = softfloat_countLeadingZeros64(absA) + 49;
+        int8_t const shiftDist = count_leading_zeros(absA) + 49;
 
         if (64 <= shiftDist) {
             return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});

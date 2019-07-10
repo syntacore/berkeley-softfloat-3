@@ -43,7 +43,7 @@ ui32_to_extF80(uint32_t a)
     uint16_t  uiZ64 = 0;
 
     if (a) {
-        auto const shiftDist = softfloat_countLeadingZeros32(a);
+        auto const shiftDist = count_leading_zeros(a);
         uiZ64 = 0x401Eu - shiftDist;
         a <<= shiftDist;
     }

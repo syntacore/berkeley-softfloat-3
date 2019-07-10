@@ -328,7 +328,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
                 }
             }
 
-            shiftDist = softfloat_countLeadingZeros64(sigZ.v64);
+            shiftDist = count_leading_zeros(sigZ.v64);
             expZ += 7 - shiftDist;
             shiftDist = 15 - shiftDist;
 

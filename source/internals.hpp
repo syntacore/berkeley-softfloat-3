@@ -66,8 +66,8 @@ struct exp8_sig16
 
     explicit
     exp8_sig16(uint16_t const sig)
-        : exp(static_cast<int8_t>(1 - (softfloat_countLeadingZeros16(sig) - 5)))
-        , sig(static_cast<uint16_t>(sig << (softfloat_countLeadingZeros16(sig) - 5)))
+        : exp(static_cast<int8_t>(1 - (count_leading_zeros(sig) - 5)))
+        , sig(static_cast<uint16_t>(sig << (count_leading_zeros(sig) - 5)))
     {
     }
 
@@ -88,8 +88,8 @@ struct exp16_sig32
 
     explicit
     exp16_sig32(uint32_t const sig)
-        : exp{static_cast<int16_t>(1 - (softfloat_countLeadingZeros32(sig) - 8))}
-        , sig{sig << (softfloat_countLeadingZeros32(sig) - 8)}
+        : exp{static_cast<int16_t>(1 - (count_leading_zeros(sig) - 8))}
+        , sig{sig << (count_leading_zeros(sig) - 8)}
     {}
 
     int16_t exp;
@@ -106,8 +106,8 @@ struct exp16_sig64
     {}
 
     explicit exp16_sig64(uint64_t const sig)
-        : exp{static_cast<int16_t>(1 - (softfloat_countLeadingZeros64(sig) - 11))}
-        , sig{sig << (softfloat_countLeadingZeros64(sig) - 11)}
+        : exp{static_cast<int16_t>(1 - (count_leading_zeros(sig) - 11))}
+        , sig{sig << (count_leading_zeros(sig) - 11)}
     {
     }
 
@@ -663,7 +663,7 @@ softfloat_normRoundPackToF64(bool const sign,
                              int16_t const exp,
                              uint64_t const sig)
 {
-    int8_t const shiftDist = softfloat_countLeadingZeros64(sig) - 1;
+    int8_t const shiftDist = count_leading_zeros(sig) - 1;
     int16_t const exp_1 = exp - shiftDist;
 
     if (10 <= shiftDist && static_cast<uint16_t>(exp_1) < 0x7FD) {
@@ -678,7 +678,7 @@ softfloat_normRoundPackToF32(bool const sign,
                              int16_t const exp,
                              uint32_t const sig)
 {
-    int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 1;
+    int8_t const shiftDist = count_leading_zeros(sig) - 1;
     int16_t const exp_1 = exp - shiftDist;
 
     if (7 <= shiftDist && static_cast<uint16_t>(exp_1) < 0xFD) {

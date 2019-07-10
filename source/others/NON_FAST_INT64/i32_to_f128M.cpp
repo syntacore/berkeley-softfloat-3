@@ -54,7 +54,7 @@ i32_to_f128M(int32_t a,
     } else {
         bool const sign = a < 0;
         uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
-        int8_t const shiftDist = softfloat_countLeadingZeros32(absA) + 17;
+        int8_t const shiftDist = count_leading_zeros(absA) + 17;
         uint64_t const normAbsA = static_cast<uint64_t>(absA) << shiftDist;
         zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(normAbsA);
         zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x402Eu - shiftDist, normAbsA >> 32);
