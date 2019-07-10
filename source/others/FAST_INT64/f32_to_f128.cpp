@@ -41,7 +41,7 @@ f32_to_f128(float32_t a)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
-    bool const sign = signF32UI(uiA);
+    bool const sign = is_sign(uiA);
     int16_t exp = expF32UI(uiA);
     uint32_t frac = fracF32UI(uiA);
 

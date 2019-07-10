@@ -488,12 +488,6 @@ u_as_f_64(uint64_t v)
     return float64_t{v};
 }
 
-inline constexpr bool
-signF32UI(uint32_t a)
-{
-    return static_cast<int32_t>(a) < 0;
-}
-
 /** @bug return signed 16-bits value instead unsigned 8-bits value */
 inline constexpr int16_t
 expF32UI(uint32_t const& a)

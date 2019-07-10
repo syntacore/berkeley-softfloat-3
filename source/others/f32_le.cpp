@@ -48,8 +48,8 @@ f32_le(float32_t a,
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     } else {
-        bool const signA = signF32UI(uiA);
-        bool const signB = signF32UI(uiB);
+        bool const signA = is_sign(uiA);
+        bool const signB = is_sign(uiB);
         return
             signA != signB ?
                 signA || 0 == static_cast<uint32_t>((uiA | uiB) << 1) :

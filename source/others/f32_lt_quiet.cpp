@@ -51,8 +51,8 @@ f32_lt_quiet(float32_t a, float32_t b)
         return false;
     }
 
-    bool const signA = signF32UI(uiA);
-    bool const signB = signF32UI(uiB);
+    bool const signA = is_sign(uiA);
+    bool const signB = is_sign(uiB);
     return
         signA != signB ?
         signA && 0 != static_cast<decltype(uiA)>((uiA | uiB) << 1) :

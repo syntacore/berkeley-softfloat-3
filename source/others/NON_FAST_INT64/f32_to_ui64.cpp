@@ -44,7 +44,7 @@ f32_to_ui64(float32_t const a,
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
-    bool const sign = signF32UI(uiA);
+    bool const sign = is_sign(uiA);
     int16_t const exp = expF32UI(uiA);
     uint32_t const sig = fracF32UI(uiA);
     int16_t const shiftDist = 0xBE - exp;

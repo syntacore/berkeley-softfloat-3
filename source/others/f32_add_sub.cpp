@@ -47,7 +47,7 @@ addMags(uint32_t const uiA,
 
     if (isInf32UI(uiA) || isInf32UI(uiB)) {
         /** propagate infinity if operand(s) is infinity */
-        return signed_inf_F32(signF32UI(uiA));
+        return signed_inf_F32(is_sign(uiA));
     }
 
     static uint32_t const hidden_bit = UINT32_C(1) << 23;
@@ -66,7 +66,7 @@ addMags(uint32_t const uiA,
 
         /** add hidden bits to operands if fractional are normal aligned */
         uint32_t const sigZ = (sigA + hidden_bit) + (sigB + hidden_bit);
-        bool const signA = signF32UI(uiA);
+        bool const signA = is_sign(uiA);
 
         /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
         if (0 == (sigZ & 1) && expA < 0xFE) {
@@ -107,9 +107,9 @@ addMags(uint32_t const uiA,
     /* mantissa bits are [30..0] with up to 2 digits before point */
     /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
     if (sigZ < 2 * hidden_bit_scaled) {
-        return softfloat_roundPackToF32(signF32UI(uiA), expZ - 1, sigZ << 1);
+        return softfloat_roundPackToF32(is_sign(uiA), expZ - 1, sigZ << 1);
     } else {
-        return softfloat_roundPackToF32(signF32UI(uiA), expZ, sigZ);
+        return softfloat_roundPackToF32(is_sign(uiA), expZ, sigZ);
     }
 }
 
@@ -147,7 +147,7 @@ subMags(uint32_t const uiA,
             --expA;
         }
 
-        bool const signZ = sigDiff < 0 ? !signF32UI(uiA) : signF32UI(uiA);
+        bool const signZ = sigDiff < 0 ? !is_sign(uiA) : is_sign(uiA);
         int32_t const sigAbsDiff = sigDiff < 0 ? -sigDiff : sigDiff;
         int8_t const shiftDist = softfloat_countLeadingZeros32(static_cast<uint32_t>(sigAbsDiff)) - 8;
         int16_t const expZ = expA - shiftDist;
@@ -157,7 +157,7 @@ subMags(uint32_t const uiA,
                       packToF32UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
     }
 
-    bool const signZ = signF32UI(uiA);
+    bool const signZ = is_sign(uiA);
     auto const sigA_1 = sigA << 7;
     auto const sigB_1 = sigB << 7;
 
@@ -194,7 +194,7 @@ f32_add(float32_t const a,
     }
 
     return
-        (signF32UI(uiA) == signF32UI(uiB) ? addMags : subMags)(uiA, uiB);
+        (is_sign(uiA) == is_sign(uiB) ? addMags : subMags)(uiA, uiB);
 }
 
 float32_t
@@ -211,5 +211,5 @@ f32_sub(float32_t const a,
         return u_as_f_32(propagate_NaN(uiA, uiB));
     }
 
-    return (signF32UI(uiA) == signF32UI(uiB) ? subMags : addMags)(uiA, uiB);
+    return (is_sign(uiA) == is_sign(uiB) ? subMags : addMags)(uiA, uiB);
 }

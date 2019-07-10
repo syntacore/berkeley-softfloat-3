@@ -42,11 +42,11 @@ f32_div(float32_t a,
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
-    bool const signA = signF32UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF32UI(uiA);
     uint32_t sigA = fracF32UI(uiA);
     uint32_t const uiB = f_as_u_32(b);
-    bool const signB = signF32UI(uiB);
+    bool const signB = is_sign(uiB);
     int16_t expB = expF32UI(uiB);
     uint32_t sigB = fracF32UI(uiB);
     bool const signZ = signA != signB;

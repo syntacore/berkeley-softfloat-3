@@ -50,7 +50,7 @@ f32_to_i32(float32_t const a,
         return i32_fromNaN;
     } else {
         int16_t const exp = expF32UI(uiA);
-        bool const sign = signF32UI(uiA);
+        bool const sign = is_sign(uiA);
         if (255 == exp) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return sign ? i32_fromNegOverflow : i32_fromPosOverflow;

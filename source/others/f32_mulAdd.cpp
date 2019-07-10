@@ -50,13 +50,13 @@ mulAdd(Mul_add_operations const op,
         return u_as_f_32(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
-    bool const signA = signF32UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF32UI(uiA);
     uint32_t sigA = fracF32UI(uiA);
-    bool const signB = signF32UI(uiB);
+    bool const signB = is_sign(uiB);
     int16_t expB = expF32UI(uiB);
     uint32_t sigB = fracF32UI(uiB);
-    bool const signC = signF32UI(uiC) != (softfloat_mulAdd_subC == op);
+    bool const signC = is_sign(uiC) != (softfloat_mulAdd_subC == op);
     int16_t expC = expF32UI(uiC);
     uint32_t sigC = fracF32UI(uiC);
     bool const signProd = (signA != signB) != (op == softfloat_mulAdd_subProd);

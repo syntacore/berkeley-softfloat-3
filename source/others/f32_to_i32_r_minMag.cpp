@@ -53,7 +53,7 @@ f32_to_i32_r_minMag(float32_t const a,
 
         return 0;
     } else {
-        bool const sign = signF32UI(uiA);
+        bool const sign = is_sign(uiA);
 
         if (shiftDist <= 0) {
             if (uiA == packToF32UI(true, 0x9E, 0)) {

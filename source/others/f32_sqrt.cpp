@@ -42,7 +42,7 @@ f32_sqrt(float32_t a)
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
-    bool const signA = signF32UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF32UI(uiA);
     uint32_t sigA = fracF32UI(uiA);
 

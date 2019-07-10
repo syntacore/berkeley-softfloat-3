@@ -43,7 +43,7 @@ f32_to_ui32(float32_t const a,
 {
     using namespace softfloat::internals;
     uint32_t const uiA = f_as_u_32(a);
-    bool const sign = signF32UI(uiA);
+    bool const sign = is_sign(uiA);
     int16_t const exp = expF32UI(uiA);
 
     if (isNaNF32UI(uiA)) {

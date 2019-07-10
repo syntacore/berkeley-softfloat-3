@@ -53,7 +53,7 @@ f32_to_ui64_r_minMag(float32_t a,
 
         return 0;
     } else {
-        bool const sign = signF32UI(uiA);
+        bool const sign = is_sign(uiA);
 
         if (sign || shiftDist < 0) {
             softfloat_raiseFlags(softfloat_flag_invalid);
