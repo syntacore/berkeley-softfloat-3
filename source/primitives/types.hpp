@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PRIMITIVETYPES_H_
-#define PRIMITIVETYPES_H_
+#ifndef SOFTFLOAT_PRIMITIVES_TYPES_HPP_
+#define SOFTFLOAT_PRIMITIVES_TYPES_HPP_
 
 #include "softfloat/types.h"
 #include <cstdint>
@@ -49,27 +49,124 @@ These macros are used to isolate the differences in word order between big-
 endian and little-endian platforms.
 */
 #ifdef BIG_ENDIAN
-#define wordIncr -1
-#define indexWord( total, n ) ((total) - 1 - (n))
-#define indexWordHi( total ) 0
-#define indexWordLo( total ) ((total) - 1)
-#define indexMultiword( total, m, n ) ((total) - 1 - (m))
-#define indexMultiwordHi( total, n ) 0
-#define indexMultiwordLo( total, n ) ((total) - (n))
-#define indexMultiwordHiBut( total, n ) 0
-#define indexMultiwordLoBut( total, n ) (n)
+
+static int const wordIncr = -1;
+
+static inline constexpr size_t
+indexWord(size_t const total, size_t const n)
+{
+    return total - 1 - n;
+}
+
+static inline constexpr size_t
+indexWordHi(size_t const total)
+{
+    return 0;
+}
+
+static inline constexpr size_t
+indexWordLo(size_t const total)
+{
+    return total - 1;
+}
+
+static inline constexpr size_t
+indexMultiword(size_t total,
+               size_t m,
+               size_t)
+{
+    return total - 1 - m;
+}
+
+static inline constexpr size_t
+indexMultiwordHi(size_t,
+                 size_t)
+{
+    return 0;
+}
+
+static inline constexpr size_t
+indexMultiwordLo(size_t total,
+                 size_t n)
+{ 
+    return total - n;
+}
+
+static inline constexpr size_t
+indexMultiwordHiBut(size_t,
+                    size_t) 
+{
+    return 0;
+}
+
+static inline constexpr size_t
+indexMultiwordLoBut(size_t,
+                    size_t n)
+{
+    return n;
+}
+
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v3, v2, v1, v0 }
+
 #else
-#define wordIncr 1
-#define indexWord( total, n ) (n)
-#define indexWordHi( total ) ((total) - 1u)
-#define indexWordLo( total ) 0u
-#define indexMultiword( total, m, n ) (n)
-#define indexMultiwordHi( total, n ) ((total) - (n))
-#define indexMultiwordLo( total, n ) 0u
-#define indexMultiwordHiBut( total, n ) (n)
-#define indexMultiwordLoBut( total, n ) 0u
+
+static int const wordIncr = 1;
+
+static inline constexpr size_t
+indexWord(size_t, size_t const n)
+{
+    return n;
+}
+
+static inline constexpr size_t
+indexWordHi(size_t const total)
+{
+    return total - 1u;
+}
+
+static inline constexpr size_t
+indexWordLo(size_t const)
+{
+    return 0;
+}
+
+static inline constexpr size_t
+indexMultiword(size_t,
+               size_t,
+               size_t n)
+{
+    return n;
+}
+
+static inline constexpr size_t
+indexMultiwordHi(size_t total,
+                 size_t n) 
+{
+    return total - n;
+}
+
+static inline constexpr size_t
+indexMultiwordLo(size_t, size_t)
+{
+    return 0u;
+}
+
+static inline constexpr size_t
+indexMultiwordHiBut(size_t,
+                    size_t n)
+{
+    return n;
+}
+
+static inline constexpr size_t
+indexMultiwordLoBut(size_t,
+                    size_t)
+{
+    return 0u;
+}
+
 #define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
+
 #endif
 
 static_assert(16 == CHAR_BIT * sizeof(float16_t), "Bad size of float16_t");
@@ -83,23 +180,28 @@ static_assert(128 == CHAR_BIT * sizeof(float128_t), "Bad size of float128_t");
 struct uint128
 {
     uint128() = default;
-    constexpr uint128(uint64_t const& a64,
-                      uint64_t const& a0)
+
+    constexpr
+    uint128(uint64_t const& a64,
+            uint64_t const& a0)
         : v64(a64)
         , v0(a0)
     {}
 
-    explicit constexpr uint128(float128_t const& a)
+    explicit constexpr
+    uint128(float128_t const& a)
         : v64(a.v64)
         , v0(a.v0)
     {}
 
-    explicit operator float128_t()const
+    explicit constexpr
+    operator float128_t()const
     {
-        float128_t ret;
-        ret.v64 = v64;
-        ret.v0 = v0;
-        return ret;
+#ifdef BIG_ENDIAN
+        return float128_t{v64, v0};
+#else
+        return float128_t{v0, v64};
+#endif
     }
 
     uint64_t v64;
@@ -111,8 +213,10 @@ static_assert(sizeof(uint128) == sizeof(float128_t), "sizeof(uint128) != sizeof(
 struct uint64_extra
 {
     uint64_extra() = default;
-    constexpr uint64_extra(uint64_t const& a_v,
-                           uint64_t const& a_extra)
+
+    constexpr
+    uint64_extra(uint64_t const& a_v,
+                 uint64_t const& a_extra)
         : v(a_v)
         , extra(a_extra)
     {}
@@ -138,4 +242,4 @@ struct uint128_extra
 }  // namespace internals
 }  // namespace softfloat
 
-#endif  /* PRIMITIVETYPES_H_ */
+#endif  /* SOFTFLOAT_PRIMITIVES_TYPES_HPP_ */
