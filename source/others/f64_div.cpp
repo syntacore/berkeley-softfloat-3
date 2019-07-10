@@ -42,11 +42,11 @@ f64_div(float64_t const a,
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
-    bool const signA = signF64UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF64UI(uiA);
     uint64_t sigA = fracF64UI(uiA);
     uint64_t uiB = f_as_u_64(b);
-    bool const signB = signF64UI(uiB);
+    bool const signB = is_sign(uiB);
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
     bool const signZ = signA ^ signB;
@@ -77,7 +77,7 @@ f64_div(float64_t const a,
                     return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
                 }
             } else {
-                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+                exp16_sig64 const normExpSig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -87,7 +87,7 @@ f64_div(float64_t const a,
             if (0 == sigA) {
                 return u_as_f_64(packToF64UI(signZ, 0, 0));
             } else {
-                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                exp16_sig64 const normExpSig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

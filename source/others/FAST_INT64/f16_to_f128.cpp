@@ -55,7 +55,7 @@ f16_to_f128(float16_t const a)
 
     if (!exp) {
         if (frac) {
-            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+            exp8_sig16 const normExpSig{frac};
             exp = normExpSig.exp - 1;
             frac = normExpSig.sig;
         }

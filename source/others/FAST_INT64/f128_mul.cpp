@@ -52,7 +52,7 @@ f128_mul(float128_t a,
 
     uint64_t const uiA64 = f_as_u_128(a).v64;
     uint64_t const uiA0 = f_as_u_128(a).v0;
-    bool const signA = signF128UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     int32_t expA = expF128UI64(uiA64);
 
     uint128 sigA;
@@ -61,7 +61,7 @@ f128_mul(float128_t a,
 
     uint64_t const uiB64 = f_as_u_128(b).v64;
     uint64_t const uiB0 = f_as_u_128(b).v0;
-    bool const signB = signF128UI64(uiB64);
+    bool const signB = is_sign(uiB64);
     int32_t expB = expF128UI64(uiB64);
 
     uint128 sigB;

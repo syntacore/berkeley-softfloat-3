@@ -58,7 +58,7 @@ f16_to_f32(float16_t a)
             return signed_zero_F32(sign);
         }
 
-        exp8_sig16 normExpSig = softfloat_normSubnormalF16Sig(frac);
+        exp8_sig16 const normExpSig{frac};
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }

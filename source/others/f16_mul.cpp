@@ -86,7 +86,7 @@ f16_mul(float16_t a,
             return u_as_f_16(packToF16UI(signZ, 0, 0));
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+        exp8_sig16 const normExpSig{sigA};
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -96,7 +96,7 @@ f16_mul(float16_t a,
             return u_as_f_16(packToF16UI(signZ, 0, 0));
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+        exp8_sig16 const normExpSig{sigB};
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }

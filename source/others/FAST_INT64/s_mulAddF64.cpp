@@ -51,13 +51,13 @@ mulAdd(Mul_add_operations op,
         return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));
     }
 
-    bool const signA = signF64UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF64UI(uiA);
     uint64_t sigA = fracF64UI(uiA);
-    bool const signB = signF64UI(uiB);
+    bool const signB = is_sign(uiB);
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
-    bool const signC = signF64UI(uiC) ^ (op == softfloat_mulAdd_subC);
+    bool const signC = is_sign(uiC) ^ (op == softfloat_mulAdd_subC);
     int16_t expC = expF64UI(uiC);
     uint64_t sigC = fracF64UI(uiC);
     bool signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
@@ -106,7 +106,7 @@ mulAdd(Mul_add_operations op,
             return u_as_f_64(uiC);
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+        exp16_sig64 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -120,7 +120,7 @@ mulAdd(Mul_add_operations op,
             return u_as_f_64(uiC);
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+        exp16_sig64 const normExpSig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -141,7 +141,7 @@ mulAdd(Mul_add_operations op,
             return softfloat_roundPackToF64(signZ, expZ, sig128Z.v64 << 1 | (sig128Z.v0 != 0));
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigC);
+        exp16_sig64 const normExpSig(sigC);
         expC = normExpSig.exp;
         sigC = normExpSig.sig;
     }

@@ -55,7 +55,7 @@ f128_to_i32_r_minMag(float128_t a,
         return 0;
     }
 
-    bool const sign = signF128UI64(uA.v64);
+    bool const sign = is_sign(uA.v64);
 
     if (shiftDist < 18) {
         if (sign && (shiftDist == 17) && (sig64 < UINT64_C(0x0000000000020000))) {

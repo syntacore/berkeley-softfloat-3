@@ -68,7 +68,7 @@ f16_rem(float16_t const a,
             return u_as_f_16(defaultNaNF16UI);
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+        exp8_sig16 const normExpSig{sigB};
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -78,7 +78,7 @@ f16_rem(float16_t const a,
             return a;
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+        exp8_sig16 const normExpSig{sigA};
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }

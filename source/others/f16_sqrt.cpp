@@ -72,7 +72,7 @@ f16_sqrt(float16_t a)
             return a;
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+        exp8_sig16 const normExpSig{sigA};
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }

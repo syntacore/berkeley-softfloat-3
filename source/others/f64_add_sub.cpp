@@ -194,9 +194,9 @@ f64_add(float64_t a,
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
-    bool const signA = signF64UI(uiA);
+    bool const signA = is_sign(uiA);
     uint64_t const uiB = f_as_u_64(b);
-    bool signB = signF64UI(uiB);
+    bool signB = is_sign(uiB);
     return
         (signA == signB ? addMags : subMags)(uiA, uiB, signA);
 }
@@ -206,9 +206,9 @@ f64_sub(float64_t a, float64_t b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
-    bool const signA = signF64UI(uiA);
+    bool const signA = is_sign(uiA);
     uint64_t const uiB = f_as_u_64(b);
-    bool const signB = signF64UI(uiB);
+    bool const signB = is_sign(uiB);
     return
         (signA == signB ? subMags : addMags)(uiA, uiB, signA);
 }

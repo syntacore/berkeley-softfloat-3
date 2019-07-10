@@ -44,11 +44,11 @@ f128_sub(float128_t const a,
     uint128 const uA{a};
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
-    bool const signA = signF128UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     uint128 const uB{b};
     uint64_t const uiB64 = uB.v64;
     uint64_t const uiB0 = uB.v0;
-    bool const signB = signF128UI64(uiB64);
+    bool const signB = is_sign(uiB64);
     return
         signA == signB ? softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA) :
         softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA);

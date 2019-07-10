@@ -48,8 +48,8 @@ f64_lt(float64_t const a,
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     } else {
-        bool const signA = signF64UI(uiA);
-        bool const signB = signF64UI(uiB);
+        bool const signA = is_sign(uiA);
+        bool const signB = is_sign(uiB);
         return
             signA != signB ?
             signA && 0 != static_cast<uint64_t>((uiA | uiB) << 1) :

@@ -117,7 +117,7 @@ softfloat_mulAddF16(Mul_add_operations op,
                 return u_as_f_16(!(expC | sigC) && (signProd != signC) ? packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
             }
 
-            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+            exp8_sig16 const normExpSig{sigA};
             expA = normExpSig.exp;
             sigA = normExpSig.sig;
         }
@@ -127,7 +127,7 @@ softfloat_mulAddF16(Mul_add_operations op,
                 return u_as_f_16(!(expC | sigC) && (signProd != signC) ? packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
             }
 
-            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+            exp8_sig16 const normExpSig{sigB};
             expB = normExpSig.exp;
             sigB = normExpSig.sig;
         }
@@ -154,7 +154,7 @@ softfloat_mulAddF16(Mul_add_operations op,
                 return softfloat_roundPackToF16(signZ, expZ, sigZ);
             }
 
-            exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigC);
+            exp8_sig16 const normExpSig{sigC};
             expC = normExpSig.exp;
             sigC = normExpSig.sig;
         }

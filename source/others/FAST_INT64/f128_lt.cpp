@@ -51,8 +51,8 @@ f128_lt(float128_t a,
         return false;
     }
 
-    bool const signA = signF128UI64(uiA64);
-    bool const signB = signF128UI64(uiB64);
+    bool const signA = is_sign(uiA64);
+    bool const signB = is_sign(uiB64);
     return
         signA != signB ? signA && 0 != (((uiA64 | uiB64) & UINT64_C(0x7FFFFFFFFFFFFFFF)) | uiA0 | uiB0) :
         (uiA64 != uiB64 || uiA0 != uiB0) && signA != softfloat_lt128(uiA64, uiA0, uiB64, uiB0);

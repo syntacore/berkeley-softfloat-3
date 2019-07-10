@@ -47,7 +47,7 @@ f64_to_ui32(float64_t const a,
     static bool const fromNaN_is_same_as_both_overflow = fromNaN_is_same_as_pos_overflow && fromNaN_is_same_as_neg_overflow;
     static bool const fromNaN_is_same_as_any_overflow = fromNaN_is_same_as_pos_overflow || fromNaN_is_same_as_neg_overflow;
     uint64_t const uiA = f_as_u_64(a);
-    bool sign = signF64UI(uiA);
+    bool sign = is_sign(uiA);
     int16_t const exp = expF64UI(uiA);
     uint64_t sig = fracF64UI(uiA);
 

@@ -43,7 +43,7 @@ f128_to_f16(float128_t const a)
     uint128 const uA{a};
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
-    bool const sign = signF128UI64(uiA64);
+    bool const sign = is_sign(uiA64);
     int32_t exp = expF128UI64(uiA64);
     uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
 

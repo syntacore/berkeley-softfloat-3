@@ -58,7 +58,7 @@ f16_to_f64(float16_t a)
             return u_as_f_64(packToF64UI(sign, 0, 0));
         }
 
-        exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(frac);
+        exp8_sig16 const normExpSig{frac};
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }

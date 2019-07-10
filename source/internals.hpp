@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "primitives/functions.hpp"
 
 #include <cassert>
+#include <type_traits>
 
 namespace softfloat {
 namespace internals {
@@ -63,6 +64,13 @@ struct exp8_sig16
         , sig(a_sig)
     {}
 
+    explicit
+    exp8_sig16(uint16_t const sig)
+        : exp(static_cast<int8_t>(1 - (softfloat_countLeadingZeros16(sig) - 5)))
+        , sig(static_cast<uint16_t>(sig << (softfloat_countLeadingZeros16(sig) - 5)))
+    {
+    }
+
     int8_t exp;
     uint16_t sig;
 };
@@ -78,6 +86,12 @@ struct exp16_sig32
         , sig(a_sig)
     {}
 
+    explicit
+    exp16_sig32(uint32_t const sig)
+        : exp{static_cast<int16_t>(1 - (softfloat_countLeadingZeros32(sig) - 8))}
+        , sig{sig << (softfloat_countLeadingZeros32(sig) - 8)}
+    {}
+
     int16_t exp;
     uint32_t sig;
 };
@@ -91,6 +105,12 @@ struct exp16_sig64
         , sig(a_sig)
     {}
 
+    explicit exp16_sig64(uint64_t const sig)
+        : exp{static_cast<int16_t>(1 - (softfloat_countLeadingZeros64(sig) - 11))}
+        , sig{sig << (softfloat_countLeadingZeros64(sig) - 11)}
+    {
+    }
+
     int16_t exp;
     uint64_t sig;
 };
@@ -101,6 +121,14 @@ Valid values are 32, 64, and 80.
 */
 extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
 extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
+
+template<typename Ty>
+inline constexpr
+typename std::enable_if<std::is_integral<Ty>::value,bool>::type
+is_sign(Ty const& v)
+{
+    return static_cast<typename std::make_unsigned<Ty>::type>(v) < 0;
+}
 
 template<typename Ty>
 Ty
@@ -254,12 +282,6 @@ inline float128_t
 u_as_f_128(uint128 const& v)
 {
     return float128_t(v);
-}
-
-inline constexpr bool
-signF128UI64(uint64_t a64)
-{
-    return static_cast<int64_t>(a64) < 0;
 }
 
 inline constexpr int32_t
@@ -557,12 +579,6 @@ isSubnormal32UI(uint32_t const& a)
         0 != fracF32UI(a);
 }
 
-inline constexpr bool
-signF64UI(uint64_t const& a)
-{
-    return static_cast<int64_t>(a) < 0;
-}
-
 inline constexpr int16_t
 expF64UI(uint64_t const& a)
 {
@@ -694,27 +710,6 @@ softfloat_normRoundPackToF32(bool const sign,
     } else {
         return softfloat_roundPackToF32(sign, exp_1, sig << shiftDist);
     }
-}
-
-inline exp8_sig16
-softfloat_normSubnormalF16Sig(uint16_t const sig)
-{
-    int8_t const shiftDist = softfloat_countLeadingZeros16(sig) - 5;
-    return exp8_sig16{static_cast<int8_t>(1 - shiftDist), static_cast<uint16_t>(sig << shiftDist)};
-}
-
-inline exp16_sig32
-softfloat_normSubnormalF32Sig(uint32_t const sig)
-{
-    int8_t const shiftDist = softfloat_countLeadingZeros32(sig) - 8;
-    return exp16_sig32{static_cast<int16_t>(1 - shiftDist), sig << shiftDist};
-}
-
-inline exp16_sig64
-softfloat_normSubnormalF64Sig(uint64_t const sig)
-{
-    int8_t const shiftDist = softfloat_countLeadingZeros64(sig) - 11;
-    return exp16_sig64{static_cast<int16_t>(1 - shiftDist),sig << shiftDist};
 }
 
 }  // namespace internals

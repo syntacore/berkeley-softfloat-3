@@ -42,7 +42,7 @@ f64_to_i64_r_minMag(float64_t const a,
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
+    bool const sign = is_sign(uiA);
     int16_t const exp = expF64UI(uiA);
     uint64_t const sig = fracF64UI(uiA);
     int16_t const shiftDist = 0x433 - exp;

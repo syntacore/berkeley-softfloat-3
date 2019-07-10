@@ -58,7 +58,7 @@ f32_to_f128(float32_t a)
             return u_as_f_128(uint128{packToF128UI64(sign, 0, 0), 0});
         }
 
-        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+        exp16_sig32 const normExpSig(frac);
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }

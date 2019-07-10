@@ -43,7 +43,7 @@ f128_sqrt(float128_t a)
     uint128 const uA{a};
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
-    bool const signA = signF128UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     int32_t expA = expF128UI64(uiA64);
     uint128 sigA;
     sigA.v64 = fracF128UI64(uiA64);

@@ -95,7 +95,7 @@ f128_roundToInt(float128_t a,
             }
         } else if (roundingMode != softfloat_round_minMag) {
             if (
-                signF128UI64(uiZ.v64) ^ (roundingMode == softfloat_round_max)
+                is_sign(uiZ.v64) ^ (roundingMode == softfloat_round_max)
             ) {
                 uiZ = softfloat_add128(uiZ.v64, uiZ.v0, 0, roundBitsMask);
             }
@@ -162,7 +162,7 @@ f128_roundToInt(float128_t a,
             }
         } else if (roundingMode != softfloat_round_minMag) {
             if (
-                signF128UI64(uiZ.v64) ^ (roundingMode == softfloat_round_max)
+                is_sign(uiZ.v64) ^ (roundingMode == softfloat_round_max)
             ) {
                 uiZ.v64 = (uiZ.v64 | (uiA0 != 0)) + roundBitsMask;
             }

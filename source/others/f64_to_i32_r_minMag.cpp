@@ -53,7 +53,7 @@ f64_to_i32_r_minMag(float64_t a,
 
         return 0;
     } else {
-        bool const sign = signF64UI(uiA);
+        bool const sign = is_sign(uiA);
 
         if (shiftDist < 22) {
             if (sign && 0x41E == exp && sig < UINT64_C(0x0000000000200000)) {

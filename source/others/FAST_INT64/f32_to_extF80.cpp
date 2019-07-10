@@ -66,7 +66,7 @@ f32_to_extF80(float32_t const a)
             uZ.signif = 0;
             return uZ;
         } else {
-            exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+            exp16_sig32 const normExpSig(frac);
             exp = normExpSig.exp;
             frac = normExpSig.sig;
         }

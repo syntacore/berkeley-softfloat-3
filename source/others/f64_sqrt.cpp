@@ -41,7 +41,7 @@ f64_sqrt(float64_t const a)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
-    bool const signA = signF64UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF64UI(uiA);
     uint64_t sigA = fracF64UI(uiA);
 
@@ -66,7 +66,7 @@ f64_sqrt(float64_t const a)
             if (0 == sigA) {
                 return a;
             } else {
-                exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+                exp16_sig64 const normExpSig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

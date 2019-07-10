@@ -42,7 +42,7 @@ f64_rem(float64_t const a,
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);
-    bool const signA = signF64UI(uiA);
+    bool const signA = is_sign(uiA);
     int16_t expA = expF64UI(uiA);
     uint64_t sigA = fracF64UI(uiA);
     uint64_t const uiB = f_as_u_64(b);
@@ -65,7 +65,7 @@ f64_rem(float64_t const a,
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_64(defaultNaNF64UI);
         } else {
-            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigB);
+            exp16_sig64 const normExpSig(sigB);
             expB = normExpSig.exp;
             sigB = normExpSig.sig;
         }
@@ -75,7 +75,7 @@ f64_rem(float64_t const a,
         if (!sigA) {
             return a;
         } else {
-            exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(sigA);
+            exp16_sig64 const normExpSig(sigA);
             expA = normExpSig.exp;
             sigA = normExpSig.sig;
         }

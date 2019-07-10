@@ -142,7 +142,7 @@ f32_div(float32_t a,
                     return signed_inf_F32(signZ);
                 }
             } else {
-                exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigB);
+                exp16_sig32 const normExpSig(sigB);
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -152,7 +152,7 @@ f32_div(float32_t a,
             if (!sigA) {
                 return signed_zero_F32(signZ);
             } else {
-                exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(sigA);
+                exp16_sig32 const normExpSig(sigA);
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }

@@ -69,7 +69,7 @@ f32_to_f128M(float32_t a,
             return;
         }
 
-        exp16_sig32 const normExpSig = softfloat_normSubnormalF32Sig(frac);
+        exp16_sig32 const normExpSig(frac);
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
     }

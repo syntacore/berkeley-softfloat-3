@@ -47,11 +47,11 @@ f128M_add(float128_t const *const aPtr,
     uint64_t const* const bWPtr = reinterpret_cast<uint64_t const*>(bPtr);
     uint64_t const uiA64 = aWPtr[indexWord(2, 1)];
     uint64_t const uiA0 = aWPtr[indexWord(2, 0)];
-    bool const signA = signF128UI64(uiA64);
+    bool const signA = is_sign(uiA64);
 
     uint64_t const uiB64 = bWPtr[indexWord(2, 1)];
     uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
-    bool const signB = signF128UI64(uiB64);
+    bool const signB = is_sign(uiB64);
 
     *zPtr = (signA == signB ? softfloat_addMagsF128 : softfloat_subMagsF128)(uiA64, uiA0, uiB64, uiB0, signA);
 }

@@ -60,13 +60,13 @@ softfloat_mulAddF128(uint64_t const uiA64,
     uint64_t sig256Z0;
 
 
-    bool const signA = signF128UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     int32_t expA = expF128UI64(uiA64);
     uint128 sigA{fracF128UI64(uiA64), uiA0};
-    bool const signB = signF128UI64(uiB64);
+    bool const signB = is_sign(uiB64);
     int32_t expB = expF128UI64(uiB64);
     uint128 sigB{fracF128UI64(uiB64), uiB0};
-    bool const signC = signF128UI64(uiC64) ^ (op == softfloat_mulAdd_subC);
+    bool const signC = is_sign(uiC64) ^ (op == softfloat_mulAdd_subC);
     int32_t expC = expF128UI64(uiC64);
     uint128 sigC{fracF128UI64(uiC64), uiC0};
     bool signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);

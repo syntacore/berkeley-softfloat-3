@@ -43,7 +43,7 @@ f64_to_extF80M(float64_t a,
     using namespace softfloat::internals;
     extFloat80M* zSPtr = zPtr;
     uint64_t const uiA = f_as_u_64(a);
-    bool const sign = signF64UI(uiA);
+    bool const sign = is_sign(uiA);
     int16_t exp = expF64UI(uiA);
     uint64_t frac = fracF64UI(uiA);
 
@@ -65,7 +65,7 @@ f64_to_extF80M(float64_t a,
             return;
         }
 
-        exp16_sig64 const normExpSig = softfloat_normSubnormalF64Sig(frac);
+        exp16_sig64 const normExpSig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;
     }

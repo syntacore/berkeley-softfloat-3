@@ -155,7 +155,7 @@ f16_div(float16_t const a,
                     return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
                 }
             } else {
-                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigB);
+                exp8_sig16 const normExpSig{sigB};
                 expB = normExpSig.exp;
                 sigB = normExpSig.sig;
             }
@@ -165,7 +165,7 @@ f16_div(float16_t const a,
             if (0 == sigA) {
                 return u_as_f_16(packToF16UI(signZ, 0, 0));
             } else {
-                exp8_sig16 const normExpSig = softfloat_normSubnormalF16Sig(sigA);
+                exp8_sig16 const normExpSig{sigA};
                 expA = normExpSig.exp;
                 sigA = normExpSig.sig;
             }
