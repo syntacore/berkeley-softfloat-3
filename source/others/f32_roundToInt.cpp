@@ -51,8 +51,11 @@ f32_roundToInt(float32_t const a,
 
     if (exp <= 0x7E) {
         if (0 == static_cast<uint32_t>(uiA << 1)) {
+            // is zero
             return a;
-        } else if (exact) {
+        }
+
+        if (exact) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -63,6 +66,7 @@ f32_roundToInt(float32_t const a,
             if (0 == fracF32UI(uiA)) {
                 break;
             }
+
             [[fallthrough]];
 
         case softfloat_round_near_maxMag:
@@ -88,31 +92,37 @@ f32_roundToInt(float32_t const a,
         }
 
         return u_as_f_32(uiZ);
-    } else if (0x96 <= exp) {
-        return exp == 0xFF && fracF32UI(uiA) ? u_as_f_32(softfloat_propagateNaNF32UI(uiA, 0)) : a;
-    } else {
-        uint32_t uiZ = uiA;
-        uint32_t const lastBitMask = static_cast<uint32_t>(1) << (0x96 - exp);
-        uint32_t const roundBitsMask = lastBitMask - 1;
-
-        if (softfloat_round_near_maxMag == roundingMode) {
-            uiZ += lastBitMask >> 1;
-        } else if (roundingMode == softfloat_round_near_even) {
-            uiZ += lastBitMask >> 1;
-
-            if (0 == (uiZ & roundBitsMask)) {
-                uiZ &= ~lastBitMask;
-            }
-        } else if (softfloat_round_minMag != roundingMode && (signF32UI(uiZ) ^ (roundingMode == softfloat_round_max))) {
-            uiZ += roundBitsMask;
-        }
-
-        uiZ &= ~roundBitsMask;
-
-        if (exact && uiZ != uiA) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-
-        return u_as_f_32(uiZ);
     }
+
+    if (0x96 <= exp) {
+        static constexpr int16_t const max_exp = 0xFF;
+        return
+            max_exp == exp && fracF32UI(uiA) ?
+            u_as_f_32(propagate_NaN(uiA, UINT32_C(0))) :
+            a;
+    }
+
+    uint32_t uiZ = uiA;
+    uint32_t const lastBitMask = static_cast<uint32_t>(1) << (0x96 - exp);
+    uint32_t const roundBitsMask = lastBitMask - 1;
+
+    if (softfloat_round_near_maxMag == roundingMode) {
+        uiZ += lastBitMask >> 1;
+    } else if (roundingMode == softfloat_round_near_even) {
+        uiZ += lastBitMask >> 1;
+
+        if (0 == (uiZ & roundBitsMask)) {
+            uiZ &= ~lastBitMask;
+        }
+    } else if (softfloat_round_minMag != roundingMode && (signF32UI(uiZ) != (softfloat_round_max == roundingMode))) {
+        uiZ += roundBitsMask;
+    }
+
+    uiZ &= ~roundBitsMask;
+
+    if (exact && uiZ != uiA) {
+        softfloat_raiseFlags(softfloat_flag_inexact);
+    }
+
+    return u_as_f_32(uiZ);
 }
