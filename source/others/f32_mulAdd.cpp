@@ -67,14 +67,14 @@ softfloat_mulAddF32(Mul_add_operations const op,
             /* product is inf or undefined */
             if (!is_product_undefined) {
                 /* product is inf */
-                uint32_t const uiZ = signed_inf_F32UI(signProd);
+                float32_t const uiZ = signed_inf_F32(signProd);
 
                 if (expC != 0xFF) {
                     /* summand c is finite, return product as result */
-                    return u_as_f_32(uiZ);
+                    return uiZ;
                 } else if (signProd == signC) {
                     /* summands are same sign inf */
-                    return u_as_f_32(uiZ);
+                    return uiZ;
                 }
 
                 /* summands are different sign inf, undefined sum */
