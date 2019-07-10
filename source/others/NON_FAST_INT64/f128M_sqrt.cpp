@@ -44,7 +44,7 @@ f128M_sqrt(float128_t const* const aPtr,
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    bool const signA = signF128UI96(uiA96);
+    bool const signA = is_sign(uiA96);
     int32_t const rawExpA = expF128UI96(uiA96);
 
     if (0x7FFF == rawExpA) {

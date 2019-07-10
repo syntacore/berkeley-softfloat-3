@@ -61,7 +61,7 @@ f128M_to_ui32_r_minMag(float128_t const* aPtr,
         return 0;
     }
 
-    bool const sign = signF128UI96(uiA96);
+    bool const sign = is_sign(uiA96);
 
     if (sign || shiftDist < 17) {
         softfloat_raiseFlags(softfloat_flag_invalid);

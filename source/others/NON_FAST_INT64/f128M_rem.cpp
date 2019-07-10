@@ -107,7 +107,7 @@ f128M_rem(const float128_t* aPtr,
         return;
     }
 
-    bool signRem = signF128UI96(uiA96);
+    bool signRem = is_sign(uiA96);
 
     expDiff = expA - expB;
 

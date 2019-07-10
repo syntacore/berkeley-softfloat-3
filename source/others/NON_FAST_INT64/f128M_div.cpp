@@ -47,10 +47,10 @@ f128M_div(float128_t const* const aPtr,
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    bool const signA = signF128UI96(uiA96);
+    bool const signA = is_sign(uiA96);
     int32_t expA = expF128UI96(uiA96);
     uint32_t const uiB96 = bWPtr[indexWordHi(4)];
-    bool const signB = signF128UI96(uiB96);
+    bool const signB = is_sign(uiB96);
     int32_t expB = expF128UI96(uiB96);
     bool const signZ = signA != signB;
 

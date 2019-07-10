@@ -44,7 +44,7 @@ f128M_to_i64(float128_t const* aPtr,
     using namespace softfloat::internals;
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    bool const sign = signF128UI96(uiA96);
+    bool const sign = is_sign(uiA96);
     int32_t const exp = expF128UI96(uiA96);
     uint32_t sig96 = fracF128UI96(uiA96);
     int32_t const shiftDist = 0x404F - exp;

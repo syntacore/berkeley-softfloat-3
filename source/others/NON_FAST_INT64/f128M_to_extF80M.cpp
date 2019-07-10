@@ -53,7 +53,7 @@ f128M_to_extF80M(const float128_t* aPtr,
     zSPtr = zPtr;
 
     uiA96 = aWPtr[indexWordHi(4)];
-    sign = signF128UI96(uiA96);
+    sign = is_sign(uiA96);
     exp = expF128UI96(uiA96);
 
     if (exp == 0x7FFF) {

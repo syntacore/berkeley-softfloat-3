@@ -80,7 +80,7 @@ f128M_roundToInt(float128_t const* aPtr,
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        sign = signF128UI96(ui96);
+        sign = is_sign(ui96);
 
         switch (roundingMode) {
         case softfloat_round_near_even:
@@ -186,7 +186,7 @@ f128M_roundToInt(float128_t const* aPtr,
         wordZ = wordA;
         carry = false;
 
-        if (softfloat_round_minMag != roundingMode && signF128UI96(ui96) != (softfloat_round_max == roundingMode)) {
+        if (softfloat_round_minMag != roundingMode && is_sign(ui96) != (softfloat_round_max == roundingMode)) {
             if (extra || (wordA & extrasMask)) {
                 wordZ += bit;
                 carry = wordZ < wordA;

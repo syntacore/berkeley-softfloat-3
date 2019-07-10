@@ -49,7 +49,7 @@ f128M_to_i32(float128_t const* const aPtr,
 
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    bool sign = signF128UI96(uiA96);
+    bool sign = is_sign(uiA96);
     int32_t const exp = expF128UI96(uiA96);
     uint64_t sig64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];
 

@@ -59,8 +59,8 @@ f128M_le_quiet(const float128_t* aPtr,
 
     uiA96 = aWPtr[indexWordHi(4)];
     uiB96 = bWPtr[indexWordHi(4)];
-    signA = signF128UI96(uiA96);
-    signB = signF128UI96(uiB96);
+    signA = is_sign(uiA96);
+    signB = is_sign(uiB96);
 
     if (signA != signB) {
         if (signA) {

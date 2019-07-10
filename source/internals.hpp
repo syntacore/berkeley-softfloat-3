@@ -397,12 +397,6 @@ softfloat_mulAddF128M(uint32_t const*,
                       uint32_t*,
                       Mul_add_operations);
 
-inline constexpr bool
-signF128UI96(uint32_t const& a96)
-{
-    return static_cast<int32_t>(a96) < 0;
-}
-
 inline constexpr uint16_t
 expF128UI96(uint32_t const& a96)
 {

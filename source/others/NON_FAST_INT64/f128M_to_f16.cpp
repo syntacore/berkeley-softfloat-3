@@ -43,7 +43,7 @@ f128M_to_f16(const float128_t* aPtr)
     uint32_t const* const aWPtr = (uint32_t const*)aPtr;
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    bool const sign = signF128UI96(uiA96);
+    bool const sign = is_sign(uiA96);
     int32_t exp = expF128UI96(uiA96);
     uint32_t const frac32 =
         fracF128UI96(uiA96) |

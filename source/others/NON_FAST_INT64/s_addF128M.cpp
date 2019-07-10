@@ -75,8 +75,8 @@ softfloat_addF128M(uint32_t const* aWPtr,
         return;
     }
 
-    bool signZ = signF128UI96(uiA96);
-    bool const signB = signF128UI96(uiB96) != negateB;
+    bool signZ = is_sign(uiA96);
+    bool const signB = is_sign(uiB96) != negateB;
     negateB = signZ != signB;
 
     if (static_cast<uint32_t>(uiA96 << 1) < static_cast<uint32_t>(uiB96 << 1)) {
