@@ -73,7 +73,7 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
     bool raiseInexact = false;
 
     uint32_t absZ;

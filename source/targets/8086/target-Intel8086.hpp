@@ -358,7 +358,7 @@ softfloat_extF80MToCommonNaN(extFloat80M const& a)
     if (extF80M_isSignalingNaN(&a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    return commonNaN{signExtF80UI64(a.signExp), a.signif << 1, 0};
+    return commonNaN{is_sign(a.signExp), a.signif << 1, 0};
 }
 
 /**

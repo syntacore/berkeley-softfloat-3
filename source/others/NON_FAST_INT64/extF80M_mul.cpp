@@ -48,7 +48,7 @@ extF80M_mul(extFloat80_t const* const aPtr,
     int32_t const expA = expExtF80UI64(uiA64);
     uint16_t const uiB64 = bPtr->signExp;
     int32_t const expB = expExtF80UI64(uiB64);
-    bool const signZ = signExtF80UI64(uiA64) != signExtF80UI64(uiB64);
+    bool const signZ = is_sign(uiA64) != is_sign(uiB64);
 
     if (0x7FFF == expA || 0x7FFF == expB) {
         if (!softfloat_tryPropagateNaNExtF80M(aPtr, bPtr, zPtr)) {

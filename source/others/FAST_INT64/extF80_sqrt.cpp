@@ -41,7 +41,7 @@ extF80_sqrt(extFloat80_t const a)
 {
     using namespace softfloat::internals;
 
-    bool const signA = signExtF80UI64(a.signExp);
+    bool const signA = is_sign(a.signExp);
     int32_t expA = expExtF80UI64(a.signExp);
     uint64_t sigA = a.signif;
 

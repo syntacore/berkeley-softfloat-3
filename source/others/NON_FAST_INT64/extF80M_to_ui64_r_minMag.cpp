@@ -64,7 +64,7 @@ extF80M_to_ui64_r_minMag(const extFloat80_t *aPtr, bool exact)
         return 0;
     }
     
-    sign = signExtF80UI64(uiA64);
+    sign = is_sign(uiA64);
     if (shiftDist < 0) {
         if (sign || (shiftDist <= -63)) {
             goto invalid;

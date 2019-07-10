@@ -79,7 +79,7 @@ extF80M_rem(extFloat80_t const* const aPtr,
         }
     }
 
-    bool signRem = signExtF80UI64(uiA64);
+    bool signRem = is_sign(uiA64);
 
     if (0 == expA) {
         expA = 1;

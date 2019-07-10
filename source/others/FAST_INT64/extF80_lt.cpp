@@ -51,8 +51,8 @@ extF80_lt(extFloat80_t const a,
         return false;
     }
 
-    bool const signA = signExtF80UI64(uiA64);
-    bool const signB = signExtF80UI64(uiB64);
+    bool const signA = is_sign(uiA64);
+    bool const signB = is_sign(uiB64);
     typedef typename std::conditional<(sizeof uiA0 < sizeof uiA64), decltype(uiA64), decltype(uiA0)>::type largest_type;
     return
         signA != signB ?

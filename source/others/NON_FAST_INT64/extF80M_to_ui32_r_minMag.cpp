@@ -60,7 +60,7 @@ extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
 
     if (shiftDist < 0) {
         if (sign || sig >> 32 || (shiftDist <= -31)) {

@@ -44,7 +44,7 @@ extF80M_to_i32(extFloat80_t const* const aPtr,
 {
     using namespace softfloat::internals;
     uint16_t const uiA64 = aPtr->signExp;
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);
     uint64_t sig = aPtr->signif;
     int32_t const shiftDist = 0x4032 - exp;

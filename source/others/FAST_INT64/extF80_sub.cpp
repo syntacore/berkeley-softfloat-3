@@ -43,10 +43,10 @@ extF80_sub(extFloat80_t const a,
     using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
-    bool const signA = signExtF80UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     uint16_t const uiB64 = b.signExp;
     uint64_t const uiB0 = b.signif;
-    bool const signB = signExtF80UI64(uiB64);
+    bool const signB = is_sign(uiB64);
     return
         signA == signB ? softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA) :
         softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);

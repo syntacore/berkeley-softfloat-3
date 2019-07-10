@@ -607,12 +607,6 @@ isZero64UI(uint64_t a)
     return 0 == (~(~UINT64_C(0) << 63) & a);
 }
 
-inline constexpr bool
-signExtF80UI64(uint16_t a64)
-{
-    return 0 != (a64 >> 15);
-}
-
 inline constexpr uint16_t
 expExtF80UI64(uint16_t const& a64)
 {

@@ -55,7 +55,7 @@ extF80M_le_quiet(extFloat80_t const* const aPtr,
         return false;
     }
 
-    bool const signA = signExtF80UI64(uiA64);
+    bool const signA = is_sign(uiA64);
 
     if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
         /* Signs are different. */

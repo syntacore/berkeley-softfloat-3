@@ -47,8 +47,8 @@ extF80_le(extFloat80_t const a,
         return false;
     }
 
-    bool const signA = signExtF80UI64(a.signExp);
-    bool const signB = signExtF80UI64(b.signExp);
+    bool const signA = is_sign(a.signExp);
+    bool const signB = is_sign(b.signExp);
     return
         signA != signB ?
         signA || 0 == (((a.signExp | b.signExp) & UINT16_C(0x7FFF)) | a.signif | b.signif) :

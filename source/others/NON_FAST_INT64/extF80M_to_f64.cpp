@@ -43,7 +43,7 @@ extF80M_to_f64(extFloat80_t const *aPtr)
     using namespace softfloat::internals;
     extFloat80M const *aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 

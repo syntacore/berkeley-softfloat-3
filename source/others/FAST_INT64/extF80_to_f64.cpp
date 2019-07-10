@@ -42,7 +42,7 @@ extF80_to_f64(extFloat80_t a)
     using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 =  a.signif;
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
     int32_t exp = expExtF80UI64(uiA64);
     uint64_t sig = uiA0;
 

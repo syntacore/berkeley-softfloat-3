@@ -49,7 +49,7 @@ extF80_rem(extFloat80_t a,
 
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
-    bool const signA = signExtF80UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     int32_t expA = expExtF80UI64(uiA64);
     uint64_t sigA = uiA0;
     uint16_t const uiB64 = b.signExp;

@@ -41,12 +41,12 @@ extF80_div(extFloat80_t const a,
            extFloat80_t const b)
 {
     using namespace softfloat::internals;
-    bool const signA = signExtF80UI64(a.signExp);
+    bool const signA = is_sign(a.signExp);
     int32_t expA = expExtF80UI64(a.signExp);
     uint64_t sigA = a.signif;
     uint16_t const uiB64 = b.signExp;
     uint64_t const uiB0 = b.signif;
-    bool const signB = signExtF80UI64(uiB64);
+    bool const signB = is_sign(uiB64);
     int32_t expB = expExtF80UI64(uiB64);
     uint64_t sigB = uiB0;
     bool const signZ = signA != signB;

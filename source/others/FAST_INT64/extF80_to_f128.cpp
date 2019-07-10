@@ -52,7 +52,7 @@ extF80_to_f128(extFloat80_t a)
     if (0x7FFF == exp && 0 != frac) {
         uiZ = softfloat_commonNaNToF128UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0));
     } else {
-        sign = signExtF80UI64(uiA64);
+        sign = is_sign(uiA64);
         frac128 = softfloat_shortShiftLeft128(0, frac, 49);
         uiZ.v64 = packToF128UI64(sign, exp, frac128.v64);
         uiZ.v0 = frac128.v0;

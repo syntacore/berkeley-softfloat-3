@@ -45,10 +45,10 @@ extF80M_add(extFloat80_t const *const aPtr,
     using namespace softfloat::internals;
     uint16_t const uiA64 = aPtr->signExp;
     uint64_t const uiA0 = aPtr->signif;
-    bool const signA = signExtF80UI64(uiA64);
+    bool const signA = is_sign(uiA64);
     uint16_t const uiB64 = bPtr->signExp;
     uint64_t const uiB0 = bPtr->signif;
-    bool const signB = signExtF80UI64(uiB64);
+    bool const signB = is_sign(uiB64);
     *zPtr =
         signA == signB ? softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA) :
         softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);

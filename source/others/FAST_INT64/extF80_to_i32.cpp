@@ -49,7 +49,7 @@ extF80_to_i32(extFloat80_t a,
     static bool const fromNaN_is_same_as_any_overflow = fromNaN_is_same_as_pos_overflow || fromNaN_is_same_as_neg_overflow;
 
     uint16_t const uiA64 = a.signExp;
-    bool sign = signExtF80UI64(uiA64);
+    bool sign = is_sign(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);
     uint64_t sig = a.signif;
 

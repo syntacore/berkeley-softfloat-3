@@ -55,7 +55,7 @@ extF80_to_ui32_r_minMag(extFloat80_t const a,
         return 0;
     }
 
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
 
     if (sign || shiftDist < 32) {
         softfloat_raiseFlags(softfloat_flag_invalid);

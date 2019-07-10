@@ -54,7 +54,7 @@ extF80_to_i64_r_minMag(extFloat80_t const a,
         return 0;
     }
 
-    bool const sign = signExtF80UI64(uiA64);
+    bool const sign = is_sign(uiA64);
 
     if (shiftDist <= 0) {
         if (uiA64 == packToExtF80UI64(1, 0x403E) && sig == UINT64_C(0x8000000000000000)) {
