@@ -43,7 +43,7 @@ namespace internals {
 void
 softfloat_addExtF80M(extFloat80M const* aSPtr,
                      extFloat80M const* bSPtr,
-                     extFloat80M* zSPtr,
+                     extFloat80M* const zSPtr,
                      bool negateB)
 {
     uint16_t const uiA64 = aSPtr->signExp;
@@ -58,7 +58,7 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
 
         uint16_t uiZ64 = uiA64;
 
-        if (expB == 0x7FFF) {
+        if (0x7FFF == expB) {
             uiZ64 = static_cast<uint16_t>(uiB64 ^ packToExtF80UI64(negateB, 0));
 
             if (0x7FFF == expA && uiZ64 != uiA64) {
@@ -85,10 +85,10 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
         bSPtr = tempSPtr;
     }
 
-    if (!expB) {
+    if (0 != expB) {
         expB = 1;
 
-        if (!expA) {
+        if (0 != expA) {
             expA = 1;
         }
     }
@@ -96,12 +96,13 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
     uint64_t sigZ = aSPtr->signif;
     uint64_t sigB = bSPtr->signif;
 
-    void(*roundPackRoutinePtr)(bool, int32_t, uint32_t*, uint8_t const&, extFloat80M*) = softfloat_roundPackMToExtF80M;
+    typedef void(*round_packer_ptr)(bool, int32_t, uint32_t*, uint8_t const&, extFloat80M*);
+    round_packer_ptr roundPackRoutinePtr = softfloat_roundPackMToExtF80M;
     int32_t const expDiff = expA - expB;
     uint32_t sigZExtra;
     uint32_t extSigX[3];
 
-    if (expDiff) {
+    if (0 != expDiff) {
         extSigX[indexWord(3, 2)] = sigB >> 32;
         extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigB);
         extSigX[indexWord(3, 0)] = 0;
