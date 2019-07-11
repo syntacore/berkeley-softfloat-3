@@ -37,59 +37,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 bool
-f128M_le(const float128_t* aPtr,
-         const float128_t* bPtr)
+f128M_le(float128_t const *const aPtr,
+         float128_t const *const bPtr)
 {
     using namespace softfloat::internals;
-    const uint32_t* aWPtr, *bWPtr;
-    uint32_t uiA96, uiB96;
-    bool signA, signB;
-    uint32_t wordA, wordB;
 
-    aWPtr = (const uint32_t*)aPtr;
-    bWPtr = (const uint32_t*)bPtr;
+    uint32_t const* aWPtr = reinterpret_cast<uint32_t const *>(aPtr);
+    uint32_t const* bWPtr = reinterpret_cast<uint32_t const *>(bPtr);
 
     if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
-    uiA96 = aWPtr[indexWordHi(4)];
-    uiB96 = bWPtr[indexWordHi(4)];
-    signA = is_sign(uiA96);
-    signB = is_sign(uiB96);
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    bool const signA = is_sign(uiA96);
+    bool const signB = is_sign(uiB96);
 
     if (signA != signB) {
         if (signA) {
             return true;
         }
 
-        if ((uiA96 | uiB96) & 0x7FFFFFFF) {
+        if (0 != ((uiA96 | uiB96) & 0x7FFFFFFF)) {
             return false;
         }
 
-        wordA = aWPtr[indexWord(4, 2)];
-        wordB = bWPtr[indexWord(4, 2)];
+        uint32_t wordA = aWPtr[indexWord(4, 2)];
+        uint32_t wordB = bWPtr[indexWord(4, 2)];
 
-        if (wordA | wordB) {
+        if (0 != (wordA | wordB)) {
             return false;
         }
 
         wordA = aWPtr[indexWord(4, 1)];
         wordB = bWPtr[indexWord(4, 1)];
 
-        if (wordA | wordB) {
+        if (0 != (wordA | wordB)) {
             return false;
         }
 
         wordA = aWPtr[indexWord(4, 0)];
         wordB = bWPtr[indexWord(4, 0)];
-        return ((wordA | wordB) == 0);
+        return 0 == (wordA | wordB);
     }
 
     if (signA) {
-        aWPtr = (const uint32_t*)bPtr;
-        bWPtr = (const uint32_t*)aPtr;
+        std::swap(aWPtr, bWPtr);
     }
 
     return (softfloat_compare128M(aWPtr, bWPtr) <= 0);
