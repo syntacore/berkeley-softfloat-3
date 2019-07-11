@@ -19,5 +19,6 @@ set(ALL_SRC
 source_group(TREE ${SOFTFLOAT_ROOT} FILES ${ALL_SRC})
 
 add_library(softfloat-${SOFTFLOAT_MODEL}-nfi64 EXCLUDE_FROM_ALL ${ALL_SRC})
+target_include_directories(softfloat-${SOFTFLOAT_MODEL}-nfi64 PUBLIC ${SOFTFLOAT_INCLUDE})
 target_link_libraries(softfloat-${SOFTFLOAT_MODEL}-nfi64 PRIVATE softfloat-build-defs)
 set_target_properties(softfloat-${SOFTFLOAT_MODEL}-nfi64 PROPERTIES FOLDER "softfloat/${SOFTFLOAT_MODEL}")

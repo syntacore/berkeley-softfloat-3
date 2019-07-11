@@ -10,9 +10,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(SOFTFLOAT_FAST_DIV64TO32 OFF CACHE BOOL "SOFTFLOAT_FAST_DIV64TO32")
 
 set(SOFTFLOAT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(SOFTFLOAT_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(INC_SOFTFLOAT
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/softfloat/functions.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/softfloat/types.h
+    ${SOFTFLOAT_INCLUDE}/softfloat/functions.h
+    ${SOFTFLOAT_INCLUDE}/softfloat/types.h
 )
 
 add_library(softfloat-build-defs INTERFACE)
