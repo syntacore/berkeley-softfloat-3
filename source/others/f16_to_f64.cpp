@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "target.hpp"
+#include "model.hpp"
 
 float64_t
 f16_to_f64(float16_t a)

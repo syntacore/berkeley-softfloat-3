@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "target.hpp"
+#include "model.hpp"
 
 extFloat80_t
 extF80_add(extFloat80_t a, extFloat80_t b)

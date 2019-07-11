@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "target.hpp"
+#include "model.hpp"
 
 uint32_t
 f64_to_ui32_r_minMag(float64_t const a,

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "target.hpp"
+#include "model.hpp"
 
 void
 extF80M_div(extFloat80_t const* const aSPtr,

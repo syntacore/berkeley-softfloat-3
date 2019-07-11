@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-set(INC_TARGET ${INC_TARGET} ${CMAKE_CURRENT_SOURCE_DIR}/target.hpp)
+set(INC_TARGET ${INC_TARGET} ${CMAKE_CURRENT_SOURCE_DIR}/model.hpp)
 
 set(SOFTFLOAT_MODEL SSE)
 add_subdirectory(FAST_INT64)
