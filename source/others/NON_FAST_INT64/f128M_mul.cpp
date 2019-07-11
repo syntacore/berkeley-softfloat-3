@@ -37,121 +37,100 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "target.hpp"
 
 void
-f128M_mul(const float128_t* aPtr,
-          const float128_t* bPtr,
-          float128_t* zPtr)
+f128M_mul(float128_t* const aPtr,
+          float128_t* const bPtr,
+          float128_t* const zPtr)
 {
     using namespace softfloat::internals;
-    const uint32_t* aWPtr, *bWPtr;
-    uint32_t* zWPtr;
-    uint32_t uiA96;
-    int32_t expA;
-    uint32_t uiB96;
-    int32_t expB;
-    bool signZ;
-    const uint32_t* ptr;
-    uint32_t uiZ96, sigA[4];
-    uint8_t shiftDist;
-    uint32_t sigB[4];
-    int32_t expZ;
-    uint32_t sigProd[8], *extSigZPtr;
 
+    uint32_t const* const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
+    uint32_t const* const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);
+    uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
-    aWPtr = (const uint32_t*) aPtr;
-    bWPtr = (const uint32_t*) bPtr;
-    zWPtr = (uint32_t*) zPtr;
+    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    int32_t expA = expF128UI96(uiA96);
+    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    int32_t expB = expF128UI96(uiB96);
+    bool const signZ = is_sign(uiA96) != is_sign(uiB96);
 
-    uiA96 = aWPtr[indexWordHi(4)];
-    expA = expF128UI96(uiA96);
-    uiB96 = bWPtr[indexWordHi(4)];
-    expB = expF128UI96(uiB96);
-    signZ = is_sign(uiA96) != is_sign(uiB96);
-
-    if ((expA == 0x7FFF) || (expB == 0x7FFF)) {
+    if (0x7FFF == expA || 0x7FFF == expB) {
         if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
             return;
         }
 
-        ptr = aWPtr;
-
-        if (! expA) {
-            goto possiblyInvalid;
-        }
-
-        if (! expB) {
-            ptr = bWPtr;
-possiblyInvalid:
+        if (0 == expA || 0 == expB) {
+            uint32_t const* ptr = 0 == expA ? aWPtr : bWPtr;
 
             if (
-                ! fracF128UI96(ptr[indexWordHi(4)])
-                && !(ptr[indexWord(4, 2)] | ptr[indexWord(4, 1)]
-                     | ptr[indexWord(4, 0)])
+                0 == fracF128UI96(ptr[indexWordHi(4)]) &&
+                0 == (ptr[indexWord(4, 2)] | ptr[indexWord(4, 1)] | ptr[indexWord(4, 0)])
             ) {
                 softfloat_invalidF128M(zWPtr);
                 return;
             }
         }
 
-        uiZ96 = packToF128UI96(signZ, 0x7FFF, 0);
-        goto uiZ96;
+        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
     }
 
-    if (expA) {
+    uint32_t sigA[4];
+
+    if (0 != expA) {
         sigA[indexWordHi(4)] = fracF128UI96(uiA96) | 0x00010000;
         sigA[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
         sigA[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
         sigA[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
-    }
-    else {
+    } else {
         expA = softfloat_shiftNormSigF128M(aWPtr, 0, sigA);
 
         if (expA == -128) {
-            goto zero;
+            zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[indexWord(4, 0)] = 0;
+            return;
         }
     }
 
-    if (expB) {
+    uint32_t sigB[4];
+
+    if (0 != expB) {
         sigB[indexWordHi(4)] = fracF128UI96(uiB96) | 0x00010000;
         sigB[indexWord(4, 2)] = bWPtr[indexWord(4, 2)];
         sigB[indexWord(4, 1)] = bWPtr[indexWord(4, 1)];
         sigB[indexWord(4, 0)] = bWPtr[indexWord(4, 0)];
-    }
-    else {
+    } else {
         expB = softfloat_shiftNormSigF128M(bWPtr, 0, sigB);
 
         if (expB == -128) {
-            goto zero;
+            zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
+            zWPtr[indexWord(4, 2)] = 0;
+            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[indexWord(4, 0)] = 0;
+            return;
         }
     }
 
-    expZ = expA + expB - 0x4000;
+    int32_t expZ = expA + expB - 0x4000;
+    uint32_t sigProd[8];
     softfloat_mul128MTo256M(sigA, sigB, sigProd);
 
-    if (
-        sigProd[indexWord(8, 2)]
-        || (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])
-    ) {
+    if (0 != sigProd[indexWord(8, 2)] || 0 != (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])) {
         sigProd[indexWord(8, 3)] |= 1;
     }
 
-    extSigZPtr = &sigProd[indexMultiwordHi(8, 5)];
-    shiftDist = 16;
+    uint32_t* const extSigZPtr = &sigProd[indexMultiwordHi(8, 5)];
+    uint8_t shiftDist = 16;
 
-    if (extSigZPtr[indexWordHi(5)] & 2) {
+    if (0 != (extSigZPtr[indexWordHi(5)] & 2)) {
         ++expZ;
         shiftDist = 15;
     }
 
     softfloat_shortShiftLeft160M(extSigZPtr, shiftDist, extSigZPtr);
     softfloat_roundPackMToF128M(signZ, expZ, extSigZPtr, zWPtr);
-    return;
-
-zero:
-    uiZ96 = packToF128UI96(signZ, 0, 0);
-uiZ96:
-    zWPtr[indexWordHi(4)] = uiZ96;
-    zWPtr[indexWord(4, 2)] = 0;
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
-
 }
