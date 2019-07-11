@@ -112,7 +112,8 @@ f128_rem(float128_t const a,
             sigB = softfloat_add128(sigB.v64, sigB.v0, sigB.v64, sigB.v0);
             q = 0;
         } else {
-            q = !!softfloat_le128(sigB.v64, sigB.v0, rem.v64, rem.v0);
+            /* suppress warning: '=': conversion from 'bool' to 'uint32_t', signed/unsigned mismatch */
+            q = 0u + !!softfloat_le128(sigB.v64, sigB.v0, rem.v64, rem.v0);
 
             if (0 != q) {
                 rem = softfloat_sub128(rem.v64, rem.v0, sigB.v64, sigB.v0);
