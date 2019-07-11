@@ -34,38 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef INTEL8086_SSE_TARGET_HPP_
-#define INTEL8086_SSE_TARGET_HPP_
+#ifndef INTEL8086_NON_SSE_TARGET_HPP_
+#define INTEL8086_NON_SSE_TARGET_HPP_
 
-#include "target-Intel8086.hpp"
+#include "Intel8086.hpp"
 
 namespace softfloat {
 namespace internals {
 inline namespace Intel_8086 {
 
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
-inline uint16_t
+uint16_t
 softfloat_propagateNaNF16UI(uint16_t const uiA,
-                            uint16_t const uiB)
-{
-    static uint16_t const quite_nan_bit = UINT16_C(0x0200);
-    bool const isSigNaNA = softfloat_isSigNaNF16UI(uiA);
-
-    if (isSigNaNA || softfloat_isSigNaNF16UI(uiB)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-
-        if (isSigNaNA) {
-            return static_cast<uint16_t>(quite_nan_bit | uiA);
-        }
-    }
-
-    return static_cast<uint16_t>(quite_nan_bit | (isNaNF16UI(uiA) ? uiA : uiB));
-}
+                            uint16_t const uiB);
 
 template<typename Ty>
 inline Ty
@@ -84,60 +64,25 @@ propagate_NaN<uint32_t>(uint32_t const& uiA,
                         uint32_t const& uiB)
 {
     static uint32_t const quietNaN_bit = UINT32_C(0x00400000);
-
     bool const isSigNaNA = softfloat_isSigNaNF32UI(uiA);
     bool const isSigNaNB = softfloat_isSigNaNF32UI(uiB);
-    /* Make NaNs non-signaling. */
-    uint32_t const uiNonsigA = quietNaN_bit | uiA;
-    uint32_t const uiNonsigB = quietNaN_bit | uiB;
 
     if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
-        if (!isSigNaNA) {
-            return isNaNF32UI(uiA) ? uiNonsigA : uiNonsigB;
-        }
-
-        if (!isSigNaNB) {
-            return isNaNF32UI(uiB) ? uiNonsigB : uiNonsigA;
-        }
-    }
-
-    {
-        uint32_t const uiMagA = uiNonsigA & 0x7FFFFFFF;
-        uint32_t const uiMagB = uiNonsigB & 0x7FFFFFFF;
-        return
-            uiMagA < uiMagB ? uiNonsigB :
-            uiMagB < uiMagA ? uiNonsigA :
-            uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
-    }
-}
-
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
-inline uint64_t
-softfloat_propagateNaNF64UI(uint64_t const uiA,
-                            uint64_t const uiB)
-{
-    bool const isSigNaNA = softfloat_isSigNaNF64UI(uiA);
-
-    if (isSigNaNA || softfloat_isSigNaNF64UI(uiB)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-
         if (isSigNaNA) {
-            return uiA | UINT64_C(0x0008000000000000);
+            return quietNaN_bit | uiA;
         }
     }
 
-    return (isNaNF64UI(uiA) ? uiA : uiB) | UINT64_C(0x0008000000000000);
+    return quietNaN_bit | (isNaNF32UI(uiA) ? uiA : uiB);
 }
 
+uint64_t
+softfloat_propagateNaNF64UI(uint64_t const uiA,
+                            uint64_t const uiB);
 }  // namespace Intel_8086
 }  // namespace internals
 }  // namespace softfloat
 
-#endif  /* INTEL8086_SSE_TARGET_HPP_ */
+#endif  /* INTEL8086_NON_SSE_TARGET_HPP_ */

@@ -8,5 +8,5 @@ set(INC_OTHERS
 
 add_subdirectory(primitives)
 add_subdirectory(others)
-add_subdirectory(targets/8086)
-add_subdirectory(targets/RISCV)
+add_subdirectory(models/x86)
+add_subdirectory(models/RISCV)

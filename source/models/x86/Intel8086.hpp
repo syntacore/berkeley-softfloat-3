@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TARGET_INTEL8086_HPP_
-#define TARGET_INTEL8086_HPP_
+#ifndef SOFTFLOAT_MODEL_INTEL8086_HPP_
+#define SOFTFLOAT_MODEL_INTEL8086_HPP_
 
 #include "internals.hpp"
 
@@ -448,4 +448,4 @@ softfloat_propagateNaNF128M(uint32_t const* aWPtr,
 }  // namespace internals
 }  // namespace softfloat
 
-#endif  /* TARGET_INTEL8086_HPP_ */
+#endif  /* SOFTFLOAT_MODEL_INTEL8086_HPP_ */

@@ -7,8 +7,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_definitions(-DSOFTFLOAT_FAST_DIV32TO16)
 
-set(INC_TARGET ${CMAKE_CURRENT_SOURCE_DIR}/target-Intel8086.hpp)
-set(SRC_TARGET-8086)
+set(INC_TARGET ${CMAKE_CURRENT_SOURCE_DIR}/Intel8086.hpp)
 
-add_subdirectory(NON-SSE)
+add_subdirectory(FPU)
 add_subdirectory(SSE)
