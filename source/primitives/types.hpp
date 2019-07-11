@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "softfloat/types.h"
 #include <cstdint>
 #include <climits>
+#include <cstddef>
 
 namespace softfloat {
 namespace internals {
