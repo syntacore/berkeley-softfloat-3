@@ -55,19 +55,27 @@ extern "C" {
     the types below may, if desired, be defined as aliases for the native types
     (typically `float' and `double', and possibly `long double').
     */
-    typedef struct float16_t
+    struct float16_type
     {
         uint16_t v;
-    } float16_t;
-    typedef struct float32_t
+    };
+    typedef struct float16_type float16_t;
+
+    struct float32_type
     {
         uint32_t v;
-    } float32_t;
-    typedef struct float64_t
+    };
+
+    typedef struct float32_type float32_t;
+
+    struct float64_type
     {
         uint64_t v;
-    } float64_t;
-    typedef struct float128_t
+    };
+    
+    typedef struct float64_type float64_t;
+
+    struct float128_type
     {
 #ifdef BIG_ENDIAN
         uint64_t v64;
@@ -76,7 +84,9 @@ extern "C" {
         uint64_t v0;
         uint64_t v64;
 #endif
-    } float128_t;
+    };
+
+    typedef struct float128_type float128_t;
 
     /**
     The format of an 80-bit extended floating-point number in memory.  This
