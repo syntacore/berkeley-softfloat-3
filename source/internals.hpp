@@ -594,7 +594,7 @@ isInf64UI(uint64_t const& a)
 }
 
 inline constexpr bool
-isZero64UI(uint64_t a)
+isZero64UI(uint64_t const &a)
 {
     return 0 == (~(~UINT64_C(0) << 63) & a);
 }
