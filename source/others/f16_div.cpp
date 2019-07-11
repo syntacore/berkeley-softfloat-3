@@ -58,7 +58,7 @@ make_result(uint16_t const sigA,
 
     uint16_t sigZ = static_cast<uint16_t>(sig32A / sigB);
 
-    if (!(sigZ & 7)) {
+    if (0 == (sigZ & 7)) {
         sigZ |= (static_cast<uint32_t>(sigB) * sigZ != sig32A);
     }
 
@@ -92,7 +92,7 @@ make_result(uint16_t sigA,
 
     ++sigZ;
 
-    if (!(sigZ & 7)) {
+    if (0 == (sigZ & 7)) {
         sigZ &= ~1;
         rem = (sigA << 10) - sigZ * sigB;
 
