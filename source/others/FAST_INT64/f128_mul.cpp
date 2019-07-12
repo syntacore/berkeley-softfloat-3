@@ -140,7 +140,7 @@ f128_mul(float128_t const a,
 
     expZ = expA + expB - 0x4000;
     sigA.v64 |= UINT64_C(0x0001000000000000);
-    sigB = softfloat_shortShiftLeft128(sigB.v64, sigB.v0, 16);
+    sigB = softfloat_shortShiftLeft128(sigB, 16);
     softfloat_mul128To256M(sigA.v64, sigA.v0, sigB.v64, sigB.v0, sig256Z);
     sigZExtra = sig256Z[indexWord(4, 1)] | (sig256Z[indexWord(4, 0)] != 0);
     sigZ =

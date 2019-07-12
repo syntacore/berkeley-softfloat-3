@@ -143,7 +143,7 @@ f128_div(float128_t a,
             break;
         }
 
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
+        rem = softfloat_shortShiftLeft128(rem, 29);
         uint128 const term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
@@ -156,7 +156,7 @@ f128_div(float128_t a,
     }
 
     if (((q + 1) & 7) < 2) {
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
+        rem = softfloat_shortShiftLeft128(rem, 29);
         uint128 const term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 

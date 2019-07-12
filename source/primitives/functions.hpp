@@ -215,7 +215,7 @@ softfloat_approxRecip32_1(uint32_t a)
         softfloat_approxRecip_1k0s[index] -
         ((softfloat_approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
     uint32_t const sigma0 = ~static_cast<uint32_t>((r0 * static_cast<uint64_t>(a)) >> 7);
-    uint32_t r =
+    uint32_t const r =
         (static_cast<uint32_t>(r0) << 16) +
         static_cast<uint32_t>(static_cast<uint64_t>(r0) * sigma0 >> 24);
     uint32_t const sqrSigma0 = (static_cast<uint64_t>(sigma0) * sigma0) >> 32;
@@ -253,17 +253,6 @@ softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
 
 /**
 Returns true if the 128-bit unsigned integer formed by concatenating `a64'
-and `a0' is equal to the 128-bit unsigned integer formed by concatenating
-`b64' and `b0'.
-*/
-inline constexpr bool
-softfloat_eq128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
-{
-    return a64 == b64 && a0 == b0;
-}
-
-/**
-Returns true if the 128-bit unsigned integer formed by concatenating `a64'
 and `a0' is less than or equal to the 128-bit unsigned integer formed by
 concatenating `b64' and `b0'.
 */
@@ -293,11 +282,18 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' left by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-softfloat_shortShiftLeft128(uint64_t a64,
-                            uint64_t a0,
+softfloat_shortShiftLeft128(uint64_t const& a64,
+                            uint64_t const& a0,
                             uint8_t dist)
 {
     return uint128{a64 << dist | a0 >> (63u & -static_cast<int8_t>(dist)), a0 << dist};
+}
+
+inline constexpr uint128
+softfloat_shortShiftLeft128(uint128 const& a,
+                            uint8_t const dist)
+{
+    return uint128{a.v64 << dist | a.v0 >> (63u & -static_cast<int8_t>(dist)), a.v0 << dist};
 }
 
 /**
@@ -307,9 +303,16 @@ number of bits given in `dist', which must be in the range 1 to 63.
 inline constexpr uint128
 softfloat_shortShiftRight128(uint64_t const& a64,
                              uint64_t const& a0,
-                             uint8_t dist)
+                             uint8_t const dist)
 {
     return uint128{a64 >> dist, a64 << (63 & -dist) | a0 >> dist};
+}
+
+inline constexpr uint128
+softfloat_shortShiftRight128(uint128 const& a,
+                             uint8_t const dist)
+{
+    return uint128{a.v64 >> dist, a.v64 << (63 & -dist) | a.v0 >> dist};
 }
 
 /**
@@ -317,9 +320,9 @@ This function is the same as `softfloat_shiftRightJam64Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
 inline uint64_extra
-softfloat_shortShiftRightJam64Extra(uint64_t a,
-                                    uint64_t extra,
-                                    uint8_t dist)
+softfloat_shortShiftRightJam64Extra(uint64_t const& a,
+                                    uint64_t const& extra,
+                                    uint8_t const dist)
 {
     return uint64_extra{a >> dist, a << (-static_cast<int8_t>(dist) & 63) | !!(0 != extra)};
 }

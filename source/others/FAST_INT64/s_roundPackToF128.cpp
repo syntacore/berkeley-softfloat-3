@@ -42,6 +42,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
+namespace {
+
+/**
+Returns true if the 128-bit unsigned integer formed by concatenating `a64'
+and `a0' is equal to the 128-bit unsigned integer formed by concatenating
+`b64' and `b0'.
+*/
+static inline constexpr bool
+softfloat_eq128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
+{
+    return a64 == b64 && a0 == b0;
+}
+
+}  // namespace
 
 float128_t
 softfloat_roundPackToF128(bool sign,
