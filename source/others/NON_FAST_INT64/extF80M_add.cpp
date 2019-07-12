@@ -42,7 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 void
-extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr)
+extF80M_add(extFloat80_t const *const aPtr,
+            extFloat80_t const *const bPtr,
+            extFloat80_t *const zPtr)
 {
     using namespace softfloat::internals;
     softfloat_addExtF80M(aPtr, bPtr, zPtr, false);

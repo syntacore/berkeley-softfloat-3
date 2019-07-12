@@ -44,13 +44,13 @@ namespace softfloat {
 namespace internals {
 
 extFloat80_t
-softfloat_normRoundPackToExtF80(bool sign,
+softfloat_normRoundPackToExtF80(bool const sign,
                                 int32_t exp,
                                 uint64_t sig,
                                 uint64_t sigExtra,
-                                uint8_t roundingPrecision)
+                                uint8_t const roundingPrecision)
 {
-    if (!sig) {
+    if (0 == sig) {
         exp -= 64;
         sig = sigExtra;
         sigExtra = 0;
@@ -59,16 +59,14 @@ softfloat_normRoundPackToExtF80(bool sign,
     auto const shiftDist = count_leading_zeros(sig);
     exp -= shiftDist;
 
-    if (shiftDist) {
+    if (0 != shiftDist) {
         uint128 const sig128 = softfloat_shortShiftLeft128(sig, sigExtra, shiftDist);
         sig = sig128.v64;
         sigExtra = sig128.v0;
     }
 
     return
-        softfloat_roundPackToExtF80(
-            sign, exp, sig, sigExtra, roundingPrecision);
-
+        softfloat_roundPackToExtF80(sign, exp, sig, sigExtra, roundingPrecision);
 }
 
 }  // namespace internals
