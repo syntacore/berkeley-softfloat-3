@@ -358,6 +358,7 @@ softfloat_extF80MToCommonNaN(extFloat80M const& a)
     if (extF80M_isSignalingNaN(&a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
+
     return commonNaN{is_sign(a.signExp), a.signif << 1, 0};
 }
 
@@ -405,11 +406,12 @@ four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
 inline commonNaN
-softfloat_f128MToCommonNaN(uint32_t const *const aWPtr)
+softfloat_f128MToCommonNaN(uint32_t const* const aWPtr)
 {
-    if (f128M_isSignalingNaN((float128_t const *)aWPtr)) {
+    if (f128M_isSignalingNaN((float128_t const*)aWPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
+
     commonNaN z;
     z.sign = 0 != (aWPtr[indexWordHi(4)] >> 31);
     softfloat_shortShiftLeft128M(aWPtr, 16, reinterpret_cast<uint32_t*>(&z.v0));
@@ -424,9 +426,9 @@ platform's normal endian order to form a 128-bit floating-point value.
 */
 inline void
 softfloat_commonNaNToF128M(commonNaN const& a,
-                           uint32_t *const zWPtr)
+                           uint32_t* const zWPtr)
 {
-    softfloat_shortShiftRight128M(reinterpret_cast<uint32_t const *>(&a.v0), 16u, zWPtr);
+    softfloat_shortShiftRight128M(reinterpret_cast<uint32_t const*>(&a.v0), 16u, zWPtr);
     zWPtr[indexWordHi(4)] |= static_cast<uint32_t>(!!a.sign) << 31 | UINT32_C(0x7FFF8000);
 }
 
