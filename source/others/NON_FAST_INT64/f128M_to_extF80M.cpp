@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifdef SOFTFLOAT_FAST_INT64
+#error For non-fast int64_t only
+#endif
+
 void
 f128M_to_extF80M(const float128_t* aPtr,
                  extFloat80_t* zPtr)

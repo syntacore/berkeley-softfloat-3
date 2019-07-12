@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 int64_t
 extF80_to_i64_r_minMag(extFloat80_t const a,
                        bool exact)

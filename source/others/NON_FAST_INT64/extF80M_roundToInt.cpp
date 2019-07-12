@@ -41,6 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning( disable : 5030)
 #endif
 
+#ifdef SOFTFLOAT_FAST_INT64
+#error For non-fast int64_t only
+#endif
+
 void
 extF80M_roundToInt(extFloat80_t const* const aPtr,
                    uint8_t roundingMode,

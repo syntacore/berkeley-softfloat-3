@@ -36,8 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 bool
-f128_isSignalingNaN(float128_t a)
+f128_isSignalingNaN(float128_t const a)
 {
     using namespace softfloat::internals;
     return softfloat_isSigNaNF128UI(f_as_u_128(a).v64, f_as_u_128(a).v0);

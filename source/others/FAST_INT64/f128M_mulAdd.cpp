@@ -36,11 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 void
-f128M_mulAdd(const float128_t* aPtr,
-             const float128_t* bPtr,
-             const float128_t* cPtr,
-             float128_t* zPtr)
+f128M_mulAdd(const float128_t* const aPtr,
+             const float128_t* const bPtr,
+             const float128_t* const cPtr,
+             float128_t* const zPtr)
 {
     using namespace softfloat::internals;
     const uint64_t* aWPtr, *bWPtr, *cWPtr;

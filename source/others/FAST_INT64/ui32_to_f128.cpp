@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 float128_t
 ui32_to_f128(uint32_t a)
 {

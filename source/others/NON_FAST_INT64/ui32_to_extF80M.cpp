@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifdef SOFTFLOAT_FAST_INT64
+#error For non-fast int64_t only
+#endif
+
 void
 ui32_to_extF80M(uint32_t a,
                 extFloat80_t *const zPtr)

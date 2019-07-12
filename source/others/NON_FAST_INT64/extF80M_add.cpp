@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifdef SOFTFLOAT_FAST_INT64
+#error For non-fast int64_t only
+#endif
+
 void
 extF80M_add(extFloat80_t const *aPtr, extFloat80_t const *bPtr, extFloat80_t *zPtr)
 {

@@ -36,10 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 uint64_t
-f128_to_ui64(float128_t a,
+f128_to_ui64(float128_t const a,
              softfloat_round_mode const roundingMode,
-             bool exact)
+             bool const exact)
 {
     using namespace softfloat::internals;
     uint64_t const uiA64 = f_as_u_128(a).v64;

@@ -36,8 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 float128_t
-i32_to_f128(int32_t a)
+i32_to_f128(int32_t const a)
 {
     using namespace softfloat::internals;
 
@@ -45,7 +49,7 @@ i32_to_f128(int32_t a)
         return static_cast<float128_t>(uint128{0, 0});
     }
 
-    bool const sign = (a < 0);
+    bool const sign = a < 0;
     uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
     int8_t const shiftDist = count_leading_zeros(absA) + 17;
     uint64_t const uiZ64 = packToF128UI64(sign, 0x402E - shiftDist, static_cast<uint64_t>(absA) << shiftDist);

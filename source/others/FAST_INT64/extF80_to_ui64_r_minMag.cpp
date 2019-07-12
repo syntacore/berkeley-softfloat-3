@@ -36,19 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 uint64_t
 extF80_to_ui64_r_minMag(extFloat80_t const a,
                         bool exact)
 {
     using namespace softfloat::internals;
-    int32_t shiftDist;
-
 
     uint16_t const uiA64 = a.signExp;
     int32_t const exp = expExtF80UI64(uiA64);
     uint64_t const sig = a.signif;
-
-    shiftDist = 0x403E - exp;
+    int32_t const shiftDist = 0x403E - exp;
 
     if (64 <= shiftDist) {
         if (exact && (exp | sig)) {

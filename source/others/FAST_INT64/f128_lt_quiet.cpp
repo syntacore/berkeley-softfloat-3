@@ -36,9 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifndef SOFTFLOAT_FAST_INT64
+#error Fast int64_t operations only
+#endif
+
 bool
-f128_lt_quiet(float128_t a,
-              float128_t b)
+f128_lt_quiet(float128_t const a,
+              float128_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA64 = f_as_u_128(a).v64;
