@@ -43,6 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define THREAD_LOCAL
 #endif
 
+#ifdef __GNUC__
+#    define ALIGN(X) __attribute__((aligned(X)))
+#elif defined(_MSC_VER)
+#    define ALIGN(X) /* formal parameter with __declspec(align(16)) won't be aligned */
+#else
+#    error Unknown compiler, unknown alignment attribute!
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -75,7 +83,7 @@ extern "C" {
     
     typedef struct float64_type float64_t;
 
-    struct float128_type
+    struct ALIGN(16) float128_type
     {
 #ifdef BIG_ENDIAN
         uint64_t v64;
@@ -155,5 +163,7 @@ extern "C" {
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+
+#undef ALIGN
 
 #endif  // SOFTFLOAT_TYPES_H
