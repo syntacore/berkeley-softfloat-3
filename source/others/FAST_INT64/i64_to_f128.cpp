@@ -50,7 +50,9 @@ i64_to_f128(int64_t const a)
     }
 
     bool const sign = (a < 0);
-    /** @bug for INT64_MIN */
+    /**
+    @bug for INT64_MIN
+    */
     uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
     int8_t const shiftDist = count_leading_zeros(absA) + 49;
 

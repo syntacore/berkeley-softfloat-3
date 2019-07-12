@@ -200,7 +200,9 @@ softfloat_roundPackMToExtF80M(bool sign,
             exp < 0 ||
             !doIncrement ||
             sig < UINT64_MAX;
-        /** @todo use local variable for output */
+        /**
+        @todo use local variable for output
+        */
         softfloat_shiftRightJam96M(extSigPtr, static_cast<uint8_t>(1 - exp), extSigPtr);
         sigExtra = extSigPtr[indexWordLo(3)];
 

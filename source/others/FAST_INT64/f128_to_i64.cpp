@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Fast int64_t operations only
 #endif
 
-/** @todo refactoring */
+/**
+@todo refactoring
+*/
 int64_t
 f128_to_i64(float128_t const a,
             softfloat_round_mode const roundingMode,

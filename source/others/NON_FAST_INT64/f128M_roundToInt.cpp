@@ -136,7 +136,9 @@ f128M_roundToInt(float128_t const* aPtr,
         return;
     }
 
-    /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint8_t', possible loss of data */
+    /**
+    @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint8_t', possible loss of data
+    */
     bool const roundNear =
         softfloat_round_near_maxMag == roundingMode ||
         softfloat_round_near_even == roundingMode;

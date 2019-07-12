@@ -52,7 +52,9 @@ f128_to_f32(float128_t const a)
     uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
 
     if (INT16_MAX != exp) {
-        /** @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data */
+        /**
+        @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
+        */
         uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac64, 18));
 
         if (0 != (exp | frac32)) {

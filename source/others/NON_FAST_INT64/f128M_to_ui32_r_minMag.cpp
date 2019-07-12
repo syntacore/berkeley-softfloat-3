@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error For non-fast int64_t only
 #endif
 
-/** @todo refactoring */
+/**
+@todo refactoring
+*/
 uint32_t
 f128M_to_ui32_r_minMag(float128_t const* aPtr,
                        bool exact)

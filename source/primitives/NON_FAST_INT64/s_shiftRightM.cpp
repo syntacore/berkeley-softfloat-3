@@ -70,7 +70,9 @@ softfloat_shiftRightM(size_t const size_words,
             aPtr += indexWordLo(size_words - wordDist);
             uint32_t* destPtr = zPtr + indexWordLo(size_words);
 
-            /** @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
+            /**
+            @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint8_t', possible loss of data
+            */
             for (auto i = size_words - wordDist; i; --i) {
                 *destPtr = *aPtr;
                 aPtr += wordIncr;

@@ -163,7 +163,9 @@ count_leading_zeros<uint64_t>(uint64_t a)
 
     if (0 == a32) {
         count = 32;
-        /** @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data */
+        /**
+        @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+        */
         a32 = static_cast<uint32_t>(a);
     }
 

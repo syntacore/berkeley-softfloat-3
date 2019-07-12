@@ -41,7 +41,9 @@ i32_to_f16(int32_t a)
 {
     using namespace softfloat::internals;
     bool const sign = a < 0;
-    /** @bug INT32_MIN */
+    /**
+    @bug INT32_MIN
+    */
     uint32_t absA = static_cast<uint32_t>(sign ? -a : a);
     int8_t const shiftDist = count_leading_zeros(absA) - 21;
 

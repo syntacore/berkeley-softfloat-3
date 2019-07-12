@@ -50,7 +50,9 @@ pointed to by `aSPtr' and `bSPtr' is a NaN, stores the combined NaN result
 at the location pointed to by `zSPtr'.  If either original floating-point
 value is a signaling NaN, the invalid exception is raised.
 */
-/** @bug use extFloat80_t */
+/**
+@bug use extFloat80_t
+*/
 void
 softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
                               extFloat80M const* const bSPtr,

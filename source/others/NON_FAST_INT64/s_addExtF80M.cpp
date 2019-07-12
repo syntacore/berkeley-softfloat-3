@@ -43,7 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
-/** @bug use extFloat80_t */
+/**
+@bug use extFloat80_t
+*/
 void
 softfloat_addExtF80M(extFloat80M const* aSPtr,
                      extFloat80M const* bSPtr,

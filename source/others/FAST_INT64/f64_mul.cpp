@@ -40,10 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Fast int64_t operations only
 #endif
 
-/** @todo split to different implementations */
+/**
+@todo split to different implementations
+*/
 float64_t
-f64_mul(float64_t a,
-        float64_t b)
+f64_mul(float64_t const a,
+        float64_t const b)
 {
     using namespace softfloat::internals;
     uint64_t const uiA = f_as_u_64(a);

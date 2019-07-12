@@ -55,12 +55,14 @@ roundPackTo<int32_t>(bool const sign,
     uint16_t const roundBits = sig & 0xFFFu;
     sig += roundIncrement;
 
-    if (sig & UINT64_C(0xFFFFF00000000000)) {
+    if (0 != (sig & UINT64_C(0xFFFFF00000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
 
-    // TODO: check
+    /**
+    @todo check
+    */
     uint32_t const sig32 = (sig >> 12) & ~(!(roundBits ^ 0x800) & !!(roundNearEven));
     int32_t const z = sign ? -static_cast<int32_t>(sig32) : static_cast<int32_t>(sig32);
 

@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error For non-fast int64_t only
 #endif
 
-/** @todo split to different implementations */
+/**
+@todo split to different implementations
+*/
 uint64_t
 f32_to_ui64(float32_t const a,
             softfloat_round_mode const roundingMode,

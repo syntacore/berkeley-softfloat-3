@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-/// @todo make inline
+/**
+@todo make inline
+*/
 bool
 f32_isSignalingNaN(float32_t const a)
 {

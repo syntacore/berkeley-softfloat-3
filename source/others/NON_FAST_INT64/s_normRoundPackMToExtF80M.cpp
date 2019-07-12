@@ -49,6 +49,7 @@ namespace internals {
 @param[in] extSigPtr
 @param[in] roundingPrecision
 @param[out] zSPtr
+
 @bug use extFloat80_t
 */
 void

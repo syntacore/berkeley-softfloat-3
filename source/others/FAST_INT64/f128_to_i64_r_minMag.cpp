@@ -75,7 +75,9 @@ f128_to_i64_r_minMag(float128_t const a,
         }
 
         sig64 |= UINT64_C(0x0001000000000000);
-        /** @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data */
+        /**
+        @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data
+        */
         auto const negShiftDist = -shiftDist;
         int64_t const absZ = static_cast<int64_t>(sig64 << negShiftDist | sig0 >>(shiftDist & 63u));
 

@@ -171,7 +171,9 @@ softfloat_mulAddF16(Mul_add_operations op,
     if (signProd == signC) {
         if (expDiff <= 0) {
             expZ = expC;
-            /** @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint16_t', possible loss of data */
+            /**
+            @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint16_t', possible loss of data
+            */
             sigZ = static_cast<uint16_t>(sigC + softfloat_shiftRightJam32(sigProd, static_cast<uint16_t>(16 - expDiff)));
         } else {
             expZ = expProd;

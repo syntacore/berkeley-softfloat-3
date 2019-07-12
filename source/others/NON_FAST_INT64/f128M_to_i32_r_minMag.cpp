@@ -75,7 +75,9 @@ f128M_to_i32_r_minMag(const float128_t* aPtr,
     uint32_t const absZ = static_cast<uint32_t>(sig64 >> shiftDist);
     uint32_t const uiZ = sign ? -static_cast<int32_t>(absZ) : absZ;
 
-    /**@todo */
+    /**
+    @todo
+    */
     if ((0 != (uiZ >> 31)) != sign) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return

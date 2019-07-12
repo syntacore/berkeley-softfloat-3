@@ -101,7 +101,9 @@ extern "C" {
     structure must contain a 16-bit field named `signExp' and a 64-bit field
     named `signif'.
     */
-    /** @bug macro value dependent interface */
+    /**
+    @bug macro value dependent interface
+    */
     struct extFloat80M
     {
 #ifdef BIG_ENDIAN

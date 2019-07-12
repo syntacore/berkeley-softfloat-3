@@ -119,6 +119,9 @@ f128_roundToInt(float128_t a,
             uiZ.v64 = uiA64 & packToF128UI64(1, 0, 0);
             uiZ.v0 = 0;
 
+            /**
+            @bug  warning: enumeration value ‘softfloat_round_minMag’ not handled in switch
+            */
             switch (roundingMode) {
             case softfloat_round_near_even:
                 if (!(fracF128UI64(uiA64) | uiA0)) {

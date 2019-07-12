@@ -70,6 +70,8 @@ extF80_to_f16(extFloat80_t a)
         exp = -0x40;
     }
 
-    /** @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data */
+    /**
+    @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
+    */
     return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
 }

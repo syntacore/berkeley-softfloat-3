@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error For non-fast int64_t only
 #endif
 
-/** @todo split to different implementations */
+/**
+@todo split to different implementations
+*/
 float64_t
 f64_mul(float64_t a,
         float64_t b)

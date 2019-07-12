@@ -283,7 +283,7 @@ u_as_f_128(uint128 const& v)
 }
 
 inline constexpr int32_t
-expF128UI64(uint64_t a64)
+expF128UI64(uint64_t const& a64)
 {
     return static_cast<int32_t>(a64 >> 48) & INT32_C(0x7FFF);
 }
@@ -295,7 +295,7 @@ fracF128UI64(uint64_t const& a64)
 }
 
 inline constexpr uint64_t
-packToF128UI64(bool sign,
+packToF128UI64(bool const sign,
                int32_t const& exp,
                uint64_t const& sig64)
 {
@@ -306,8 +306,8 @@ packToF128UI64(bool sign,
 }
 
 inline constexpr bool
-isNaNF128UI(uint64_t a64,
-            uint64_t a0)
+isNaNF128UI(uint64_t const& a64,
+            uint64_t const& a0)
 {
     return
         0 == (~a64 & UINT64_C(0x7FFF000000000000)) &&
@@ -408,7 +408,7 @@ fracF128UI96(uint32_t const& a96)
 }
 
 inline constexpr uint32_t
-packToF128UI96(bool sign,
+packToF128UI96(bool const sign,
                unsigned const expnt,
                uint32_t const& sig96)
 {
@@ -425,7 +425,7 @@ expF16UI(uint16_t const& a)
 }
 
 inline constexpr uint16_t
-fracF16UI(uint16_t a)
+fracF16UI(uint16_t const& a)
 {
     return a & 0x03FFu;
 }
@@ -443,7 +443,7 @@ packToF16UI(bool sign,
 }
 
 inline constexpr bool
-isNaNF16UI(uint16_t a)
+isNaNF16UI(uint16_t const& a)
 {
     return
         0 == (UINT16_C(0x7C00) & ~a) &&
@@ -451,7 +451,7 @@ isNaNF16UI(uint16_t a)
 }
 
 inline constexpr uint16_t
-f_as_u_16(float16_t v)
+f_as_u_16(float16_t const& v)
 {
     return v.v;
 }
@@ -463,7 +463,7 @@ u_as_f_16(uint16_t v)
 }
 
 inline constexpr uint32_t
-f_as_u_32(float32_t v)
+f_as_u_32(float32_t const& v)
 {
     return v.v;
 }
@@ -475,7 +475,7 @@ u_as_f_32(uint32_t v)
 }
 
 inline constexpr uint64_t
-f_as_u_64(float64_t v)
+f_as_u_64(float64_t const& v)
 {
     return v.v;
 }
@@ -486,7 +486,9 @@ u_as_f_64(uint64_t v)
     return float64_t{v};
 }
 
-/** @bug return signed 16-bits value instead unsigned 8-bits value */
+/**
+@bug return signed 16-bits value instead unsigned 8-bits value
+*/
 inline constexpr int16_t
 expF32UI(uint32_t const& a)
 {
@@ -566,7 +568,7 @@ expF64UI(uint64_t const& a)
 }
 
 inline constexpr uint64_t
-fracF64UI(uint64_t a)
+fracF64UI(uint64_t const& a)
 {
     return a & ~(~UINT64_C(0) << 52);
 }
@@ -606,8 +608,8 @@ expExtF80UI64(uint16_t const& a64)
 }
 
 inline constexpr uint16_t
-packToExtF80UI64(bool sign,
-                 uint16_t expnt)
+packToExtF80UI64(bool const sign,
+                 uint16_t const expnt)
 {
     return static_cast<uint16_t>((!!sign << 15) | expnt);
 }

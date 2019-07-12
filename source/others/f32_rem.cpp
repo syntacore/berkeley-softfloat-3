@@ -59,7 +59,9 @@ f32_rem(float32_t const a,
             return u_as_f_32(propagate_NaN(uiA, uiB));
         }
 
-        /** @todo check */
+        /**
+        @todo check
+        */
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f_32(defaultNaNF32UI);
     }
@@ -69,7 +71,9 @@ f32_rem(float32_t const a,
             return u_as_f_32(propagate_NaN(uiA, uiB));
         }
 
-        /** @todo check */
+        /**
+        @todo check
+        */
         return a;
     }
 
