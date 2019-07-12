@@ -54,7 +54,8 @@ endian and little-endian platforms.
 static int const wordIncr = -1;
 
 static inline constexpr size_t
-indexWord(size_t const total, size_t const n)
+indexWord(size_t const total,
+          size_t const n)
 {
     return total - 1 - n;
 }
@@ -72,8 +73,8 @@ indexWordLo(size_t const total)
 }
 
 static inline constexpr size_t
-indexMultiword(size_t total,
-               size_t m,
+indexMultiword(size_t const total,
+               size_t const m,
                size_t)
 {
     return total - 1 - m;
@@ -87,8 +88,8 @@ indexMultiwordHi(size_t,
 }
 
 static inline constexpr size_t
-indexMultiwordLo(size_t total,
-                 size_t n)
+indexMultiwordLo(size_t const total,
+                 size_t const n)
 { 
     return total - n;
 }
@@ -102,7 +103,7 @@ indexMultiwordHiBut(size_t,
 
 static inline constexpr size_t
 indexMultiwordLoBut(size_t,
-                    size_t n)
+                    size_t const n)
 {
     return n;
 }
@@ -114,7 +115,8 @@ indexMultiwordLoBut(size_t,
 static int const wordIncr = 1;
 
 static inline constexpr size_t
-indexWord(size_t, size_t const n)
+indexWord(size_t,
+          size_t const n)
 {
     return n;
 }
@@ -134,27 +136,28 @@ indexWordLo(size_t const)
 static inline constexpr size_t
 indexMultiword(size_t,
                size_t,
-               size_t n)
+               size_t const n)
 {
     return n;
 }
 
 static inline constexpr size_t
-indexMultiwordHi(size_t total,
-                 size_t n) 
+indexMultiwordHi(size_t const total,
+                 size_t const n) 
 {
     return total - n;
 }
 
 static inline constexpr size_t
-indexMultiwordLo(size_t, size_t)
+indexMultiwordLo(size_t,
+                 size_t)
 {
     return 0u;
 }
 
 static inline constexpr size_t
 indexMultiwordHiBut(size_t,
-                    size_t n)
+                    size_t const n)
 {
     return n;
 }
