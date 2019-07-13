@@ -45,48 +45,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 float128_t
-f128_roundToInt(float128_t a,
+f128_roundToInt(float128_t const a,
                 softfloat_round_mode const roundingMode,
                 bool const exact)
 {
     using namespace softfloat::internals;
-    uint64_t uiA64, uiA0;
-    int32_t exp;
-    uint128 uiZ;
-    uint64_t lastBitMask, roundBitsMask;
-    bool roundNearEven;
 
+    uint128 uiZ;
 
     uint128 const uA{a};
-    uiA64 = uA.v64;
-    uiA0 = uA.v0;
-    exp = expF128UI64(uiA64);
+    int32_t exp = expF128UI64(uA.v64);
 
     if (0x402F <= exp) {
-
         if (0x406F <= exp) {
-            if ((exp == 0x7FFF) && (fracF128UI64(uiA64) | uiA0)) {
-                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiA64, uiA0, 0, 0));
+            if (0x7FFF == exp && 0 != (fracF128UI64(uA.v64) | uA.v0)) {
+                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uA.v64, uA.v0, 0, 0));
             }
 
             return a;
         }
 
-        lastBitMask = static_cast<uint64_t>(2) << (0x406E - exp);
-        roundBitsMask = lastBitMask - 1;
-        uiZ.v64 = uiA64;
-        uiZ.v0 = uiA0;
-        roundNearEven = (roundingMode == softfloat_round_near_even);
+        uint64_t const lastBitMask = static_cast<uint64_t>(2) << (0x406E - exp);
+        uint64_t const roundBitsMask = lastBitMask - 1;
+        uiZ = uA;
+        bool const roundNearEven = (roundingMode == softfloat_round_near_even);
 
         if (roundNearEven || (roundingMode == softfloat_round_near_maxMag)) {
-            if (exp == 0x402F) {
+            if (0x402F == exp) {
                 if (UINT64_C(0x8000000000000000) <= uiZ.v0) {
                     ++uiZ.v64;
 
-                    if (
-                        roundNearEven
-                        && (uiZ.v0 == UINT64_C(0x8000000000000000))
-                    ) {
+                    if (roundNearEven && UINT64_C(0x8000000000000000) == uiZ.v0) {
                         uiZ.v64 &= ~1;
                     }
                 }
@@ -98,9 +87,7 @@ f128_roundToInt(float128_t a,
                 }
             }
         } else if (roundingMode != softfloat_round_minMag) {
-            if (
-                is_sign(uiZ.v64) != (softfloat_round_max == roundingMode)
-            ) {
+            if (is_sign(uiZ.v64) != (softfloat_round_max == roundingMode)) {
                 uiZ = softfloat_add128(uiZ.v64, uiZ.v0, 0, roundBitsMask);
             }
         }
@@ -108,7 +95,7 @@ f128_roundToInt(float128_t a,
         uiZ.v0 &= ~roundBitsMask;
     } else {
         if (exp < 0x3FFF) {
-            if (!((uiA64 & UINT64_C(0x7FFFFFFFFFFFFFFF)) | uiA0)) {
+            if (0 == ((uA.v64 & UINT64_C(0x7FFFFFFFFFFFFFFF)) | uA.v0)) {
                 return a;
             }
 
@@ -116,7 +103,7 @@ f128_roundToInt(float128_t a,
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            uiZ.v64 = uiA64 & packToF128UI64(1, 0, 0);
+            uiZ.v64 = uA.v64 & packToF128UI64(1, 0, 0);
             uiZ.v0 = 0;
 
             /**
@@ -124,27 +111,28 @@ f128_roundToInt(float128_t a,
             */
             switch (roundingMode) {
             case softfloat_round_near_even:
-                if (!(fracF128UI64(uiA64) | uiA0)) {
+                if (0 == (fracF128UI64(uA.v64) | uA.v0)) {
                     break;
                 }
+
                 [[fallthrough]];
 
             case softfloat_round_near_maxMag:
-                if (exp == 0x3FFE) {
+                if (0x3FFE == exp) {
                     uiZ.v64 |= packToF128UI64(0, 0x3FFF, 0);
                 }
 
                 break;
 
             case softfloat_round_min:
-                if (uiZ.v64) {
+                if (0 != uiZ.v64) {
                     uiZ.v64 = packToF128UI64(1, 0x3FFF, 0);
                 }
 
                 break;
 
             case softfloat_round_max:
-                if (!uiZ.v64) {
+                if (0 == uiZ.v64) {
                     uiZ.v64 = packToF128UI64(0, 0x3FFF, 0);
                 }
 
@@ -154,31 +142,32 @@ f128_roundToInt(float128_t a,
             return static_cast<float128_t>(uiZ);
         }
 
-        uiZ.v64 = uiA64;
+        uiZ.v64 = uA.v64;
         uiZ.v0 = 0;
-        lastBitMask = static_cast<uint64_t>(1) << (0x402F - exp);
-        roundBitsMask = lastBitMask - 1;
+        uint64_t const lastBitMask = static_cast<uint64_t>(1) << (0x402F - exp);
+        uint64_t const roundBitsMask = lastBitMask - 1;
 
         if (roundingMode == softfloat_round_near_maxMag) {
             uiZ.v64 += lastBitMask >> 1;
         } else if (roundingMode == softfloat_round_near_even) {
             uiZ.v64 += lastBitMask >> 1;
 
-            if (!((uiZ.v64 & roundBitsMask) | uiA0)) {
+            if (0 == ((uiZ.v64 & roundBitsMask) | uA.v0)) {
                 uiZ.v64 &= ~lastBitMask;
             }
-        } else if (roundingMode != softfloat_round_minMag) {
+        } else if (softfloat_round_minMag != roundingMode) {
             if (is_sign(uiZ.v64) != (softfloat_round_max == roundingMode)) {
-                uiZ.v64 = (uiZ.v64 | (uiA0 != 0)) + roundBitsMask;
+                uiZ.v64 = (uiZ.v64 | !!(uA.v0 != 0)) + roundBitsMask;
             }
         }
 
         uiZ.v64 &= ~roundBitsMask;
     }
 
-    if (exact && (uiZ.v64 != uiA64 || uiZ.v0 != uiA0)) {
+    if (exact && (uiZ.v64 != uA.v64 || uiZ.v0 != uA.v0)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     return static_cast<float128_t>(uiZ);
 }
 
