@@ -54,8 +54,8 @@ f32_rem(float32_t const a,
     int16_t expB = expF32UI(uiB);
     uint32_t sigB = fracF32UI(uiB);
 
-    if (expA == 0xFF) {
-        if (sigA || ((expB == 0xFF) && sigB)) {
+    if (0xFF == expA) {
+        if (0 != sigA || (0xFF == expB && 0 != sigB)) {
             return u_as_f_32(propagate_NaN(uiA, uiB));
         }
 

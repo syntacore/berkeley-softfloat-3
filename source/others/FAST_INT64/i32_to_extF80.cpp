@@ -48,7 +48,7 @@ i32_to_extF80(int32_t const a)
     uint16_t uiZ64 = 0;
     uint32_t absA = 0;
 
-    if (a) {
+    if (0 != a) {
         bool const sign = (a < 0);
         absA = static_cast<uint32_t>(sign ? -a : a);
         auto const shiftDist = count_leading_zeros(absA);

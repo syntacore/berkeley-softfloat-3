@@ -44,9 +44,12 @@ namespace softfloat {
 namespace internals {
 
 float128_t
-softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t sig0)
+softfloat_normRoundPackToF128(bool const sign,
+                              int32_t exp,
+                              uint64_t sig64,
+                              uint64_t sig0)
 {
-    if (!sig64) {
+    if (0 == sig64) {
         exp -= 64;
         sig64 = sig0;
         sig0 = 0;
@@ -56,7 +59,7 @@ softfloat_normRoundPackToF128(bool sign, int32_t exp, uint64_t sig64, uint64_t s
     exp -= shiftDist;
 
     if (0 <= shiftDist) {
-        if (shiftDist) {
+        if (0 != shiftDist) {
             uint128 const sig128 = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(shiftDist));
             sig64 = sig128.v64;
             sig0 = sig128.v0;
