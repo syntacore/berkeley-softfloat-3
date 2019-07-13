@@ -45,10 +45,6 @@ extF80_rem(extFloat80_t a,
            extFloat80_t b)
 {
     using namespace softfloat::internals;
-    exp32_sig64 normExpSig;
-    uint32_t q;
-    uint128 altRem;
-
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     bool const signA = is_sign(uiA64);
@@ -59,7 +55,7 @@ extF80_rem(extFloat80_t a,
     int32_t expB = expExtF80UI64(uiB64);
     uint64_t sigB = uiB0;
 
-    if (expA == 0x7FFF) {
+    if (0x7FFF == expA) {
         if (0 != (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) || (0x7FFF == expB && 0 != (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))) {
             uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
             extFloat80_t uZ;
@@ -76,7 +72,7 @@ extF80_rem(extFloat80_t a,
     }
 
     if (0x7FFF == expB) {
-        if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
+        if (0 != (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
             uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
@@ -92,7 +88,7 @@ extF80_rem(extFloat80_t a,
         expB += expB;
     }
 
-    if (!expB) {
+    if (0 == expB) {
         expB = 1;
     }
 
@@ -105,7 +101,7 @@ extF80_rem(extFloat80_t a,
             return uZ;
         }
 
-        normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
+        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -122,7 +118,7 @@ extF80_rem(extFloat80_t a,
             return uZ;
         }
 
-        normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -143,6 +139,9 @@ extF80_rem(extFloat80_t a,
 
     uint128 rem = softfloat_shortShiftLeft128(0, sigA, 32);
     uint128 shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 32);
+
+    uint128 altRem;
+    uint32_t q;
 
     if (expDiff < 1) {
         if (0 != expDiff) {
@@ -200,13 +199,12 @@ extF80_rem(extFloat80_t a,
 
             bool signRem = signA;
 
-            if (rem.v64 & UINT64_C(0x8000000000000000)) {
+            if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
                 signRem = !signRem;
                 rem = softfloat_sub128(0, 0, rem.v64, rem.v0);
             }
 
-            return
-                softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
+            return softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
         }
     }
 
@@ -232,6 +230,5 @@ extF80_rem(extFloat80_t a,
         rem = softfloat_sub128(0, 0, rem.v64, rem.v0);
     }
 
-    return
-        softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
+    return softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
 }
