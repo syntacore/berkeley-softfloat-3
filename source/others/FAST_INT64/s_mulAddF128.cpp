@@ -293,7 +293,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
 
                 if (0 != (sigZ.v64 & UINT64_C(0x8000000000000000))) {
                     signZ = !signZ;
-                    uint64_t zero256[4] = INIT_UINTM4(0, 0, 0, 0);
+                    uint64_t const zero256[4] = INIT_UINTM4(0, 0, 0, 0);
                     softfloat_sub256M(zero256, sig256Z, sig256Z);
                 }
             } else {
