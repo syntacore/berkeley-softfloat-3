@@ -57,5 +57,8 @@ f128M_add(float128_t const *const aPtr,
     uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
     bool const signB = is_sign(uiB64);
 
-    *zPtr = (signA == signB ? softfloat_addMagsF128 : softfloat_subMagsF128)(uiA64, uiA0, uiB64, uiB0, signA);
+    *zPtr =
+        signA == signB ?
+        softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA) :
+        softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
 }
