@@ -41,11 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 float128_t
-ui64_to_f128(uint64_t a)
+ui64_to_f128(uint64_t const a)
 {
     using namespace softfloat::internals;
 
-    if (!a) {
+    if (0 == a) {
         return float128_t(uint128{0u, 0u});
     }
 
