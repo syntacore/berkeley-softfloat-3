@@ -46,10 +46,8 @@ extF80_rem(extFloat80_t a,
 {
     using namespace softfloat::internals;
     exp32_sig64 normExpSig;
-    uint128 rem, shiftedSigB;
-    uint32_t q, recip32;
+    uint32_t q;
     uint128 altRem;
-    uint128 meanRem;
 
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
@@ -143,11 +141,11 @@ extF80_rem(extFloat80_t a,
         return uZ;
     }
 
-    rem = softfloat_shortShiftLeft128(0, sigA, 32);
-    shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 32);
+    uint128 rem = softfloat_shortShiftLeft128(0, sigA, 32);
+    uint128 shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 32);
 
     if (expDiff < 1) {
-        if (expDiff) {
+        if (0 != expDiff) {
             --expB;
             shiftedSigB = softfloat_shortShiftLeft128(0, sigB, 33);
             q = 0;
@@ -159,7 +157,7 @@ extF80_rem(extFloat80_t a,
             }
         }
     } else {
-        recip32 = softfloat_approxRecip32_1(sigB >> 32);
+        uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32);
         expDiff -= 30;
 
         uint64_t q64;
@@ -194,7 +192,7 @@ extF80_rem(extFloat80_t a,
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
             altRem = softfloat_add128(rem, shiftedSigB);
-            meanRem = softfloat_add128(rem, altRem);
+            uint128 const meanRem = softfloat_add128(rem, altRem);
 
             if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
                 rem = altRem;
@@ -218,15 +216,18 @@ extF80_rem(extFloat80_t a,
         rem = softfloat_sub128(rem, shiftedSigB);
     } while (0 == (rem.v64 & UINT64_C(0x8000000000000000)));
 
-    meanRem = softfloat_add128(rem, altRem);
+    uint128 const meanRem = softfloat_add128(rem, altRem);
 
-    if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
+    if (
+        0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) ||
+        (0 == (meanRem.v64 | meanRem.v0) && 0 != (q & 1))
+    ) {
         rem = altRem;
     }
 
     bool signRem = signA;
 
-    if (rem.v64 & UINT64_C(0x8000000000000000)) {
+    if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
         signRem = !signRem;
         rem = softfloat_sub128(0, 0, rem.v64, rem.v0);
     }
