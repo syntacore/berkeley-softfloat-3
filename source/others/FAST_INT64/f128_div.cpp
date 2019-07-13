@@ -49,32 +49,25 @@ f128_div(float128_t const a,
     uint64_t const uiA0 = uint128(a).v0;
     bool const signA = is_sign(uiA64);
     int32_t expA = expF128UI64(uiA64);
-
-    uint128 sigA;
-    sigA.v64 = fracF128UI64(uiA64);
-    sigA.v0 = uiA0;
+    uint128 sigA{fracF128UI64(uiA64), uiA0};
 
     uint64_t const uiB64 = uint128(b).v64;
     uint64_t const uiB0 = uint128(b).v0;
     bool const signB = is_sign(uiB64);
     int32_t expB = expF128UI64(uiB64);
 
-    uint128 sigB;
-    sigB.v64 = fracF128UI64(uiB64);
-    sigB.v0 = uiB0;
+    uint128 sigB{fracF128UI64(uiB64), uiB0};
 
     bool const signZ = signA != signB;
 
-    if (expA == 0x7FFF) {
-        if (sigA.v64 | sigA.v0) {
-            uint128 const uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-            return float128_t(uiZ);
+    if (0x7FFF == expA) {
+        if (0 != (sigA.v64 | sigA.v0)) {
+            return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
         }
 
-        if (expB == 0x7FFF) {
-            if (sigB.v64 | sigB.v0) {
-                uint128 const uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-                return float128_t(uiZ);
+        if (0x7FFF == expB) {
+            if (0 != (sigB.v64 | sigB.v0)) {
+                return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
@@ -84,17 +77,17 @@ f128_div(float128_t const a,
         return float128_t(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
     }
 
-    if (expB == 0x7FFF) {
-        if (sigB.v64 | sigB.v0) {
+    if (0x7FFF == expB) {
+        if (0 != (sigB.v64 | sigB.v0)) {
             return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
         }
 
         return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
     }
 
-    if (!expB) {
-        if (!(sigB.v64 | sigB.v0)) {
-            if (!(expA | sigA.v64 | sigA.v0)) {
+    if (0 == expB) {
+        if (0 == (sigB.v64 | sigB.v0)) {
+            if (0 == (expA | sigA.v64 | sigA.v0)) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
                 return float128_t(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
             }
@@ -108,8 +101,8 @@ f128_div(float128_t const a,
         sigB = normExpSig.sig;
     }
 
-    if (!expA) {
-        if (!(sigA.v64 | sigA.v0)) {
+    if (0 == expA) {
+        if (0 == (sigA.v64 | sigA.v0)) {
             return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
         }
 
@@ -160,7 +153,7 @@ f128_div(float128_t const a,
         uint128 const term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
         rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
 
-        if (rem.v64 & UINT64_C(0x8000000000000000)) {
+        if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
             --q;
             rem = softfloat_add128(rem.v64, rem.v0, sigB.v64, sigB.v0);
         } else if (softfloat_le128(sigB.v64, sigB.v0, rem.v64, rem.v0)) {
@@ -168,7 +161,7 @@ f128_div(float128_t const a,
             rem = softfloat_sub128(rem.v64, rem.v0, sigB.v64, sigB.v0);
         }
 
-        if (rem.v64 | rem.v0) {
+        if (0 != (rem.v64 | rem.v0)) {
             q |= 1;
         }
     }
@@ -177,7 +170,8 @@ f128_div(float128_t const a,
     uint128 const term = softfloat_shortShiftLeft128(0, qs[1], 54);
     uint128 const sigZ =
         softfloat_add128(
-            static_cast<uint64_t>(qs[2]) << 19, (static_cast<uint64_t>(qs[0]) << 25) + (q >> 4),
+            static_cast<uint64_t>(qs[2]) << 19,
+            (static_cast<uint64_t>(qs[0]) << 25) + (q >> 4),
             term.v64,
             term.v0);
     return softfloat_roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
