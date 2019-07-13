@@ -45,28 +45,30 @@ f128_to_ui64_r_minMag(float128_t const a,
                       bool const exact)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA64 = uint128(a).v64;
-    uint64_t const uiA0 = uint128(a).v0;
-    bool const sign = is_sign(uiA64);
-    int32_t const exp = expF128UI64(uiA64);
-    uint64_t sig64 = fracF128UI64(uiA64);
-    uint64_t const sig0 = uiA0;
+
+    uint128 const aa{a};
+    bool const sign = is_sign(aa.v64);
+    int32_t const exp = expF128UI64(aa.v64);
+    uint64_t sig64 = fracF128UI64(aa.v64);
 
     int32_t const shiftDist = 0x402F - exp;
 
     if (shiftDist < 0) {
-        if (sign || (shiftDist < -15)) {
+        if (sign || shiftDist < -15) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                exp == 0x7FFF && 0 != (sig64 | sig0) ? ui64_fromNaN :
-                sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+                exp == 0x7FFF && 0 != (sig64 | aa.v0) ?
+                ui64_fromNaN :
+                sign ?
+                ui64_fromNegOverflow :
+                ui64_fromPosOverflow;
         }
 
         sig64 |= UINT64_C(0x0001000000000000);
         auto const negShiftDist = -shiftDist;
-        uint64_t const z = sig64 << negShiftDist | sig0 >> (shiftDist & 63);
+        uint64_t const z = sig64 << negShiftDist | aa.v0 >> (shiftDist & 63);
 
-        if (exact && 0 != static_cast<uint64_t>(sig0 << negShiftDist)) {
+        if (exact && 0 != static_cast<uint64_t>(aa.v0 << negShiftDist)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -74,7 +76,7 @@ f128_to_ui64_r_minMag(float128_t const a,
     }
 
     if (49 <= shiftDist) {
-        if (exact && (exp | sig64 | sig0)) {
+        if (exact && (exp | sig64 | aa.v0)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -84,17 +86,16 @@ f128_to_ui64_r_minMag(float128_t const a,
     if (sign) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0x7FFF && 0 != (sig64 | sig0) ? ui64_fromNaN :
+            exp == 0x7FFF && 0 != (sig64 | aa.v0) ? ui64_fromNaN :
             sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
 
     sig64 |= UINT64_C(0x0001000000000000);
     uint64_t const z = sig64 >> shiftDist;
 
-    if (exact && (sig0 || (z << shiftDist != sig64))) {
+    if (exact && (0 != aa.v0 || (z << shiftDist != sig64))) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
     return z;
 }
-
