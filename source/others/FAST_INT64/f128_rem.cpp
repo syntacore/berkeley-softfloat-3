@@ -57,7 +57,7 @@ f128_rem(float128_t const a,
 
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0) || (0x7FFF == expB && 0 != (sigB.v64 | sigB.v0))) {
-            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uA, uB));
+            return float128_t(softfloat_propagateNaNF128UI(uA, uB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -68,7 +68,7 @@ f128_rem(float128_t const a,
         return
             0 == (sigB.v64 | sigB.v0) ?
             a :
-            static_cast<float128_t>(softfloat_propagateNaNF128UI(uA, uB));
+            float128_t(softfloat_propagateNaNF128UI(uA, uB));
     }
 
     if (0 == expB) {

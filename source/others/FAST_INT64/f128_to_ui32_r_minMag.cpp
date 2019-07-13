@@ -45,27 +45,30 @@ f128_to_ui32_r_minMag(float128_t const a,
                       bool const exact)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA64 = uint128(a).v64;
-    uint64_t const uiA0 = uint128(a).v0;
-    int32_t const exp = expF128UI64(uiA64);
-    uint64_t sig64 = fracF128UI64(uiA64) | (uiA0 != 0);
+
+    uint128 const aa{a};
+    int32_t const exp = expF128UI64(aa.v64);
+    uint64_t sig64 = fracF128UI64(aa.v64) | (aa.v0 != 0);
     int32_t const shiftDist = 0x402F - exp;
 
     if (49 <= shiftDist) {
-        if (exact && (exp | sig64)) {
+        if (exact && 0 != (exp | sig64)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
         return 0;
     }
 
-    bool const sign = is_sign(uiA64);
+    bool const sign = is_sign(aa.v64);
 
     if (sign || shiftDist < 17) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0x7FFF && sig64 ? ui32_fromNaN :
-            sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+            0x7FFF == exp && sig64 ?
+            ui32_fromNaN :
+            sign ?
+            ui32_fromNegOverflow :
+            ui32_fromPosOverflow;
     }
 
     sig64 |= UINT64_C(0x0001000000000000);

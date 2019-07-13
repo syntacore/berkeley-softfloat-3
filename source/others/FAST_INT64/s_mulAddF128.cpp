@@ -66,7 +66,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0) || (expB == 0x7FFF && 0 != (sigB.v64 | sigB.v0))) {
             auto const uiZ_1 = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
+            return float128_t(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
         }
 
         if (0 != (expB | sigB.v64 | sigB.v0)) {
@@ -77,7 +77,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
             }
 
             if (0 != (sigC.v64 | sigC.v0)) {
-                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
+                return float128_t(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
             }
 
             if (signZ == signC) {
@@ -92,7 +92,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
     if (0x7FFF == expB) {
         if (0 != (sigB.v64 | sigB.v0)) {
             auto const uiZ_1 = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
+            return float128_t(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
         }
 
         if (0 != (expA | sigA.v64 | sigA.v0)) {
@@ -103,21 +103,21 @@ softfloat_mulAddF128(uint64_t const uiA64,
             }
 
             if (0 != (sigC.v64 | sigC.v0)) {
-                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
+                return float128_t(softfloat_propagateNaNF128UI(uiZ_1.v64, uiZ_1.v0, uiC64, uiC0));
             }
 
             if (signZ == signC) {
-                return static_cast<float128_t>(uiZ_1);
+                return float128_t(uiZ_1);
             }
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return static_cast<float128_t>(softfloat_propagateNaNF128UI(defaultNaNF128UI64, defaultNaNF128UI0, uiC64, uiC0));
+        return float128_t(softfloat_propagateNaNF128UI(defaultNaNF128UI64, defaultNaNF128UI0, uiC64, uiC0));
     }
 
     if (0x7FFF == expC) {
         if (0 != (sigC.v64 | sigC.v0)) {
-            return static_cast<float128_t>(softfloat_propagateNaNF128UI(0, 0, uiC64, uiC0));
+            return float128_t(softfloat_propagateNaNF128UI(0, 0, uiC64, uiC0));
         }
 
         return static_cast<float128_t>(uint128{uiC64, uiC0});
