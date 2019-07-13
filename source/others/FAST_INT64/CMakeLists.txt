@@ -82,7 +82,6 @@ set(SRC_OTHERS_FAST_INT64
     ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToExtF80.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF128.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_normSubnormalExtF80Sig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normSubnormalF128Sig.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToExtF80.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF128.cpp

@@ -207,8 +207,13 @@ roundPackTo(bool,
             softfloat_round_mode,
             bool);
 
+inline
 exp32_sig64
-softfloat_normSubnormalExtF80Sig(uint64_t);
+softfloat_normSubnormalExtF80Sig(uint64_t const& sig)
+{
+    auto const shiftDist = count_leading_zeros(sig);
+    return exp32_sig64{-shiftDist, sig << shiftDist};
+}
 
 extFloat80_t
 softfloat_roundPackToExtF80(bool,
