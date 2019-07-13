@@ -80,7 +80,7 @@ f128_sqrt(float128_t const a)
             return a;
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }

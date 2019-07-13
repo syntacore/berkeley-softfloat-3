@@ -47,22 +47,17 @@ f128_rem(float128_t const a,
          float128_t const b)
 {
     using namespace softfloat::internals;
-    uint128 rem;
     uint128 const uA{a};
-    uint64_t const uiA64 = uA.v64;
-    uint64_t const uiA0 = uA.v0;
-    bool const signA = is_sign(uiA64);
-    int32_t expA = expF128UI64(uiA64);
-    uint128 sigA{fracF128UI64(uiA64), uiA0};
+    bool const signA = is_sign(uA.v64);
+    int32_t expA = expF128UI64(uA.v64);
+    uint128 sigA{fracF128UI64(uA.v64), uA.v0};
     uint128 const uB{b};
-    uint64_t const uiB64 = uB.v64;
-    uint64_t const uiB0 = uB.v0;
-    int32_t expB = expF128UI64(uiB64);
-    uint128 sigB{fracF128UI64(uiB64), uiB0};
+    int32_t expB = expF128UI64(uB.v64);
+    uint128 sigB{fracF128UI64(uB.v64), uB.v0};
 
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0) || (0x7FFF == expB && 0 != (sigB.v64 | sigB.v0))) {
-            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
+            return static_cast<float128_t>(softfloat_propagateNaNF128UI(uA, uB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -73,7 +68,7 @@ f128_rem(float128_t const a,
         return
             0 == (sigB.v64 | sigB.v0) ?
             a :
-            static_cast<float128_t>(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
+            static_cast<float128_t>(softfloat_propagateNaNF128UI(uA, uB));
     }
 
     if (0 == expB) {
@@ -82,7 +77,7 @@ f128_rem(float128_t const a,
             return static_cast<float128_t>(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigB.v64, sigB.v0);
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -92,19 +87,18 @@ f128_rem(float128_t const a,
             return a;
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
 
     sigA.v64 |= UINT64_C(0x0001000000000000);
     sigB.v64 |= UINT64_C(0x0001000000000000);
-    rem = sigA;
-    int32_t expDiff = expA - expB;
 
+    uint128 rem = sigA;
+    int32_t expDiff = expA - expB;
     uint32_t q;
     uint128 altRem;
-    uint128 term;
 
     if (expDiff < 1) {
         if (expDiff < -1) {
@@ -137,8 +131,7 @@ f128_rem(float128_t const a,
 
             q = (q64 + 0x80000000) >> 32;
             rem = softfloat_shortShiftLeft128(rem, 29);
-            term = softfloat_mul128By32(sigB, q);
-            rem = softfloat_sub128(rem, term);
+            rem = softfloat_sub128(rem, softfloat_mul128By32(sigB, q));
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
                 rem = softfloat_add128(rem, sigB);
@@ -151,8 +144,7 @@ f128_rem(float128_t const a,
         assert(-29 <= expDiff);
         q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         rem = softfloat_shortShiftLeft128(rem, static_cast<uint8_t>(expDiff + 30u));
-        term = softfloat_mul128By32(sigB, q);
-        rem = softfloat_sub128(rem, term);
+        rem = softfloat_sub128(rem, softfloat_mul128By32(sigB, q));
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
             altRem = softfloat_add128(rem, sigB);

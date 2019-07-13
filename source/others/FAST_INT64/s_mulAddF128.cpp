@@ -134,7 +134,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
             return static_cast<float128_t>(uint128{uiC64, uiC0});
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -148,7 +148,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
             return static_cast<float128_t>(uint128{uiC64, uiC0});
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigB.v64, sigB.v0);
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -182,7 +182,7 @@ softfloat_mulAddF128(uint64_t const uiA64,
             return softfloat_roundPackToF128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigC.v64, sigC.v0);
+        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigC);
         expC = normExpSig.exp;
         sigC = normExpSig.sig;
     }
