@@ -54,34 +54,27 @@ If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
 uint128
-softfloat_propagateNaNF128UI(uint64_t uiA64,
-                             uint64_t uiA0,
-                             uint64_t uiB64,
-                             uint64_t uiB0)
+softfloat_propagateNaNF128UI(uint64_t const uiA64,
+                             uint64_t const uiA0,
+                             uint64_t const uiB64,
+                             uint64_t const uiB0)
 {
-    bool const isSigNaNA = softfloat_isSigNaNF128UI(uiA64, uiA0);
-
-    if (isSigNaNA || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
+    if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
+#if 0
 
-        if (isSigNaNA) {
-            goto returnNonsigA;
+        if (softfloat_isSigNaNF128UI(uiA64, uiA0)) {
+            return uint128{uiA64 | UINT64_C(0x0000800000000000), uiA0};
         }
+
+#endif
     }
 
-    uint128 uiZ;
     if (isNaNF128UI(uiA64, uiA0)) {
-returnNonsigA:
-        uiZ.v64 = uiA64;
-        uiZ.v0 = uiA0;
+        return uint128{uiA64 | UINT64_C(0x0000800000000000), uiA0};
     } else {
-        uiZ.v64 = uiB64;
-        uiZ.v0 = uiB0;
+        return uint128{uiB64 | UINT64_C(0x0000800000000000), uiB0};
     }
-
-    uiZ.v64 |= UINT64_C(0x0000800000000000);
-    return uiZ;
-
 }
 
 }  // namespace Intel_8086
