@@ -44,6 +44,44 @@ namespace softfloat {
 namespace internals {
 namespace Intel_8086 {
 
+namespace {
+static uint128
+return_larger_magnitude(uint16_t const uiA64,
+                        uint64_t const uiNonsigA0,
+                        uint16_t const uiB64,
+                        uint64_t const uiNonsigB0)
+{
+    uint16_t const uiMagA64 = uiA64 & 0x7FFFu;
+    uint16_t const uiMagB64 = uiB64 & 0x7FFFu;
+
+    if (uiMagA64 < uiMagB64) {
+        return uint128{uiB64, uiNonsigB0};
+    }
+
+    if (uiMagB64 < uiMagA64) {
+        return uint128{uiA64, uiNonsigA0};
+    }
+
+    assert(uiMagA64 == uiMagB64);
+
+    if (uiNonsigA0 < uiNonsigB0) {
+        return uint128{uiB64, uiNonsigB0};
+    }
+
+    if (uiNonsigB0 < uiNonsigA0) {
+        return uint128{uiA64, uiNonsigA0};
+    }
+
+    assert(uiNonsigA0 == uiNonsigB0);
+
+    return
+        uiA64 < uiB64 ?
+        uint128{uiA64, uiNonsigA0} :
+        uint128{uiB64, uiNonsigB0};
+}
+
+}  // namespace
+
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
 `uiA0' as an 80-bit extended floating-point value, and likewise interpreting
@@ -54,10 +92,10 @@ result.  If either original floating-point value is a signaling NaN, the
 invalid exception is raised.
 */
 uint128
-softfloat_propagateNaNExtF80UI(uint16_t uiA64,
-                               uint64_t uiA0,
-                               uint16_t uiB64,
-                               uint64_t uiB0)
+softfloat_propagateNaNExtF80UI(uint16_t const uiA64,
+                               uint64_t const uiA0,
+                               uint16_t const uiB64,
+                               uint64_t const uiB0)
 {
     bool const isSigNaNA = softfloat_isSigNaNExtF80UI(uiA64, uiA0);
     bool const isSigNaNB = softfloat_isSigNaNExtF80UI(uiB64, uiB0);
@@ -70,60 +108,24 @@ softfloat_propagateNaNExtF80UI(uint16_t uiA64,
 
         if (isSigNaNA) {
             if (isSigNaNB) {
-                goto returnLargerMag;
+                return return_larger_magnitude(uiA64, uiNonsigA0, uiB64, uiNonsigB0);
             }
 
             if (isNaNExtF80UI(uiB64, uiB0)) {
-                goto returnB;
+                return uint128{uiB64, uiNonsigB0};
             }
 
-            goto returnA;
+            return uint128{uiA64, uiNonsigA0};
         }
-        else {
-            if (isNaNExtF80UI(uiA64, uiA0)) {
-                goto returnA;
-            }
 
-            goto returnB;
+        if (isNaNExtF80UI(uiA64, uiA0)) {
+            return uint128{uiA64, uiNonsigA0};
         }
+
+        return uint128{uiB64, uiNonsigB0};
     }
 
-returnLargerMag: {
-        uint16_t const uiMagA64 = uiA64 & 0x7FFFu;
-        uint16_t const uiMagB64 = uiB64 & 0x7FFFu;
-
-        if (uiMagA64 < uiMagB64) {
-            goto returnB;
-        }
-
-        if (uiMagB64 < uiMagA64) {
-            goto returnA;
-        }
-
-        if (uiNonsigA0 < uiNonsigB0) {
-            goto returnB;
-        }
-
-        if (uiNonsigB0 < uiNonsigA0) {
-            goto returnA;
-        }
-
-        if (uiA64 < uiB64) {
-            goto returnA;
-        }
-    }
-returnB: {
-        uint128 uiZ;
-        uiZ.v64 = uiB64;
-        uiZ.v0 = uiNonsigB0;
-        return uiZ;
-    }
-returnA: {
-        uint128 uiZ;
-        uiZ.v64 = uiA64;
-        uiZ.v0 = uiNonsigA0;
-        return uiZ;
-    }
+    return return_larger_magnitude(uiA64, uiNonsigA0, uiB64, uiNonsigB0);
 }
 
 }  // namespace Intel_8086
