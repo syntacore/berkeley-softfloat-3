@@ -44,6 +44,6 @@ bool
 f128_isSignalingNaN(float128_t const a)
 {
     using namespace softfloat::internals;
-    return softfloat_isSigNaNF128UI(f_as_u_128(a).v64, f_as_u_128(a).v0);
+    return softfloat_isSigNaNF128UI(uint128(a).v64, uint128(a).v0);
 }
 

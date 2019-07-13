@@ -54,8 +54,8 @@ f128_mul(float128_t const a,
     uint128_extra sig128Extra;
     uint128 uiZ;
 
-    uint64_t const uiA64 = f_as_u_128(a).v64;
-    uint64_t const uiA0 = f_as_u_128(a).v0;
+    uint64_t const uiA64 = uint128(a).v64;
+    uint64_t const uiA0 = uint128(a).v0;
     bool const signA = is_sign(uiA64);
     int32_t expA = expF128UI64(uiA64);
 
@@ -63,8 +63,8 @@ f128_mul(float128_t const a,
     sigA.v64 = fracF128UI64(uiA64);
     sigA.v0 = uiA0;
 
-    uint64_t const uiB64 = f_as_u_128(b).v64;
-    uint64_t const uiB0 = f_as_u_128(b).v0;
+    uint64_t const uiB64 = uint128(b).v64;
+    uint64_t const uiB0 = uint128(b).v0;
     bool const signB = is_sign(uiB64);
     int32_t expB = expF128UI64(uiB64);
 

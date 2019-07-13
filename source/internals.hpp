@@ -270,12 +270,6 @@ softfloat_mulAddF128(uint64_t,
                      uint64_t,
                      Mul_add_operations);
 
-inline uint128
-f_as_u_128(float128_t const& v)
-{
-    return uint128(v);
-}
-
 inline constexpr int32_t
 expF128UI64(uint64_t const& a64)
 {

@@ -45,8 +45,8 @@ f128_to_ui32_r_minMag(float128_t const a,
                       bool const exact)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA64 = f_as_u_128(a).v64;
-    uint64_t const uiA0 = f_as_u_128(a).v0;
+    uint64_t const uiA64 = uint128(a).v64;
+    uint64_t const uiA0 = uint128(a).v0;
     int32_t const exp = expF128UI64(uiA64);
     uint64_t sig64 = fracF128UI64(uiA64) | (uiA0 != 0);
     int32_t const shiftDist = 0x402F - exp;

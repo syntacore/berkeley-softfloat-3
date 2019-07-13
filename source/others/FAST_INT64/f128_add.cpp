@@ -41,15 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 float128_t
-f128_add(float128_t a,
-         float128_t b)
+f128_add(float128_t const a,
+         float128_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA64 = f_as_u_128(a).v64;
-    uint64_t const uiA0  = f_as_u_128(a).v0;
+    uint64_t const uiA64 = uint128(a).v64;
+    uint64_t const uiA0  = uint128(a).v0;
     bool const signA = is_sign(uiA64);
-    uint64_t const uiB64 = f_as_u_128(b).v64;
-    uint64_t const uiB0  = f_as_u_128(b).v0;
+    uint64_t const uiB64 = uint128(b).v64;
+    uint64_t const uiB0  = uint128(b).v0;
     bool const signB = is_sign(uiB64);
     return 
         signA == signB ? softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA):
