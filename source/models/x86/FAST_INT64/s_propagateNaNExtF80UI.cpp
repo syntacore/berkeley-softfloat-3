@@ -65,7 +65,7 @@ softfloat_propagateNaNExtF80UI(uint16_t uiA64,
     uint64_t const uiNonsigA0 = uiA0 | UINT64_C(0xC000000000000000);
     uint64_t const uiNonsigB0 = uiB0 | UINT64_C(0xC000000000000000);
 
-    if (isSigNaNA | isSigNaNB) {
+    if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (isSigNaNA) {
