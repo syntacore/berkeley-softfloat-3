@@ -50,7 +50,7 @@ f128_le_quiet(float128_t const a,
     uint64_t const uiB64 = uint128(b).v64;
     uint64_t const uiB0 = uint128(b).v0;
 
-    if (isNaNF128UI(uiA64, uiA0) || isNaNF128UI(uiB64, uiB0)) {
+    if (isNaNF128UI(uint128(a)) || isNaNF128UI(uint128(b))) {
         if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }

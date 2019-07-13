@@ -302,6 +302,11 @@ isNaNF128UI(uint64_t const& a64,
         (0 != a0 || 0 != (a64 & UINT64_C(0x0000FFFFFFFFFFFF)));
 }
 
+inline constexpr bool
+isNaNF128UI(uint128 const& a)
+{
+    return isNaNF128UI(a.v64, a.v0);
+}
 
 #else
 

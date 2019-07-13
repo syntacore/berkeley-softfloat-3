@@ -45,16 +45,16 @@ f128_lt(float128_t const a,
         float128_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA64 = uint128(a).v64;
-    uint64_t const uiA0 = uint128(a).v0;
-    uint64_t const uiB64 = uint128(b).v64;
-    uint64_t const uiB0 = uint128(b).v0;
 
-    if (isNaNF128UI(uiA64, uiA0) || isNaNF128UI(uiB64, uiB0)) {
+    if (isNaNF128UI(uint128(a)) || isNaNF128UI(uint128(b))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
+    uint64_t const uiA64 = uint128(a).v64;
+    uint64_t const uiA0 = uint128(a).v0;
+    uint64_t const uiB64 = uint128(b).v64;
+    uint64_t const uiB0 = uint128(b).v0;
     bool const signA = is_sign(uiA64);
     bool const signB = is_sign(uiB64);
     return
