@@ -46,17 +46,22 @@ f128_eq_signaling(float128_t const a,
 {
     using namespace softfloat::internals;
 
-    if (isNaNF128UI(uint128(a)) || isNaNF128UI(uint128(b))) {
+    uint128 const aa{a};
+    uint128 const bb{b};
+
+    if (isNaNF128UI(aa) || isNaNF128UI(bb)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
-    uint64_t const uiA64 = uint128(a).v64;
-    uint64_t const uiA0 = uint128(a).v0;
-    uint64_t const uiB64 = uint128(b).v64;
-    uint64_t const uiB0 = uint128(b).v0;
-
     return
-        uiA0 == uiB0 && (uiA64 == uiB64 || (0 == uiA0 && 0 == ((uiA64 | uiB64) & UINT64_C(0x7FFFFFFFFFFFFFFF))));
+        aa.v0 == bb.v0 &&
+        (
+            aa.v64 == bb.v64 ||
+            (
+                0 == aa.v0 &&
+                0 == ((aa.v64 | bb.v64) & UINT64_C(0x7FFFFFFFFFFFFFFF))
+            )
+        );
 }
 
