@@ -44,9 +44,9 @@ extFloat80_t
 ui32_to_extF80(uint32_t a)
 {
     using namespace softfloat::internals;
-    uint16_t  uiZ64 = 0;
+    uint16_t uiZ64 = 0;
 
-    if (a) {
+    if (0 != a) {
         auto const shiftDist = count_leading_zeros(a);
         uiZ64 = 0x401Eu - shiftDist;
         a <<= shiftDist;
