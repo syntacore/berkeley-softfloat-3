@@ -648,10 +648,10 @@ Argument `zPtr' points to an array of four 64-bit elements that concatenate
 in the platform's normal endian order to form a 256-bit integer.
 */
 void
-softfloat_mul128To256M(uint64_t a64,
-                       uint64_t a0,
-                       uint64_t b64,
-                       uint64_t b0,
+softfloat_mul128To256M(uint64_t const& a64,
+                       uint64_t const& a0,
+                       uint64_t const& b64,
+                       uint64_t const& b0,
                        uint64_t* zPtr);
 
 inline

@@ -44,10 +44,10 @@ namespace softfloat {
 namespace internals {
 
 void
-softfloat_mul128To256M(uint64_t const a64,
-                       uint64_t const a0,
-                       uint64_t const b64,
-                       uint64_t const b0,
+softfloat_mul128To256M(uint64_t const& a64,
+                       uint64_t const& a0,
+                       uint64_t const& b64,
+                       uint64_t const& b0,
                        uint64_t* zPtr)
 {
     uint128 const p0 = softfloat_mul64To128(a0, b0);

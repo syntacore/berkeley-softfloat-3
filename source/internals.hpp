@@ -296,13 +296,13 @@ softfloat_subMagsF128(uint128 const& a,
 }
 
 float128_t
-softfloat_mulAddF128(uint64_t,
-                     uint64_t,
-                     uint64_t,
-                     uint64_t,
-                     uint64_t,
-                     uint64_t,
-                     Mul_add_operations);
+softfloat_mulAddF128(Mul_add_operations const op,
+                     uint64_t const& uiA64,
+                     uint64_t const& uiA0,
+                     uint64_t const& uiB64,
+                     uint64_t const& uiB0,
+                     uint64_t const& uiC64,
+                     uint64_t const& uiC0);
 
 inline constexpr int32_t
 expF128UI64(uint64_t const& a64)
