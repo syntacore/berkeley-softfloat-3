@@ -79,7 +79,7 @@ f128_mul(float128_t const a,
             (sigA.v64 | sigA.v0) || ((expB == 0x7FFF) && (sigB.v64 | sigB.v0))
         ) {
             uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         magBits = expB | sigB.v64 | sigB.v0;
@@ -87,18 +87,18 @@ f128_mul(float128_t const a,
             softfloat_raiseFlags(softfloat_flag_invalid);
             uiZ.v64 = defaultNaNF128UI64;
             uiZ.v0 = defaultNaNF128UI0;
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         uiZ.v64 = packToF128UI64(signZ, 0x7FFF, 0);
         uiZ.v0 = 0;
-        return u_as_f_128(uiZ);
+        return float128_t(uiZ);
     }
 
     if (expB == 0x7FFF) {
         if (sigB.v64 | sigB.v0) {
             uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         magBits = expA | sigA.v64 | sigA.v0;
@@ -106,19 +106,19 @@ f128_mul(float128_t const a,
             softfloat_raiseFlags(softfloat_flag_invalid);
             uiZ.v64 = defaultNaNF128UI64;
             uiZ.v0 = defaultNaNF128UI0;
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         uiZ.v64 = packToF128UI64(signZ, 0x7FFF, 0);
         uiZ.v0 = 0;
-        return u_as_f_128(uiZ);
+        return float128_t(uiZ);
     }
 
     if (!expA) {
         if (!(sigA.v64 | sigA.v0)) {
             uiZ.v64 = packToF128UI64(signZ, 0, 0);
             uiZ.v0 = 0;
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);
@@ -130,7 +130,7 @@ f128_mul(float128_t const a,
         if (!(sigB.v64 | sigB.v0)) {
             uiZ.v64 = packToF128UI64(signZ, 0, 0);
             uiZ.v0 = 0;
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         normExpSig = softfloat_normSubnormalF128Sig(sigB.v64, sigB.v0);

@@ -46,7 +46,7 @@ ui64_to_f128(uint64_t a)
     using namespace softfloat::internals;
 
     if (!a) {
-        return u_as_f_128(uint128{0u, 0u});
+        return float128_t(uint128{0u, 0u});
     }
 
     int8_t const shiftDist = count_leading_zeros(a) + 49;
@@ -59,6 +59,6 @@ ui64_to_f128(uint64_t a)
         zSig = softfloat_shortShiftLeft128(0u, a, static_cast<uint8_t>(shiftDist));
     }
 
-    return u_as_f_128(uint128{packToF128UI64(0, 0x406E - shiftDist, zSig.v64), zSig.v0});
+    return float128_t(uint128{packToF128UI64(0, 0x406E - shiftDist, zSig.v64), zSig.v0});
 }
 

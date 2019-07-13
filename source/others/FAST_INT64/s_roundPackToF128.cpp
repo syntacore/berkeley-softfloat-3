@@ -114,10 +114,10 @@ softfloat_roundPackToF128(bool sign,
                 softfloat_round_near_maxMag == softfloat_roundingMode ||
                 (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode
             ) {
-                return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
+                return float128_t(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
             }
 
-            return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
+            return float128_t(uint128{packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
         }
     }
 
@@ -127,7 +127,7 @@ softfloat_roundPackToF128(bool sign,
 
     if (doIncrement) {
         uint128 const sig128 = softfloat_add128(sig64, sig0, 0, 1);
-        return u_as_f_128(uint128{
+        return float128_t(uint128{
             packToF128UI64(sign, exp, sig128.v64),
             sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven)});
     }
@@ -136,7 +136,7 @@ softfloat_roundPackToF128(bool sign,
         exp = 0;
     }
 
-    return u_as_f_128(uint128{packToF128UI64(sign, exp, sig64), sig0});
+    return float128_t(uint128{packToF128UI64(sign, exp, sig64), sig0});
 }
 
 }  // namespace internals

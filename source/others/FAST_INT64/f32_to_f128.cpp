@@ -51,15 +51,15 @@ f32_to_f128(float32_t a)
 
     if (0xFF == exp) {
         if (0 != frac) {
-            return u_as_f_128(softfloat_commonNaNToF128UI(softfloat_f32UIToCommonNaN(uiA)));
+            return float128_t(softfloat_commonNaNToF128UI(softfloat_f32UIToCommonNaN(uiA)));
         }
 
-        return u_as_f_128(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
+        return float128_t(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
     }
 
     if (0 == exp) {
         if (0 == frac) {
-            return u_as_f_128(uint128{packToF128UI64(sign, 0, 0), 0});
+            return float128_t(uint128{packToF128UI64(sign, 0, 0), 0});
         }
 
         exp16_sig32 const normExpSig(frac);
@@ -67,6 +67,6 @@ f32_to_f128(float32_t a)
         frac = normExpSig.sig;
     }
 
-    return u_as_f_128(uint128{packToF128UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25), 0});
+    return float128_t(uint128{packToF128UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25), 0});
 }
 

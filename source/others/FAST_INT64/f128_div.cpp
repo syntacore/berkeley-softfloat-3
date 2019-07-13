@@ -68,39 +68,39 @@ f128_div(float128_t a,
     if (expA == 0x7FFF) {
         if (sigA.v64 | sigA.v0) {
             uint128 const uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-            return u_as_f_128(uiZ);
+            return float128_t(uiZ);
         }
 
         if (expB == 0x7FFF) {
             if (sigB.v64 | sigB.v0) {
                 uint128 const uiZ = softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0);
-                return u_as_f_128(uiZ);
+                return float128_t(uiZ);
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_128(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
+            return float128_t(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
         }
 
-        return u_as_f_128(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
+        return float128_t(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
     }
 
     if (expB == 0x7FFF) {
         if (sigB.v64 | sigB.v0) {
-            return u_as_f_128(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
+            return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
         }
 
-        return u_as_f_128(uint128{packToF128UI64(signZ, 0, 0), 0});
+        return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
     }
 
     if (!expB) {
         if (!(sigB.v64 | sigB.v0)) {
             if (!(expA | sigA.v64 | sigA.v0)) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_128(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
+                return float128_t(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
             }
 
             softfloat_raiseFlags(softfloat_flag_infinite);
-            return u_as_f_128(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
+            return float128_t(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
         }
 
         exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigB.v64, sigB.v0);
@@ -110,7 +110,7 @@ f128_div(float128_t a,
 
     if (!expA) {
         if (!(sigA.v64 | sigA.v0)) {
-            return u_as_f_128(uint128{packToF128UI64(signZ, 0, 0), 0});
+            return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
         }
 
         exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA.v64, sigA.v0);

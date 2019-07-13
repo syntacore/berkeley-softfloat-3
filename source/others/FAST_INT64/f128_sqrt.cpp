@@ -51,7 +51,7 @@ f128_sqrt(float128_t const a)
 
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0)) {
-            return u_as_f_128(softfloat_propagateNaNF128UI(uA.v64, uA.v0, 0, 0));
+            return float128_t(softfloat_propagateNaNF128UI(uA.v64, uA.v0, 0, 0));
         }
 
         // infinity
@@ -62,7 +62,7 @@ f128_sqrt(float128_t const a)
 
         // -inf
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_128(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
+        return float128_t(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
     }
 
     if (signA) {
@@ -71,7 +71,7 @@ f128_sqrt(float128_t const a)
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_128(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
+        return float128_t(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
     }
 
     if (0 == expA) {

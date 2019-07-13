@@ -62,5 +62,5 @@ extF80_to_f128(extFloat80_t a)
         uiZ.v0 = frac128.v0;
     }
 
-    return u_as_f_128(uiZ);
+    return float128_t(uiZ);
 }

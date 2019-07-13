@@ -276,12 +276,6 @@ f_as_u_128(float128_t const& v)
     return uint128(v);
 }
 
-inline float128_t
-u_as_f_128(uint128 const& v)
-{
-    return float128_t(v);
-}
-
 inline constexpr int32_t
 expF128UI64(uint64_t const& a64)
 {
