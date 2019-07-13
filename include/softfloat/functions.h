@@ -238,7 +238,7 @@ extern "C" {
     float64_t f128M_to_f64(const float128_t*);
     void f128M_to_extF80M(const float128_t*, extFloat80_t*);
     void f128M_roundToInt(const float128_t*, uint8_t, bool, float128_t*);
-    void f128M_mul(const float128_t*, const float128_t*, float128_t*);
+    void f128M_mul(float128_t const*, float128_t const*, float128_t*);
     void f128M_div(const float128_t*, const float128_t*, float128_t*);
     void f128M_rem(const float128_t*, const float128_t*, float128_t*);
     void f128M_sqrt(const float128_t*, float128_t*);
@@ -674,30 +674,32 @@ extern "C" {
     }
 
     static inline void
-        f128M_mul(const float128_t* aPtr,
-                  const float128_t* bPtr,
-                  float128_t* zPtr)
+        f128M_mul(float128_t const* const aPtr,
+                  float128_t const* const bPtr,
+                  float128_t* const zPtr)
     {
         *zPtr = f128_mul(*aPtr, *bPtr);
     }
 
     static inline void
-        f128M_div(const float128_t* aPtr, const float128_t* bPtr, float128_t* zPtr)
+        f128M_div(float128_t const* const aPtr,
+                  float128_t const* const bPtr,
+                  float128_t* const zPtr)
     {
         *zPtr = f128_div(*aPtr, *bPtr);
     }
 
     static inline void
-        f128M_rem(const float128_t* aPtr,
-                  const float128_t* bPtr,
-                  float128_t* zPtr)
+        f128M_rem(float128_t const* const aPtr,
+                  float128_t const* const bPtr,
+                  float128_t* const zPtr)
     {
         *zPtr = f128_rem(*aPtr, *bPtr);
     }
 
     static inline void
-        f128M_sqrt(const float128_t* aPtr,
-                   float128_t* zPtr)
+        f128M_sqrt(float128_t const* const aPtr,
+                   float128_t* const zPtr)
     {
         *zPtr = f128_sqrt(*aPtr);
     }
