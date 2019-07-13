@@ -45,13 +45,12 @@ f128_add(float128_t const a,
          float128_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA64 = uint128(a).v64;
-    uint64_t const uiA0  = uint128(a).v0;
-    bool const signA = is_sign(uiA64);
-    uint64_t const uiB64 = uint128(b).v64;
-    uint64_t const uiB0  = uint128(b).v0;
-    bool const signB = is_sign(uiB64);
-    return 
-        signA == signB ? softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA):
-        softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
+    uint128 const aa{a};
+    uint128 const bb{b};
+    bool const signA = is_sign(aa.v64);
+    bool const signB = is_sign(bb.v64);
+    return
+        signA == signB ?
+        softfloat_addMagsF128(aa, bb, signA) :
+        softfloat_subMagsF128(aa, bb, signA);
 }
