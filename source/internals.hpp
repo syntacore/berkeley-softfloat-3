@@ -240,6 +240,13 @@ exp32_sig128
 softfloat_normSubnormalF128Sig(uint64_t,
                                uint64_t);
 
+inline
+exp32_sig128
+softfloat_normSubnormalF128Sig(uint128 const& a)
+{
+    return softfloat_normSubnormalF128Sig(a.v64, a.v0);
+}
+
 float128_t
 softfloat_roundPackToF128(bool,
                           int32_t,

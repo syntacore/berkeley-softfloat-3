@@ -654,6 +654,15 @@ softfloat_mul128To256M(uint64_t a64,
                        uint64_t b0,
                        uint64_t* zPtr);
 
+inline
+void
+softfloat_mul128To256M(uint128 const& a,
+                       uint128 const& b,
+                       uint64_t* const zPtr)
+{
+    softfloat_mul128To256M(a.v64, a.v0, b.v64, b.v0, zPtr);
+}
+
 #else
 
 /**
