@@ -41,23 +41,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 extFloat80_t
-extF80_rem(extFloat80_t a,
-           extFloat80_t b)
+extF80_rem(extFloat80_t const a,
+           extFloat80_t const b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 = a.signif;
-    bool const signA = is_sign(uiA64);
-    int32_t expA = expExtF80UI64(uiA64);
-    uint64_t sigA = uiA0;
-    uint16_t const uiB64 = b.signExp;
-    uint64_t const uiB0 = b.signif;
-    int32_t expB = expExtF80UI64(uiB64);
-    uint64_t sigB = uiB0;
+    bool const signA = is_sign(a.signExp);
+    int32_t expA = expExtF80UI64(a.signExp);
+    uint64_t sigA = a.signif;
+    int32_t expB = expExtF80UI64(b.signExp);
+    uint64_t sigB = b.signif;
 
     if (0x7FFF == expA) {
         if (0 != (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) || (0x7FFF == expB && 0 != (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)))) {
-            uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+            uint128 const uiZ = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
@@ -73,7 +69,7 @@ extF80_rem(extFloat80_t a,
 
     if (0x7FFF == expB) {
         if (0 != (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+            uint128 const uiZ = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
