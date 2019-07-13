@@ -41,21 +41,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 extFloat80_t
-ui64_to_extF80(uint64_t a)
+ui64_to_extF80(uint64_t const a)
 {
     using namespace softfloat::internals;
 
-    uint16_t uiZ64 = 0;
-
-    if (a) {
-        auto const shiftDist = count_leading_zeros(a);
-        uiZ64 = 0x403Eu - shiftDist;
-        a <<= shiftDist;
+    if (0 == a) {
+        extFloat80_t uZ;
+        uZ.signExp = 0;
+        uZ.signif = 0;
+        return uZ;
     }
 
+    auto const shiftDist = count_leading_zeros(a);
     extFloat80_t uZ;
-    uZ.signExp = uiZ64;
-    uZ.signif  = a;
+    uZ.signExp = 0x403Eu - shiftDist;
+    uZ.signif  = a << shiftDist;
     return uZ;
 }
-
