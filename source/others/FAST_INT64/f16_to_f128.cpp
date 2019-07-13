@@ -46,26 +46,46 @@ f16_to_f128(float16_t const a)
     using namespace softfloat::internals;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = is_sign(uiA);
-    int8_t exp = expF16UI(uiA);
-    uint16_t frac = fracF16UI(uiA);
+    int8_t const exp = expF16UI(uiA);
+    uint16_t const frac = fracF16UI(uiA);
 
-    if (exp == 0x1F) {
-        if (frac) {
-            return float128_t(softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA)));
-        }
-
-        return float128_t(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
+    if (0x1F == exp) {
+        // infinity or NaN
+        return
+            float128_t(
+                0 != frac ?
+                softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(uiA)) :
+                uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
     }
 
-    if (!exp) {
-        if (frac) {
-            exp8_sig16 const normExpSig{frac};
-            exp = normExpSig.exp - 1;
-            frac = normExpSig.sig;
-        }
+    assert(0x1F != exp);
 
+    if (0 != exp) {
+        // normalized
+        return
+            float128_t(
+                uint128(
+                    packToF128UI64(sign,
+                                   exp + 0x3FF0,
+                                   static_cast<uint64_t>(frac) << 38),
+                    0));
+    }
+
+    assert(0 == exp);
+
+    if (0 == frac) {
+        assert(0 == exp && 0 == frac);
         return float128_t(uint128{packToF128UI64(sign, 0, 0), 0});
     }
 
-    return float128_t(uint128{packToF128UI64(sign, exp + 0x3FF0, static_cast<uint64_t>(frac) << 38), 0});
+    assert(0 == exp && 0 != frac);
+
+    exp8_sig16 const normExpSig(frac);
+    return
+        float128_t(
+            uint128(
+                packToF128UI64(sign,
+                               normExpSig.exp - 1 + 0x3FF0,
+                               static_cast<uint64_t>(normExpSig.sig) << 38),
+                0));
 }
