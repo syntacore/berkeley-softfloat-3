@@ -41,26 +41,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 void
-f128M_mulAdd(const float128_t* const aPtr,
-             const float128_t* const bPtr,
-             const float128_t* const cPtr,
+f128M_mulAdd(float128_t const* const aPtr,
+             float128_t const* const bPtr,
+             float128_t const* const cPtr,
              float128_t* const zPtr)
 {
     using namespace softfloat::internals;
-    const uint64_t* aWPtr, *bWPtr, *cWPtr;
-    uint64_t uiA64, uiA0;
-    uint64_t uiB64, uiB0;
-    uint64_t uiC64, uiC0;
 
-    aWPtr = (const uint64_t*)aPtr;
-    bWPtr = (const uint64_t*)bPtr;
-    cWPtr = (const uint64_t*)cPtr;
-    uiA64 = aWPtr[indexWord(2, 1)];
-    uiA0 = aWPtr[indexWord(2, 0)];
-    uiB64 = bWPtr[indexWord(2, 1)];
-    uiB0 = bWPtr[indexWord(2, 0)];
-    uiC64 = cWPtr[indexWord(2, 1)];
-    uiC0 = cWPtr[indexWord(2, 0)];
+    uint64_t const* const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);
+    uint64_t const* const bWPtr = reinterpret_cast<uint64_t const*>(bPtr);
+    uint64_t const* const cWPtr = reinterpret_cast<uint64_t const*>(cPtr);
+    uint64_t const uiA64 = aWPtr[indexWord(2, 1)];
+    uint64_t const uiA0 = aWPtr[indexWord(2, 0)];
+    uint64_t const uiB64 = bWPtr[indexWord(2, 1)];
+    uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
+    uint64_t const uiC64 = cWPtr[indexWord(2, 1)];
+    uint64_t const uiC0 = cWPtr[indexWord(2, 0)];
     *zPtr = softfloat_mulAddF128(uiA64, uiA0, uiB64, uiB0, uiC64, uiC0, softfloat_mulAdd_madd);
 
 }
