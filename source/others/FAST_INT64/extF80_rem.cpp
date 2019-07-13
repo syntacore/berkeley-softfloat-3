@@ -154,10 +154,8 @@ extF80_rem(extFloat80_t a,
         } else {
             q = 0u + !!(sigB <= sigA);
 
-            if (q) {
-                rem =
-                    softfloat_sub128(
-                        rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
+            if (0 != q) {
+                rem = softfloat_sub128(rem, shiftedSigB);
             }
         }
     } else {
@@ -176,12 +174,10 @@ extF80_rem(extFloat80_t a,
             q = (q64 + 0x80000000) >> 32;
             rem = softfloat_shortShiftLeft128(rem, 29);
             uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
-            rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+            rem = softfloat_sub128(rem, term);
 
-            if (rem.v64 & UINT64_C(0x8000000000000000)) {
-                rem =
-                    softfloat_add128(
-                        rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
+            if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
+                rem = softfloat_add128(rem, shiftedSigB);
             }
 
             expDiff -= 29;
@@ -194,12 +190,11 @@ extF80_rem(extFloat80_t a,
         @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data
         */
         rem = softfloat_shortShiftLeft128(rem, uint8_t(expDiff + 30));
-        uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
-        rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+        rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
 
-        if (rem.v64 & UINT64_C(0x8000000000000000)) {
-            altRem = softfloat_add128(rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
-            meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
+        if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
+            altRem = softfloat_add128(rem, shiftedSigB);
+            meanRem = softfloat_add128(rem, altRem);
 
             if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
                 rem = altRem;
@@ -220,12 +215,10 @@ extF80_rem(extFloat80_t a,
     do {
         altRem = rem;
         ++q;
-        rem =
-            softfloat_sub128(
-                rem.v64, rem.v0, shiftedSigB.v64, shiftedSigB.v0);
-    } while (!(rem.v64 & UINT64_C(0x8000000000000000)));
+        rem = softfloat_sub128(rem, shiftedSigB);
+    } while (0 == (rem.v64 & UINT64_C(0x8000000000000000)));
 
-    meanRem = softfloat_add128(rem.v64, rem.v0, altRem.v64, altRem.v0);
+    meanRem = softfloat_add128(rem, altRem);
 
     if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
         rem = altRem;

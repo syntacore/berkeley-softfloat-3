@@ -65,7 +65,7 @@ softfloat_addMagsF128(uint64_t const uiA64,
             return static_cast<float128_t>(uint128{uiA64, uiA0});
         }
 
-        uint128 const sigZ = softfloat_add128(sigA.v64, sigA.v0, sigB.v64, sigB.v0);
+        uint128 const sigZ = softfloat_add128(sigA, sigB);
 
         if (0 == expA) {
             return static_cast<float128_t>(uint128{packToF128UI64(signZ, 0, sigZ.v64), sigZ.v0});
@@ -93,18 +93,18 @@ softfloat_addMagsF128(uint64_t const uiA64,
                 return softfloat_roundPackToF128(signZ, expB - 1, sigZ.v64, sigZ.v0, 0);
             }
 
-            uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sigZ.v64, sigZ.v0, 0, 1);
+            uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sigZ, 0, 1);
             return softfloat_roundPackToF128(signZ, expB, sig128Extra.v.v64, sig128Extra.v.v0, sig128Extra.extra);
         }
 
-        uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sigA.v64, sigA.v0, 0, static_cast<uint32_t>(-(expDiff + 1)));
+        uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sigA, 0, static_cast<uint32_t>(-(expDiff + 1)));
         uint128 const sigZ = softfloat_add128(sig128Extra.v.v64 | UINT64_C(0x0001000000000000), sig128Extra.v.v0, sigB.v64, sigB.v0);
 
         if (sigZ.v64 < UINT64_C(0x0002000000000000)) {
             return softfloat_roundPackToF128(signZ, expB - 1, sigZ.v64, sigZ.v0, sig128Extra.extra);
         }
 
-        uint128_extra const sig128Extra_1 = softfloat_shortShiftRightJam128Extra(sigZ.v64, sigZ.v0, sig128Extra.extra, 1);
+        uint128_extra const sig128Extra_1 = softfloat_shortShiftRightJam128Extra(sigZ, sig128Extra.extra, 1);
         return softfloat_roundPackToF128(signZ, expB, sig128Extra_1.v.v64, sig128Extra_1.v.v0, sig128Extra_1.extra);
     }
 
@@ -125,18 +125,18 @@ softfloat_addMagsF128(uint64_t const uiA64,
             return softfloat_roundPackToF128(signZ, expA - 1, sigZ.v64, sigZ.v0, 0);
         }
 
-        uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sigZ.v64, sigZ.v0, 0, 1);
+        uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sigZ, 0, 1);
         return softfloat_roundPackToF128(signZ, expA, sig128Extra.v.v64, sig128Extra.v.v0, sig128Extra.extra);
     }
 
-    uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sigB.v64, sigB.v0, 0, static_cast<uint32_t>(expDiff - 1));
+    uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sigB, 0, static_cast<uint32_t>(expDiff - 1));
     uint128 const sigZ = softfloat_add128(sigA.v64 | UINT64_C(0x0001000000000000), sigA.v0, sig128Extra.v.v64, sig128Extra.v.v0);
 
     if (sigZ.v64 < UINT64_C(0x0002000000000000)) {
         return softfloat_roundPackToF128(signZ, expA - 1, sigZ.v64, sigZ.v0, sig128Extra.extra);
     }
 
-    uint128_extra const sig128Extra_1 = softfloat_shortShiftRightJam128Extra(sigZ.v64, sigZ.v0, sig128Extra.extra, 1);
+    uint128_extra const sig128Extra_1 = softfloat_shortShiftRightJam128Extra(sigZ, sig128Extra.extra, 1);
     return softfloat_roundPackToF128(signZ, expA, sig128Extra_1.v.v64, sig128Extra_1.v.v0, sig128Extra_1.extra);
 }
 

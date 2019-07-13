@@ -165,8 +165,7 @@ extF80_div(extFloat80_t const a,
         }
 
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
-        uint128 const term = softfloat_mul64ByShifted32To128(sigB, q);
-        rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+        rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
@@ -178,16 +177,15 @@ extF80_div(extFloat80_t const a,
 
     if (((q + 1) & 0x3FFFFF) < 2) {
         rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
-        uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
-        rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
-        term = softfloat_shortShiftLeft128(0, sigB, 32);
+        rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
+        uint128 const term = softfloat_shortShiftLeft128(0, sigB, 32);
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
-            rem = softfloat_add128(rem.v64, rem.v0, term.v64, term.v0);
-        } else if (softfloat_le128(term.v64, term.v0, rem.v64, rem.v0)) {
+            rem = softfloat_add128(rem, term);
+        } else if (softfloat_le128(term, rem)) {
             ++q;
-            rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+            rem = softfloat_sub128(rem, term);
         }
 
         if (rem.v64 | rem.v0) {

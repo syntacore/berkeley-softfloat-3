@@ -56,6 +56,5 @@ extF80_le(extFloat80_t const a,
     return
         signA != signB ?
         signA || 0 == (((a.signExp | b.signExp) & UINT16_C(0x7FFF)) | a.signif | b.signif) :
-        (a.signExp == b.signExp && a.signif == b.signif) || softfloat_lt128(a.signExp, a.signif, b.signExp, b.signif) != signA;
+        (a.signExp == b.signExp && a.signif == b.signif) || softfloat_lt128(a, b) != signA;
 }
-

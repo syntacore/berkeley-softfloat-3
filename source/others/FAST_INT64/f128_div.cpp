@@ -116,9 +116,9 @@ f128_div(float128_t const a,
     sigB.v64 |= UINT64_C(0x0001000000000000);
     uint128 rem = sigA;
 
-    if (softfloat_lt128(sigA.v64, sigA.v0, sigB.v64, sigB.v0)) {
+    if (softfloat_lt128(sigA, sigB)) {
         --expZ;
-        rem = softfloat_add128(sigA.v64, sigA.v0, sigA.v64, sigA.v0);
+        rem = softfloat_add128(sigA, sigA);
     }
 
     uint32_t const recip32 = softfloat_approxRecip32_1(static_cast<uint32_t>(sigB.v64 >> 17));
@@ -137,12 +137,11 @@ f128_div(float128_t const a,
         }
 
         rem = softfloat_shortShiftLeft128(rem, 29);
-        uint128 const term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
-        rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+        rem = softfloat_sub128(rem, softfloat_mul128By32(sigB, q));
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
-            rem = softfloat_add128(rem.v64, rem.v0, sigB.v64, sigB.v0);
+            rem = softfloat_add128(rem, sigB);
         }
 
         qs[ix] = q;
@@ -150,15 +149,15 @@ f128_div(float128_t const a,
 
     if (((q + 1) & 7) < 2) {
         rem = softfloat_shortShiftLeft128(rem, 29);
-        uint128 const term = softfloat_mul128By32(sigB.v64, sigB.v0, q);
-        rem = softfloat_sub128(rem.v64, rem.v0, term.v64, term.v0);
+        uint128 const term = softfloat_mul128By32(sigB, q);
+        rem = softfloat_sub128(rem, term);
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
             --q;
-            rem = softfloat_add128(rem.v64, rem.v0, sigB.v64, sigB.v0);
-        } else if (softfloat_le128(sigB.v64, sigB.v0, rem.v64, rem.v0)) {
+            rem = softfloat_add128(rem, sigB);
+        } else if (softfloat_le128(sigB, rem)) {
             ++q;
-            rem = softfloat_sub128(rem.v64, rem.v0, sigB.v64, sigB.v0);
+            rem = softfloat_sub128(rem, sigB);
         }
 
         if (0 != (rem.v64 | rem.v0)) {

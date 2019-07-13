@@ -136,7 +136,7 @@ mulAdd(Mul_add_operations op,
 
     if (sig128Z.v64 < UINT64_C(0x2000000000000000)) {
         --expZ;
-        sig128Z = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
+        sig128Z = softfloat_add128(sig128Z, sig128Z);
     }
 
     if (0 == expC) {
@@ -162,7 +162,7 @@ mulAdd(Mul_add_operations op,
         if (signZ == signC || expDiff < -1) {
             sig128Z.v64 = softfloat_shiftRightJam64(sig128Z.v64, static_cast<uint32_t>(-expDiff));
         } else {
-            sig128Z = softfloat_shortShiftRightJam128(sig128Z.v64, sig128Z.v0, 1);
+            sig128Z = softfloat_shortShiftRightJam128(sig128Z, 1);
         }
     } else if (0 < expDiff) {
         sig128C = softfloat_shiftRightJam128(sigC, 0u, static_cast<uint32_t>(expDiff));
@@ -176,7 +176,7 @@ mulAdd(Mul_add_operations op,
         } else {
             /* 0 < expDiff */
             assert(0 < expDiff);
-            sig128Z = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0);
+            sig128Z = softfloat_add128(sig128Z, sig128C);
             sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
         }
 
@@ -205,7 +205,7 @@ mulAdd(Mul_add_operations op,
     } else {
         /* 0 < expDiff */
         assert(0 < expDiff);
-        sig128Z = softfloat_sub128(sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0);
+        sig128Z = softfloat_sub128(sig128Z, sig128C);
     }
 
     if (0 == sig128Z.v64) {

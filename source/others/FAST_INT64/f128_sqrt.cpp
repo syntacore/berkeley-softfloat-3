@@ -116,7 +116,7 @@ f128_sqrt(float128_t const a)
     x64 += sig64Z;
     uint128 rem_1 = softfloat_shortShiftLeft128(rem, 29);
     uint128 const tmp = softfloat_mul64ByShifted32To128(x64, q);
-    uint128 rem_2 = softfloat_sub128(rem_1.v64, rem_1.v0, tmp.v64, tmp.v0);
+    uint128 rem_2 = softfloat_sub128(rem_1, tmp);
     uint32_t q_2 = (static_cast<uint32_t>(rem_2.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
     uint128 const y_0 = softfloat_shortShiftLeft128(rem_2, 29);
     sig64Z <<= 1;
@@ -125,8 +125,8 @@ f128_sqrt(float128_t const a)
     for (;;) {
         uint128 const tmp_1 = softfloat_shortShiftLeft128(0, sig64Z, 32);
         uint128 const tmp_2 = softfloat_add128(tmp_1.v64, tmp_1.v0, 0, static_cast<uint64_t>(q_2) << 6);
-        uint128 const tmp_3 = softfloat_mul128By32(tmp_2.v64, tmp_2.v0, q_2);
-        rem_2 = softfloat_sub128(y_0.v64, y_0.v0, tmp_3.v64, tmp_3.v0);
+        uint128 const tmp_3 = softfloat_mul128By32(tmp_2, q_2);
+        rem_2 = softfloat_sub128(y_0, tmp_3);
 
         if (0 == (rem_2.v64 & UINT64_C(0x8000000000000000))) {
             break;
@@ -152,7 +152,7 @@ f128_sqrt(float128_t const a)
         uint128 const term_3 = softfloat_mul64ByShifted32To128(term_2.v64, q_1);
         uint128 const term_4 = softfloat_add128(term_3.v64, term_3.v0, 0, y_1.v64);
         uint128 const rem_3 = softfloat_shortShiftLeft128(rem_2, 20);
-        uint128 const term_5 = softfloat_sub128(term_4.v64, term_4.v0, rem_3.v64, rem_3.v0);
+        uint128 const term_5 = softfloat_sub128(term_4, rem_3);
 
         /* The concatenation of `term' and `y_1.v0' is now the negative remainder
         (3 words altogether).

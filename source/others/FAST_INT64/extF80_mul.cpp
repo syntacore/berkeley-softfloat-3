@@ -126,7 +126,7 @@ extF80_mul(extFloat80_t const a,
     uint128 const sig128Z = softfloat_mul64To128(sigA, sigB);
 
     if (sig128Z.v64 < UINT64_C(0x8000000000000000)) {
-        auto const sig128Z_1 = softfloat_add128(sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0);
+        auto const sig128Z_1 = softfloat_add128(sig128Z, sig128Z);
         return
             softfloat_roundPackToExtF80(signZ, expZ - 1, sig128Z_1.v64, sig128Z_1.v0, extF80_roundingPrecision);
     }

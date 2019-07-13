@@ -259,11 +259,19 @@ and `a0' is less than or equal to the 128-bit unsigned integer formed by
 concatenating `b64' and `b0'.
 */
 inline constexpr bool
-softfloat_le128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
+softfloat_le128(uint64_t const& a64,
+                uint64_t const& a0,
+                uint64_t const& b64,
+                uint64_t const& b0)
 {
-    return
-        a64 < b64 ||
-        (a64 == b64 && a0 <= b0);
+    return a64 < b64 || (a64 == b64 && a0 <= b0);
+}
+
+inline constexpr bool
+softfloat_le128(uint128 const& a,
+                uint128 const& b)
+{
+    return softfloat_le128(a.v64, a.v0, b.v64, b.v64);
 }
 
 /**
@@ -272,11 +280,28 @@ and `a0' is less than the 128-bit unsigned integer formed by concatenating
 `b64' and `b0'.
 */
 inline constexpr bool
-softfloat_lt128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
+softfloat_lt128(uint64_t const& a64,
+                uint64_t const& a0,
+                uint64_t const& b64,
+                uint64_t const& b0)
 {
     return
         a64 < b64 ||
         (a64 == b64 && a0 < b0);
+}
+
+inline constexpr bool
+softfloat_lt128(uint128 const& a,
+                uint128 const& b)
+{
+    return softfloat_lt128(a.v64, a.v0, b.v64, b.v0);
+}
+
+inline constexpr bool
+softfloat_lt128(extFloat80_t const& a,
+                extFloat80_t const& b)
+{
+    return softfloat_lt128(a.signExp, a.signif, b.signExp, b.signif);
 }
 
 /**
@@ -337,15 +362,22 @@ bit of the shifted value by setting the least-significant bit to 1.  This
 shifted-and-jammed value is returned.
 */
 inline uint128
-softfloat_shortShiftRightJam128(uint64_t a64,
-                                uint64_t a0,
-                                uint8_t dist)
+softfloat_shortShiftRightJam128(uint64_t const& a64,
+                                uint64_t const& a0,
+                                uint8_t const dist)
 {
     auto const negDist = 63 & -static_cast<int8_t>(dist);
-    uint128 z;
-    z.v64 = a64 >> dist;
-    z.v0 = a64 << negDist | a0 >> dist | !!(0 != (a0 << negDist));
-    return z;
+    return uint128{
+        a64 >> dist,
+        a64 << negDist | a0 >> dist | !!(0 != (a0 << negDist))
+    };
+}
+
+inline uint128
+softfloat_shortShiftRightJam128(uint128 const& a,
+                                uint8_t const dist)
+{
+    return softfloat_shortShiftRightJam128(a.v64, a.v0, dist);
 }
 
 /**
@@ -364,6 +396,14 @@ softfloat_shortShiftRightJam128Extra(uint64_t a64,
     z.v.v0 = a64 << uNegDist | a0 >> dist;
     z.extra = a0 << uNegDist | (0 != extra);
     return z;
+}
+
+inline uint128_extra
+softfloat_shortShiftRightJam128Extra(uint128 const& a,
+                                     uint64_t const& extra,
+                                     uint8_t const dist)
+{
+    return softfloat_shortShiftRightJam128Extra(a.v64, a.v0, extra, dist);
 }
 
 /**
@@ -412,7 +452,16 @@ greater than 128, the result will be either 0 or 1, depending on whether the
 original 128 bits are all zeros.
 */
 uint128
-softfloat_shiftRightJam128(uint64_t a64, uint64_t a0, uint32_t dist);
+softfloat_shiftRightJam128(uint64_t a64,
+                           uint64_t a0,
+                           uint32_t dist);
+
+inline uint128
+softfloat_shiftRightJam128(uint128 const& a,
+                           uint32_t const dist)
+{
+    return softfloat_shiftRightJam128(a.v64, a.v0, dist);
+}
 
 /**
 Shifts the 192 bits formed by concatenating `a64', `a0', and `extra' right
@@ -436,6 +485,14 @@ softfloat_shiftRightJam128Extra(uint64_t a64,
                                 uint64_t a0,
                                 uint64_t extra,
                                 uint32_t dist);
+
+inline uint128_extra
+softfloat_shiftRightJam128Extra(uint128 const& a,
+                                uint64_t const& extra,
+                                uint32_t const& dist)
+{
+    return softfloat_shiftRightJam128Extra(a.v64, a.v0, extra, dist);
+}
 
 /**
 Shifts the 256-bit unsigned integer pointed to by `aPtr' right by the number
@@ -466,6 +523,13 @@ softfloat_add128(uint64_t a64,
                  uint64_t b0)
 {
     return uint128{a64 + b64 + !!(a0 + b0 < a0), a0 + b0};
+}
+
+inline constexpr uint128
+softfloat_add128(uint128 const& a,
+                 uint128 const& b)
+{
+    return softfloat_add128(a.v64, a.v0, b.v64, b.v0);
 }
 
 /**
@@ -503,12 +567,19 @@ and `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.
 The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 */
 inline constexpr uint128
-softfloat_sub128(uint64_t a64,
-                 uint64_t a0,
-                 uint64_t b64,
-                 uint64_t b0)
+softfloat_sub128(uint64_t const& a64,
+                 uint64_t const& a0,
+                 uint64_t const& b64,
+                 uint64_t const& b0)
 {
     return uint128{a64 - b64 - !!(a0 < b0), a0 - b0};
+}
+
+inline constexpr uint128
+softfloat_sub128(uint128 const& a,
+                 uint128 const& b)
+{
+    return softfloat_sub128(a.v64, a.v0, b.v64, b.v0);
 }
 
 /**
@@ -528,18 +599,19 @@ softfloat_sub256M(uint64_t const* aPtr,
 @return the 128-bit product of `a', `b', and 2^32.
 */
 inline uint128
-softfloat_mul64ByShifted32To128(uint64_t a,
-                                uint32_t b)
+softfloat_mul64ByShifted32To128(uint64_t const& a,
+                                uint32_t const& b)
 {
     uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a)) * b;
-    uint128 z;
-    z.v0 = mid << 32;
-    z.v64 = static_cast<uint64_t>(static_cast<uint32_t>(a >> 32)) * b + (mid >> 32);
-    return z;
+    return
+        uint128{
+        mid << 32,
+        static_cast<uint64_t>(static_cast<uint32_t>(a >> 32)) * b + (mid >> 32)
+    };
 }
 
 /**
-Returns the 128-bit product of `a' and `b'.
+@returns the 128-bit product of `a' and `b'.
 */
 uint128
 softfloat_mul64To128(uint64_t a,
@@ -551,17 +623,21 @@ softfloat_mul64To128(uint64_t a,
 bits are discarded.
 */
 inline uint128
-softfloat_mul128By32(uint64_t a64,
-                     uint64_t a0,
-                     uint32_t b)
+softfloat_mul128By32(uint64_t const& a64,
+                     uint64_t const& a0,
+                     uint32_t const& b)
 {
     uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a0 >> 32)) * b;
     uint64_t const v0 = a0 * b;
     uint32_t const carry = static_cast<uint32_t>(static_cast<uint32_t>(v0 >> 32) - static_cast<uint32_t>(mid));
-    uint128 z;
-    z.v0 = v0;
-    z.v64 = a64 * b + static_cast<uint32_t>((mid + carry) >> 32);
-    return z;
+    return uint128{a64 * b + static_cast<uint32_t>((mid + carry) >> 32), v0};
+}
+
+inline uint128
+softfloat_mul128By32(uint128 const& a,
+                     uint32_t const& b)
+{
+    return softfloat_mul128By32(a.v64, a.v0, b);
 }
 
 /**
