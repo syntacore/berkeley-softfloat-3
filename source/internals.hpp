@@ -260,7 +260,20 @@ softfloat_normRoundPackToF128(bool,
                               uint64_t);
 
 float128_t
-softfloat_addMagsF128(uint64_t, uint64_t, uint64_t, uint64_t, bool);
+softfloat_addMagsF128(uint64_t,
+                      uint64_t,
+                      uint64_t,
+                      uint64_t,
+                      bool);
+
+inline
+float128_t
+softfloat_addMagsF128(uint128 const& a,
+                      uint128 const& b,
+                      bool const signZ)
+{
+    return softfloat_addMagsF128(a.v64, a.v0, b.v64, b.v0, signZ);
+}
 
 float128_t
 softfloat_subMagsF128(uint64_t,
@@ -268,6 +281,15 @@ softfloat_subMagsF128(uint64_t,
                       uint64_t,
                       uint64_t,
                       bool);
+inline
+float128_t
+softfloat_subMagsF128(uint128 const& a,
+                      uint128 const& b,
+                      bool const signZ)
+{
+    return softfloat_subMagsF128(a.v64, a.v0, b.v64, b.v0, signZ);
+}
+
 float128_t
 softfloat_mulAddF128(uint64_t,
                      uint64_t,
