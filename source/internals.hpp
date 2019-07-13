@@ -623,6 +623,11 @@ isNaNExtF80UI(uint16_t const& a64,
         0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & a0);
 }
 
+inline constexpr bool
+isNaNExtF80UI(extFloat80_t const& a)
+{
+    return isNaNExtF80UI(a.signExp, a.signif);
+}
 /**
 @returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point NaN.

@@ -221,6 +221,12 @@ softfloat_isSigNaNExtF80UI(uint16_t const uiA64,
         0 != (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
 }
 
+inline constexpr bool
+softfloat_isSigNaNExtF80UI(extFloat80_t const& a)
+{
+    return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
+}
+
 #ifdef SOFTFLOAT_FAST_INT64
 
 /**

@@ -240,6 +240,12 @@ softfloat_isSigNaNExtF80UI(uint16_t const& uiA64,
         0 != (UINT64_C(0x3FFFFFFFFFFFFFFF) & uiA0);
 }
 
+inline constexpr bool
+softfloat_isSigNaNExtF80UI(extFloat80_t const& a)
+{
+    return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
+}
+
 template<typename Ty>
 inline Ty
 propagate_NaN(Ty const& uiA,
@@ -486,7 +492,7 @@ softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
                               extFloat80M const* const bSPtr,
                               extFloat80M* const zSPtr)
 {
-    if (softfloat_isSigNaNExtF80UI(aSPtr->signExp, aSPtr->signif) || (bSPtr && softfloat_isSigNaNExtF80UI(bSPtr->signExp, bSPtr->signif))) {
+    if (softfloat_isSigNaNExtF80UI(*aSPtr) || (bSPtr && softfloat_isSigNaNExtF80UI(*bSPtr))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 

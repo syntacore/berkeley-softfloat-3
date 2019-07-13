@@ -45,19 +45,21 @@ extF80_lt(extFloat80_t const a,
           extFloat80_t const b)
 {
     using namespace softfloat::internals;
-    auto const uiA64 = a.signExp;
-    auto const uiA0  = a.signif;
-    auto const uiB64 = b.signExp;
-    auto const uiB0  = b.signif;
 
-    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
+    if (isNaNExtF80UI(a) || isNaNExtF80UI(b)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
+    auto const uiA64 = a.signExp;
+    auto const uiA0 = a.signif;
+    auto const uiB64 = b.signExp;
+    auto const uiB0 = b.signif;
+
     bool const signA = is_sign(uiA64);
     bool const signB = is_sign(uiB64);
     typedef typename std::conditional<(sizeof uiA0 < sizeof uiA64), decltype(uiA64), decltype(uiA0)>::type largest_type;
+
     return
         signA != signB ?
         signA && 0 != static_cast<largest_type>(((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) :

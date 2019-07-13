@@ -45,19 +45,19 @@ extF80_lt_quiet(extFloat80_t a,
                 extFloat80_t b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 = a.signif;
-    uint16_t const uiB64 = b.signExp;
-    uint64_t const uiB0 = b.signif;
 
-    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
-        if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
+    if (isNaNExtF80UI(a) || isNaNExtF80UI(b)) {
+        if (softfloat_isSigNaNExtF80UI(a) || softfloat_isSigNaNExtF80UI(a)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 
         return false;
     }
 
+    uint16_t const uiA64 = a.signExp;
+    uint64_t const uiA0 = a.signif;
+    uint16_t const uiB64 = b.signExp;
+    uint64_t const uiB0 = b.signif;
     bool const signA = is_sign(uiA64);
     bool const signB = is_sign(uiB64);
     typedef typename std::conditional<(sizeof uiA0 < sizeof uiA64), decltype(uiA64), decltype(uiA0)>::type largest_type;

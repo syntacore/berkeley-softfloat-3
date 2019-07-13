@@ -46,15 +46,16 @@ extF80M_eq_signaling(extFloat80_t const* const aPtr,
                      extFloat80_t const* const bPtr)
 {
     using namespace softfloat::internals;
+
+    if (isNaNExtF80UI(*aPtr) || isNaNExtF80UI(*bPtr)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return false;
+    }
+
     uint16_t const uiA64 = aPtr->signExp;
     uint64_t const uiA0 = aPtr->signif;
     uint16_t const uiB64 = bPtr->signExp;
     uint64_t const uiB0 = bPtr->signif;
-
-    if (isNaNExtF80UI(uiA64, uiA0) || isNaNExtF80UI(uiB64, uiB0)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return false;
-    }
 
     if (uiA0 == uiB0) {
         return uiA64 == uiB64 || 0 == uiA0;
