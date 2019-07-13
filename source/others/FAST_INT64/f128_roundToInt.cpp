@@ -59,7 +59,7 @@ f128_roundToInt(float128_t const a,
     if (0x402F <= exp) {
         if (0x406F <= exp) {
             if (0x7FFF == exp && 0 != (fracF128UI64(uA.v64) | uA.v0)) {
-                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uA.v64, uA.v0, 0, 0));
+                return static_cast<float128_t>(softfloat_propagateNaNF128UI(uA, uint128{0, 0}));
             }
 
             return a;
@@ -70,7 +70,7 @@ f128_roundToInt(float128_t const a,
         uiZ = uA;
         bool const roundNearEven = (roundingMode == softfloat_round_near_even);
 
-        if (roundNearEven || (roundingMode == softfloat_round_near_maxMag)) {
+        if (roundNearEven || softfloat_round_near_maxMag == roundingMode) {
             if (0x402F == exp) {
                 if (UINT64_C(0x8000000000000000) <= uiZ.v0) {
                     ++uiZ.v64;
@@ -82,11 +82,11 @@ f128_roundToInt(float128_t const a,
             } else {
                 uiZ = softfloat_add128(uiZ.v64, uiZ.v0, 0, lastBitMask >> 1);
 
-                if (roundNearEven && !(uiZ.v0 & roundBitsMask)) {
+                if (roundNearEven && 0 == (uiZ.v0 & roundBitsMask)) {
                     uiZ.v0 &= ~lastBitMask;
                 }
             }
-        } else if (roundingMode != softfloat_round_minMag) {
+        } else if (softfloat_round_minMag != roundingMode) {
             if (is_sign(uiZ.v64) != (softfloat_round_max == roundingMode)) {
                 uiZ = softfloat_add128(uiZ.v64, uiZ.v0, 0, roundBitsMask);
             }
@@ -170,4 +170,3 @@ f128_roundToInt(float128_t const a,
 
     return static_cast<float128_t>(uiZ);
 }
-

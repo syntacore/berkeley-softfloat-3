@@ -333,6 +333,12 @@ softfloat_isSigNaNF128UI(uint64_t const& uiA64,
         (0 != uiA0 || 0 != (uiA64 & UINT64_C(0x00007FFFFFFFFFFF)));
 }
 
+inline constexpr bool
+softfloat_isSigNaNF128UI(uint128 const& a)
+{
+    return softfloat_isSigNaNF128UI(a.v64, a.v0);
+}
+
 /**
 Assuming the unsigned integer formed from concatenating `uiA64' and `uiA0'
 has the bit pattern of a 128-bit floating-point NaN, converts this NaN to
@@ -415,6 +421,13 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
     }
 
     return uint128{defaultNaNF128UI64, defaultNaNF128UI0};
+}
+
+inline uint128
+softfloat_propagateNaNF128UI(uint128 const& a,
+                             uint128 const& b)
+{
+    return softfloat_propagateNaNF128UI(a.v64, a.v0, b.v64, b.v0);
 }
 
 #else

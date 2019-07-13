@@ -291,12 +291,18 @@ point signaling NaN.
 Note:  This macro evaluates its arguments more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNF128UI(uint64_t uiA64,
-                         uint64_t uiA0)
+softfloat_isSigNaNF128UI(uint64_t const& uiA64,
+                         uint64_t const& uiA0)
 {
     return
         UINT64_C(0x7FFF000000000000) == (uiA64 & UINT64_C(0x7FFF800000000000)) &&
         (0 != uiA0 || 0 != (uiA64 & UINT64_C(0x00007FFFFFFFFFFF)));
+}
+
+inline constexpr bool
+softfloat_isSigNaNF128UI(uint128 const& a)
+{
+    return softfloat_isSigNaNF128UI(a.v64, a.v0);
 }
 
 /**
@@ -343,6 +349,13 @@ softfloat_propagateNaNF128UI(uint64_t uiA64,
                              uint64_t uiA0,
                              uint64_t uiB64,
                              uint64_t uiB0);
+
+inline uint128
+softfloat_propagateNaNF128UI(uint128 const& a,
+                             uint128 const& b)
+{
+    return softfloat_propagateNaNF128UI(a.v64, a.v0, b.v64, b.v0);
+}
 
 #else
 
