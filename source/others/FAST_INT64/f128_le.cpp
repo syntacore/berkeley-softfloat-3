@@ -56,7 +56,8 @@ f128_le(float128_t const a,
     bool const signA = is_sign(aa.v64);
     bool const signB = is_sign(bb.v64);
     return
-        signA != signB ? signA || 0 == (((aa.v64 | bb.v64) & UINT64_C(0x7FFFFFFFFFFFFFFF)) | aa.v0 | bb.v0) :
-        (aa.v64 == bb.v64 && aa.v0 == bb.v0) || (signA != softfloat_lt128(aa, bb));
+        signA != signB ?
+        signA || 0 == (((aa.v64 | bb.v64) & UINT64_C(0x7FFFFFFFFFFFFFFF)) | aa.v0 | bb.v0) :
+        (aa.v64 == bb.v64 && aa.v0 == bb.v0) || softfloat_lt128(aa, bb) != signA;
 }
 
