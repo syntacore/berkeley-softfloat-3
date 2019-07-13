@@ -78,7 +78,7 @@ f128_to_i64(float128_t const a,
         return roundPackTo<int64_t>(sign, sig64, sig0, roundingMode, exact);
     }
 
-    if (exp) {
+    if (0 != exp) {
         sig64 |= UINT64_C(0x0001000000000000);
     }
 
