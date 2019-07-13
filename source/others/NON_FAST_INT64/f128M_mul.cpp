@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 void
-f128M_mul(float128_t* const aPtr,
-          float128_t* const bPtr,
+f128M_mul(float128_t const* const aPtr,
+          float128_t const* const bPtr,
           float128_t* const zPtr)
 {
     using namespace softfloat::internals;
