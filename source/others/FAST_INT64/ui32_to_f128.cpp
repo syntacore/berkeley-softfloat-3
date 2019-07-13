@@ -41,20 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 float128_t
-ui32_to_f128(uint32_t a)
+ui32_to_f128(uint32_t const a)
 {
     using namespace softfloat::internals;
-    uint64_t uiZ64 = 0;
 
-    if (a) {
-        int8_t shiftDist = count_leading_zeros(a) + 17;
-        uiZ64 =
-            packToF128UI64(0, 0x402E - shiftDist, static_cast<uint64_t>(a) << shiftDist);
+    if (0 == a) {
+        return float128_t(uint128{0, 0});
     }
 
-    uint128 uZ;
-    uZ.v64 = uiZ64;
-    uZ.v0 = 0;
-    return float128_t(uZ);
+    int8_t const shiftDist = count_leading_zeros(a) + 17;
+    return
+        float128_t(
+            uint128(
+                packToF128UI64(false,
+                               0x402E - shiftDist,
+                               static_cast<uint64_t>(a) << shiftDist),
+                0));
 }
 
