@@ -1,4 +1,4 @@
-
+ï»¿
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -107,7 +107,7 @@ f128_roundToInt(float128_t const a,
             uiZ.v0 = 0;
 
             /**
-            @bug  warning: enumeration value ‘softfloat_round_minMag’ not handled in switch
+            @bug  warning: enumeration value â€˜softfloat_round_minMagâ€™ not handled in switch
             */
             switch (roundingMode) {
             case softfloat_round_near_even:
