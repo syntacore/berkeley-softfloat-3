@@ -502,23 +502,6 @@ softfloat_shiftRightJam128Extra(uint128_extra const& a,
 }
 
 /**
-Shifts the 256-bit unsigned integer pointed to by `aPtr' right by the number
-of bits given in `dist', which must not be zero.  If any nonzero bits are
-shifted off, they are "jammed" into the least-significant bit of the shifted
-value by setting the least-significant bit to 1.  This shifted-and-jammed
-value is stored at the location pointed to by `zPtr'.  Each of `aPtr' and
-`zPtr' points to an array of four 64-bit elements that concatenate in the
-platform's normal endian order to form a 256-bit integer.
-The value of `dist' can be arbitrarily large.  In particular, if `dist'
-is greater than 256, the stored result will be either 0 or 1, depending on
-whether the original 256 bits are all zeros.
-*/
-void
-softfloat_shiftRightJam256M(uint64_t const* aPtr,
-                            uint32_t dist,
-                            uint64_t* zPtr);
-
-/**
 Returns the sum of the 128-bit integer formed by concatenating `a64' and
 `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.  The
 addition is modulo 2^128, so any carry out is lost.

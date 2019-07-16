@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#include <cassert>
+#include <cstring> 
+
 #ifndef SOFTFLOAT_FAST_INT64
 #error Fast int64_t operations only
 #endif
@@ -43,6 +46,128 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
+namespace {
+
+static
+void
+softfloat_shortShiftRightJamM(size_t const size_words,
+                              uint64_t const* const aPtr,
+                              uint8_t const dist,
+                              uint64_t* const zPtr)
+{
+    uint8_t const uNegDist = 63u & -static_cast<int8_t>(dist);
+    auto index = indexWordLo(size_words);
+    auto const lastIndex = indexWordHi(size_words);
+    uint64_t wordA = aPtr[index];
+    uint64_t partWordZ = wordA >> dist;
+
+    if (partWordZ << dist != wordA) {
+        partWordZ |= 1;
+    }
+
+    while (index != lastIndex) {
+        wordA = aPtr[index + wordIncr];
+        zPtr[index] = wordA << uNegDist | partWordZ;
+        index += wordIncr;
+        partWordZ = wordA >> dist;
+    }
+
+    zPtr[index] = partWordZ;
+
+}
+
+/**
+Shifts the 256-bit unsigned integer pointed to by `aPtr' right by the number
+of bits given in `dist', which must not be zero.  If any nonzero bits are
+shifted off, they are "jammed" into the least-significant bit of the shifted
+value by setting the least-significant bit to 1.  This shifted-and-jammed
+value is stored at the location pointed to by `zPtr'.  Each of `aPtr' and
+`zPtr' points to an array of four 64-bit elements that concatenate in the
+platform's normal endian order to form a 256-bit integer.
+The value of `dist' can be arbitrarily large.  In particular, if `dist'
+is greater than 256, the stored result will be either 0 or 1, depending on
+whether the original 256 bits are all zeros.
+*/
+static void
+softfloat_shiftRightJam256M(uint64_t const* aPtr,
+                            uint32_t const dist,
+                            uint64_t* const zPtr)
+{
+    assert(aPtr);
+    assert(zPtr);
+
+    uint64_t wordJam = 0;
+    uint64_t* ptr = nullptr;
+    uint32_t wordDist = dist / (CHAR_BIT * sizeof(*aPtr));
+
+    if (0 != wordDist) {
+        if (4 < wordDist) {
+            wordDist = 4;
+        }
+
+        assert(wordDist <= 4);
+
+        uint32_t i = wordDist;
+        uint64_t const* ptr1 = aPtr + indexMultiwordLo(4, wordDist);
+
+        for (uint32_t i = wordDist; 0 != i; --i) {
+            wordJam = *ptr1++;
+
+            if (0 != wordJam) {
+                break;
+            }
+        }
+
+        ptr = zPtr;
+    }
+
+    assert(wordDist <= 4);
+
+    if (wordDist < 4) {
+        aPtr += indexMultiwordHiBut(4, wordDist);
+        uint8_t const innerDist = dist & 63;
+
+        if (0 != innerDist) {
+            softfloat_shortShiftRightJamM(4u - wordDist,
+                                          aPtr,
+                                          innerDist,
+                                          zPtr + indexMultiwordLoBut(4, wordDist));
+
+            if (0 == wordDist) {
+                if (wordJam) {
+                    zPtr[indexWordLo(4)] |= 1;
+                }
+
+                return;
+            }
+        } else {
+            aPtr += indexWordLo(4 - wordDist);
+            ptr = zPtr + indexWordLo(4);
+
+            /**
+            @todo memmove
+            */
+            for (auto i = 4 - wordDist; i; --i, aPtr += wordIncr, ptr += wordIncr) {
+                *ptr = *aPtr;
+            }
+        }
+
+        ptr = zPtr + indexMultiwordHi(4, wordDist);
+    }
+
+    assert(ptr);
+    memset(ptr, 0, wordDist * sizeof(*ptr));
+
+    if (wordJam) {
+        zPtr[indexWordLo(4)] |= 1;
+    }
+}
+
+}  // namespace
+
+/**
+@todo Merge fast int64 and non fast int 64
+*/
 float128_t
 softfloat_mulAddF128(Mul_add_operations const op,
                      uint64_t const& uiA64,
