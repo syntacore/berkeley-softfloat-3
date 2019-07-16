@@ -50,15 +50,25 @@ and `a0' is equal to the 128-bit unsigned integer formed by concatenating
 `b64' and `b0'.
 */
 static inline constexpr bool
-softfloat_eq128(uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0)
+softfloat_eq128(uint64_t const& a64,
+                uint64_t const& a0,
+                uint64_t const& b64,
+                uint64_t const& b0)
 {
     return a64 == b64 && a0 == b0;
+}
+
+static inline constexpr bool
+softfloat_eq128(uint128 const& a,
+                uint128 const& b)
+{
+    return softfloat_eq128(a.v64, a.v0, b.v64, b.v0);
 }
 
 }  // namespace
 
 float128_t
-softfloat_roundPackToF128(bool sign,
+softfloat_roundPackToF128(bool const sign,
                           int32_t exp,
                           uint64_t sig64,
                           uint64_t sig0,
@@ -80,9 +90,9 @@ softfloat_roundPackToF128(bool sign,
                 softfloat_tininess_beforeRounding == softfloat_detectTininess ||
                 exp < -1 ||
                 !doIncrement ||
-                softfloat_lt128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_MAX);
+                softfloat_lt128(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_MAX));
 
-            uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(sig64, sig0, sigExtra, static_cast<uint32_t>(-exp));
+            uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(uint128_extra(uint128(sig64, sig0), sigExtra), static_cast<uint32_t>(-exp));
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
@@ -97,14 +107,14 @@ softfloat_roundPackToF128(bool sign,
             if (!roundNearEven && softfloat_round_near_maxMag != softfloat_roundingMode) {
                 doIncrement =
                     (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode &&
-                    sigExtra;
+                    0 != sigExtra;
             }
         } else if (
             0x7FFD < exp ||
             (
                 0x7FFD == exp &&
                 doIncrement &&
-                softfloat_eq128(sig64, sig0, UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF))
+                softfloat_eq128(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF)))
             )
         ) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);

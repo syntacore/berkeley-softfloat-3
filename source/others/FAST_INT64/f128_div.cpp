@@ -88,7 +88,7 @@ f128_div(float128_t const a,
         // b is NaN or inf
         if (0 != (sigB.v64 | sigB.v0)) {
             // b is NaN
-            return float128_t(softfloat_propagateNaNF128UI(aa.v64, aa.v0, bb.v64, bb.v0));
+            return float128_t(softfloat_propagateNaNF128UI(aa, bb));
         }
 
         // b is inf, result is 0

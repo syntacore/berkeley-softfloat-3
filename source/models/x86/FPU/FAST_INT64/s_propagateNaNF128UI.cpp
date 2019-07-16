@@ -40,80 +40,70 @@ namespace softfloat {
 namespace internals {
 namespace Intel_8086 {
 
+namespace {
+static uint64_t const non_signal_bit = UINT64_C(0x0000'8000'0000'0000);
+static uint64_t const suppress_sign_mask = UINT64_C(0x7FFF'FFFF'FFFF'FFFF);
+}
+
 uint128
-softfloat_propagateNaNF128UI(uint64_t uiA64,
-                             uint64_t uiA0,
-                             uint64_t uiB64,
-                             uint64_t uiB0)
+softfloat_propagateNaNF128UI(uint64_t const& uiA64,
+                             uint64_t const& uiA0,
+                             uint64_t const& uiB64,
+                             uint64_t const& uiB0)
 {
     bool const isSigNaNA = softfloat_isSigNaNF128UI(uiA64, uiA0);
     bool const isSigNaNB = softfloat_isSigNaNF128UI(uiB64, uiB0);
     /* Make NaNs non-signaling. */
-    uint64_t const uiNonsigA64 = uiA64 | UINT64_C(0x0000800000000000);
-    uint64_t const uiNonsigB64 = uiB64 | UINT64_C(0x0000800000000000);
+    uint64_t const uiNonsigA64 = uiA64 | non_signal_bit;
+    uint64_t const uiNonsigB64 = uiB64 | non_signal_bit;
+    uint128 nsA(uiNonsigA64, uiA0);
+    uint128 nsB(uiNonsigB64, uiB0);
 
-    if (isSigNaNA | isSigNaNB) {
+    if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
-        if (isSigNaNA) {
-            if (isSigNaNB) {
-                goto returnLargerMag;
-            }
-
-            if (isNaNF128UI(uiB64, uiB0)) {
-                goto returnB;
-            }
-
-            goto returnA;
+        if (!isSigNaNA) {
+            return isNaNF128UI(uiA64, uiA0) ? nsA : nsB;
         }
 
-        if (isNaNF128UI(uiA64, uiA0)) {
-            goto returnA;
+        assert(isSigNaNA);
+
+        if (!isSigNaNB) {
+            return isNaNF128UI(uiB64, uiB0) ? nsB : nsA;
         }
 
-        goto returnB;
+        assert(isSigNaNA && isSigNaNB);
     }
 
-returnLargerMag:
-    {
-        uint64_t const uiMagA64 = uiNonsigA64 & UINT64_C(0x7FFFFFFFFFFFFFFF);
-        uint64_t const uiMagB64 = uiNonsigB64 & UINT64_C(0x7FFFFFFFFFFFFFFF);
+    uint64_t const uiMagA64 = uiNonsigA64 & suppress_sign_mask;
+    uint64_t const uiMagB64 = uiNonsigB64 & suppress_sign_mask;
 
-        if (uiMagA64 < uiMagB64) {
-            goto returnB;
-        }
-
-        if (uiMagB64 < uiMagA64) {
-            goto returnA;
-        }
-
-        if (uiA0 < uiB0) {
-            goto returnB;
-        }
-
-        if (uiB0 < uiA0) {
-            goto returnA;
-        }
-
-        if (uiNonsigA64 < uiNonsigB64) {
-            goto returnA;
-        }
-
-returnB:
-        {
-            uint128 uiZ;
-            uiZ.v64 = uiNonsigB64;
-            uiZ.v0 = uiB0;
-            return uiZ;
-        }
-returnA:
-        {
-            uint128 uiZ;
-            uiZ.v64 = uiNonsigA64;
-            uiZ.v0 = uiA0;
-            return uiZ;
-        }
+    if (uiMagA64 < uiMagB64) {
+        return nsB;
     }
+
+    assert(uiMagB64 <= uiMagA64);
+
+    if (uiMagB64 < uiMagA64) {
+        return nsA;
+    }
+
+    assert(uiMagB64 == uiMagA64);
+
+    if (uiA0 < uiB0) {
+        return nsB;
+    }
+
+    assert(uiB0 <= uiA0);
+
+    if (uiB0 < uiA0) {
+        return nsA;
+    }
+
+    assert(uiB0 == uiA0);
+
+    return
+        uiNonsigA64 < uiNonsigB64 ? nsA : nsB;
 }
 
 }  // namespace Intel_8086

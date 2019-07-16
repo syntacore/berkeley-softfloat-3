@@ -345,10 +345,10 @@ If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
 uint128
-softfloat_propagateNaNF128UI(uint64_t uiA64,
-                             uint64_t uiA0,
-                             uint64_t uiB64,
-                             uint64_t uiB0);
+softfloat_propagateNaNF128UI(uint64_t const& uiA64,
+                             uint64_t const& uiA0,
+                             uint64_t const& uiB64,
+                             uint64_t const& uiB0);
 
 inline uint128
 softfloat_propagateNaNF128UI(uint128 const& a,

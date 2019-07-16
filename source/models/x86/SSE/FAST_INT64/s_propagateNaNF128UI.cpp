@@ -54,27 +54,26 @@ If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
 uint128
-softfloat_propagateNaNF128UI(uint64_t const uiA64,
-                             uint64_t const uiA0,
-                             uint64_t const uiB64,
-                             uint64_t const uiB0)
+softfloat_propagateNaNF128UI(uint64_t const& uiA64,
+                             uint64_t const& uiA0,
+                             uint64_t const& uiB64,
+                             uint64_t const& uiB0)
 {
     if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 #if 0
 
         if (softfloat_isSigNaNF128UI(uiA64, uiA0)) {
-            return uint128{uiA64 | UINT64_C(0x0000800000000000), uiA0};
+            return uint128{uiA64 | UINT64_C(0x0000'8000'0000'0000), uiA0};
         }
 
 #endif
     }
 
-    if (isNaNF128UI(uiA64, uiA0)) {
-        return uint128{uiA64 | UINT64_C(0x0000800000000000), uiA0};
-    } else {
-        return uint128{uiB64 | UINT64_C(0x0000800000000000), uiB0};
-    }
+    return 
+        isNaNF128UI(uiA64, uiA0) ?
+        uint128{uiA64 | UINT64_C(0x0000'8000'0000'0000), uiA0} :
+        uint128{uiB64 | UINT64_C(0x0000'8000'0000'0000), uiB0};
 }
 
 }  // namespace Intel_8086
