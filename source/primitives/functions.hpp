@@ -494,6 +494,13 @@ softfloat_shiftRightJam128Extra(uint128 const& a,
     return softfloat_shiftRightJam128Extra(a.v64, a.v0, extra, dist);
 }
 
+inline uint128_extra
+softfloat_shiftRightJam128Extra(uint128_extra const& a,
+                                uint32_t const& dist)
+{
+    return softfloat_shiftRightJam128Extra(a.v, a.extra, dist);
+}
+
 /**
 Shifts the 256-bit unsigned integer pointed to by `aPtr' right by the number
 of bits given in `dist', which must not be zero.  If any nonzero bits are
