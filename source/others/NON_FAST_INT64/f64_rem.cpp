@@ -40,11 +40,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error For non-fast int64_t only
 #endif
 
-float64_t
-f64_rem(float64_t a,
-        float64_t b)
+using namespace softfloat::internals;
+
+namespace {
+static float64_t
+selectRem(bool const signA,
+          int16_t expB,
+          uint64_t rem,
+          uint64_t altRem,
+          uint32_t q)
 {
-    using namespace softfloat::internals;
+    uint64_t const meanRem = rem + altRem;
+
+    if (0 != (meanRem & UINT64_C(0x8000000000000000)) || (0 == meanRem && 0 != (q & 1))) {
+        rem = altRem;
+    }
+
+    bool signRem = signA;
+
+    if (0 != (rem & UINT64_C(0x8000000000000000))) {
+        signRem = !signRem;
+        rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
+    }
+
+    return softfloat_normRoundPackToF64(signRem, expB, rem);
+}
+
+}  // namespace
+
+float64_t
+f64_rem(float64_t const a,
+        float64_t const b)
+{
     uint64_t const uiA = f_as_u_64(a);
     bool const signA = is_sign(uiA);
     int16_t expA = expF64UI(uiA);
@@ -53,8 +80,8 @@ f64_rem(float64_t a,
     int16_t expB = expF64UI(uiB);
     uint64_t sigB = fracF64UI(uiB);
 
-    if (expA == 0x7FF) {
-        if (sigA || ((expB == 0x7FF) && sigB)) {
+    if (0x7FF == expA) {
+        if (0 != sigA || (0x7FF == expB && 0 != sigB)) {
             return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
         }
 
@@ -62,7 +89,9 @@ f64_rem(float64_t a,
         return u_as_f_64(defaultNaNF64UI);
     }
 
-    if (expB == 0x7FF) {
+    // a is finite
+
+    if (0x7FF == expB) {
         return sigB ? u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB)) : a;
     }
 
@@ -70,8 +99,8 @@ f64_rem(float64_t a,
         return a;
     }
 
-    if (!expB) {
-        if (!sigB) {
+    if (0 == expB) {
+        if (0 == sigB) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f_64(defaultNaNF64UI);
         }
@@ -81,8 +110,8 @@ f64_rem(float64_t a,
         sigB = normExpSig.sig;
     }
 
-    if (!expA) {
-        if (!sigA) {
+    if (0 == expA) {
+        if (0 == sigA) {
             return a;
         }
 
@@ -95,7 +124,6 @@ f64_rem(float64_t a,
     sigB |= UINT64_C(0x0010000000000000);
     int16_t expDiff = expA - expB;
     uint32_t q;
-    uint64_t altRem;
 
     if (expDiff < 1) {
         if (expDiff < -1) {
@@ -142,7 +170,7 @@ f64_rem(float64_t a,
             rem = static_cast<uint64_t>(static_cast<uint32_t>(rem >> 3)) << 32;
             rem -= q * static_cast<uint64_t>(sigB);
 
-            if (rem & UINT64_C(0x8000000000000000)) {
+            if (0 != (rem & UINT64_C(0x8000000000000000))) {
                 rem += sigB;
             }
 
@@ -153,33 +181,19 @@ f64_rem(float64_t a,
         q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
         rem = (rem << (expDiff + 30)) - q * static_cast<uint64_t>(sigB);
 
-        if (rem & UINT64_C(0x8000000000000000)) {
-            altRem = rem + sigB;
-            goto selectRem;
+        if (0 != (rem & UINT64_C(0x8000000000000000))) {
+            return selectRem(signA, expB, rem, rem + sigB, q);
         }
     }
+
+    uint64_t altRem;
 
     do {
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while (!(rem & UINT64_C(0x8000000000000000)));
+    } while (0 == (rem & UINT64_C(0x8000000000000000)));
 
-selectRem:
-    {
-        uint64_t const meanRem = rem + altRem;
+    return selectRem(signA, expB, rem, altRem, q);
 
-        if ((meanRem & UINT64_C(0x8000000000000000)) || (!meanRem && (q & 1))) {
-            rem = altRem;
-        }
-
-        bool signRem = signA;
-
-        if (rem & UINT64_C(0x8000000000000000)) {
-            signRem = !signRem;
-            rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
-        }
-
-        return softfloat_normRoundPackToF64(signRem, expB, rem);
-    }
 }
