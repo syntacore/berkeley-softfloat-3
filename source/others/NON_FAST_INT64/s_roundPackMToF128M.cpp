@@ -70,6 +70,10 @@ softfloat_roundPackMToF128M(bool const sign,
                 exp < -1 ||
                 !doIncrement ||
                 softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig) < 0;
+
+            /**
+            @bug modify input
+            */
             softfloat_shiftRightJam160M(extSigPtr, static_cast<uint8_t>(-exp), extSigPtr);
             exp = 0;
             sigExtra = extSigPtr[indexWordLo(5)];
