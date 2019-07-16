@@ -41,45 +41,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 void
-f16_to_extF80M(float16_t a,
+f16_to_extF80M(float16_t const a,
                extFloat80_t* zPtr)
 {
     using namespace softfloat::internals;
-    uint16_t uiZ64;
-    uint32_t uiZ32;
 
     extFloat80M* const zSPtr = zPtr;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = is_sign(uiA);
-    int8_t exp = expF16UI(uiA);
-    uint16_t frac = fracF16UI(uiA);
+    int8_t const exp = expF16UI(uiA);
+    uint16_t const frac = fracF16UI(uiA);
 
-    if (exp == 0x1F) {
-        if (frac) {
+    if (0x1F == exp) {
+        if (0 != frac) {
             *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f16UIToCommonNaN(uiA));
             return;
         }
 
-        uiZ64 = packToExtF80UI64(sign, 0x7FFF);
-        uiZ32 = 0x80000000;
-        goto uiZ;
+        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
+        zSPtr->signif = UINT64_C(0x8000'0000'0000'0000);
+        return;
     }
 
-    if (!exp) {
-        if (!frac) {
-            uiZ64 = packToExtF80UI64(sign, 0);
-            uiZ32 = 0;
-            goto uiZ;
-        }
-
-        exp8_sig16 const normExpSig{frac};
-        exp = normExpSig.exp;
-        frac = normExpSig.sig;
+    if (0 != exp) {
+        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3FF0));
+        zSPtr->signif = static_cast<uint64_t>(0x80000000 | static_cast<uint32_t>(frac) << 21) << 32;
+        return;
     }
 
-    uiZ64 = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3FF0));
-    uiZ32 = 0x80000000 | static_cast<uint32_t>(frac) << 21;
-uiZ:
-    zSPtr->signExp = uiZ64;
-    zSPtr->signif = static_cast<uint64_t>(uiZ32) << 32;
+    if (0 == frac) {
+        zSPtr->signExp = packToExtF80UI64(sign, 0);
+        zSPtr->signif = 0;
+        return;
+    }
+
+    exp8_sig16 const normExpSig{frac};
+    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(normExpSig.exp + 0x3FF0));
+    zSPtr->signif = static_cast<uint64_t>(0x80000000 | static_cast<uint32_t>(normExpSig.sig) << 21) << 32;
 }
