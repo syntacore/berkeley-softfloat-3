@@ -1,4 +1,4 @@
-
+﻿
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -44,16 +44,16 @@ namespace softfloat {
 namespace internals {
 
 void
-softfloat_roundPackMToF128M(bool sign,
+softfloat_roundPackMToF128M(bool const sign,
                             int32_t exp,
-                            uint32_t* extSigPtr,
-                            uint32_t* zWPtr)
+                            uint32_t* const extSigPtr,
+                            uint32_t* const zWPtr)
 {
     static const uint32_t maxSig[4] = INIT_UINTM4(0x0001FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
-    bool roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
+    bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
     uint32_t sigExtra = extSigPtr[indexWordLo(5)];
     bool doIncrement = (0x80000000 <= sigExtra);
 
@@ -155,7 +155,7 @@ softfloat_roundPackMToF128M(bool sign,
         ui = extSigPtr[indexWordHi(5)];
         uj |= ui;
 
-        if (!uj) {
+        if (0 == uj) {
             exp = 0;
         }
 
