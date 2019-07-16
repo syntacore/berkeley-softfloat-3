@@ -44,17 +44,14 @@ namespace softfloat {
 namespace internals {
 
 void
-softfloat_normRoundPackMToF128M(bool sign,
+softfloat_normRoundPackMToF128M(bool const sign,
                                 int32_t exp,
-                                uint32_t* extSigPtr,
-                                uint32_t* zWPtr)
+                                uint32_t* const extSigPtr,
+                                uint32_t* const zWPtr)
 {
-    const uint32_t* ptr;
-    int16_t shiftDist;
+    auto ptr = extSigPtr + indexWordHi(5);
+    int16_t shiftDist = 0;
     uint32_t wordSig;
-
-    ptr = extSigPtr + indexWordHi(5);
-    shiftDist = 0;
 
     for (;;) {
         wordSig = *ptr;
@@ -76,15 +73,17 @@ softfloat_normRoundPackMToF128M(bool sign,
         ptr -= wordIncr;
     }
 
-    shiftDist += count_leading_zeros(wordSig) - 15;
+    int16_t const shiftDist_1 = shiftDist + count_leading_zeros(wordSig) - 15;
 
-    if (shiftDist) {
-        exp -= shiftDist;
-        softfloat_shiftLeft160M(extSigPtr, static_cast<uint32_t>(shiftDist), extSigPtr);
+    if (0 != shiftDist_1) {
+        exp -= shiftDist_1;
+        /**
+        @bug modify input
+        */
+        softfloat_shiftLeft160M(extSigPtr, static_cast<uint32_t>(shiftDist_1), extSigPtr);
     }
 
     softfloat_roundPackMToF128M(sign, exp, extSigPtr, zWPtr);
-
 }
 
 }  // namespace internals
