@@ -90,13 +90,13 @@ indexMultiwordHi(size_t,
 static inline constexpr size_t
 indexMultiwordLo(size_t const total,
                  size_t const n)
-{ 
+{
     return total - n;
 }
 
 static inline constexpr size_t
 indexMultiwordHiBut(size_t,
-                    size_t) 
+                    size_t)
 {
     return 0;
 }
@@ -143,7 +143,7 @@ indexMultiword(size_t,
 
 static inline constexpr size_t
 indexMultiwordHi(size_t const total,
-                 size_t const n) 
+                 size_t const n)
 {
     return total - n;
 }
@@ -186,20 +186,20 @@ struct uint128
     uint128() = default;
 
     constexpr
-    uint128(uint64_t const& a64,
-            uint64_t const& a0)
+        uint128(uint64_t const& a64,
+                uint64_t const& a0)
         : v64(a64)
         , v0(a0)
     {}
 
     explicit constexpr
-    uint128(float128_t const& a)
+        uint128(float128_t const& a)
         : v64(a.v64)
         , v0(a.v0)
     {}
 
     explicit constexpr
-    operator float128_t()const
+        operator float128_t()const
     {
 #ifdef BIG_ENDIAN
         return float128_t{v64, v0};
@@ -219,8 +219,8 @@ struct uint64_extra
     uint64_extra() = default;
 
     constexpr
-    uint64_extra(uint64_t const& a_v,
-                 uint64_t const& a_extra)
+        uint64_extra(uint64_t const& a_v,
+                     uint64_t const& a_extra)
         : v(a_v)
         , extra(a_extra)
     {}
@@ -232,7 +232,9 @@ struct uint64_extra
 struct uint128_extra
 {
     uint128_extra() = default;
-    constexpr uint128_extra(uint128 const& a_v, uint64_t const& a_extra)
+
+    constexpr
+        uint128_extra(uint128 const& a_v, uint64_t const& a_extra)
         : v(a_v)
         , extra(a_extra)
     {}
