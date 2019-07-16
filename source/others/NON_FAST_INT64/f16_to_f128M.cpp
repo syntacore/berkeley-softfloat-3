@@ -48,36 +48,42 @@ f16_to_f128M(float16_t a,
     uint32_t* const zWPtr = (uint32_t*)zPtr;
     uint16_t const uiA = f_as_u_16(a);
     bool const sign = is_sign(uiA);
-    int8_t exp = expF16UI(uiA);
-    uint16_t frac = fracF16UI(uiA);
+    int8_t const exp = expF16UI(uiA);
+    uint16_t const frac = fracF16UI(uiA);
 
-    uint32_t uiZ96;
-
-    if (exp == 0x1F) {
+    if (0x1F == exp) {
         if (frac) {
             softfloat_commonNaNToF128M(softfloat_f16UIToCommonNaN(uiA), zWPtr);
             return;
         }
 
-        uiZ96 = packToF128UI96(sign, 0x7FFF, 0);
-        goto uiZ;
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
     }
 
-    if (!exp) {
-        if (frac) {
-            exp8_sig16 const normExpSig{frac};
-            exp = normExpSig.exp - 1;
-            frac = normExpSig.sig;
-        } else {
-            uiZ96 = packToF128UI96(sign, 0, 0);
-            goto uiZ;
-        }
+    if (0 != exp) {
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
     }
 
-    uiZ96 = packToF128UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
-uiZ:
-    zWPtr[indexWord(4, 3)] = uiZ96;
+    if (0 == frac) {
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[indexWord(4, 0)] = 0;
+        return;
+    }
+
+    exp8_sig16 const normExpSig{frac};
+    zWPtr[indexWord(4, 3)] = packToF128UI96(sign, normExpSig.exp - 1 + 0x3FF0u, static_cast<uint32_t>(normExpSig.sig) << 6);
     zWPtr[indexWord(4, 2)] = 0;
     zWPtr[indexWord(4, 1)] = 0;
     zWPtr[indexWord(4, 0)] = 0;
+    return;
 }
