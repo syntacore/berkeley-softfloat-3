@@ -113,7 +113,7 @@ softfloat_shiftRightJam256M(uint64_t const* aPtr,
                                           innerDist,
                                           zPtr + indexMultiwordLoBut(4, wordDist));
 
-            if (!wordDist) {
+            if (0 == wordDist) {
                 goto wordJam;
             }
         } else {
