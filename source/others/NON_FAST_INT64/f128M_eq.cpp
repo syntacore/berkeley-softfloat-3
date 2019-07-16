@@ -41,53 +41,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 bool
-f128M_eq(const float128_t *aPtr,
-         const float128_t *bPtr)
+f128M_eq(float128_t const* aPtr,
+         float128_t const* bPtr)
 {
     using namespace softfloat::internals;
-    const uint32_t *aWPtr, *bWPtr;
-    uint32_t wordA, wordB, uiA96, uiB96;
-    bool possibleOppositeZeros;
-    uint32_t mashWord;
 
-    aWPtr = (const uint32_t *)aPtr;
-    bWPtr = (const uint32_t *)bPtr;
-    wordA = aWPtr[indexWord(4, 2)];
-    wordB = bWPtr[indexWord(4, 2)];
-    if (wordA != wordB) {
-        goto false_checkSigNaNs;
-    }
-    uiA96 = aWPtr[indexWordHi(4)];
-    uiB96 = bWPtr[indexWordHi(4)];
-    possibleOppositeZeros = false;
-    if (uiA96 != uiB96) {
-        possibleOppositeZeros = (((uiA96 | uiB96) & 0x7FFFFFFF) == 0);
-        if (!possibleOppositeZeros) {
-            goto false_checkSigNaNs;
+    uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
+    uint32_t const* const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
+    uint32_t wordA = aWPtr[indexWord(4, 2)];
+    uint32_t wordB = bWPtr[indexWord(4, 2)];
+
+    if (wordA == wordB) {
+        uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+        uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+        bool possibleOppositeZeros = false;
+
+        if (uiA96 != uiB96) {
+            possibleOppositeZeros = 0 == ((uiA96 | uiB96) & 0x7FFFFFFF);
+
+            if (!possibleOppositeZeros) {
+                if (f128M_isSignalingNaN(aPtr) || f128M_isSignalingNaN(bPtr)) {
+                    softfloat_raiseFlags(softfloat_flag_invalid);
+                }
+
+                return false;
+            }
+        }
+
+        auto const mashWord = wordA | wordB;
+        auto const wordA_2 = aWPtr[indexWord(4, 1)];
+        auto const wordB_2 = bWPtr[indexWord(4, 1)];
+
+        if (wordA_2 == wordB_2) {
+            auto const mashWord_1 = mashWord | wordA_2 | wordB_2;
+            auto const wordA_1 = aWPtr[indexWord(4, 0)];
+            auto const wordB_1 = bWPtr[indexWord(4, 0)];
+
+            if (
+                wordA_1 == wordB_1 &&
+                !(possibleOppositeZeros && 0 != (mashWord_1 | wordA_1 | wordB_1)) &&
+                !softfloat_isNaNF128M(aWPtr) && !softfloat_isNaNF128M(bWPtr)
+            ) {
+                return true;
+            }
         }
     }
-    mashWord = wordA | wordB;
-    wordA = aWPtr[indexWord(4, 1)];
-    wordB = bWPtr[indexWord(4, 1)];
-    if (wordA != wordB) {
-        goto false_checkSigNaNs;
-    }
-    mashWord |= wordA | wordB;
-    wordA = aWPtr[indexWord(4, 0)];
-    wordB = bWPtr[indexWord(4, 0)];
-    if (wordA != wordB) {
-        goto false_checkSigNaNs;
-    }
-    if (possibleOppositeZeros && ((mashWord | wordA | wordB) != 0)) {
-        goto false_checkSigNaNs;
-    }
-    if (!softfloat_isNaNF128M(aWPtr) && !softfloat_isNaNF128M(bWPtr)) {
-        return true;
-    }
-false_checkSigNaNs:
-    if (f128M_isSignalingNaN((const float128_t *)aWPtr) || f128M_isSignalingNaN((const float128_t *)bWPtr)) {
+
+    if (f128M_isSignalingNaN(aPtr) || f128M_isSignalingNaN(bPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
-    return false;
 
+    return false;
 }
