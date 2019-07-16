@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+﻿cmake_minimum_required(VERSION 3.0)
 
 add_subdirectory(FAST_INT64)
 add_subdirectory(NON_FAST_INT64)
@@ -77,7 +77,6 @@ set(SRC_OTHERS
     ${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f32.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f64.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF16.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF16.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF32.cpp

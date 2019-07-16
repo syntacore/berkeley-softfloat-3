@@ -1,4 +1,4 @@
-/** @file
+﻿/** @file
 
 This C header file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3b, by John R. Hauser.
@@ -150,12 +150,6 @@ softfloat_addMagsF16(uint16_t const&,
 float16_t
 softfloat_subMagsF16(uint16_t const&,
                      uint16_t const&);
-
-float16_t
-softfloat_mulAddF16(Mul_add_operations,
-                    uint16_t const&,
-                    uint16_t const&,
-                    uint16_t const&);
 
 float32_t
 softfloat_roundPackToF32(bool,
