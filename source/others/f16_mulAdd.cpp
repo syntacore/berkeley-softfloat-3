@@ -150,9 +150,9 @@ softfloat_mulAddF16(Mul_add_operations op,
         if (0 == sigA) {
             // a is zero, result is c
             return u_as_f_16(
-                0 == (expC | sigC) && signProd != signC ?
-                packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) :
-                uiC);
+                       0 == (expC | sigC) && signProd != signC ?
+                       packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) :
+                       uiC);
         }
 
         // a is subnormal
@@ -165,8 +165,8 @@ softfloat_mulAddF16(Mul_add_operations op,
         if (0 == sigB) {
             // b is zero, result is c
             return u_as_f_16(
-                0 == (expC | sigC) && signProd != signC ?
-                packToF16UI(softfloat_round_min == softfloat_roundingMode, 0, 0) : uiC);
+                       0 == (expC | sigC) && signProd != signC ?
+                       packToF16UI(softfloat_round_min == softfloat_roundingMode, 0, 0) : uiC);
         }
 
         // b is subnormal
@@ -179,19 +179,17 @@ softfloat_mulAddF16(Mul_add_operations op,
     uint16_t const sigA_1 = static_cast<uint16_t>((sigA | 0x0400) << 4);
     uint16_t const sigB_1 = static_cast<uint16_t>((sigB | 0x0400) << 4);
     uint32_t sigProd = static_cast<uint32_t>(sigA_1) * sigB_1;
-    uint16_t sigZ;
 
     if (sigProd < 0x20000000) {
         --expProd;
         sigProd <<= 1;
     }
 
-    bool signZ = signProd;
-
     if (0 == expC) {
         if (0 == sigC) {
-            sigZ = static_cast<uint16_t>(sigProd >> 15 | !!(0 != (sigProd & 0x7FFF)));
-            return softfloat_roundPackToF16(signZ, expProd - 1, sigZ);
+            return softfloat_roundPackToF16(signProd,
+                                            expProd - 1,
+                                            static_cast<uint16_t>(sigProd >> 15 | !!(0 != (sigProd & 0x7FFF))));
         }
 
         exp8_sig16 const normExpSig{sigC};
@@ -204,6 +202,7 @@ softfloat_mulAddF16(Mul_add_operations op,
 
     if (signProd == signC) {
         int8_t expZ;
+        uint16_t sigZ;
 
         if (expDiff <= 0) {
             expZ = expC;
@@ -224,10 +223,11 @@ softfloat_mulAddF16(Mul_add_operations op,
             sigZ <<= 1;
         }
 
-        return softfloat_roundPackToF16(signZ, expZ, sigZ);
+        return softfloat_roundPackToF16(signProd, expZ, sigZ);
     }
 
     uint32_t const sig32C = static_cast<uint32_t>(sigC_1) << 16;
+    bool signZ = signProd;
     int8_t expZ;
     uint32_t sig32Z;
 
