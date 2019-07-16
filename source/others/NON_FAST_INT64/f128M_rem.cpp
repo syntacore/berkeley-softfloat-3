@@ -55,9 +55,9 @@ copyA(uint32_t const uiA96,
 }  // namespace
 
 void
-f128M_rem(const float128_t* aPtr,
-          const float128_t* bPtr,
-          float128_t* zPtr)
+f128M_rem(float128_t const* const aPtr,
+          float128_t const* const bPtr,
+          float128_t* const zPtr)
 {
     uint32_t x[4];
     uint32_t* remPtr;
