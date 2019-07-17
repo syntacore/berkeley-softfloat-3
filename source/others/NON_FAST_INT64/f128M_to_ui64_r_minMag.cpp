@@ -41,72 +41,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 uint64_t
-f128M_to_ui64_r_minMag(float128_t const* aPtr,
-                       bool exact)
+f128M_to_ui64_r_minMag(float128_t const* const aPtr,
+                       bool const exact)
 {
     using namespace softfloat::internals;
-    int32_t shiftDist;
-    uint32_t sig[4];
-    uint64_t z;
-
 
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = is_sign(uiA96);
     int32_t const exp = expF128UI96(uiA96);
     uint32_t sig96 = fracF128UI96(uiA96);
+    int32_t const shiftDist = 0x403E - exp;
 
-    shiftDist = 0x403E - exp;
+    if (0 <= shiftDist) {
+        if (exact) {
+            if (0 != exp) {
+                sig96 |= 0x00010000;
+            }
 
-    if (shiftDist < 0) {
-        goto invalid;
+            uint32_t sig[4];
+            sig[indexWord(4, 3)] = sig96;
+            sig[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
+            sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
+            sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
+            softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist + 17), sig);
+            uint64_t const z = static_cast<uint64_t>(sig[indexWord(4, 2)]) << 32 | sig[indexWord(4, 1)];
+
+            if (!sign || 0 == z) {
+                if (0 != sig[indexWordLo(4)]) {
+                    softfloat_raiseFlags(softfloat_flag_inexact);
+                }
+
+                return z;
+            }
+        } else {
+            if (64 <= shiftDist) {
+                return 0;
+            }
+
+            if (!sign) {
+                return
+                    (
+                        UINT64_C(0x8000000000000000) |
+                        static_cast<uint64_t>(sig96) << 47 |
+                        static_cast<uint64_t>(aWPtr[indexWord(4, 2)]) << 15 |
+                        aWPtr[indexWord(4, 1)] >> 17
+                    ) >> shiftDist;
+            }
+        }
     }
 
-    if (exact) {
-        if (exp) {
-            sig96 |= 0x00010000;
-        }
-
-        sig[indexWord(4, 3)] = sig96;
-        sig[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
-        sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
-        sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
-        softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist + 17), sig);
-        z = static_cast<uint64_t>(sig[indexWord(4, 2)]) << 32 | sig[indexWord(4, 1)];
-
-        if (sign && z) {
-            goto invalid;
-        }
-
-        if (sig[indexWordLo(4)]) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
-        }
-    } else {
-        if (64 <= shiftDist) {
-            return 0;
-        }
-
-        if (sign) {
-            goto invalid;
-        }
-
-        z = UINT64_C(0x8000000000000000)
-            | static_cast<uint64_t>(sig96) << 47
-            | static_cast<uint64_t>(aWPtr[indexWord(4, 2)]) << 15
-            | aWPtr[indexWord(4, 1)] >> 17;
-        z >>= shiftDist;
-    }
-
-    return z;
-
-invalid:
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
-        (exp == 0x7FFF)
-        && (sig96
-            || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)]
-            | aWPtr[indexWord(4, 0)]))
-        ? ui64_fromNaN
-        : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+        0x7FFF == exp && (0 != sig96 || 0 != (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) ?
+        ui64_fromNaN :
+        sign ?
+        ui64_fromNegOverflow :
+        ui64_fromPosOverflow;
 
 }
