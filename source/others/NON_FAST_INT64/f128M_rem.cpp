@@ -59,15 +59,6 @@ f128M_rem(float128_t const* const aPtr,
           float128_t const* const bPtr,
           float128_t* const zPtr)
 {
-    uint32_t x[4];
-    uint32_t* remPtr;
-    int32_t expDiff;
-    uint32_t q;
-    uint32_t recip32;
-    uint64_t q64;
-    uint32_t rem2[5];
-    uint32_t* altRemPtr;
-
     auto const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
     auto const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
@@ -95,15 +86,16 @@ f128M_rem(float128_t const* const aPtr,
         return;
     }
 
+    uint32_t x[4];
     expB = softfloat_shiftNormSigF128M(bWPtr, 13, x);
 
-    if (expB == -128) {
+    if (-128 == expB) {
         softfloat_invalidF128M(zWPtr);
         return;
     }
 
     uint32_t rem1[5];
-    remPtr = &rem1[indexMultiwordLo(5, 4)];
+    uint32_t* remPtr = &rem1[indexMultiwordLo(5, 4)];
     expA = softfloat_shiftNormSigF128M(aWPtr, 13, remPtr);
 
     if (expA == -128) {
@@ -113,7 +105,10 @@ f128M_rem(float128_t const* const aPtr,
 
     bool signRem = is_sign(uiA96);
 
-    expDiff = expA - expB;
+    int32_t expDiff = expA - expB;
+    uint32_t* altRemPtr;
+    uint32_t rem2[5];
+    uint32_t q;
 
     if (expDiff < 1) {
         if (expDiff < -1) {
@@ -133,12 +128,11 @@ f128M_rem(float128_t const* const aPtr,
             }
         }
     } else {
-        recip32 =
-            softfloat_approxRecip32_1(
-            (static_cast<uint64_t>(x[indexWord(4, 3)]) << 32 | x[indexWord(4, 2)])
-                >> 30
-            );
+        uint32_t const recip32 =
+            softfloat_approxRecip32_1((static_cast<uint64_t>(x[indexWord(4, 3)]) << 32 | x[indexWord(4, 2)]) >> 30);
         expDiff -= 30;
+
+        uint64_t q64;
 
         for (;;) {
             q64 = static_cast<uint64_t>(remPtr[indexWordHi(4)]) * recip32;
@@ -164,7 +158,7 @@ f128M_rem(float128_t const* const aPtr,
         */
         softfloat_remStep128MBy32(remPtr, static_cast<uint8_t>(expDiff + 30), x, q, remPtr);
 
-        if (remPtr[indexWordHi(4)] & 0x80000000) {
+        if (0 != (remPtr[indexWordHi(4)] & 0x80000000)) {
             altRemPtr = &rem2[indexMultiwordLo(5, 4)];
             softfloat_add128M(remPtr, x, altRemPtr);
             goto selectRem;
@@ -179,21 +173,27 @@ f128M_rem(float128_t const* const aPtr,
         softfloat_sub128M(remPtr, x, newRemPtr);
         altRemPtr = remPtr;
         remPtr = newRemPtr;
-    } while (!(remPtr[indexWordHi(4)] & 0x80000000));
+    } while (0 == (remPtr[indexWordHi(4)] & 0x80000000));
 
 selectRem:
+
     {
         softfloat_add128M(remPtr, altRemPtr, x);
-        uint32_t const wordMeanRem = x[indexWordHi(4)];
 
         if (
-            0 != (wordMeanRem & 0x80000000) ||
-            (!wordMeanRem && (q & 1) && !x[indexWord(4, 0)] && !(x[indexWord(4, 2)] | x[indexWord(4, 1)]))
+            0 != (x[indexWordHi(4)] & 0x80000000) ||
+            (
+                0 != (q & 1) &&
+                0 == x[indexWord(4, 0)] &&
+                0 == x[indexWord(4, 1)] &&
+                0 == x[indexWord(4, 2)] &&
+                0 == x[indexWordHi(4)]
+            )
         ) {
             remPtr = altRemPtr;
         }
 
-        if (remPtr[indexWordHi(4)] & 0x80000000) {
+        if (0 != (remPtr[indexWordHi(4)] & 0x80000000)) {
             signRem = !signRem;
             softfloat_negX128M(remPtr);
         }
