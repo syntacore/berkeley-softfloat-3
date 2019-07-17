@@ -41,62 +41,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 uint64_t
-extF80M_to_ui64_r_minMag(const extFloat80_t *aPtr, bool exact)
+extF80M_to_ui64_r_minMag(extFloat80_t const* const aPtr,
+                         bool const exact)
 {
     using namespace softfloat::internals;
-    extFloat80M const *aSPtr;
-    uint16_t uiA64;
-    int32_t exp;
-    uint64_t sig;
-    int32_t shiftDist;
-    bool sign;
-    uint64_t z;
 
-    aSPtr = aPtr;
-    uiA64 = aSPtr->signExp;
-    exp = expExtF80UI64(uiA64);
-    sig = aSPtr->signif;
-    
-    if (!sig && (exp != 0x7FFF)) {
+    extFloat80M const* const aSPtr = aPtr;
+    uint16_t const uiA64 = aSPtr->signExp;
+    int32_t const exp = expExtF80UI64(uiA64);
+    uint64_t const sig = aSPtr->signif;
+
+    if (0 == sig && 0x7FFF != exp) {
         return 0;
     }
-    shiftDist = 0x403E - exp;
+
+    int32_t const shiftDist = 0x403E - exp;
+
     if (64 <= shiftDist) {
         if (exact) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
+
         return 0;
     }
-    
-    sign = is_sign(uiA64);
+
+    bool const sign = is_sign(uiA64);
+
     if (shiftDist < 0) {
-        if (sign || (shiftDist <= -63)) {
-            goto invalid;
-        }
-        shiftDist = -shiftDist;
-        z = sig << shiftDist;
-        if (z >> shiftDist != sig) {
-            goto invalid;
+        if (!sign && -63 < shiftDist) {
+            auto const shiftDist_1 = -shiftDist;
+            uint64_t const z = sig << shiftDist_1;
+
+            if (z >> shiftDist_1 == sig) {
+                return z;
+            }
         }
     } else {
-        z = sig;
-        if (shiftDist) {
-            z >>= shiftDist;
-        }
-        if (sign && z) {
-            goto invalid;
-        }
-        if (exact && shiftDist && (z << shiftDist != sig)) {
-            softfloat_raiseFlags(softfloat_flag_inexact);
+        assert(0 <= shiftDist && shiftDist < 64);
+        uint64_t const z = sig >> shiftDist;
+
+        if (!sign || 0 == z) {
+            if (exact && 0 != shiftDist && z << shiftDist != sig) {
+                softfloat_raiseFlags(softfloat_flag_inexact);
+            }
+
+            return z;
         }
     }
-    return z;
 
-invalid:
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
-        (exp == 0x7FFF) && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))
-        ? ui64_fromNaN
-        : sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
-
+        0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ?
+        ui64_fromNaN :
+        sign ?
+        ui64_fromNegOverflow :
+        ui64_fromPosOverflow;
 }
