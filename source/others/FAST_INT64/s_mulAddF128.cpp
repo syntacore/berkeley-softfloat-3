@@ -107,7 +107,6 @@ softfloat_shiftRightJam256M(uint64_t const* aPtr,
 
         assert(wordDist <= 4);
 
-        uint32_t i = wordDist;
         uint64_t const* ptr1 = aPtr + indexMultiwordLo(4, wordDist);
 
         for (uint32_t i = wordDist; 0 != i; --i) {
