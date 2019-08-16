@@ -52,12 +52,12 @@ f64_to_f32(float64_t a)
             return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
         }
 
-        return signed_zero<float32_t>(sign);
+        return make_signed_zero<float32_t>(sign);
     }
 
     if (0 != frac) {
         return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(uiA)));
     }
 
-    return signed_inf<float32_t>(sign);
+    return make_signed_inf<float32_t>(sign);
 }

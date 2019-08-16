@@ -68,12 +68,12 @@ f32_mul(float32_t a,
             return u_as_f_32(defaultNaNF32UI);
         }
 
-        return signed_inf<float32_t>(signZ);
+        return make_signed_inf<float32_t>(signZ);
     }
 
     if (0 == expA) {
         if (0 == sigA) {
-            return signed_zero<float32_t>(signZ);
+            return make_signed_zero<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigA);
@@ -83,7 +83,7 @@ f32_mul(float32_t a,
 
     if (0 == expB) {
         if (0 == sigB) {
-            return signed_zero<float32_t>(signZ);
+            return make_signed_zero<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigB);

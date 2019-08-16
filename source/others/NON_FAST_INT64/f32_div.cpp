@@ -69,11 +69,11 @@ f32_div(float32_t a,
             return u_as_f_32(defaultNaNF32UI);
         }
 
-        return signed_inf<float32_t>(signZ);
+        return make_signed_inf<float32_t>(signZ);
     }
 
     if (expB == 0xFF) {
-        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : signed_zero<float32_t>(signZ);
+        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : make_signed_zero<float32_t>(signZ);
     }
 
     if (!expB) {
@@ -84,7 +84,7 @@ f32_div(float32_t a,
             }
 
             softfloat_raiseFlags(softfloat_flag_infinite);
-            return signed_inf<float32_t>(signZ);
+            return make_signed_inf<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigB);
@@ -94,7 +94,7 @@ f32_div(float32_t a,
 
     if (!expA) {
         if (!sigA) {
-            return signed_zero<float32_t>(signZ);
+            return make_signed_zero<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigA);

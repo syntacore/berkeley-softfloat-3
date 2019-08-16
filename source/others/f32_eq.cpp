@@ -45,7 +45,7 @@ f32_eq(float32_t a,
     uint32_t const uiB = f_as_u(b);
 
     if (is_NaN(uiA) || is_NaN(uiB)) {
-        if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
+        if (is_sNaN(uiA) || is_sNaN(uiB)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 

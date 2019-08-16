@@ -85,8 +85,8 @@ propagate_NaN<uint32_t>(uint32_t const& uiA,
 {
     static uint32_t const quietNaN_bit = UINT32_C(0x00400000);
 
-    bool const isSigNaNA = softfloat_isSigNaNF32UI(uiA);
-    bool const isSigNaNB = softfloat_isSigNaNF32UI(uiB);
+    bool const isSigNaNA = is_sNaN(uiA);
+    bool const isSigNaNB = is_sNaN(uiB);
     /* Make NaNs non-signaling. */
     uint32_t const uiNonsigA = quietNaN_bit | uiA;
     uint32_t const uiNonsigB = quietNaN_bit | uiB;

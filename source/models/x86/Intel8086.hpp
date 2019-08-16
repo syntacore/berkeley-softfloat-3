@@ -135,7 +135,7 @@ exception is raised.
 inline commonNaN
 softfloat_f32UIToCommonNaN(uint32_t const uiA)
 {
-    if (softfloat_isSigNaNF32UI(uiA)) {
+    if (is_sNaN(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 

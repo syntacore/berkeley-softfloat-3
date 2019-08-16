@@ -323,7 +323,7 @@ packToF128UI64(bool const sign,
 
 inline constexpr bool
 is_NaN(uint64_t const& a64,
-            uint64_t const& a0)
+       uint64_t const& a0)
 {
     return
         0 == (~a64 & UINT64_C(0x7FFF000000000000)) &&
@@ -532,39 +532,46 @@ packToF32UI(bool sign,
         ((static_cast<uint32_t>(expnt) << 23) + sgnf);
 }
 
+template<typename Ty>
+Ty
+make_signed_zero(bool sign);
+
+template<>
 inline constexpr uint32_t
-signed_zero_F32UI(bool sign)
+make_signed_zero<uint32_t>(bool sign)
 {
     return packToF32UI(sign, 0, 0u);
 }
 
-template<typename Ty>
-Ty
-signed_zero(bool sign);
-
 template<>
 inline constexpr float32_t
-signed_zero<float32_t>(bool sign)
+make_signed_zero<float32_t>(bool sign)
 {
-    return u_as_f_32(signed_zero_F32UI(sign));
+    return u_as_f_32(make_signed_zero<uint32_t>(sign));
 }
 
 template<typename Ty>
 Ty
-signed_inf(bool sign);
+make_signed_inf(bool sign);
 
 template<>
 inline constexpr float32_t
-signed_inf<float32_t>(bool sign)
+make_signed_inf<float32_t>(bool sign)
 {
     return u_as_f_32(packToF32UI(sign, 0xFF, 0u));
+}
+
+inline constexpr bool
+is_finite(uint32_t const& a)
+{
+    return 255 != get_exp(a);
 }
 
 inline constexpr bool
 is_NaN(uint32_t const& a)
 {
     return
-        255 == get_exp(a) &&
+        !is_finite(a) &&
         0 != get_frac(a);
 }
 
@@ -572,7 +579,7 @@ inline constexpr bool
 is_inf(uint32_t const& a)
 {
     return
-        255 == get_exp(a) &&
+        !is_finite(a) &&
         0 == get_frac(a);
 }
 
@@ -613,17 +620,26 @@ packToF64UI(bool sign, int16_t const& expnt, uint64_t const& sgnf)
 }
 
 inline constexpr bool
+is_finite(uint64_t const& a)
+{
+    return
+        2047 != get_exp(a);
+}
+
+inline constexpr bool
 is_NaN(uint64_t const& a)
 {
     return
-        2047 == get_exp(a) &&
+        !is_finite(a) &&
         0 != get_frac(a);
 }
 
 inline constexpr bool
 is_inf(uint64_t const& a)
 {
-    return (~(~UINT64_C(0) << 11) << 52) == (~(~UINT64_C(0) << 63) & a);
+    return
+        !is_finite(a) &&
+        0 == get_frac(a);
 }
 
 inline constexpr bool
@@ -647,7 +663,7 @@ packToExtF80UI64(bool const sign,
 
 inline constexpr bool
 is_NaN(uint16_t const& a64,
-              uint64_t const& a0)
+       uint64_t const& a0)
 {
     return
         UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & a64) &&
@@ -665,7 +681,7 @@ Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point signaling NaN.
 */
 inline constexpr bool
-softfloat_isSigNaNF32UI(uint32_t const& uiA)
+is_sNaN(uint32_t const& uiA)
 {
     return
         (~(~UINT32_C(0) << 8) << 23) == (((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22)) & uiA) &&

@@ -59,7 +59,7 @@ f32_roundToInt(float32_t const a,
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        uint32_t const uiZ = uiA & signed_zero_F32UI(true);
+        uint32_t const uiZ = uiA & make_signed_zero<uint32_t>(true);
 
         switch (roundingMode) {
         case softfloat_round_near_even:

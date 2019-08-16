@@ -47,7 +47,7 @@ addMags(uint32_t const uiA,
 
     if (is_inf(uiA) || is_inf(uiB)) {
         /** propagate infinity if operand(s) is infinity */
-        return signed_inf<float32_t>(is_sign(uiA));
+        return make_signed_inf<float32_t>(is_sign(uiA));
     }
 
     static uint32_t const hidden_bit = UINT32_C(1) << 23;
@@ -140,7 +140,7 @@ subMags(uint32_t const uiA,
 
         if (0 == sigDiff) {
             softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-            return signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode);
+            return make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode);
         }
 
         if (expA) {
@@ -166,7 +166,7 @@ subMags(uint32_t const uiA,
             max_exp != expB ?
             softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
             0 == sigB_1 ?
-            signed_inf<float32_t>(!signZ) :
+            make_signed_inf<float32_t>(!signZ) :
             u_as_f_32(propagate_NaN(uiA, uiB));
     }
 

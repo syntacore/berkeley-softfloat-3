@@ -263,7 +263,7 @@ inline uint32_t
 propagate_NaN<uint32_t>(uint32_t const& uiA,
                         uint32_t const& uiB)
 {
-    if (softfloat_isSigNaNF32UI(uiA) || softfloat_isSigNaNF32UI(uiB)) {
+    if (is_sNaN(uiA) || is_sNaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 

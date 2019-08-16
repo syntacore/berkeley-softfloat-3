@@ -45,7 +45,7 @@ mulAdd(uint32_t const& uiA,
        uint32_t const& uiB,
        uint32_t const& uiC)
 {
-    if (is_NaN(uiA) || is_NaN(uiB) || softfloat_isSigNaNF32UI(uiC)) {
+    if (is_NaN(uiA) || is_NaN(uiB) || is_sNaN(uiC)) {
         return u_as_f_32(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
@@ -73,7 +73,7 @@ mulAdd(uint32_t const& uiA,
         }
 
         /* product is inf */
-        float32_t const uiZ = signed_inf<float32_t>(signProd);
+        float32_t const uiZ = make_signed_inf<float32_t>(signProd);
 
         if (expC != max_exp) {
             /* summand c is finite, return product as result */
@@ -106,7 +106,7 @@ mulAdd(uint32_t const& uiA,
         /* a is zero or subnormal */
         if (0 == sigA) {
             /* a is zero */
-            return 0 == (expC | sigC) && signProd != signC ? signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
+            return 0 == (expC | sigC) && signProd != signC ? make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
         }
 
         exp16_sig32 const normExpSig(sigA);
@@ -120,7 +120,7 @@ mulAdd(uint32_t const& uiA,
             /* b is zero */
             return
                 0 == (expC | sigC) && signProd != signC ?
-                signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) :
+                make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) :
                 u_as_f_32(uiC);
         }
 
@@ -189,7 +189,7 @@ mulAdd(uint32_t const& uiA,
         sig64Z = sigProd - sig64C;
 
         if (0 == sig64Z) {
-            return signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode);
+            return make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode);
         }
 
         if (sig64Z & INT64_MIN) {

@@ -50,12 +50,12 @@ f16_to_f32(float16_t a)
             return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f16UIToCommonNaN(uiA)));
         }
 
-        return signed_inf<float32_t>(sign);
+        return make_signed_inf<float32_t>(sign);
     }
 
     if (!exp) {
         if (!frac) {
-            return signed_zero<float32_t>(sign);
+            return make_signed_zero<float32_t>(sign);
         }
 
         exp8_sig16 const normExpSig{frac};
