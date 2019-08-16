@@ -41,8 +41,8 @@ f16_sub(float16_t a,
         float16_t b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u_16(a);
-    uint16_t const uiB = f_as_u_16(b);
+    uint16_t const uiA = f_as_u(a);
+    uint16_t const uiB = f_as_u(b);
     return
         is_sign(static_cast<uint16_t>(uiA ^ uiB)) ?
         softfloat_addMagsF16(uiA, uiB) :

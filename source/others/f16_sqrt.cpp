@@ -40,10 +40,10 @@ float16_t
 f16_sqrt(float16_t a)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u_16(a);
+    uint16_t const uiA = f_as_u(a);
     bool const signA = is_sign(uiA);
-    int8_t expA = expF16UI(uiA);
-    uint16_t sigA = fracF16UI(uiA);
+    int8_t expA = get_exp(uiA);
+    uint16_t sigA = get_frac(uiA);
 
     if (expA == 0x1F) {
         if (sigA) {

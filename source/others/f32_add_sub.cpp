@@ -43,18 +43,18 @@ static float32_t
 addMags(uint32_t const uiA,
         uint32_t const uiB)
 {
-    assert(!isNaNF32UI(uiA) && !isNaNF32UI(uiB));
+    assert(!is_NaN(uiA) && !is_NaN(uiB));
 
-    if (isInf32UI(uiA) || isInf32UI(uiB)) {
+    if (is_inf(uiA) || is_inf(uiB)) {
         /** propagate infinity if operand(s) is infinity */
-        return signed_inf_F32(is_sign(uiA));
+        return signed_inf<float32_t>(is_sign(uiA));
     }
 
     static uint32_t const hidden_bit = UINT32_C(1) << 23;
-    int16_t const expA = expF32UI(uiA);
-    uint32_t const sigA = fracF32UI(uiA);
-    int16_t const expB = expF32UI(uiB);
-    uint32_t const sigB = fracF32UI(uiB);
+    int16_t const expA = get_exp(uiA);
+    uint32_t const sigA = get_frac(uiA);
+    int16_t const expB = get_exp(uiB);
+    uint32_t const sigB = get_frac(uiB);
     int16_t const expDiff = expA - expB;
 
     if (0 == expDiff) {
@@ -117,11 +117,11 @@ static float32_t
 subMags(uint32_t const uiA,
         uint32_t const uiB)
 {
-    assert(!isNaNF32UI(uiA) && !isNaNF32UI(uiB));
-    int16_t expA = expF32UI(uiA);
-    uint32_t const sigA = fracF32UI(uiA);
-    int16_t const expB = expF32UI(uiB);
-    uint32_t const sigB = fracF32UI(uiB);
+    assert(!is_NaN(uiA) && !is_NaN(uiB));
+    int16_t expA = get_exp(uiA);
+    uint32_t const sigA = get_frac(uiA);
+    int16_t const expB = get_exp(uiB);
+    uint32_t const sigB = get_frac(uiB);
 
     int16_t const expDiff = expA - expB;
     static int16_t const max_exp = 0xFF;
@@ -140,7 +140,7 @@ subMags(uint32_t const uiA,
 
         if (0 == sigDiff) {
             softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-            return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
+            return signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode);
         }
 
         if (expA) {
@@ -166,7 +166,7 @@ subMags(uint32_t const uiA,
             max_exp != expB ?
             softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
             0 == sigB_1 ?
-            signed_inf_F32(!signZ) :
+            signed_inf<float32_t>(!signZ) :
             u_as_f_32(propagate_NaN(uiA, uiB));
     }
 
@@ -185,10 +185,10 @@ f32_add(float32_t const a,
         float32_t const b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
-    uint32_t const uiB = f_as_u_32(b);
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
 
-    if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
+    if (is_NaN(uiA) || is_NaN(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
         return u_as_f_32(propagate_NaN(uiA, uiB));
     }
@@ -203,10 +203,10 @@ f32_sub(float32_t const a,
 {
     using namespace softfloat::internals;
 
-    uint32_t const uiA = f_as_u_32(a);
-    uint32_t const uiB = f_as_u_32(b);
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
 
-    if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
+    if (is_NaN(uiA) || is_NaN(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
         return u_as_f_32(propagate_NaN(uiA, uiB));
     }

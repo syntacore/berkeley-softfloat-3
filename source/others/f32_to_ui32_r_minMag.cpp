@@ -41,9 +41,9 @@ f32_to_ui32_r_minMag(float32_t const a,
                      bool const exact)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
-    int16_t const exp = expF32UI(uiA);
-    uint32_t sig = fracF32UI(uiA);
+    uint32_t const uiA = f_as_u(a);
+    int16_t const exp = get_exp(uiA);
+    uint32_t sig = get_frac(uiA);
 
     int16_t const shiftDist = 0x9E - exp;
 

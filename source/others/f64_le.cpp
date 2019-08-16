@@ -41,10 +41,10 @@ f64_le(float64_t const a,
        float64_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
-    uint64_t const uiB = f_as_u_64(b);
+    uint64_t const uiA = f_as_u(a);
+    uint64_t const uiB = f_as_u(b);
 
-    if (isNaNF64UI(uiA) || isNaNF64UI(uiB)) {
+    if (is_NaN(uiA) || is_NaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }

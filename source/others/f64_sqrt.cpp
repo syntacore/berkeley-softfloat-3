@@ -40,14 +40,14 @@ float64_t
 f64_sqrt(float64_t const a)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiA = f_as_u(a);
     bool const signA = is_sign(uiA);
-    int16_t expA = expF64UI(uiA);
-    uint64_t sigA = fracF64UI(uiA);
+    int16_t expA = get_exp(uiA);
+    uint64_t sigA = get_frac(uiA);
 
     if (expA == 0x7FF) {
         if (sigA) {
-            return u_as_f_64(softfloat_propagateNaNF64UI(uiA, 0));
+            return u_as_f_64(propagate_NaN(uiA, 0));
         }
 
         if (0 == signA) {

@@ -48,7 +48,7 @@ Returns true when 16-bit unsigned integer `uiA' has the bit pattern of a
 16-bit floating-point signaling NaN.
 */
 inline constexpr bool
-softfloat_isSigNaNF16UI(uint16_t const uiA)
+is_sNaN(uint16_t const uiA)
 {
     return
         UINT16_C(0x7C00) == (UINT16_C(0x7E00) & uiA) &&

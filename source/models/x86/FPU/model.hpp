@@ -75,11 +75,11 @@ propagate_NaN<uint32_t>(uint32_t const& uiA,
         }
     }
 
-    return quietNaN_bit | (isNaNF32UI(uiA) ? uiA : uiB);
+    return quietNaN_bit | (is_NaN(uiA) ? uiA : uiB);
 }
 
 uint64_t
-softfloat_propagateNaNF64UI(uint64_t const uiA,
+propagate_NaN(uint64_t const uiA,
                             uint64_t const uiB);
 }  // namespace Intel_8086
 }  // namespace internals

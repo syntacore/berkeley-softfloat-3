@@ -46,8 +46,8 @@ f32_roundToInt(float32_t const a,
                bool const exact)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
-    int16_t const exp = expF32UI(uiA);
+    uint32_t const uiA = f_as_u(a);
+    int16_t const exp = get_exp(uiA);
 
     if (exp <= 0x7E) {
         if (0 == static_cast<uint32_t>(uiA << 1)) {
@@ -63,7 +63,7 @@ f32_roundToInt(float32_t const a,
 
         switch (roundingMode) {
         case softfloat_round_near_even:
-            if (0 == fracF32UI(uiA)) {
+            if (0 == get_frac(uiA)) {
                 break;
             }
 
@@ -97,7 +97,7 @@ f32_roundToInt(float32_t const a,
     if (0x96 <= exp) {
         static constexpr int16_t const max_exp = 0xFF;
         return
-            max_exp == exp && fracF32UI(uiA) ?
+            max_exp == exp && get_frac(uiA) ?
             u_as_f_32(propagate_NaN(uiA, UINT32_C(0))) :
             a;
     }

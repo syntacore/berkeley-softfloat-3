@@ -40,10 +40,10 @@ float16_t
 f64_to_f16(float64_t const a)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int16_t const exp = expF64UI(uiA);
-    uint64_t const frac = fracF64UI(uiA);
+    int16_t const exp = get_exp(uiA);
+    uint64_t const frac = get_frac(uiA);
 
     if (exp == 0x7FF) {
         if (frac) {

@@ -63,13 +63,13 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (!isSigNaNA) {
-            return isNaNF128UI(uiA64, uiA0) ? nsA : nsB;
+            return is_NaN(uiA64, uiA0) ? nsA : nsB;
         }
 
         assert(isSigNaNA);
 
         if (!isSigNaNB) {
-            return isNaNF128UI(uiB64, uiB0) ? nsB : nsA;
+            return is_NaN(uiB64, uiB0) ? nsB : nsA;
         }
 
         assert(isSigNaNA && isSigNaNB);

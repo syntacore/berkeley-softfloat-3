@@ -40,9 +40,9 @@ int32_t
 f16_to_i32_r_minMag(float16_t a, bool exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u_16(a);
-    int8_t const exp = expF16UI(uiA);
-    uint16_t const frac = fracF16UI(uiA);
+    uint16_t const uiA = f_as_u(a);
+    int8_t const exp = get_exp(uiA);
+    uint16_t const frac = get_frac(uiA);
     int8_t const shiftDist = exp - 0x0F;
 
     if (shiftDist < 0) {

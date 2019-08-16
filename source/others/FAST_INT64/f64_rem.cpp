@@ -45,17 +45,17 @@ f64_rem(float64_t const a,
         float64_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiA = f_as_u(a);
     bool const signA = is_sign(uiA);
-    int16_t expA = expF64UI(uiA);
-    uint64_t sigA = fracF64UI(uiA);
-    uint64_t const uiB = f_as_u_64(b);
-    int16_t expB = expF64UI(uiB);
-    uint64_t sigB = fracF64UI(uiB);
+    int16_t expA = get_exp(uiA);
+    uint64_t sigA = get_frac(uiA);
+    uint64_t const uiB = f_as_u(b);
+    int16_t expB = get_exp(uiB);
+    uint64_t sigB = get_frac(uiB);
 
     if (0x7FF == expA) {
         if (sigA || ((expB == 0x7FF) && sigB)) {
-            return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
+            return u_as_f_64(propagate_NaN(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -63,7 +63,7 @@ f64_rem(float64_t const a,
     }
 
     if (0x7FF == expB) {
-        return sigB ? u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB)) : a;
+        return sigB ? u_as_f_64(propagate_NaN(uiA, uiB)) : a;
     }
 
     if (expA < expB - 1) {

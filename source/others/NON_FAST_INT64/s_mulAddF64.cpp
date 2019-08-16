@@ -46,32 +46,30 @@ namespace internals {
 namespace {
 
 static inline float64_t
-mulAdd(Mul_add_operations op,
-       uint64_t const uiA,
+mulAdd(uint64_t const uiA,
        uint64_t const uiB,
-       uint64_t const uiC
-      )
+       uint64_t const uiC)
 {
-    if (softfloat_isSigNaNF64UI(uiC) || softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB)) {
-        return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));
+    if (is_sNaN(uiC) || is_NaN(uiA) || is_NaN(uiB)) {
+        return u_as_f_64(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
-    uint64_t sigA = fracF64UI(uiA);
+    uint64_t sigA = get_frac(uiA);
     bool const signB = is_sign(uiB);
-    uint64_t sigB = fracF64UI(uiB);
-    bool const signC = is_sign(uiC) != (softfloat_mulAdd_subC == op);
-    int16_t expC = expF64UI(uiC);
-    uint64_t sigC = fracF64UI(uiC);
-    bool signZ = (signA != signB) != (softfloat_mulAdd_subProd == op);
+    uint64_t sigB = get_frac(uiB);
+    bool const signC = is_sign(uiC);
+    int16_t expC = get_exp(uiC);
+    uint64_t sigC = get_frac(uiC);
+    bool signZ = signA != signB;
 
-    if (isInf64UI(uiA) || isInf64UI(uiB)) {
+    if (is_inf(uiA) || is_inf(uiB)) {
         /* a or b is inf, product is inf or undefined, check other operand for zero */
-        bool const is_product_undefined = isInf64UI(uiA) ? isZero64UI(uiB) : isZero64UI(uiA);
+        bool const is_product_undefined = is_inf(uiA) ? is_zero(uiB) : is_zero(uiA);
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
+            return u_as_f_64(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
         /* product is inf */
@@ -83,18 +81,18 @@ mulAdd(Mul_add_operations op,
         }
 
         /* if summand is inf, check for same sign */
-        if (!softfloat_isNaNF64UI(uiC) && signZ == signC) {
+        if (!is_NaN(uiC) && signZ == signC) {
             /* summands are same sign inf */
             return u_as_f_64(uiZ);
         }
 
         /* summands are different sign inf or NaN, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
+        return u_as_f_64(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
-    if (softfloat_isNaNF64UI(uiC)) {
-        return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
+    if (is_NaN(uiC)) {
+        return u_as_f_64(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
     if (expC == 0x7FF) {
@@ -102,7 +100,7 @@ mulAdd(Mul_add_operations op,
         return u_as_f_64(uiC);
     }
 
-    int16_t expA = expF64UI(uiA);
+    int16_t expA = get_exp(uiA);
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
@@ -116,7 +114,7 @@ mulAdd(Mul_add_operations op,
         sigA = normExpSig.sig;
     }
 
-    int16_t expB = expF64UI(uiB);
+    int16_t expB = get_exp(uiB);
 
     if (!expB) {
         if (!sigB) {
@@ -294,5 +292,5 @@ f64_mulAdd(float64_t a,
            float64_t c)
 {
     using namespace softfloat::internals;
-    return mulAdd(softfloat_mulAdd_madd, f_as_u_64(a), f_as_u_64(b), f_as_u_64(c));
+    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
 }

@@ -322,7 +322,7 @@ packToF128UI64(bool const sign,
 }
 
 inline constexpr bool
-isNaNF128UI(uint64_t const& a64,
+is_NaN(uint64_t const& a64,
             uint64_t const& a0)
 {
     return
@@ -331,9 +331,9 @@ isNaNF128UI(uint64_t const& a64,
 }
 
 inline constexpr bool
-isNaNF128UI(uint128 const& a)
+is_NaN(uint128 const& a)
 {
-    return isNaNF128UI(a.v64, a.v0);
+    return is_NaN(a.v64, a.v0);
 }
 
 #else
@@ -440,13 +440,13 @@ packToF128UI96(bool const sign,
 
 
 inline constexpr int8_t
-expF16UI(uint16_t const& a)
+get_exp(uint16_t const& a)
 {
     return static_cast<int8_t>((a >> 10) & 0x1F);
 }
 
 inline constexpr uint16_t
-fracF16UI(uint16_t const& a)
+get_frac(uint16_t const& a)
 {
     return a & 0x03FFu;
 }
@@ -464,7 +464,7 @@ packToF16UI(bool sign,
 }
 
 inline constexpr bool
-isNaNF16UI(uint16_t const& a)
+is_NaN(uint16_t const& a)
 {
     return
         0 == (UINT16_C(0x7C00) & ~a) &&
@@ -472,7 +472,7 @@ isNaNF16UI(uint16_t const& a)
 }
 
 inline constexpr uint16_t
-f_as_u_16(float16_t const& v)
+f_as_u(float16_t const& v)
 {
     return v.v;
 }
@@ -484,7 +484,7 @@ u_as_f_16(uint16_t v)
 }
 
 inline constexpr uint32_t
-f_as_u_32(float32_t const& v)
+f_as_u(float32_t const& v)
 {
     return v.v;
 }
@@ -496,7 +496,7 @@ u_as_f_32(uint32_t v)
 }
 
 inline constexpr uint64_t
-f_as_u_64(float64_t const& v)
+f_as_u(float64_t const& v)
 {
     return v.v;
 }
@@ -511,13 +511,13 @@ u_as_f_64(uint64_t v)
 @bug return signed 16-bits value instead unsigned 8-bits value
 */
 inline constexpr int16_t
-expF32UI(uint32_t const& a)
+get_exp(uint32_t const& a)
 {
     return static_cast<int16_t>((a >> 23) & ~(~UINT32_C(0) << 8));
 }
 
 inline constexpr uint32_t
-fracF32UI(uint32_t const& a)
+get_frac(uint32_t const& a)
 {
     return a & ~(~UINT32_C(0) << 23);
 }
@@ -538,58 +538,68 @@ signed_zero_F32UI(bool sign)
     return packToF32UI(sign, 0, 0u);
 }
 
+template<typename Ty>
+Ty
+signed_zero(bool sign);
+
+template<>
 inline constexpr float32_t
-signed_zero_F32(bool sign)
+signed_zero<float32_t>(bool sign)
 {
     return u_as_f_32(signed_zero_F32UI(sign));
 }
 
+template<typename Ty>
+Ty
+signed_inf(bool sign);
+
+template<>
 inline constexpr float32_t
-signed_inf_F32(bool sign)
+signed_inf<float32_t>(bool sign)
 {
     return u_as_f_32(packToF32UI(sign, 0xFF, 0u));
 }
 
 inline constexpr bool
-isNaNF32UI(uint32_t const& a)
+is_NaN(uint32_t const& a)
 {
     return
-        255 == expF32UI(a) &&
-        0 != fracF32UI(a);
+        255 == get_exp(a) &&
+        0 != get_frac(a);
 }
 
 inline constexpr bool
-isInf32UI(uint32_t const& a)
+is_inf(uint32_t const& a)
 {
     return
-        255 == expF32UI(a) &&
-        0 == fracF32UI(a);
+        255 == get_exp(a) &&
+        0 == get_frac(a);
 }
 
 inline constexpr bool
-isZero32UI(uint32_t const& a)
+is_zero(uint32_t const& a)
 {
     return
-        0 == expF32UI(a) &&
-        0 == fracF32UI(a);
+        0 == get_exp(a) &&
+        0 == get_frac(a);
 }
 
 inline constexpr bool
-isSubnormal32UI(uint32_t const& a)
+is_subnormal(uint32_t const& a)
 {
     return
-        0 == expF32UI(a) &&
-        0 != fracF32UI(a);
+        0 == get_exp(a) &&
+        0 != get_frac(a);
 }
 
 inline constexpr int16_t
-expF64UI(uint64_t const& a)
+get_exp(uint64_t const& a)
 {
     return static_cast<int16_t>((a >> 52) & ~(~UINT32_C(0) << 11));
 }
 
 inline constexpr uint64_t
-fracF64UI(uint64_t const& a)
+get_frac(uint64_t const& a)
 {
     return a & ~(~UINT64_C(0) << 52);
 }
@@ -603,21 +613,21 @@ packToF64UI(bool sign, int16_t const& expnt, uint64_t const& sgnf)
 }
 
 inline constexpr bool
-isNaNF64UI(uint64_t const& a)
+is_NaN(uint64_t const& a)
 {
     return
-        2047 == expF64UI(a) &&
-        0 != fracF64UI(a);
+        2047 == get_exp(a) &&
+        0 != get_frac(a);
 }
 
 inline constexpr bool
-isInf64UI(uint64_t const& a)
+is_inf(uint64_t const& a)
 {
     return (~(~UINT64_C(0) << 11) << 52) == (~(~UINT64_C(0) << 63) & a);
 }
 
 inline constexpr bool
-isZero64UI(uint64_t const &a)
+is_zero(uint64_t const &a)
 {
     return 0 == (~(~UINT64_C(0) << 63) & a);
 }
@@ -636,7 +646,7 @@ packToExtF80UI64(bool const sign,
 }
 
 inline constexpr bool
-isNaNExtF80UI(uint16_t const& a64,
+is_NaN(uint16_t const& a64,
               uint64_t const& a0)
 {
     return
@@ -645,33 +655,11 @@ isNaNExtF80UI(uint16_t const& a64,
 }
 
 inline constexpr bool
-isNaNExtF80UI(extFloat80_t const& a)
+is_NaN(extFloat80_t const& a)
 {
-    return isNaNExtF80UI(a.signExp, a.signif);
-}
-/**
-@returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
-32-bit floating-point NaN.
-*/
-inline constexpr bool
-softfloat_isNaNF32UI(uint32_t const& uiA)
-{
-    return
-        (~(~UINT32_C(0) << 8) << 23) == (uiA & (~(~UINT32_C(0) << 8) << 23)) &&
-        0 != (uiA & (~(~UINT32_C(0) << 23)));
+    return is_NaN(a.signExp, a.signif);
 }
 
-/**
-@returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
-64-bit floating-point NaN.
-*/
-inline constexpr bool
-softfloat_isNaNF64UI(uint64_t const& uiA)
-{
-    return
-        (~(~UINT64_C(0) << 11) << 52) == ((~(~UINT64_C(0) << 11) << 52) & uiA) &&
-        0 != ((~(~UINT64_C(0) << 52)) & uiA);
-}
 /**
 Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point signaling NaN.

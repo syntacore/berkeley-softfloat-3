@@ -41,25 +41,24 @@ using namespace softfloat::internals;
 namespace {
 
 static inline float32_t
-mulAdd(Mul_add_operations const op,
-       uint32_t const& uiA,
+mulAdd(uint32_t const& uiA,
        uint32_t const& uiB,
        uint32_t const& uiC)
 {
-    if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB) || softfloat_isSigNaNF32UI(uiC)) {
+    if (is_NaN(uiA) || is_NaN(uiB) || softfloat_isSigNaNF32UI(uiC)) {
         return u_as_f_32(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
-    int16_t expA = expF32UI(uiA);
-    uint32_t sigA = fracF32UI(uiA);
+    int16_t expA = get_exp(uiA);
+    uint32_t sigA = get_frac(uiA);
     bool const signB = is_sign(uiB);
-    int16_t expB = expF32UI(uiB);
-    uint32_t sigB = fracF32UI(uiB);
-    bool const signC = is_sign(uiC) != (softfloat_mulAdd_subC == op);
-    int16_t expC = expF32UI(uiC);
-    uint32_t sigC = fracF32UI(uiC);
-    bool const signProd = (signA != signB) != (op == softfloat_mulAdd_subProd);
+    int16_t expB = get_exp(uiB);
+    uint32_t sigB = get_frac(uiB);
+    bool const signC = is_sign(uiC);
+    int16_t expC = get_exp(uiC);
+    uint32_t sigC = get_frac(uiC);
+    bool const signProd = signA != signB;
 
     static int16_t const max_exp = 0xFF;
 
@@ -74,7 +73,7 @@ mulAdd(Mul_add_operations const op,
         }
 
         /* product is inf */
-        float32_t const uiZ = signed_inf_F32(signProd);
+        float32_t const uiZ = signed_inf<float32_t>(signProd);
 
         if (expC != max_exp) {
             /* summand c is finite, return product as result */
@@ -82,7 +81,7 @@ mulAdd(Mul_add_operations const op,
         }
 
         /* if summand is inf, check for same sign */
-        if (softfloat_isNaNF32UI(uiC) && signProd == signC) {
+        if (is_NaN(uiC) && signProd == signC) {
             /* summands are same sign inf */
             return uiZ;
         }
@@ -92,7 +91,7 @@ mulAdd(Mul_add_operations const op,
         return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
-    if (softfloat_isNaNF32UI(uiC)) {
+    if (is_NaN(uiC)) {
         return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
@@ -107,7 +106,7 @@ mulAdd(Mul_add_operations const op,
         /* a is zero or subnormal */
         if (0 == sigA) {
             /* a is zero */
-            return 0 == (expC | sigC) && signProd != signC ? signed_zero_F32(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
+            return 0 == (expC | sigC) && signProd != signC ? signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
         }
 
         exp16_sig32 const normExpSig(sigA);
@@ -121,7 +120,7 @@ mulAdd(Mul_add_operations const op,
             /* b is zero */
             return
                 0 == (expC | sigC) && signProd != signC ?
-                signed_zero_F32(softfloat_round_min == softfloat_roundingMode) :
+                signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) :
                 u_as_f_32(uiC);
         }
 
@@ -190,7 +189,7 @@ mulAdd(Mul_add_operations const op,
         sig64Z = sigProd - sig64C;
 
         if (0 == sig64Z) {
-            return signed_zero_F32(softfloat_round_min == softfloat_roundingMode);
+            return signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode);
         }
 
         if (sig64Z & INT64_MIN) {
@@ -221,6 +220,6 @@ f32_mulAdd(float32_t a,
            float32_t b,
            float32_t c)
 {
-    return mulAdd(softfloat_mulAdd_madd, f_as_u_32(a), f_as_u_32(b), f_as_u_32(c));
+    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
 }
 

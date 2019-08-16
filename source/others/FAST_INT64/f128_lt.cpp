@@ -48,7 +48,7 @@ f128_lt(float128_t const a,
     uint128 aa{a};
     uint128 bb{b};
 
-    if (isNaNF128UI(aa) || isNaNF128UI(bb)) {
+    if (is_NaN(aa) || is_NaN(bb)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }

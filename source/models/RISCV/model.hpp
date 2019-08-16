@@ -141,7 +141,7 @@ inline uint16_t
 softfloat_propagateNaNF16UI(uint16_t const& uiA,
                             uint16_t const& uiB)
 {
-    if (softfloat_isSigNaNF16UI(uiA) || softfloat_isSigNaNF16UI(uiB)) {
+    if (is_sNaN(uiA) || is_sNaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
@@ -185,7 +185,7 @@ Returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
 Note:  This macro evaluates its argument more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNF64UI(uint64_t const& uiA)
+is_sNaN(uint64_t const& uiA)
 {
     return
         UINT64_C(0x7FF0000000000000) == (uiA & UINT64_C(0x7FF8000000000000)) &&
@@ -277,10 +277,10 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 static inline uint64_t
-softfloat_propagateNaNF64UI(uint64_t const& uiA,
+propagate_NaN(uint64_t const& uiA,
                             uint64_t const& uiB)
 {
-    if (softfloat_isSigNaNF64UI(uiA) || softfloat_isSigNaNF64UI(uiB)) {
+    if (is_sNaN(uiA) || is_sNaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 

@@ -54,9 +54,9 @@ softfloat_propagateNaNF16UI(uint16_t const uiA,
                             uint16_t const uiB)
 {
     static uint16_t const quite_nan_bit = UINT16_C(0x0200);
-    bool const isSigNaNA = softfloat_isSigNaNF16UI(uiA);
+    bool const isSigNaNA = is_sNaN(uiA);
 
-    if (isSigNaNA || softfloat_isSigNaNF16UI(uiB)) {
+    if (isSigNaNA || is_sNaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (isSigNaNA) {
@@ -64,7 +64,7 @@ softfloat_propagateNaNF16UI(uint16_t const uiA,
         }
     }
 
-    return static_cast<uint16_t>(quite_nan_bit | (isNaNF16UI(uiA) ? uiA : uiB));
+    return static_cast<uint16_t>(quite_nan_bit | (is_NaN(uiA) ? uiA : uiB));
 }
 
 template<typename Ty>
@@ -95,11 +95,11 @@ propagate_NaN<uint32_t>(uint32_t const& uiA,
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (!isSigNaNA) {
-            return isNaNF32UI(uiA) ? uiNonsigA : uiNonsigB;
+            return is_NaN(uiA) ? uiNonsigA : uiNonsigB;
         }
 
         if (!isSigNaNB) {
-            return isNaNF32UI(uiB) ? uiNonsigB : uiNonsigA;
+            return is_NaN(uiB) ? uiNonsigB : uiNonsigA;
         }
     }
 
@@ -120,12 +120,12 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint64_t
-softfloat_propagateNaNF64UI(uint64_t const uiA,
+propagate_NaN(uint64_t const uiA,
                             uint64_t const uiB)
 {
-    bool const isSigNaNA = softfloat_isSigNaNF64UI(uiA);
+    bool const isSigNaNA = is_sNaN(uiA);
 
-    if (isSigNaNA || softfloat_isSigNaNF64UI(uiB)) {
+    if (isSigNaNA || is_sNaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (isSigNaNA) {
@@ -133,7 +133,7 @@ softfloat_propagateNaNF64UI(uint64_t const uiA,
         }
     }
 
-    return (isNaNF64UI(uiA) ? uiA : uiB) | UINT64_C(0x0008000000000000);
+    return (is_NaN(uiA) ? uiA : uiB) | UINT64_C(0x0008000000000000);
 }
 
 }  // namespace Intel_8086

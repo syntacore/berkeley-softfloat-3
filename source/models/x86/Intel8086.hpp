@@ -104,7 +104,7 @@ exception is raised.
 inline commonNaN
 softfloat_f16UIToCommonNaN(uint16_t const uiA)
 {
-    if (softfloat_isSigNaNF16UI(uiA)) {
+    if (is_sNaN(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
@@ -163,7 +163,7 @@ Returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
 Note:  This macro evaluates its argument more than once.
 */
 inline constexpr bool
-softfloat_isSigNaNF64UI(uint64_t uiA)
+is_sNaN(uint64_t uiA)
 {
     return
         UINT64_C(0x7FF0000000000000) == (uiA & UINT64_C(0x7FF8000000000000)) &&
@@ -179,7 +179,7 @@ exception is raised.
 inline commonNaN
 softfloat_f64UIToCommonNaN(uint64_t uiA)
 {
-    if (softfloat_isSigNaNF64UI(uiA)) {
+    if (is_sNaN(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 

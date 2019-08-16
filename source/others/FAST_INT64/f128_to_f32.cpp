@@ -68,12 +68,12 @@ f128_to_f32(float128_t const a)
             return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
         }
 
-        return signed_zero_F32(sign);
+        return signed_zero<float32_t>(sign);
     }
 
     if (0 != frac64) {
         return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
     }
 
-    return signed_inf_F32(sign);
+    return signed_inf<float32_t>(sign);
 }

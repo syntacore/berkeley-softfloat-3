@@ -46,10 +46,10 @@ f16_to_f128M(float16_t a,
 {
     using namespace softfloat::internals;
     uint32_t* const zWPtr = (uint32_t*)zPtr;
-    uint16_t const uiA = f_as_u_16(a);
+    uint16_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int8_t const exp = expF16UI(uiA);
-    uint16_t const frac = fracF16UI(uiA);
+    int8_t const exp = get_exp(uiA);
+    uint16_t const frac = get_frac(uiA);
 
     if (0x1F == exp) {
         if (frac) {

@@ -51,8 +51,8 @@ signaling NaN, the invalid exception is raised.
 uint16_t
 softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
 {
-    bool const isSigNaNA = softfloat_isSigNaNF16UI(uiA);
-    bool const isSigNaNB = softfloat_isSigNaNF16UI(uiB);
+    bool const isSigNaNA = is_sNaN(uiA);
+    bool const isSigNaNB = is_sNaN(uiB);
     /* Make NaNs non-signaling.*/
     uint16_t const uiNonsigA = uiA | 0x0200u;
     uint16_t const uiNonsigB = uiB | 0x0200u;
@@ -61,10 +61,10 @@ softfloat_propagateNaNF16UI(uint16_t uiA, uint16_t uiB)
         softfloat_raiseFlags(softfloat_flag_invalid);
         if (isSigNaNA) {
             if (!isSigNaNB) {
-                return isNaNF16UI(uiB) ? uiNonsigB : uiNonsigA;
+                return is_NaN(uiB) ? uiNonsigB : uiNonsigA;
             }
         } else {
-            return isNaNF16UI(uiA) ? uiNonsigA : uiNonsigB;
+            return is_NaN(uiA) ? uiNonsigA : uiNonsigB;
         }
     }
     {

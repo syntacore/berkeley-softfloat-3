@@ -41,20 +41,20 @@ f32_mul(float32_t a,
         float32_t b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
-    uint32_t const uiB = f_as_u_32(b);
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
 
-    if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB)) {
+    if (is_NaN(uiA) || is_NaN(uiB)) {
         return u_as_f_32(propagate_NaN(uiA, uiB));
     }
 
     bool const signA = is_sign(uiA);
-    int16_t expA = expF32UI(uiA);
-    uint32_t sigA = fracF32UI(uiA);
+    int16_t expA = get_exp(uiA);
+    uint32_t sigA = get_frac(uiA);
 
     bool const signB = is_sign(uiB);
-    int16_t expB = expF32UI(uiB);
-    uint32_t sigB = fracF32UI(uiB);
+    int16_t expB = get_exp(uiB);
+    uint32_t sigB = get_frac(uiB);
 
     bool const signZ = signA != signB;
 
@@ -68,12 +68,12 @@ f32_mul(float32_t a,
             return u_as_f_32(defaultNaNF32UI);
         }
 
-        return signed_inf_F32(signZ);
+        return signed_inf<float32_t>(signZ);
     }
 
     if (0 == expA) {
         if (0 == sigA) {
-            return signed_zero_F32(signZ);
+            return signed_zero<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigA);
@@ -83,7 +83,7 @@ f32_mul(float32_t a,
 
     if (0 == expB) {
         if (0 == sigB) {
-            return signed_zero_F32(signZ);
+            return signed_zero<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigB);

@@ -111,14 +111,14 @@ softfloat_propagateNaNExtF80UI(uint16_t const uiA64,
                 return return_larger_magnitude(uiA64, uiNonsigA0, uiB64, uiNonsigB0);
             }
 
-            if (isNaNExtF80UI(uiB64, uiB0)) {
+            if (is_NaN(uiB64, uiB0)) {
                 return uint128{uiB64, uiNonsigB0};
             }
 
             return uint128{uiA64, uiNonsigA0};
         }
 
-        if (isNaNExtF80UI(uiA64, uiA0)) {
+        if (is_NaN(uiA64, uiA0)) {
             return uint128{uiA64, uiNonsigA0};
         }
 

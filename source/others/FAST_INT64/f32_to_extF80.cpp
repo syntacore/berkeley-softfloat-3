@@ -45,10 +45,10 @@ f32_to_extF80(float32_t const a)
 {
     using namespace softfloat::internals;
 
-    uint32_t const uiA = f_as_u_32(a);
+    uint32_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int16_t exp = expF32UI(uiA);
-    uint32_t frac = fracF32UI(uiA);
+    int16_t exp = get_exp(uiA);
+    uint32_t frac = get_frac(uiA);
 
     if (0xFF == exp) {
         if (frac) {

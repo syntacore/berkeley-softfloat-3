@@ -47,7 +47,7 @@ extF80M_lt_quiet(extFloat80_t const* const aPtr,
 {
     using namespace softfloat::internals;
 
-    if (isNaNExtF80UI(*aPtr) || isNaNExtF80UI(*bPtr)) {
+    if (is_NaN(*aPtr) || is_NaN(*bPtr)) {
         if (softfloat_isSigNaNExtF80UI(*aPtr) || softfloat_isSigNaNExtF80UI(*bPtr)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }

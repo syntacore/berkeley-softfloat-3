@@ -47,10 +47,10 @@ addMags(uint64_t const uiA,
         bool const signZ)
 {
     using namespace softfloat::internals;
-    int16_t const expA = expF64UI(uiA);
-    uint64_t sigA = fracF64UI(uiA);
-    int16_t const expB = expF64UI(uiB);
-    uint64_t sigB = fracF64UI(uiB);
+    int16_t const expA = get_exp(uiA);
+    uint64_t sigA = get_frac(uiA);
+    int16_t const expB = get_exp(uiB);
+    uint64_t sigB = get_frac(uiB);
     int16_t const expDiff = expA - expB;
 
     if (0 == expDiff) {
@@ -59,7 +59,7 @@ addMags(uint64_t const uiA,
         }
 
         if (0x7FF == expA) {
-            return u_as_f_64(0 != (sigA | sigB) ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
+            return u_as_f_64(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
@@ -71,7 +71,7 @@ addMags(uint64_t const uiA,
 
     if (expDiff < 0) {
         if (expB == 0x7FF) {
-            return u_as_f_64(sigB ? softfloat_propagateNaNF64UI(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
+            return u_as_f_64(sigB ? propagate_NaN(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
         }
 
         expZ = expB;
@@ -85,7 +85,7 @@ addMags(uint64_t const uiA,
         sigA = softfloat_shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
     } else {
         if (0x7FF == expA) {
-            return u_as_f_64(sigA ? softfloat_propagateNaNF64UI(uiA, uiB) : uiA);
+            return u_as_f_64(sigA ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         expZ = expA;
@@ -114,17 +114,17 @@ subMags(uint64_t const uiA,
         uint64_t const uiB,
         bool signZ)
 {
-    int16_t expA = expF64UI(uiA);
-    uint64_t const sigA = fracF64UI(uiA);
-    int16_t expB = expF64UI(uiB);
-    uint64_t const sigB = fracF64UI(uiB);
+    int16_t expA = get_exp(uiA);
+    uint64_t const sigA = get_frac(uiA);
+    int16_t expB = get_exp(uiB);
+    uint64_t const sigB = get_frac(uiB);
 
     int16_t const expDiff = expA - expB;
 
     if (0 == expDiff) {
         if (0x7FF == expA) {
             if (0 != sigA || 0 != sigB) {
-                return u_as_f_64(softfloat_propagateNaNF64UI(uiA, uiB));
+                return u_as_f_64(propagate_NaN(uiA, uiB));
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
@@ -163,7 +163,7 @@ subMags(uint64_t const uiA,
         if (0x7FF == expB) {
             return
                 u_as_f_64(0 != sigB_shifted ?
-                          softfloat_propagateNaNF64UI(uiA, uiB) :
+                          propagate_NaN(uiA, uiB) :
                           packToF64UI(signZ, 0x7FF, 0));
         }
 
@@ -176,7 +176,7 @@ subMags(uint64_t const uiA,
     }
 
     if (0x7FF == expA) {
-        return u_as_f_64(0 == sigA_shifted ? uiA : softfloat_propagateNaNF64UI(uiA, uiB));
+        return u_as_f_64(0 == sigA_shifted ? uiA : propagate_NaN(uiA, uiB));
     }
 
     return
@@ -196,9 +196,9 @@ f64_add(float64_t a,
         float64_t b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiA = f_as_u(a);
     bool const signA = is_sign(uiA);
-    uint64_t const uiB = f_as_u_64(b);
+    uint64_t const uiB = f_as_u(b);
     bool signB = is_sign(uiB);
     return
         (signA == signB ? addMags : subMags)(uiA, uiB, signA);
@@ -208,9 +208,9 @@ float64_t
 f64_sub(float64_t a, float64_t b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiA = f_as_u(a);
     bool const signA = is_sign(uiA);
-    uint64_t const uiB = f_as_u_64(b);
+    uint64_t const uiB = f_as_u(b);
     bool const signB = is_sign(uiB);
     return
         (signA == signB ? subMags : addMags)(uiA, uiB, signA);

@@ -40,10 +40,10 @@ bool
 f32_eq_signaling(float32_t a, float32_t b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
-    uint32_t const uiB = f_as_u_32(b);
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
 
-    if (isNaNF32UI(uiA) || isNaNF32UI(uiB)) {
+    if (is_NaN(uiA) || is_NaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }

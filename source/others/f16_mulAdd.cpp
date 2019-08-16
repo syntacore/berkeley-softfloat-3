@@ -49,16 +49,16 @@ softfloat_mulAddF16(Mul_add_operations op,
     using namespace softfloat::internals;
 
     bool const signA = is_sign(uiA);
-    int8_t expA = expF16UI(uiA);
-    uint16_t sigA = fracF16UI(uiA);
+    int8_t expA = get_exp(uiA);
+    uint16_t sigA = get_frac(uiA);
 
     bool const signB = is_sign(uiB);
-    int8_t expB = expF16UI(uiB);
-    uint16_t sigB = fracF16UI(uiB);
+    int8_t expB = get_exp(uiB);
+    uint16_t sigB = get_frac(uiB);
 
     bool const signC = is_sign(uiC) != (softfloat_mulAdd_subC == op);
-    int8_t expC = expF16UI(uiC);
-    uint16_t sigC = fracF16UI(uiC);
+    int8_t expC = get_exp(uiC);
+    uint16_t sigC = get_frac(uiC);
 
     bool const signProd = (signA != signB) != (softfloat_mulAdd_subProd == op);
 
@@ -271,5 +271,5 @@ f16_mulAdd(float16_t const a,
            float16_t const b,
            float16_t const c)
 {
-    return softfloat_mulAddF16(softfloat_mulAdd_madd, f_as_u_16(a), f_as_u_16(b), f_as_u_16(c));
+    return softfloat_mulAddF16(softfloat_mulAdd_madd, f_as_u(a), f_as_u(b), f_as_u(c));
 }

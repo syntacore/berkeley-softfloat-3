@@ -44,10 +44,10 @@ extFloat80_t
 f64_to_extF80(float64_t const a)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u_64(a);
+    uint64_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int16_t exp = expF64UI(uiA);
-    uint64_t frac = fracF64UI(uiA);
+    int16_t exp = get_exp(uiA);
+    uint64_t frac = get_frac(uiA);
 
     if (exp == 0x7FF) {
         extFloat80_t uZ;

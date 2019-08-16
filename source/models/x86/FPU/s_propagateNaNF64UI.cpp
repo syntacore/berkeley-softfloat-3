@@ -41,11 +41,11 @@ namespace internals {
 namespace Intel_8086 {
 
 uint64_t
-softfloat_propagateNaNF64UI(uint64_t uiA,
-                            uint64_t uiB)
+propagate_NaN(uint64_t uiA,
+              uint64_t uiB)
 {
-    bool const isSigNaNA = softfloat_isSigNaNF64UI(uiA);
-    bool const isSigNaNB = softfloat_isSigNaNF64UI(uiB);
+    bool const isSigNaNA = is_sNaN(uiA);
+    bool const isSigNaNB = is_sNaN(uiB);
     /* Make NaNs non-signaling. */
     uint64_t const uiNonsigA = uiA | UINT64_C(0x0008000000000000);
     uint64_t const uiNonsigB = uiB | UINT64_C(0x0008000000000000);
@@ -54,11 +54,11 @@ softfloat_propagateNaNF64UI(uint64_t uiA,
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (!isSigNaNA) {
-            return isNaNF64UI(uiA) ? uiNonsigA : uiNonsigB;
+            return is_NaN(uiA) ? uiNonsigA : uiNonsigB;
         }
 
         if (!isSigNaNB) {
-            return isNaNF64UI(uiB) ? uiNonsigB : uiNonsigA;
+            return is_NaN(uiB) ? uiNonsigB : uiNonsigA;
         }
     }
 

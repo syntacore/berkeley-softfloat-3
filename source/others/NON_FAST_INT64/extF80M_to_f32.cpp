@@ -56,12 +56,12 @@ extF80M_to_f32(const extFloat80_t* aPtr)
             return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_extF80MToCommonNaN(*aSPtr)));
         }
 
-        return signed_inf_F32(sign);
+        return signed_inf<float32_t>(sign);
     }
 
     if (0 == (sig & UINT64_C(0x8000000000000000))) {
         if (0 == sig) {
-            return signed_zero_F32(sign);
+            return signed_zero<float32_t>(sign);
         }
 
         exp += softfloat_normExtF80SigM(&sig);

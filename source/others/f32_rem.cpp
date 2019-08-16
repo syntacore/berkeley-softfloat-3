@@ -41,18 +41,18 @@ f32_rem(float32_t const a,
         float32_t const b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
-    uint32_t const uiB = f_as_u_32(b);
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
 
-    if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB)) {
+    if (is_NaN(uiA) || is_NaN(uiB)) {
         return u_as_f_32(propagate_NaN(uiA, uiB));
     }
 
     bool const signA = is_sign(uiA);
-    int16_t expA = expF32UI(uiA);
-    uint32_t sigA = fracF32UI(uiA);
-    int16_t expB = expF32UI(uiB);
-    uint32_t sigB = fracF32UI(uiB);
+    int16_t expA = get_exp(uiA);
+    uint32_t sigA = get_frac(uiA);
+    int16_t expB = get_exp(uiB);
+    uint32_t sigB = get_frac(uiB);
 
     if (0xFF == expA) {
         if (0 != sigA || (0xFF == expB && 0 != sigB)) {

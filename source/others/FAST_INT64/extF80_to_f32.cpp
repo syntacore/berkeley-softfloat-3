@@ -55,7 +55,7 @@ extF80_to_f32(extFloat80_t a)
             return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
         }
 
-        return signed_inf_F32(sign);
+        return signed_inf<float32_t>(sign);
     }
 
     uint32_t const sig32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(sig, 33));
@@ -71,5 +71,5 @@ extF80_to_f32(extFloat80_t a)
         return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
     }
 
-    return signed_zero_F32(sign);
+    return signed_zero<float32_t>(sign);
 }

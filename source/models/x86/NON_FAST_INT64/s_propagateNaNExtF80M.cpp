@@ -73,8 +73,8 @@ softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
             softfloat_raiseFlags(softfloat_flag_invalid);
 
             auto const p_src =
-                !isSigNaNA ? (isNaNExtF80UI(*aSPtr) ? aSPtr : bSPtr) :
-                !isSigNaNB ? (isNaNExtF80UI(*bSPtr) ? bSPtr : aSPtr) :
+                !isSigNaNA ? (is_NaN(*aSPtr) ? aSPtr : bSPtr) :
+                !isSigNaNB ? (is_NaN(*bSPtr) ? bSPtr : aSPtr) :
                 (aSPtr->signExp & 0x7FFFu) < (bSPtr->signExp & 0x7FFFu) ? bSPtr :
                 (bSPtr->signExp & 0x7FFFu) < (aSPtr->signExp & 0x7FFFu) ? aSPtr :
                 aSPtr->signif < bSPtr->signif ? bSPtr :

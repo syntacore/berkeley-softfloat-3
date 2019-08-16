@@ -71,7 +71,7 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
     }
 
     return 
-        isNaNF128UI(uiA64, uiA0) ?
+        is_NaN(uiA64, uiA0) ?
         uint128{uiA64 | UINT64_C(0x0000'8000'0000'0000), uiA0} :
         uint128{uiB64 | UINT64_C(0x0000'8000'0000'0000), uiB0};
 }

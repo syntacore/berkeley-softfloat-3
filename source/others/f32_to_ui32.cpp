@@ -42,25 +42,25 @@ f32_to_ui32(float32_t const a,
             bool const exact)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
+    uint32_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int16_t const exp = expF32UI(uiA);
+    int16_t const exp = get_exp(uiA);
 
-    if (isNaNF32UI(uiA)) {
+    if (is_NaN(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return ui32_fromNaN;
     }
 
-    if (isZero32UI(uiA)) {
+    if (is_zero(uiA)) {
         return 0u;
     }
 
-    if (isInf32UI(uiA)) {
+    if (is_inf(uiA)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 
-    uint64_t const sig64 = static_cast<uint64_t>(fracF32UI(uiA) | (0 != exp ? 0x00800000 : 0)) << 32;
+    uint64_t const sig64 = static_cast<uint64_t>(get_frac(uiA) | (0 != exp ? 0x00800000 : 0)) << 32;
     int16_t const shiftDist = 0xAA - exp;
     return
         roundPackTo<uint32_t>(sign,

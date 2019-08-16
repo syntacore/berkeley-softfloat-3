@@ -40,10 +40,10 @@ float16_t
 f32_to_f16(float32_t a)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
+    uint32_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int16_t const exp = expF32UI(uiA);
-    uint32_t const frac = fracF32UI(uiA);
+    int16_t const exp = get_exp(uiA);
+    uint32_t const frac = get_frac(uiA);
 
     if (exp == 0xFF) {
         if (frac) {

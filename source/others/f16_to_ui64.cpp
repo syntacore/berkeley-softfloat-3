@@ -42,10 +42,10 @@ f16_to_ui64(float16_t const a,
             bool const exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u_16(a);
+    uint16_t const uiA = f_as_u(a);
     bool const sign = is_sign(uiA);
-    int8_t const exp = expF16UI(uiA);
-    uint16_t const frac = fracF16UI(uiA);
+    int8_t const exp = get_exp(uiA);
+    uint16_t const frac = get_frac(uiA);
 
     if (exp == 0x1F) {
         softfloat_raiseFlags(softfloat_flag_invalid);

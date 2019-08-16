@@ -111,14 +111,14 @@ f32_div(float32_t const a,
         float32_t const b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u_32(a);
+    uint32_t const uiA = f_as_u(a);
     bool const signA = is_sign(uiA);
-    int16_t expA = expF32UI(uiA);
-    uint32_t sigA = fracF32UI(uiA);
-    uint32_t const uiB = f_as_u_32(b);
+    int16_t expA = get_exp(uiA);
+    uint32_t sigA = get_frac(uiA);
+    uint32_t const uiB = f_as_u(b);
     bool const signB = is_sign(uiB);
-    int16_t expB = expF32UI(uiB);
-    uint32_t sigB = fracF32UI(uiB);
+    int16_t expB = get_exp(uiB);
+    uint32_t sigB = get_frac(uiB);
     bool const signZ = signA != signB;
 
     if (0xFF == expA) {
@@ -127,7 +127,7 @@ f32_div(float32_t const a,
         }
 
         if (0xFF != expB) {
-            return signed_inf_F32(signZ);
+            return signed_inf<float32_t>(signZ);
         }
 
         if (0 != sigB) {
@@ -139,7 +139,7 @@ f32_div(float32_t const a,
     }
 
     if (0xFF == expB) {
-        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : signed_zero_F32(signZ);
+        return sigB ? u_as_f_32(propagate_NaN(uiA, uiB)) : signed_zero<float32_t>(signZ);
     }
 
     if (0 == expB) {
@@ -150,7 +150,7 @@ f32_div(float32_t const a,
             }
 
             softfloat_raiseFlags(softfloat_flag_infinite);
-            return signed_inf_F32(signZ);
+            return signed_inf<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigB);
@@ -160,7 +160,7 @@ f32_div(float32_t const a,
 
     if (0 == expA) {
         if (0 == sigA) {
-            return signed_zero_F32(signZ);
+            return signed_zero<float32_t>(signZ);
         }
 
         exp16_sig32 const normExpSig(sigA);

@@ -49,8 +49,8 @@ softfloat_tryPropagateNaNExtF80M(extFloat80M const* const aSPtr,
                                  extFloat80M* const zSPtr)
 {
     bool const result =
-        isNaNExtF80UI(*aSPtr) ||
-        isNaNExtF80UI(*bSPtr);
+        is_NaN(*aSPtr) ||
+        is_NaN(*bSPtr);
 
     if (result) {
         softfloat_propagateNaNExtF80M(aSPtr, bSPtr, zSPtr);

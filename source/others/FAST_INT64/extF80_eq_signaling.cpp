@@ -46,7 +46,7 @@ extF80_eq_signaling(extFloat80_t const a,
 {
     using namespace softfloat::internals;
 
-    if (isNaNExtF80UI(a) || isNaNExtF80UI(b)) {
+    if (is_NaN(a) || is_NaN(b)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
