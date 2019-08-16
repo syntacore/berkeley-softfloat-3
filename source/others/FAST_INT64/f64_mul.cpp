@@ -60,37 +60,37 @@ f64_mul(float64_t const a,
 
     if (0x7FF == expA) {
         if (sigA || (0x7FF == expB && 0 != sigB)) {
-            return u_as_f_64(propagate_NaN(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         uint64_t const magBits = expB | sigB;
 
         if (0 == magBits) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
+            return to_float(defaultNaNF64UI);
         }
 
-        return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
+        return to_float(packToF64UI(signZ, 0x7FF, 0));
     }
 
     if (0x7FF == expB) {
         if (0 != sigB) {
-            return u_as_f_64(propagate_NaN(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         uint64_t const magBits = expA | sigA;
 
         if (0 == magBits) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
+            return to_float(defaultNaNF64UI);
         }
 
-        return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
+        return to_float(packToF64UI(signZ, 0x7FF, 0));
     }
 
     if (0 == expA) {
         if (0 == sigA) {
-            return u_as_f_64(packToF64UI(signZ, 0, 0));
+            return to_float(packToF64UI(signZ, 0, 0));
         }
 
         exp16_sig64 const normExpSig(sigA);
@@ -100,7 +100,7 @@ f64_mul(float64_t const a,
 
     if (0 == expB) {
         if (0 == sigB) {
-            return u_as_f_64(packToF64UI(signZ, 0, 0));
+            return to_float(packToF64UI(signZ, 0, 0));
         }
 
         exp16_sig64 const normExpSig(sigB);

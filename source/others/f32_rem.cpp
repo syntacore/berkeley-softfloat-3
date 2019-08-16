@@ -45,7 +45,7 @@ f32_rem(float32_t const a,
     uint32_t const uiB = f_as_u(b);
 
     if (is_NaN(uiA) || is_NaN(uiB)) {
-        return u_as_f_32(propagate_NaN(uiA, uiB));
+        return to_float(propagate_NaN(uiA, uiB));
     }
 
     bool const signA = is_sign(uiA);
@@ -56,19 +56,19 @@ f32_rem(float32_t const a,
 
     if (0xFF == expA) {
         if (0 != sigA || (0xFF == expB && 0 != sigB)) {
-            return u_as_f_32(propagate_NaN(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         /**
         @todo check
         */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_32(defaultNaNF32UI);
+        return to_float(defaultNaNF32UI);
     }
 
     if (expB == 0xFF) {
         if (sigB) {
-            return u_as_f_32(propagate_NaN(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         /**
@@ -81,7 +81,7 @@ f32_rem(float32_t const a,
         if (0 == sigB) {
             /** @todo check */
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_32(defaultNaNF32UI);
+            return to_float(defaultNaNF32UI);
         }
 
         exp16_sig32 const normExpSig(sigB);

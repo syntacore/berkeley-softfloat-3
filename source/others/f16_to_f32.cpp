@@ -47,7 +47,7 @@ f16_to_f32(float16_t a)
 
     if (exp == 0x1F) {
         if (frac) {
-            return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f16UIToCommonNaN(uiA)));
+            return to_float(softfloat_commonNaNToF32UI(softfloat_f16UIToCommonNaN(uiA)));
         }
 
         return make_signed_inf<float32_t>(sign);
@@ -63,5 +63,5 @@ f16_to_f32(float16_t a)
         frac = normExpSig.sig;
     }
 
-    return u_as_f_32(packToF32UI(sign, exp + 0x70, static_cast<uint32_t>(frac) << 13));
+    return to_float(packToF32UI(sign, exp + 0x70, static_cast<uint32_t>(frac) << 13));
 }

@@ -82,17 +82,17 @@ f64_rem(float64_t const a,
 
     if (0x7FF == expA) {
         if (0 != sigA || (0x7FF == expB && 0 != sigB)) {
-            return u_as_f_64(propagate_NaN(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_64(defaultNaNF64UI);
+        return to_float(defaultNaNF64UI);
     }
 
     // a is finite
 
     if (0x7FF == expB) {
-        return sigB ? u_as_f_64(propagate_NaN(uiA, uiB)) : a;
+        return sigB ? to_float(propagate_NaN(uiA, uiB)) : a;
     }
 
     if (expA < expB - 1) {
@@ -102,7 +102,7 @@ f64_rem(float64_t const a,
     if (0 == expB) {
         if (0 == sigB) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
+            return to_float(defaultNaNF64UI);
         }
 
         exp16_sig64 const normExpSig(sigB);

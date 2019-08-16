@@ -46,7 +46,7 @@ mulAdd(uint32_t const& uiA,
        uint32_t const& uiC)
 {
     if (is_NaN(uiA) || is_NaN(uiB) || is_sNaN(uiC)) {
-        return u_as_f_32(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
+        return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
@@ -69,7 +69,7 @@ mulAdd(uint32_t const& uiA,
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
+            return to_float(propagate_NaN(defaultNaNF32UI, uiC));
         }
 
         /* product is inf */
@@ -88,16 +88,16 @@ mulAdd(uint32_t const& uiA,
 
         /* summands are different sign inf or NaN, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
+        return to_float(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
     if (is_NaN(uiC)) {
-        return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
+        return to_float(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
     if (max_exp == expC) {
         /** if c is infinity while a and b are finite, return c */
-        return u_as_f_32(uiC);
+        return to_float(uiC);
     }
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
@@ -106,7 +106,7 @@ mulAdd(uint32_t const& uiA,
         /* a is zero or subnormal */
         if (0 == sigA) {
             /* a is zero */
-            return 0 == (expC | sigC) && signProd != signC ? make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) : u_as_f_32(uiC);
+            return 0 == (expC | sigC) && signProd != signC ? make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) : to_float(uiC);
         }
 
         exp16_sig32 const normExpSig(sigA);
@@ -121,7 +121,7 @@ mulAdd(uint32_t const& uiA,
             return
                 0 == (expC | sigC) && signProd != signC ?
                 make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) :
-                u_as_f_32(uiC);
+                to_float(uiC);
         }
 
         exp16_sig32 const normExpSig(sigB);

@@ -72,7 +72,7 @@ f128_to_f32(float128_t const a)
     }
 
     if (0 != frac64) {
-        return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
+        return to_float(softfloat_commonNaNToF32UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
     }
 
     return make_signed_inf<float32_t>(sign);

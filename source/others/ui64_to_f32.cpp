@@ -50,5 +50,5 @@ ui64_to_f32(uint64_t const a)
         return softfloat_roundPackToF32(0, 0x9C - shiftDist_1, sig);
     }
 
-    return u_as_f_32(a ? packToF32UI(0, 0x95 - shiftDist, static_cast<uint32_t>(a) << shiftDist) : 0);
+    return to_float(a ? packToF32UI(0, 0x95 - shiftDist, static_cast<uint32_t>(a) << shiftDist) : 0);
 }

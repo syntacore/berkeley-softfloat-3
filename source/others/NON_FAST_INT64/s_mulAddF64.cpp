@@ -50,7 +50,7 @@ mulAdd(uint64_t const uiA,
        uint64_t const uiC)
 {
     if (is_sNaN(uiC) || is_NaN(uiA) || is_NaN(uiB)) {
-        return u_as_f_64(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
+        return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
@@ -68,7 +68,7 @@ mulAdd(uint64_t const uiA,
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(propagate_NaN(defaultNaNF64UI, uiC));
+            return to_float(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
         /* product is inf */
@@ -76,27 +76,27 @@ mulAdd(uint64_t const uiA,
 
         if (expC != 0x7FF) {
             /* summand c is finite, return product as result */
-            return u_as_f_64(uiZ);
+            return to_float(uiZ);
         }
 
         /* if summand is inf, check for same sign */
         if (!is_NaN(uiC) && signZ == signC) {
             /* summands are same sign inf */
-            return u_as_f_64(uiZ);
+            return to_float(uiZ);
         }
 
         /* summands are different sign inf or NaN, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_64(propagate_NaN(defaultNaNF64UI, uiC));
+        return to_float(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
     if (is_NaN(uiC)) {
-        return u_as_f_64(propagate_NaN(defaultNaNF64UI, uiC));
+        return to_float(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
     if (expC == 0x7FF) {
         /** if c is infinity while a and b are finite, return c */
-        return u_as_f_64(uiC);
+        return to_float(uiC);
     }
 
     int16_t expA = get_exp(uiA);
@@ -105,7 +105,7 @@ mulAdd(uint64_t const uiA,
 
     if (0 == expA) {
         if (!sigA) {
-            return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+            return to_float(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
         }
 
         exp16_sig64 const normExpSig(sigA);
@@ -117,7 +117,7 @@ mulAdd(uint64_t const uiA,
 
     if (!expB) {
         if (!sigB) {
-            return u_as_f_64(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+            return to_float(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
         }
 
         exp16_sig64 const normExpSig(sigB);
@@ -231,7 +231,7 @@ mulAdd(uint64_t const uiA,
             sigZ -= sigC;
 
             if (0 == sigZ && !sig128Z[indexWord(4, 1)] && !sig128Z[indexWord(4, 0)]) {
-                return u_as_f_64(packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+                return to_float(packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
             }
 
             sig128Z[indexWord(4, 3)] = sigZ >> 32;

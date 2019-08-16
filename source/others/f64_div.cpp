@@ -53,34 +53,34 @@ f64_div(float64_t const a,
 
     if (expA == 0x7FF) {
         if (0 != sigA) {
-            return u_as_f_64(propagate_NaN(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         if (0x7FF == expB) {
             if (0 != sigB) {
-                return u_as_f_64(propagate_NaN(uiA, uiB));
+                return to_float(propagate_NaN(uiA, uiB));
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
+            return to_float(defaultNaNF64UI);
         }
 
-        return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
+        return to_float(packToF64UI(signZ, 0x7FF, 0));
     }
 
     if (0x7FF == expB) {
-        return u_as_f_64(sigB ? propagate_NaN(uiA, uiB) : packToF64UI(signZ, 0, 0));
+        return to_float(sigB ? propagate_NaN(uiA, uiB) : packToF64UI(signZ, 0, 0));
     }
 
     if (0 == expB) {
         if (0 == sigB) {
             if (0 == (expA | sigA)) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_64(defaultNaNF64UI);
+                return to_float(defaultNaNF64UI);
             }
 
             softfloat_raiseFlags(softfloat_flag_infinite);
-            return u_as_f_64(packToF64UI(signZ, 0x7FF, 0));
+            return to_float(packToF64UI(signZ, 0x7FF, 0));
         }
 
         exp16_sig64 const normExpSig(sigB);
@@ -90,7 +90,7 @@ f64_div(float64_t const a,
 
     if (0 == expA) {
         if (0 == sigA) {
-            return u_as_f_64(packToF64UI(signZ, 0, 0));
+            return to_float(packToF64UI(signZ, 0, 0));
         }
 
         exp16_sig64 const normExpSig(sigA);

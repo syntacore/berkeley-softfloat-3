@@ -52,10 +52,10 @@ f128M_to_f64(const float128_t* aPtr)
 
     if (exp == 0x7FFF) {
         if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
-            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f128MToCommonNaN(aWPtr)));
+            return to_float(softfloat_commonNaNToF64UI(softfloat_f128MToCommonNaN(aWPtr)));
         }
 
-        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
+        return to_float(packToF64UI(sign, 0x7FF, 0));
     }
 
     uint32_t const frac32 = aWPtr[indexWord(4, 1)];
@@ -66,7 +66,7 @@ f128M_to_f64(const float128_t* aPtr)
     }
 
     if (0 == exp && 0 == frac64) {
-        return u_as_f_64(packToF64UI(sign, 0, 0));
+        return to_float(packToF64UI(sign, 0, 0));
     }
 
     exp -= 0x3C01;

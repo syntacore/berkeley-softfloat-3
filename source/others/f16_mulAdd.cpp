@@ -69,7 +69,7 @@ mulAdd(uint16_t const& uiA,
         // a is inf or NaN
         if (0 != sigA || (max_exp == expB && 0 != sigB)) {
             // a is NaN or b is NaN
-            return u_as_f_16(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
+            return to_float(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
         }
 
         // a is inf
@@ -79,7 +79,7 @@ mulAdd(uint16_t const& uiA,
             uint16_t const infinity = packToF16UI(signProd, max_exp, 0);
 
             if (max_exp != expC) {
-                return u_as_f_16(infinity);
+                return to_float(infinity);
             }
 
             // c is inf or NaN
@@ -87,12 +87,12 @@ mulAdd(uint16_t const& uiA,
 
             if (0 != sigC) {
                 // c is NaN
-                return u_as_f_16(softfloat_propagateNaNF16UI(infinity, uiC));
+                return to_float(softfloat_propagateNaNF16UI(infinity, uiC));
             }
 
             // c is inf
             if (signProd == signC) {
-                return u_as_f_16(infinity);
+                return to_float(infinity);
             }
 
             // result is (inf - inf)
@@ -100,7 +100,7 @@ mulAdd(uint16_t const& uiA,
 
         // (a * b) is (inf * 0) or result is (inf - inf)
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_16(softfloat_propagateNaNF16UI(defaultNaNF16UI, uiC));
+        return to_float(softfloat_propagateNaNF16UI(defaultNaNF16UI, uiC));
     }
 
     // a is finite
@@ -110,7 +110,7 @@ mulAdd(uint16_t const& uiA,
         // b is inf or NaN
         if (0 != sigB) {
             // b is NaN
-            return u_as_f_16(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
+            return to_float(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
         }
 
         // b is inf
@@ -121,27 +121,27 @@ mulAdd(uint16_t const& uiA,
             uint16_t const infinity = packToF16UI(signProd, max_exp, 0);
 
             if (max_exp != expC) {
-                return u_as_f_16(infinity);
+                return to_float(infinity);
             }
 
             if (0 != sigC) {
-                return u_as_f_16(softfloat_propagateNaNF16UI(infinity, uiC));
+                return to_float(softfloat_propagateNaNF16UI(infinity, uiC));
             }
 
             if (signProd == signC) {
-                return u_as_f_16(infinity);
+                return to_float(infinity);
             }
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_16(softfloat_propagateNaNF16UI(defaultNaNF16UI, uiC));
+        return to_float(softfloat_propagateNaNF16UI(defaultNaNF16UI, uiC));
     }
 
     // a and b are finite
 
     if (max_exp == expC) {
         // result is inf or NaN
-        return u_as_f_16(sigC ? softfloat_propagateNaNF16UI(0, uiC) : uiC);
+        return to_float(sigC ? softfloat_propagateNaNF16UI(0, uiC) : uiC);
     }
 
     // a, b, c are finite
@@ -150,7 +150,7 @@ mulAdd(uint16_t const& uiA,
     if (0 == expA) {
         if (0 == sigA) {
             // a is zero, result is c
-            return u_as_f_16(
+            return to_float(
                        0 == (expC | sigC) && signProd != signC ?
                        packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) :
                        uiC);
@@ -165,7 +165,7 @@ mulAdd(uint16_t const& uiA,
     if (0 == expB) {
         if (0 == sigB) {
             // b is zero, result is c
-            return u_as_f_16(
+            return to_float(
                        0 == (expC | sigC) && signProd != signC ?
                        packToF16UI(softfloat_round_min == softfloat_roundingMode, 0, 0) : uiC);
         }
@@ -241,7 +241,7 @@ mulAdd(uint16_t const& uiA,
         sig32Z = sigProd - sig32C;
 
         if (0 == sig32Z) {
-            return u_as_f_16(packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+            return to_float(packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
         }
 
         if (0 != (sig32Z & 0x80000000)) {
@@ -272,5 +272,5 @@ f16_mulAdd(float16_t const a,
            float16_t const b,
            float16_t const c)
 {
-    return mulAdd(softfloat_mulAdd_madd, f_as_u(a), f_as_u(b), f_as_u(c));
+    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
 }

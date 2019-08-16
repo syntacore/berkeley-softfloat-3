@@ -54,17 +54,17 @@ f128_to_f64(float128_t const a)
 
     if (exp == 0x7FFF) {
         if (frac64 | frac0) {
-            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
+            return to_float(softfloat_commonNaNToF64UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
         }
 
-        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
+        return to_float(packToF64UI(sign, 0x7FF, 0));
     }
 
     uint128 const frac128 = softfloat_shortShiftLeft128(frac64, frac0, 14);
     frac64 = frac128.v64 | (frac128.v0 != 0);
 
     if (!(exp | frac64)) {
-        return u_as_f_64(packToF64UI(sign, 0, 0));
+        return to_float(packToF64UI(sign, 0, 0));
     }
 
     exp -= 0x3C01;

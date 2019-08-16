@@ -47,7 +47,7 @@ f64_sqrt(float64_t const a)
 
     if (expA == 0x7FF) {
         if (sigA) {
-            return u_as_f_64(propagate_NaN(uiA, 0));
+            return to_float(propagate_NaN(uiA, 0));
         }
 
         if (0 == signA) {
@@ -55,7 +55,7 @@ f64_sqrt(float64_t const a)
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_64(defaultNaNF64UI);
+        return to_float(defaultNaNF64UI);
     }
 
     if (signA) {
@@ -64,7 +64,7 @@ f64_sqrt(float64_t const a)
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_64(defaultNaNF64UI);
+        return to_float(defaultNaNF64UI);
     }
 
     if (0 == expA) {

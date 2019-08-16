@@ -47,20 +47,20 @@ f32_to_f64(float32_t const a)
 
     if (0xFF == exp) {
         if (frac) {
-            return u_as_f_64(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(uiA)));
+            return to_float(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(uiA)));
         }
 
-        return u_as_f_64(packToF64UI(sign, 0x7FF, 0));
+        return to_float(packToF64UI(sign, 0x7FF, 0));
     }
 
     if (0 == exp) {
         if (0 == frac) {
-            return u_as_f_64(packToF64UI(sign, 0, 0));
+            return to_float(packToF64UI(sign, 0, 0));
         }
 
         exp16_sig32 const normExpSig(frac);
-        return u_as_f_64(packToF64UI(sign, normExpSig.exp - 1 + 0x380, static_cast<uint64_t>(normExpSig.sig) << 29));
+        return to_float(packToF64UI(sign, normExpSig.exp - 1 + 0x380, static_cast<uint64_t>(normExpSig.sig) << 29));
     }
 
-    return u_as_f_64(packToF64UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
+    return to_float(packToF64UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
 }

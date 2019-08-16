@@ -54,11 +54,11 @@ addMags(uint64_t const uiA,
 
     if (0 == expDiff) {
         if (0 == expA) {
-            return u_as_f_64(uiA + sigB);
+            return to_float(uiA + sigB);
         }
 
         if (0x7FF == expA) {
-            return u_as_f_64(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
+            return to_float(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
@@ -70,7 +70,7 @@ addMags(uint64_t const uiA,
 
     if (expDiff < 0) {
         if (expB == 0x7FF) {
-            return u_as_f_64(sigB ? propagate_NaN(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
+            return to_float(sigB ? propagate_NaN(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
         }
 
         expZ = expB;
@@ -84,7 +84,7 @@ addMags(uint64_t const uiA,
         sigA = softfloat_shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
     } else {
         if (0x7FF == expA) {
-            return u_as_f_64(sigA ? propagate_NaN(uiA, uiB) : uiA);
+            return to_float(sigA ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         expZ = expA;
@@ -123,17 +123,17 @@ subMags(uint64_t const uiA,
     if (0 == expDiff) {
         if (0x7FF == expA) {
             if (0 != sigA || 0 != sigB) {
-                return u_as_f_64(propagate_NaN(uiA, uiB));
+                return to_float(propagate_NaN(uiA, uiB));
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f_64(defaultNaNF64UI);
+            return to_float(defaultNaNF64UI);
         }
 
         int64_t sigDiff = static_cast<int64_t>(sigA - sigB);
 
         if (0 == sigDiff) {
-            return u_as_f_64(packToF64UI(softfloat_round_min == softfloat_get_roundingMode(), 0, 0));
+            return to_float(packToF64UI(softfloat_round_min == softfloat_get_roundingMode(), 0, 0));
         }
 
         if (0 != expA) {
@@ -148,7 +148,7 @@ subMags(uint64_t const uiA,
         int8_t const shiftDist = count_leading_zeros(static_cast<uint64_t>(sigDiff)) - 11;
         int16_t const expZ = expA - shiftDist;
         return
-            u_as_f_64(expZ < 0 ?
+            to_float(expZ < 0 ?
                       packToF64UI(signZ, 0, static_cast<uint64_t>(sigDiff << expA)) :
                       packToF64UI(signZ, expZ, static_cast<uint64_t>(sigDiff << shiftDist)));
     }
@@ -161,7 +161,7 @@ subMags(uint64_t const uiA,
 
         if (0x7FF == expB) {
             return
-                u_as_f_64(0 != sigB_shifted ?
+                to_float(0 != sigB_shifted ?
                           propagate_NaN(uiA, uiB) :
                           packToF64UI(signZ, 0x7FF, 0));
         }
@@ -175,7 +175,7 @@ subMags(uint64_t const uiA,
     }
 
     if (0x7FF == expA) {
-        return u_as_f_64(0 == sigA_shifted ? uiA : propagate_NaN(uiA, uiB));
+        return to_float(0 == sigA_shifted ? uiA : propagate_NaN(uiA, uiB));
     }
 
     return

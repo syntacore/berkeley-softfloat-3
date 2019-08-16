@@ -71,34 +71,34 @@ f32_roundToInt(float32_t const a,
 
         case softfloat_round_near_maxMag:
             if (0x7E == exp) {
-                return u_as_f_32(uiZ | packToF32UI(false, 0x7F, 0));
+                return to_float(uiZ | packToF32UI(false, 0x7F, 0));
             }
 
             break;
 
         case softfloat_round_min:
             if (0 != uiZ) {
-                return u_as_f_32(packToF32UI(true, 0x7F, 0));
+                return to_float(packToF32UI(true, 0x7F, 0));
             }
 
             break;
 
         case softfloat_round_max:
             if (0 == uiZ) {
-                return u_as_f_32(packToF32UI(false, 0x7F, 0));
+                return to_float(packToF32UI(false, 0x7F, 0));
             }
 
             break;
         }
 
-        return u_as_f_32(uiZ);
+        return to_float(uiZ);
     }
 
     if (0x96 <= exp) {
         static constexpr int16_t const max_exp = 0xFF;
         return
             max_exp == exp && get_frac(uiA) ?
-            u_as_f_32(propagate_NaN(uiA, UINT32_C(0))) :
+            to_float(propagate_NaN(uiA, UINT32_C(0))) :
             a;
     }
 
@@ -124,5 +124,5 @@ f32_roundToInt(float32_t const a,
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    return u_as_f_32(uiZ);
+    return to_float(uiZ);
 }

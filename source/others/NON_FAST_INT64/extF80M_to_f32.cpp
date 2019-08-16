@@ -53,7 +53,7 @@ extF80M_to_f32(const extFloat80_t* aPtr)
 
     if (0x7FFF == exp) {
         if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            return u_as_f_32(softfloat_commonNaNToF32UI(softfloat_extF80MToCommonNaN(*aSPtr)));
+            return to_float(softfloat_commonNaNToF32UI(softfloat_extF80MToCommonNaN(*aSPtr)));
         }
 
         return make_signed_inf<float32_t>(sign);

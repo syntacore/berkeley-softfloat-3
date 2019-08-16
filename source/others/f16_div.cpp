@@ -129,38 +129,38 @@ f16_div(float16_t const a,
 
     if (0x1F == expA) {
         if (0 != sigA) {
-            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
         }
 
         if (0x1F != expB) {
-            return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
+            return to_float(packToF16UI(signZ, 0x1F, 0));
         }
 
         if (0 != sigB) {
-            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f_16(defaultNaNF16UI);
+        return to_float(defaultNaNF16UI);
     }
 
     if (0x1F == expB) {
         if (sigB) {
-            return u_as_f_16(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
         }
 
-        return u_as_f_16(packToF16UI(signZ, 0, 0));
+        return to_float(packToF16UI(signZ, 0, 0));
     }
 
     if (0 == expB) {
         if (0 == sigB) {
             if (0 == (expA | sigA)) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f_16(defaultNaNF16UI);
+                return to_float(defaultNaNF16UI);
             }
 
             softfloat_raiseFlags(softfloat_flag_infinite);
-            return u_as_f_16(packToF16UI(signZ, 0x1F, 0));
+            return to_float(packToF16UI(signZ, 0x1F, 0));
         }
 
         exp8_sig16 const normExpSig{sigB};
@@ -170,7 +170,7 @@ f16_div(float16_t const a,
 
     if (0 == expA) {
         if (0 == sigA) {
-            return u_as_f_16(packToF16UI(signZ, 0, 0));
+            return to_float(packToF16UI(signZ, 0, 0));
         }
 
         exp8_sig16 const normExpSig{sigA};

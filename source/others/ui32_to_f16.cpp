@@ -43,7 +43,7 @@ ui32_to_f16(uint32_t a)
     int8_t const shiftDist = count_leading_zeros(a) - 21;
 
     if (0 <= shiftDist) {
-        return u_as_f_16(a ? packToF16UI(false, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : 0u);
+        return to_float(a ? packToF16UI(false, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : uint16_t(0));
     }
 
     int8_t const shiftDist1 = shiftDist + 4;
