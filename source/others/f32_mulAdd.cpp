@@ -46,7 +46,7 @@ mulAdd(Mul_add_operations const op,
        uint32_t const& uiB,
        uint32_t const& uiC)
 {
-    if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB) || softfloat_isNaNF32UI(uiC)) {
+    if (softfloat_isNaNF32UI(uiA) || softfloat_isNaNF32UI(uiB) || softfloat_isSigNaNF32UI(uiC)) {
         return u_as_f_32(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
@@ -68,30 +68,36 @@ mulAdd(Mul_add_operations const op,
             max_exp == expA ? /* a is inf, check b for zero  */ 0 == expB && 0 == sigB :
             /* expB == max_exp b is inf, check a for zero*/ 0 == expA && 0 == sigA;
 
-        /* product is inf or undefined */
-        if (!is_product_undefined) {
-            /* product is inf */
-            float32_t const uiZ = signed_inf_F32(signProd);
-
-            if (expC != max_exp) {
-                /* summand c is finite, return product as result */
-                return uiZ;
-            }
-
-            if (signProd == signC) {
-                /* summands are same sign inf */
-                return uiZ;
-            }
-
-            /* summands are different sign inf, undefined sum */
+        if (is_product_undefined) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
         }
 
-        /* product is undefined or undefined sum */
+        /* product is inf */
+        float32_t const uiZ = signed_inf_F32(signProd);
+
+        if (expC != max_exp) {
+            /* summand c is finite, return product as result */
+            return uiZ;
+        }
+
+        /* if summand is inf, check for same sign */
+        if (softfloat_isNaNF32UI(uiC) && signProd == signC) {
+            /* summands are same sign inf */
+            return uiZ;
+        }
+
+        /* summands are different sign inf or NaN, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
+    if (softfloat_isNaNF32UI(uiC)) {
+        return u_as_f_32(propagate_NaN(defaultNaNF32UI, uiC));
+    }
+
     if (max_exp == expC) {
+        /** if c is infinity while a and b are finite, return c */
         return u_as_f_32(uiC);
     }
 

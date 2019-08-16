@@ -51,7 +51,7 @@ mulAdd(Mul_add_operations op,
        uint64_t uiB,
        uint64_t uiC)
 {
-    if (softfloat_isNaNF64UI(uiC) || softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB)) {
+    if (softfloat_isSigNaNF64UI(uiC) || softfloat_isNaNF64UI(uiA) || softfloat_isNaNF64UI(uiB)) {
         return u_as_f_64(softfloat_propagateNaNF64UI(softfloat_propagateNaNF64UI(uiA, uiB), uiC));
     }
 
@@ -70,25 +70,31 @@ mulAdd(Mul_add_operations op,
         /* a or b is inf, product is inf or undefined, check other operand for zero */
         bool const is_product_undefined = isInf64UI(uiA) ? isZero64UI(uiB) : isZero64UI(uiA);
 
-        if (!is_product_undefined) {
-            /* product is inf */
-            uint64_t const uiZ = packToF64UI(signZ, 0x7FF, 0);
-
-            if (expC != 0x7FF) {
-                /* summand c is finite, return product as result */
-                return u_as_f_64(uiZ);
-            }
-
-            /* summand is inf, check for same sign */
-            if (signZ == signC) {
-                /* summands are same sign inf */
-                return u_as_f_64(uiZ);
-            }
-
-            /* summands are different sign inf, undefined sum */
+        if (is_product_undefined) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
         }
 
+        /* product is inf */
+        uint64_t const uiZ = packToF64UI(signZ, 0x7FF, 0);
+
+        if (expC != 0x7FF) {
+            /* summand c is finite, return product as result */
+            return u_as_f_64(uiZ);
+        }
+
+        /* if summand is inf, check for same sign */
+        if (!softfloat_isNaNF64UI(uiC) && signZ == signC) {
+            /* summands are same sign inf */
+            return u_as_f_64(uiZ);
+        }
+
+        /* summands are different sign inf or NaN, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
+    }
+
+    if (softfloat_isNaNF64UI(uiC)) {
         return u_as_f_64(softfloat_propagateNaNF64UI(defaultNaNF64UI, uiC));
     }
 
