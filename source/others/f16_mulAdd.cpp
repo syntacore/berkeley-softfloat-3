@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace softfloat::internals;
 
 namespace {
-
+/**
+@todo FIX softfloat_flag_invalid even for sNaN uiC
+*/
 static inline float16_t
-softfloat_mulAddF16(Mul_add_operations op,
-                    uint16_t const& uiA,
-                    uint16_t const& uiB,
-                    uint16_t const& uiC)
+mulAdd(uint16_t const& uiA,
+       uint16_t const& uiB,
+       uint16_t const& uiC)
 {
     using namespace softfloat::internals;
 
@@ -56,11 +57,11 @@ softfloat_mulAddF16(Mul_add_operations op,
     int8_t expB = get_exp(uiB);
     uint16_t sigB = get_frac(uiB);
 
-    bool const signC = is_sign(uiC) != (softfloat_mulAdd_subC == op);
+    bool const signC = is_sign(uiC);
     int8_t expC = get_exp(uiC);
     uint16_t sigC = get_frac(uiC);
 
-    bool const signProd = (signA != signB) != (softfloat_mulAdd_subProd == op);
+    bool const signProd = signA != signB;
 
     static constexpr int8_t const max_exp = 0x1F;
 
@@ -271,5 +272,5 @@ f16_mulAdd(float16_t const a,
            float16_t const b,
            float16_t const c)
 {
-    return softfloat_mulAddF16(softfloat_mulAdd_madd, f_as_u(a), f_as_u(b), f_as_u(c));
+    return mulAdd(softfloat_mulAdd_madd, f_as_u(a), f_as_u(b), f_as_u(c));
 }

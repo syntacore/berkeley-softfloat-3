@@ -36,8 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-namespace softfloat {
-namespace internals {
+using namespace softfloat::internals;
 
 namespace {
 
@@ -187,9 +186,6 @@ subMags(uint64_t const uiA,
 }
 
 }  // namespace
-
-}  // namespace internals
-}  // namespace softfloat
 
 float64_t
 f64_add(float64_t a,

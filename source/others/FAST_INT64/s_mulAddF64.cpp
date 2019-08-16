@@ -40,29 +40,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Fast int64_t operations only
 #endif
 
-namespace softfloat {
-namespace internals {
+using namespace softfloat::internals;
 
 namespace {
 
 static inline float64_t
-mulAdd(uint64_t uiA,
-       uint64_t uiB,
-       uint64_t uiC)
+mulAdd(uint64_t const& uiA,
+       uint64_t const& uiB,
+       uint64_t const& uiC)
 {
     if (is_sNaN(uiC) || is_NaN(uiA) || is_NaN(uiB)) {
         return u_as_f_64(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint64_t sigA = get_frac(uiA);
     bool const signB = is_sign(uiB);
-    int16_t expB = get_exp(uiB);
-    uint64_t sigB = get_frac(uiB);
     bool const signC = is_sign(uiC);
     int16_t expC = get_exp(uiC);
-    uint64_t sigC = get_frac(uiC);
     bool signZ = signA != signB;
 
     if (is_inf(uiA) || is_inf(uiB)) {
@@ -103,6 +97,8 @@ mulAdd(uint64_t uiA,
     }
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+    int16_t expA = get_exp(uiA);
+    uint64_t sigA = get_frac(uiA);
 
     if (0 == expA) {
         // subnormal or zero A
@@ -119,6 +115,10 @@ mulAdd(uint64_t uiA,
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
+
+    int16_t expB = get_exp(uiB);
+    uint64_t sigB = get_frac(uiB);
+    uint64_t sigC = get_frac(uiC);
 
     if (0 == expB) {
         if (0 == sigB) {
@@ -236,9 +236,6 @@ mulAdd(uint64_t uiA,
                                     sig128Z_1.v64 | !!(0 != sig128Z_1.v0));
 }
 }
-
-}  // namespace internals
-}  // namespace softfloat
 
 float64_t
 f64_mulAdd(float64_t a,

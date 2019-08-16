@@ -40,8 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error For non-fast int64_t only
 #endif
 
-namespace softfloat {
-namespace internals {
+using namespace softfloat::internals;
 
 namespace {
 
@@ -281,10 +280,7 @@ mulAdd(uint64_t const uiA,
                                  expZ - 1,
                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
 }
-}
-
-}  // namespace internals
-}  // namespace softfloat
+}  // namespace
 
 float64_t
 f64_mulAdd(float64_t a,
