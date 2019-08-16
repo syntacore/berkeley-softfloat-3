@@ -39,14 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 
-namespace {
-static __inline float64_t
-u64_as_f64(uint64_t v)
-{
-    return *(float64_t const*)&v;
-}
-}  // namespace
-
 float64_t
 softfloat_roundPackToF64(bool sign,
                          int16_t exp,
@@ -74,7 +66,7 @@ softfloat_roundPackToF64(bool sign,
             }
         } else if (0x7FD < exp || uint64_t(INT64_MIN) <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            return u64_as_f64(packToF64UI(sign, 0x7FF, 0) - !roundIncrement);
+            return u_as_f_64(packToF64UI(sign, 0x7FF, 0) - !roundIncrement);
         }
     }
 
@@ -83,7 +75,7 @@ softfloat_roundPackToF64(bool sign,
     }
 
     sig = ((sig + roundIncrement) >> 10) & (~static_cast<uint64_t>(0 == (roundBits ^ 0x200) && softfloat_round_near_even == softfloat_roundingMode));
-    return u64_as_f64(packToF64UI(sign, 0 != sig ? exp : 0, sig));
+    return u_as_f_64(packToF64UI(sign, 0 != sig ? exp : 0, sig));
 }
 
 }  // namespace internals
