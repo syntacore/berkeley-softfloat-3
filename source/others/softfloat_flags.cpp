@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 namespace {
-static THREAD_LOCAL uint8_t softfloat_exceptionFlags = 0;
+static thread_local uint8_t softfloat_exceptionFlags = 0;
 }  // namespace
 
 /**

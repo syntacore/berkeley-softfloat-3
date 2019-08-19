@@ -1,7 +1,7 @@
 #include "softfloat/functions.h"
 
 namespace {
-static THREAD_LOCAL softfloat_round_mode softfloat_roundingMode = softfloat_round_near_even;
+static thread_local softfloat_round_mode softfloat_roundingMode = softfloat_round_near_even;
 }
 
 softfloat_round_mode
