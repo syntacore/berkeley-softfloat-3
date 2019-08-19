@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SOFTFLOAT_TYPES_H
-#define SOFTFLOAT_TYPES_H
+#ifndef SOFTFLOAT_TYPES_H_
+#define SOFTFLOAT_TYPES_H_
 
 #include <stdint.h>
 
@@ -164,4 +164,4 @@ extern "C" {
 
 #undef ALIGN
 
-#endif  // SOFTFLOAT_TYPES_H
+#endif  // SOFTFLOAT_TYPES_H_
