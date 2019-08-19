@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <type_traits>
 
+#ifndef THREAD_LOCAL
+#define THREAD_LOCAL thread_local
+#endif
+
 namespace softfloat {
 namespace internals {
 

@@ -39,10 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
-#ifndef THREAD_LOCAL
-#define THREAD_LOCAL
-#endif
-
 #ifdef __GNUC__
 #    define ALIGN(X) __attribute__((aligned(X)))
 #elif defined(_MSC_VER)
