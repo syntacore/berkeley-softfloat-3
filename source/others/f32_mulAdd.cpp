@@ -81,7 +81,7 @@ mulAdd(uint32_t const& uiA,
         }
 
         /* if summand is inf, check for same sign */
-        if (is_NaN(uiC) && signProd == signC) {
+        if (!is_NaN(uiC) && signProd == signC) {
             /* summands are same sign inf */
             return uiZ;
         }
