@@ -40,15 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Fast int64_t operations only
 #endif
 
-using namespace softfloat::internals;
-
-namespace {
-
-static inline float64_t
-mulAdd(uint64_t const& uiA,
-       uint64_t const& uiB,
-       uint64_t const& uiC)
+float64_t
+f64_mulAdd(float64_t a,
+           float64_t b,
+           float64_t c)
 {
+    using namespace softfloat::internals;
+
+    uint64_t const uiA = f_as_u(a);
+    uint64_t const uiB = f_as_u(b);
+    uint64_t const uiC = f_as_u(c);
+
     if (is_sNaN(uiC) || is_NaN(uiA) || is_NaN(uiB)) {
         return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
@@ -56,8 +58,7 @@ mulAdd(uint64_t const& uiA,
     bool const signA = is_sign(uiA);
     bool const signB = is_sign(uiB);
     bool const signC = is_sign(uiC);
-    int16_t expC = get_exp(uiC);
-    bool signZ = signA != signB;
+    bool signProd = signA != signB;
 
     if (is_inf(uiA) || is_inf(uiB)) {
         /* a or b is inf, product is inf or undefined, check other operand for zero */
@@ -68,21 +69,16 @@ mulAdd(uint64_t const& uiA,
             return to_float(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
-        /* product is inf */
-        uint64_t const uiZ = packToF64UI(signZ, 0x7FF, 0);
-
-        if (expC != 0x7FF) {
-            /* summand c is finite, return product as result */
-            return to_float(uiZ);
+        if (is_NaN(uiC)) {
+            return to_float(propagate_NaN(defaultNaNF32UI, uiC));
         }
 
-        /* if summand is inf, check for same sign */
-        if (!is_NaN(uiC) && signZ == signC) {
-            /* summands are same sign inf */
-            return to_float(uiZ);
+        if (is_finite(uiC) || signProd == signC) {
+            /* if summand c is finite or same sign return product as result*/
+            return make_signed_inf<float64_t>(signProd);
         }
 
-        /* summands are different sign inf or NaN, undefined sum */
+        /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
         return to_float(propagate_NaN(defaultNaNF64UI, uiC));
     }
@@ -91,8 +87,7 @@ mulAdd(uint64_t const& uiA,
         return to_float(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
-    if (0x7FF == expC) {
-        // infinity C
+    if (is_inf(uiC)) {
         return to_float(uiC);
     }
 
@@ -103,12 +98,9 @@ mulAdd(uint64_t const& uiA,
     if (0 == expA) {
         // subnormal or zero A
         if (0 == sigA) {
-            // zero A
-            if (is_zero(uiC) && signZ != signC) {
-                return to_float(packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
-            }
-
-            return to_float(uiC);
+            return is_zero(uiC) && signProd != signC ?
+                   make_signed_zero<float64_t>(softfloat_round_min == softfloat_roundingMode) :
+                   to_float(uiC);
         }
 
         exp16_sig64 const normExpSig(sigA);
@@ -118,15 +110,12 @@ mulAdd(uint64_t const& uiA,
 
     int16_t expB = get_exp(uiB);
     uint64_t sigB = get_frac(uiB);
-    uint64_t sigC = get_frac(uiC);
 
     if (0 == expB) {
         if (0 == sigB) {
-            if (0 == (expC | sigC) && signZ != signC) {
-                return to_float(packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
-            }
-
-            return to_float(uiC);
+            return is_zero(uiC) && signProd != signC ?
+                   make_signed_zero<float64_t>(softfloat_round_min == softfloat_roundingMode) :
+                   to_float(uiC);
         }
 
         exp16_sig64 const normExpSig(sigB);
@@ -144,10 +133,14 @@ mulAdd(uint64_t const& uiA,
         sig128Z = softfloat_add128(sig128Z, sig128Z);
     }
 
+    int16_t expC = get_exp(uiC);
+    uint64_t sigC = get_frac(uiC);
+
     if (0 == expC) {
         if (0 == sigC) {
-            --expZ;
-            return softfloat_roundPackToF64(signZ, expZ, sig128Z.v64 << 1 | (sig128Z.v0 != 0));
+            return softfloat_roundPackToF64(signProd,
+                                            expZ - 1,
+                                            sig128Z.v64 << 1 | (sig128Z.v0 != 0));
         }
 
         exp16_sig64 const normExpSig(sigC);
@@ -164,7 +157,7 @@ mulAdd(uint64_t const& uiA,
     if (expDiff < 0) {
         expZ = expC;
 
-        if (signZ == signC || expDiff < -1) {
+        if (signProd == signC || expDiff < -1) {
             sig128Z.v64 = softfloat_shiftRightJam64(sig128Z.v64, static_cast<uint32_t>(-expDiff));
         } else {
             sig128Z = softfloat_shortShiftRightJam128(sig128Z, 1);
@@ -173,7 +166,11 @@ mulAdd(uint64_t const& uiA,
         sig128C = softfloat_shiftRightJam128(sigC, 0u, static_cast<uint32_t>(expDiff));
     }
 
-    if (signZ == signC) {
+    /**
+    @todo check case of 0 == expDiff
+    */
+
+    if (signProd == signC) {
         uint64_t sigZ;
 
         if (expDiff <= 0) {
@@ -190,11 +187,11 @@ mulAdd(uint64_t const& uiA,
             sigZ <<= 1;
         }
 
-        return softfloat_roundPackToF64(signZ, expZ, sigZ);
+        return softfloat_roundPackToF64(signProd, expZ, sigZ);
     }
 
     if (expDiff < 0) {
-        signZ = signC;
+        signProd = signC;
         sig128Z = softfloat_sub128(sigC, 0, sig128Z.v64, sig128Z.v0);
     } else if (0 == expDiff) {
         sig128Z.v64 = sig128Z.v64 - sigC;
@@ -203,12 +200,11 @@ mulAdd(uint64_t const& uiA,
             return to_float(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
         }
 
-        if (sig128Z.v64 & UINT64_C(0x8000000000000000)) {
-            signZ = !signZ;
+        if (0 != (sig128Z.v64 & UINT64_C(0x8000000000000000))) {
+            signProd = !signProd;
             sig128Z = softfloat_sub128(0, 0, sig128Z.v64, sig128Z.v0);
         }
     } else {
-        /* 0 < expDiff */
         assert(0 < expDiff);
         sig128Z = softfloat_sub128(sig128Z, sig128C);
     }
@@ -220,29 +216,18 @@ mulAdd(uint64_t const& uiA,
     }
 
     int16_t const shiftDist = count_leading_zeros(sig128Z.v64) - 1;
-    expZ -= shiftDist;
+    int16_t const expZ_1 = expZ - shiftDist;
 
     if (shiftDist < 0) {
         uint64_t const sigZ = softfloat_shortShiftRightJam64(sig128Z.v64, static_cast<uint8_t>(-shiftDist));
         return
-            softfloat_roundPackToF64(signZ,
-                                     expZ,
+            softfloat_roundPackToF64(signProd,
+                                     expZ_1,
                                      sigZ | !!(0 != sig128Z.v0));
+    } else {
+        uint128 const sig128Z_1 = softfloat_shortShiftLeft128(sig128Z.v64, sig128Z.v0, static_cast<uint8_t>(shiftDist));
+        return softfloat_roundPackToF64(signProd,
+                                        expZ_1,
+                                        sig128Z_1.v64 | !!(0 != sig128Z_1.v0));
     }
-
-    uint128 const sig128Z_1 = softfloat_shortShiftLeft128(sig128Z.v64, sig128Z.v0, static_cast<uint8_t>(shiftDist));
-    return softfloat_roundPackToF64(signZ,
-                                    expZ,
-                                    sig128Z_1.v64 | !!(0 != sig128Z_1.v0));
 }
-}
-
-float64_t
-f64_mulAdd(float64_t a,
-           float64_t b,
-           float64_t c)
-{
-    using namespace softfloat::internals;
-    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
-}
-

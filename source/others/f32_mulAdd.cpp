@@ -36,57 +36,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-using namespace softfloat::internals;
-
-namespace {
-
-static inline float32_t
-mulAdd(uint32_t const& uiA,
-       uint32_t const& uiB,
-       uint32_t const& uiC)
+float32_t
+f32_mulAdd(float32_t const a,
+           float32_t const b,
+           float32_t const c)
 {
+    using namespace softfloat::internals;
+
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
+    uint32_t const uiC = f_as_u(c);
+
     if (is_NaN(uiA) || is_NaN(uiB) || is_sNaN(uiC)) {
         return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint32_t sigA = get_frac(uiA);
     bool const signB = is_sign(uiB);
-    int16_t expB = get_exp(uiB);
-    uint32_t sigB = get_frac(uiB);
     bool const signC = is_sign(uiC);
-    int16_t expC = get_exp(uiC);
-    uint32_t sigC = get_frac(uiC);
     bool const signProd = signA != signB;
 
-    static int16_t const max_exp = 0xFF;
-
-    if (max_exp == expA || max_exp == expB) {
-        bool const is_product_undefined =
-            max_exp == expA ? /* a is inf, check b for zero  */ 0 == expB && 0 == sigB :
-            /* expB == max_exp b is inf, check a for zero*/ 0 == expA && 0 == sigA;
+    if (is_inf(uiA) || is_inf(uiB)) {
+        /* a or b is inf, product is inf or undefined, check other operand for zero */
+        bool const is_product_undefined = is_inf(uiA) ? is_zero(uiB) : is_zero(uiA);
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return to_float(propagate_NaN(defaultNaNF32UI, uiC));
         }
 
-        /* product is inf */
-        float32_t const uiZ = make_signed_inf<float32_t>(signProd);
-
-        if (expC != max_exp) {
-            /* summand c is finite, return product as result */
-            return uiZ;
+        if (is_NaN(uiC)) {
+            return to_float(propagate_NaN(defaultNaNF32UI, uiC));
         }
 
-        /* if summand is inf, check for same sign */
-        if (!is_NaN(uiC) && signProd == signC) {
-            /* summands are same sign inf */
-            return uiZ;
+        if (is_finite(uiC) || signProd == signC) {
+            /* if summand c is finite or same sign return product as result*/
+            return make_signed_inf<float32_t>(signProd);
         }
 
-        /* summands are different sign inf or NaN, undefined sum */
+        /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
         return to_float(propagate_NaN(defaultNaNF32UI, uiC));
     }
@@ -95,24 +83,35 @@ mulAdd(uint32_t const& uiA,
         return to_float(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
-    if (max_exp == expC) {
+    int16_t expC = get_exp(uiC);
+
+    if (is_inf(uiC)) {
         /** if c is infinity while a and b are finite, return c */
         return to_float(uiC);
     }
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+    int16_t expA = get_exp(uiA);
+    uint32_t sigA = get_frac(uiA);
+    uint32_t sigC = get_frac(uiC);
 
     if (0 == expA) {
         /* a is zero or subnormal */
         if (0 == sigA) {
             /* a is zero */
-            return 0 == (expC | sigC) && signProd != signC ? make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) : to_float(uiC);
+            return
+                is_zero(uiC) && signProd != signC ?
+                make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) :
+                to_float(uiC);
         }
 
         exp16_sig32 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
+
+    int16_t expB = get_exp(uiB);
+    uint32_t sigB = get_frac(uiB);
 
     if (0 == expB) {
         /* b is zero or subnormal */
@@ -211,15 +210,5 @@ mulAdd(uint32_t const& uiA,
         static_cast<uint32_t>(sig64Z) << shiftDist;
 
     return softfloat_roundPackToF32(signZ, expZ, sigZ);
-}
-
-}  // namespace
-
-float32_t
-f32_mulAdd(float32_t a,
-           float32_t b,
-           float32_t c)
-{
-    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
 }
 

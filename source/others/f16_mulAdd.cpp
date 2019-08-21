@@ -36,18 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-using namespace softfloat::internals;
-
-namespace {
 /**
 @todo FIX softfloat_flag_invalid even for sNaN uiC
 */
-static inline float16_t
-mulAdd(uint16_t const& uiA,
-       uint16_t const& uiB,
-       uint16_t const& uiC)
+float16_t
+f16_mulAdd(float16_t const a,
+           float16_t const b,
+           float16_t const c)
 {
     using namespace softfloat::internals;
+
+    uint16_t const uiA = f_as_u(a);
+    uint16_t const uiB = f_as_u(b);
+    uint16_t const uiC = f_as_u(c);
 
     bool const signA = is_sign(uiA);
     int8_t expA = get_exp(uiA);
@@ -65,17 +66,14 @@ mulAdd(uint16_t const& uiA,
 
     static constexpr int8_t const max_exp = 0x1F;
 
-    if (max_exp == expA) {
+    if (!is_finite(uiA)) {
         // a is inf or NaN
         if (0 != sigA || (max_exp == expB && 0 != sigB)) {
             // a is NaN or b is NaN
             return to_float(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
         }
 
-        // a is inf
-        bool const is_zero_b = 0 == expB || 0 == sigB;
-
-        if (!is_zero_b) {
+        if (!is_zero(uiB)) {
             uint16_t const infinity = packToF16UI(signProd, max_exp, 0);
 
             if (max_exp != expC) {
@@ -259,18 +257,8 @@ mulAdd(uint16_t const& uiA,
     return softfloat_roundPackToF16(signZ,
                                     expZ - shiftDist,
                                     static_cast<uint16_t>(
-                                    shiftDist_1 < 0 ?
-                                    sig32Z >> -shiftDist_1 | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist_1 & 31))) :
-                                    sig32Z << shiftDist_1)
-    );
-}
-
-}  // namespace
-
-float16_t
-f16_mulAdd(float16_t const a,
-           float16_t const b,
-           float16_t const c)
-{
-    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
+                                        shiftDist_1 < 0 ?
+                                        sig32Z >> -shiftDist_1 | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist_1 & 31))) :
+                                        sig32Z << shiftDist_1)
+                                   );
 }

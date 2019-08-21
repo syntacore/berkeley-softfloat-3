@@ -40,27 +40,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error For non-fast int64_t only
 #endif
 
-using namespace softfloat::internals;
-
-namespace {
-
-static inline float64_t
-mulAdd(uint64_t const uiA,
-       uint64_t const uiB,
-       uint64_t const uiC)
+float64_t
+f64_mulAdd(float64_t const a,
+           float64_t const b,
+           float64_t const c)
 {
+    using namespace softfloat::internals;
+
+    uint64_t const uiA = f_as_u(a);
+    uint64_t const uiB = f_as_u(b);
+    uint64_t const uiC = f_as_u(c);
+
     if (is_sNaN(uiC) || is_NaN(uiA) || is_NaN(uiB)) {
         return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
-    uint64_t sigA = get_frac(uiA);
     bool const signB = is_sign(uiB);
-    uint64_t sigB = get_frac(uiB);
     bool const signC = is_sign(uiC);
-    int16_t expC = get_exp(uiC);
-    uint64_t sigC = get_frac(uiC);
-    bool signZ = signA != signB;
+    bool signProd = signA != signB;
 
     if (is_inf(uiA) || is_inf(uiB)) {
         /* a or b is inf, product is inf or undefined, check other operand for zero */
@@ -71,21 +69,16 @@ mulAdd(uint64_t const uiA,
             return to_float(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
-        /* product is inf */
-        uint64_t const uiZ = packToF64UI(signZ, 0x7FF, 0);
-
-        if (expC != 0x7FF) {
-            /* summand c is finite, return product as result */
-            return to_float(uiZ);
+        if (is_NaN(uiC)) {
+            return to_float(propagate_NaN(defaultNaNF32UI, uiC));
         }
 
-        /* if summand is inf, check for same sign */
-        if (!is_NaN(uiC) && signZ == signC) {
-            /* summands are same sign inf */
-            return to_float(uiZ);
+        if (is_finite(uiC) || signProd == signC) {
+            /* if summand c is finite or same sign return product as result*/
+            return make_signed_inf<float64_t>(signProd);
         }
 
-        /* summands are different sign inf or NaN, undefined sum */
+        /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
         return to_float(propagate_NaN(defaultNaNF64UI, uiC));
     }
@@ -94,18 +87,19 @@ mulAdd(uint64_t const uiA,
         return to_float(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
-    if (expC == 0x7FF) {
-        /** if c is infinity while a and b are finite, return c */
+    if (is_inf(uiC)) {
         return to_float(uiC);
     }
 
-    int16_t expA = get_exp(uiA);
-
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+    int16_t expA = get_exp(uiA);
+    uint64_t sigA = get_frac(uiA);
 
     if (0 == expA) {
-        if (!sigA) {
-            return to_float(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+        if (0 == sigA) {
+            return is_zero(uiC) && signProd != signC ?
+                   make_signed_zero<float64_t>(softfloat_round_min == softfloat_roundingMode) :
+                   to_float(uiC);
         }
 
         exp16_sig64 const normExpSig(sigA);
@@ -114,10 +108,13 @@ mulAdd(uint64_t const uiA,
     }
 
     int16_t expB = get_exp(uiB);
+    uint64_t sigB = get_frac(uiB);
 
-    if (!expB) {
-        if (!sigB) {
-            return to_float(0 == (expC | sigC) && signZ != signC ? packToF64UI(softfloat_roundingMode == softfloat_round_min, 0, 0) : uiC);
+    if (0 == expB) {
+        if (0 == sigB) {
+            return is_zero(uiC) && signProd != signC ?
+                   make_signed_zero<float64_t>(softfloat_round_min == softfloat_roundingMode) :
+                   to_float(uiC);
         }
 
         exp16_sig64 const normExpSig(sigB);
@@ -128,6 +125,7 @@ mulAdd(uint64_t const uiA,
     int16_t expZ = expA + expB - 0x3FE;
     sigA = (sigA | UINT64_C(0x0010000000000000)) << 10;
     sigB = (sigB | UINT64_C(0x0010000000000000)) << 11;
+
     uint32_t sig128Z[4];
     softfloat_mul64To128M(sigA, sigB, sig128Z);
     uint64_t sigZ = static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
@@ -138,6 +136,9 @@ mulAdd(uint64_t const uiA,
         shiftDist = -1;
     }
 
+    int16_t expC = get_exp(uiC);
+    uint64_t sigC = get_frac(uiC);
+
     if (0 == expC) {
         if (0 == sigC) {
             if (0 != shiftDist) {
@@ -145,7 +146,8 @@ mulAdd(uint64_t const uiA,
             }
 
             return
-                softfloat_roundPackToF64(signZ, expZ - 1,
+                softfloat_roundPackToF64(signProd,
+                                         expZ - 1,
                                          sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
         }
 
@@ -162,16 +164,14 @@ mulAdd(uint64_t const uiA,
     if (expDiff < 0) {
         expZ = expC;
 
-        if ((signZ == signC) || (expDiff < -1)) {
+        if (signProd == signC || expDiff < -1) {
             shiftDist -= expDiff;
 
             if (shiftDist) {
                 sigZ = softfloat_shiftRightJam64(sigZ, static_cast<uint32_t>(shiftDist));
             }
-        } else {
-            if (!shiftDist) {
-                softfloat_shortShiftRight128M(sig128Z, 1, sig128Z);
-            }
+        } else if (0 == shiftDist) {
+            softfloat_shortShiftRight128M(sig128Z, 1, sig128Z);
         }
     } else {
         if (shiftDist) {
@@ -189,7 +189,7 @@ mulAdd(uint64_t const uiA,
         }
     }
 
-    if (signZ == signC) {
+    if (signProd == signC) {
         if (expDiff <= 0) {
             sigZ += sigC;
         } else {
@@ -205,7 +205,7 @@ mulAdd(uint64_t const uiA,
         }
     } else {
         if (expDiff < 0) {
-            signZ = signC;
+            signProd = signC;
 
             if (expDiff < -1) {
                 sigZ = sigC - sigZ;
@@ -219,7 +219,7 @@ mulAdd(uint64_t const uiA,
                     sigZ <<= 1;
                 }
 
-                return softfloat_roundPackToF64(signZ, expZ - 1, sigZ);
+                return softfloat_roundPackToF64(signProd, expZ - 1, sigZ);
             }
 
             sig128C[indexWord(4, 3)] = sigC >> 32;
@@ -238,7 +238,7 @@ mulAdd(uint64_t const uiA,
             sig128Z[indexWord(4, 2)] = static_cast<uint32_t>(sigZ);
 
             if (sigZ & INT64_MIN) {
-                signZ = !signZ;
+                signProd = !signProd;
                 softfloat_negX128M(sig128Z);
             }
         } else {
@@ -253,7 +253,7 @@ mulAdd(uint64_t const uiA,
                 }
 
                 return
-                    softfloat_roundPackToF64(signZ, expZ - 1,
+                    softfloat_roundPackToF64(signProd, expZ - 1,
                                              sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
             }
         }
@@ -276,17 +276,7 @@ mulAdd(uint64_t const uiA,
     }
 
     return
-        softfloat_roundPackToF64(signZ,
+        softfloat_roundPackToF64(signProd,
                                  expZ - 1,
                                  sigZ | (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]));
-}
-}  // namespace
-
-float64_t
-f64_mulAdd(float64_t a,
-           float64_t b,
-           float64_t c)
-{
-    using namespace softfloat::internals;
-    return mulAdd(f_as_u(a), f_as_u(b), f_as_u(c));
 }
