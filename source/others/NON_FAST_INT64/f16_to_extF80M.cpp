@@ -53,7 +53,7 @@ f16_to_extF80M(float16_t const a,
 
     if (!is_finite(a)) {
         if (is_NaN(a)) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f16UIToCommonNaN(f_as_u(a)));
+            *zSPtr = extFloat80M(softfloat_f16UIToCommonNaN(f_as_u(a)));
             return;
         }
 

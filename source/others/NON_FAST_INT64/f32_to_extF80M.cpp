@@ -51,7 +51,7 @@ f32_to_extF80M(float32_t a,
     uint32_t frac = get_frac(a);
 
     if (is_NaN(a)) {
-        *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f32UIToCommonNaN(f_as_u(a)));
+        *zSPtr = extFloat80M(softfloat_f32UIToCommonNaN(f_as_u(a)));
         return;
     }
 

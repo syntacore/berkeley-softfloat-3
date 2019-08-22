@@ -110,6 +110,14 @@ struct commonNaN
         , v0(a_v0)
     {}
 
+    explicit operator extFloat80M()const
+    {
+        extFloat80M z;
+        z.signExp = defaultNaNExtF80UI64;
+        z.signif = defaultNaNExtF80UI0;
+        return z;
+    }
+
 private:
     bool sign;
     uint64_t v64;
@@ -452,23 +460,6 @@ softfloat_f128MToCommonNaN(uint32_t const* aWPtr)
     }
 
     return commonNaN{false, 0, 0};
-}
-
-/**
-Converts the common NaN pointed to by `aPtr' into an 80-bit extended
-floating-point NaN, and stores this NaN at the location pointed to by
-`zSPtr'.
-*/
-/**
-@bug use extFloat80_t
-*/
-inline extFloat80M
-softfloat_commonNaNToExtF80M(commonNaN const&)
-{
-    extFloat80M z;
-    z.signExp = defaultNaNExtF80UI64;
-    z.signif = defaultNaNExtF80UI0;
-    return z;
 }
 
 /**

@@ -51,7 +51,7 @@ f64_to_extF80M(float64_t a,
     uint64_t frac = get_frac(a);
 
     if (is_NaN(a)) {
-        *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(f_as_u(a)));
+        *zSPtr = extFloat80M(softfloat_f64UIToCommonNaN(f_as_u(a)));
         return;
     }
 
