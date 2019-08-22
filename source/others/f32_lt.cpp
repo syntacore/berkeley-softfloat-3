@@ -41,16 +41,16 @@ f32_lt(float32_t const a,
        float32_t const b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    uint32_t const uiB = f_as_u(b);
 
-    if (is_NaN(uiA) || is_NaN(uiB)) {
+    if (is_NaN(a) || is_NaN(b)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
-    bool const signA = is_sign(uiA);
-    bool const signB = is_sign(uiB);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
+    uint32_t const uiA = f_as_u(a);
+    uint32_t const uiB = f_as_u(b);
     return
         signA != signB ?
         signA && 0 != static_cast<uint32_t>((uiA | uiB) << 1) :

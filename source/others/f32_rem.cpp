@@ -41,22 +41,20 @@ f32_rem(float32_t const a,
         float32_t const b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    uint32_t const uiB = f_as_u(b);
 
-    if (is_NaN(uiA) || is_NaN(uiB)) {
-        return u_as_f(propagate_NaN(uiA, uiB));
+    if (is_NaN(a) || is_NaN(b)) {
+        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
     }
 
-    bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint32_t sigA = get_frac(uiA);
-    int16_t expB = get_exp(uiB);
-    uint32_t sigB = get_frac(uiB);
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint32_t sigA = get_frac(a);
+    int16_t expB = get_exp(b);
+    uint32_t sigB = get_frac(b);
 
     if (0xFF == expA) {
         if (0 != sigA || (0xFF == expB && 0 != sigB)) {
-            return u_as_f(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
         /**
@@ -68,7 +66,7 @@ f32_rem(float32_t const a,
 
     if (expB == 0xFF) {
         if (sigB) {
-            return u_as_f(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
         /**
@@ -79,7 +77,9 @@ f32_rem(float32_t const a,
 
     if (0 == expB) {
         if (0 == sigB) {
-            /** @todo check */
+            /** 
+            @todo check
+            */
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f(defaultNaNF32UI);
         }

@@ -41,26 +41,22 @@ f16_mul(float16_t a,
         float16_t b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int8_t expA = get_exp(uiA);
-    uint16_t sigA = get_frac(uiA);
-    uint16_t const uiB = f_as_u(b);
-    bool const signB = is_sign(uiB);
-    int8_t expB = get_exp(uiB);
-    uint16_t sigB = get_frac(uiB);
+    bool const signA = is_sign(a);
+    int8_t expA = get_exp(a);
+    uint16_t sigA = get_frac(a);
+    bool const signB = is_sign(b);
+    int8_t expB = get_exp(b);
+    uint16_t sigB = get_frac(b);
     bool const signZ = signA != signB;
 
     static constexpr int8_t const max_exp = 0x1F;
 
-    if (expA == max_exp) {
-        if (0 != sigA || (expB == max_exp && sigB)) {
-            return u_as_f(propagate_NaN(uiA, uiB));
+    if (!is_finite(a)) {
+        if (is_NaN(a) || is_NaN(b)) {
+            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
-        uint16_t const magBits = static_cast<uint16_t>(expB | sigB);
-
-        if (0 == magBits) {
+        if (!is_zero(b)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f(defaultNaNF16UI);
         }
@@ -70,12 +66,10 @@ f16_mul(float16_t a,
 
     if (expB == max_exp) {
         if (0 != sigB) {
-            return u_as_f(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
-        uint16_t const magBits = static_cast<uint16_t>(expA | sigA);
-
-        if (0 == magBits) {
+        if (!is_zero(a)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f(defaultNaNF16UI);
         }
@@ -84,7 +78,7 @@ f16_mul(float16_t a,
     }
 
     if (0 == expA) {
-        if (0 == sigA) {
+        if (is_zero(a)) {
             return u_as_f(packToF16UI(signZ, 0, 0));
         }
 
@@ -94,7 +88,7 @@ f16_mul(float16_t a,
     }
 
     if (0 == expB) {
-        if (0 == sigB) {
+        if (is_zero(b)) {
             return u_as_f(packToF16UI(signZ, 0, 0));
         }
 

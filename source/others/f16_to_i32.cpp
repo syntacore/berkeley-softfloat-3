@@ -42,12 +42,11 @@ f16_to_i32(float16_t a,
            bool exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int8_t const exp = get_exp(uiA);
-    uint16_t const frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int8_t const exp = get_exp(a);
+    uint16_t const frac = get_frac(a);
 
-    if (exp == 0x1F) {
+    if (!is_finite(a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             frac ? i32_fromNaN :
@@ -56,7 +55,7 @@ f16_to_i32(float16_t a,
 
     int32_t sig32 = frac;
 
-    if (exp) {
+    if (0 != exp) {
         sig32 |= 0x0400;
         {
             int8_t const shiftDist = exp - 0x19;

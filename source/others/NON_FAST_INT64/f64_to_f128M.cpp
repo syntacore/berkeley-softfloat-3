@@ -46,33 +46,32 @@ f64_to_f128M(float64_t a,
 {
     using namespace softfloat::internals;
     uint32_t* zWPtr = (uint32_t*)zPtr;
-    uint64_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t exp = get_exp(uiA);
-    uint64_t frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int16_t exp = get_exp(a);
+    uint64_t frac = get_frac(a);
 
     zWPtr[indexWord(4, 0)] = 0;
 
-    if (0x7FF == exp) {
-        if (frac) {
-            softfloat_commonNaNToF128M(softfloat_f64UIToCommonNaN(uiA), zWPtr);
-            return;
-        }
+    if (is_NaN(a)) {
+        softfloat_commonNaNToF128M(softfloat_f64UIToCommonNaN(f_as_u(a)), zWPtr);
+        return;
+    }
 
+    if (is_inf(a)) {
         zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
         zWPtr[indexWord(4, 2)] = 0;
         zWPtr[indexWord(4, 1)] = 0;
         return;
     }
 
-    if (!exp) {
-        if (!frac) {
-            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
-            zWPtr[indexWord(4, 2)] = 0;
-            zWPtr[indexWord(4, 1)] = 0;
-            return;
-        }
+    if (is_zero(a)) {
+        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
+        zWPtr[indexWord(4, 2)] = 0;
+        zWPtr[indexWord(4, 1)] = 0;
+        return;
+    }
 
+    if (0 == exp) {
         exp16_sig64 const normExpSig(frac);
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;

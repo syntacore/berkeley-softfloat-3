@@ -185,16 +185,14 @@ f32_add(float32_t const a,
         float32_t const b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    uint32_t const uiB = f_as_u(b);
 
-    if (is_NaN(uiA) || is_NaN(uiB)) {
+    if (is_NaN(a) || is_NaN(b)) {
         /** propagate NaN if operand(s) is NaN*/
-        return u_as_f(propagate_NaN(uiA, uiB));
+        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
     }
 
     return
-        (is_sign(uiA) == is_sign(uiB) ? addMags : subMags)(uiA, uiB);
+        (is_sign(a) == is_sign(b) ? addMags : subMags)(f_as_u(a), f_as_u(b));
 }
 
 float32_t
@@ -203,13 +201,10 @@ f32_sub(float32_t const a,
 {
     using namespace softfloat::internals;
 
-    uint32_t const uiA = f_as_u(a);
-    uint32_t const uiB = f_as_u(b);
-
-    if (is_NaN(uiA) || is_NaN(uiB)) {
+    if (is_NaN(a) || is_NaN(b)) {
         /** propagate NaN if operand(s) is NaN*/
-        return u_as_f(propagate_NaN(uiA, uiB));
+        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
     }
 
-    return (is_sign(uiA) == is_sign(uiB) ? subMags : addMags)(uiA, uiB);
+    return (is_sign(a) == is_sign(b) ? subMags : addMags)(f_as_u(a), f_as_u(b));
 }

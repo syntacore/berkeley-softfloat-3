@@ -46,29 +46,28 @@ f64_to_extF80M(float64_t a,
 {
     using namespace softfloat::internals;
     extFloat80M* zSPtr = zPtr;
-    uint64_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t exp = get_exp(uiA);
-    uint64_t frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int16_t exp = get_exp(a);
+    uint64_t frac = get_frac(a);
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(uiA));
-            return;
-        }
+    if (is_NaN(a)) {
+        *zSPtr = softfloat_commonNaNToExtF80M(softfloat_f64UIToCommonNaN(f_as_u(a)));
+        return;
+    }
 
+    if (is_inf(a)) {
         zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
         zSPtr->signif = UINT64_C(0x8000000000000000);
         return;
     }
 
-    if (!exp) {
-        if (!frac) {
-            zSPtr->signExp = packToExtF80UI64(sign, 0);
-            zSPtr->signif = 0;
-            return;
-        }
+    if (is_zero(a)) {
+        zSPtr->signExp = packToExtF80UI64(sign, 0);
+        zSPtr->signif = 0;
+        return;
+    }
 
+    if (0 == exp) {
         exp16_sig64 const normExpSig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;

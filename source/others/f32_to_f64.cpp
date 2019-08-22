@@ -40,21 +40,21 @@ float64_t
 f32_to_f64(float32_t const a)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t const exp = get_exp(uiA);
-    uint32_t const frac = get_frac(uiA);
+    bool const sign = is_sign(a);
 
-    if (0xFF == exp) {
-        if (frac) {
-            return u_as_f(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(uiA)));
+    if (!is_finite(a)) {
+        if (is_NaN(a)) {
+            return u_as_f(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(f_as_u(a))));
         }
 
         return u_as_f(packToF64UI(sign, 0x7FF, 0));
     }
 
+    int16_t const exp = get_exp(a);
+    uint32_t const frac = get_frac(a);
+
     if (0 == exp) {
-        if (0 == frac) {
+        if (is_zero(a)) {
             return u_as_f(packToF64UI(sign, 0, 0));
         }
 

@@ -41,20 +41,18 @@ f32_mul(float32_t a,
         float32_t b)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    uint32_t const uiB = f_as_u(b);
 
-    if (is_NaN(uiA) || is_NaN(uiB)) {
-        return u_as_f(propagate_NaN(uiA, uiB));
+    if (is_NaN(a) || is_NaN(b)) {
+        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
     }
 
-    bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint32_t sigA = get_frac(uiA);
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint32_t sigA = get_frac(a);
 
-    bool const signB = is_sign(uiB);
-    int16_t expB = get_exp(uiB);
-    uint32_t sigB = get_frac(uiB);
+    bool const signB = is_sign(b);
+    int16_t expB = get_exp(b);
+    uint32_t sigB = get_frac(b);
 
     bool const signZ = signA != signB;
 

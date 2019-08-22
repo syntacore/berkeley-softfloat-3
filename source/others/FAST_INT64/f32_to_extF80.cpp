@@ -45,14 +45,13 @@ f32_to_extF80(float32_t const a)
 {
     using namespace softfloat::internals;
 
-    uint32_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t exp = get_exp(uiA);
-    uint32_t frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int16_t exp = get_exp(a);
+    uint32_t frac = get_frac(a);
 
-    if (0xFF == exp) {
-        if (frac) {
-            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(uiA));
+    if (!is_finite(a)) {
+        if (is_NaN(a)) {
+            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f32UIToCommonNaN(f_as_u(a)));
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
@@ -65,14 +64,14 @@ f32_to_extF80(float32_t const a)
         }
     }
 
-    if (0 == exp) {
-        if (0 == frac) {
-            extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, 0);
-            uZ.signif = 0;
-            return uZ;
-        }
+    if (is_zero(a)) {
+        extFloat80_t uZ;
+        uZ.signExp = packToExtF80UI64(sign, 0);
+        uZ.signif = 0;
+        return uZ;
+    }
 
+    if (0 == exp) {
         exp16_sig32 const normExpSig(frac);
         exp = normExpSig.exp;
         frac = normExpSig.sig;

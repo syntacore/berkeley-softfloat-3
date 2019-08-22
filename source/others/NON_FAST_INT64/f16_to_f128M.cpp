@@ -46,14 +46,13 @@ f16_to_f128M(float16_t a,
 {
     using namespace softfloat::internals;
     uint32_t* const zWPtr = (uint32_t*)zPtr;
-    uint16_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int8_t const exp = get_exp(uiA);
-    uint16_t const frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int8_t const exp = get_exp(a);
+    uint16_t const frac = get_frac(a);
 
-    if (0x1F == exp) {
-        if (frac) {
-            softfloat_commonNaNToF128M(softfloat_f16UIToCommonNaN(uiA), zWPtr);
+    if (!is_finite(a)) {
+        if (!is_NaN(a)) {
+            softfloat_commonNaNToF128M(softfloat_f16UIToCommonNaN(f_as_u(a)), zWPtr);
             return;
         }
 

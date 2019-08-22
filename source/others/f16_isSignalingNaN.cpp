@@ -40,5 +40,5 @@ bool
 f16_isSignalingNaN(float16_t a)
 {
     using namespace softfloat::internals;
-    return is_sNaN(f_as_u(a));
+    return is_sNaN(a);
 }

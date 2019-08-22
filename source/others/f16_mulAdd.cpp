@@ -36,9 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-/**
-@todo FIX softfloat_flag_invalid even for sNaN uiC
-*/
 float16_t
 f16_mulAdd(float16_t const a,
            float16_t const b,
@@ -46,63 +43,59 @@ f16_mulAdd(float16_t const a,
 {
     using namespace softfloat::internals;
 
-    uint16_t const uiA = f_as_u(a);
-    uint16_t const uiB = f_as_u(b);
-    uint16_t const uiC = f_as_u(c);
-
-    if (is_NaN(uiA) || is_NaN(uiB) || is_sNaN(uiC)) {
-        return u_as_f(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
+    if (is_NaN(a) || is_NaN(b) || is_sNaN(c)) {
+        return u_as_f(propagate_NaN(propagate_NaN(f_as_u(a), f_as_u(b)), f_as_u(c)));
     }
 
-    bool const signA = is_sign(uiA);
-    bool const signB = is_sign(uiB);
-    bool const signC = is_sign(uiC);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
+    bool const signC = is_sign(c);
     bool const signProd = signA != signB;
 
-    if (is_inf(uiA) || is_inf(uiB)) {
+    if (is_inf(a) || is_inf(b)) {
         /* a or b is inf, product is inf or undefined, check other operand for zero */
-        bool const is_product_undefined = is_inf(uiA) ? is_zero(uiB) : is_zero(uiA);
+        bool const is_product_undefined = is_inf(a) ? is_zero(b) : is_zero(a);
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
+            return u_as_f(propagate_NaN(defaultNaNF16UI, f_as_u(c)));
         }
 
-        if (is_NaN(uiC)) {
-            return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
+        if (is_NaN(c)) {
+            return u_as_f(propagate_NaN(defaultNaNF16UI, f_as_u(c)));
         }
 
-        if (is_finite(uiC) || signProd == signC) {
+        if (is_finite(c) || signProd == signC) {
             /* if summand c is finite or same sign return product as result*/
             return make_signed_inf<float16_t>(signProd);
         }
 
         /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
+        return u_as_f(propagate_NaN(defaultNaNF16UI, f_as_u(c)));
     }
 
-    if (is_NaN(uiC)) {
-        return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
+    if (is_NaN(c)) {
+        return u_as_f(propagate_NaN(defaultNaNF16UI, f_as_u(c)));
     }
 
-    if (is_inf(uiC)) {
+    if (is_inf(c)) {
         /** if c is infinity while a and b are finite, return c */
-        return u_as_f(uiC);
+        return c;
     }
 
     // a, b, c are finite
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-    int8_t expA = get_exp(uiA);
-    uint16_t sigA = get_frac(uiA);
+    int8_t expA = get_exp(a);
+    uint16_t sigA = get_frac(a);
 
     if (0 == expA) {
         /* a is zero or subnormal */
         if (0 == sigA) {
             // a is zero, result is c
-            return is_zero(uiC) && signProd != signC ?
+            return is_zero(c) && signProd != signC ?
                 make_signed_zero<float16_t>(softfloat_round_min == softfloat_roundingMode) :
-                u_as_f(uiC);
+                c;
         }
 
         // a is subnormal
@@ -111,15 +104,15 @@ f16_mulAdd(float16_t const a,
         sigA = normExpSig.sig;
     }
 
-    int8_t expB = get_exp(uiB);
-    uint16_t sigB = get_frac(uiB);
+    int8_t expB = get_exp(b);
+    uint16_t sigB = get_frac(b);
 
     if (0 == expB) {
         if (0 == sigB) {
             // b is zero, result is c
-            return is_zero(uiC) && signProd != signC ?
+            return is_zero(c) && signProd != signC ?
                 make_signed_zero<float16_t>(softfloat_round_min == softfloat_roundingMode) :
-                u_as_f(uiC);
+                c;
         }
 
         // b is subnormal
@@ -138,8 +131,8 @@ f16_mulAdd(float16_t const a,
         sigProd <<= 1;
     }
 
-    int8_t expC = get_exp(uiC);
-    uint16_t sigC = get_frac(uiC);
+    int8_t expC = get_exp(c);
+    uint16_t sigC = get_frac(c);
 
     if (0 == expC) {
         if (0 == sigC) {

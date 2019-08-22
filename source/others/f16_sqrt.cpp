@@ -40,14 +40,13 @@ float16_t
 f16_sqrt(float16_t a)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int8_t expA = get_exp(uiA);
-    uint16_t sigA = get_frac(uiA);
+    bool const signA = is_sign(a);
+    int8_t expA = get_exp(a);
+    uint16_t sigA = get_frac(a);
 
-    if (expA == 0x1F) {
-        if (sigA) {
-            return u_as_f(propagate_NaN(uiA, 0));
+    if (!is_finite(a)) {
+        if (is_NaN(a)) {
+            return u_as_f(propagate_NaN(f_as_u(a), 0));
         }
 
         if (!signA) {
@@ -59,7 +58,7 @@ f16_sqrt(float16_t a)
     }
 
     if (signA) {
-        if (!(expA | sigA)) {
+        if (is_zero(a)) {
             return a;
         }
 
@@ -67,8 +66,8 @@ f16_sqrt(float16_t a)
         return u_as_f(defaultNaNF16UI);
     }
 
-    if (!expA) {
-        if (!sigA) {
+    if (0 == expA) {
+        if (is_zero(a)) {
             return a;
         }
 
@@ -105,7 +104,7 @@ f16_sqrt(float16_t a)
 
     ++sigZ;
 
-    if (!(sigZ & 7)) {
+    if (0 == (sigZ & 7)) {
         uint16_t const shiftedSigZ = static_cast<uint16_t>(sigZ >> 1);
         uint16_t const negRem = static_cast<uint16_t>(shiftedSigZ * shiftedSigZ);
         sigZ &= ~1;

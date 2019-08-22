@@ -44,28 +44,27 @@ float128_t
 f64_to_f128(float64_t a)
 {
     using namespace softfloat::internals;
-    uint128 uiZ;
-    uint64_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t exp = get_exp(uiA);
-    uint64_t frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int16_t exp = get_exp(a);
+    uint64_t frac = get_frac(a);
 
-    if (exp == 0x7FF) {
-        if (frac) {
-            uiZ = softfloat_commonNaNToF128UI(softfloat_f64UIToCommonNaN(uiA));
+    uint128 uiZ;
+
+    if (!is_finite(a)) {
+        if (is_NaN(a)) {
+            return static_cast<float128_t>(softfloat_commonNaNToF128UI(softfloat_f64UIToCommonNaN(f_as_u(a))));
         } else {
             uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
             uiZ.v0 = 0;
+            return static_cast<float128_t>(uiZ);
         }
-
-        return static_cast<float128_t>(uiZ);
     }
 
-    if (!exp) {
-        if (!frac) {
-            return static_cast<float128_t>(uint128{packToF128UI64(sign, 0, 0), 0u});
-        }
+    if (is_zero(a)) {
+        return static_cast<float128_t>(uint128{packToF128UI64(sign, 0, 0), 0u});
+    }
 
+    if (0 == exp) {
         exp16_sig64 const normExpSig(frac);
         exp = normExpSig.exp - 1;
         frac = normExpSig.sig;
@@ -74,4 +73,3 @@ f64_to_f128(float64_t a)
     uint128 const frac128 = softfloat_shortShiftLeft128(0, frac, 60);
     return static_cast<float128_t>(uint128{packToF128UI64(sign, exp + 0x3C00, frac128.v64),frac128.v0});
 }
-

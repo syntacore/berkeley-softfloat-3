@@ -41,16 +41,16 @@ f16_eq(float16_t const a,
        float16_t const b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u(a);
-    uint16_t const uiB = f_as_u(b);
 
-    if (is_NaN(uiA) || is_NaN(uiB)) {
-        if (is_sNaN(uiA) || is_sNaN(uiB)) {
+    if (is_NaN(a) || is_NaN(b)) {
+        if (is_sNaN(a) || is_sNaN(b)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 
         return false;
     }
 
+    uint16_t const uiA = f_as_u(a);
+    uint16_t const uiB = f_as_u(b);
     return uiA == uiB || 0 == static_cast<uint16_t>((uiA | uiB) << 1);
 }

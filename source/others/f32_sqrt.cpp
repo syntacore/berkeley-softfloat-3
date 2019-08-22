@@ -41,14 +41,13 @@ float32_t
 f32_sqrt(float32_t a)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint32_t sigA = get_frac(uiA);
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint32_t sigA = get_frac(a);
 
-    if (0xFF == expA) {
-        if (0 != sigA) {
-            return u_as_f(propagate_NaN(uiA, UINT32_C(0)));
+    if (!is_finite(a)) {
+        if (is_NaN(a)) {
+            return u_as_f(propagate_NaN(f_as_u(a), UINT32_C(0)));
         }
 
         if (!signA) {
@@ -60,7 +59,7 @@ f32_sqrt(float32_t a)
     }
 
     if (signA) {
-        if (0 == (expA | sigA)) {
+        if (is_zero(a)) {
             return a;
         }
 
@@ -69,7 +68,7 @@ f32_sqrt(float32_t a)
     }
 
     if (0 == expA) {
-        if (0 == sigA) {
+        if (is_zero(a)) {
             return a;
         }
 
@@ -83,7 +82,7 @@ f32_sqrt(float32_t a)
     sigA = (sigA | 0x00800000) << 8;
     uint32_t sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sigA)) >> 32;
 
-    if (expA) {
+    if (0 != expA) {
         sigZ >>= 1;
     }
 

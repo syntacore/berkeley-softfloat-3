@@ -72,49 +72,45 @@ float64_t
 f64_rem(float64_t const a,
         float64_t const b)
 {
-    uint64_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint64_t sigA = get_frac(uiA);
-    uint64_t const uiB = f_as_u(b);
-    int16_t expB = get_exp(uiB);
-    uint64_t sigB = get_frac(uiB);
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
+    int16_t expB = get_exp(b);
+    uint64_t sigB = get_frac(b);
 
-    if (0x7FF == expA) {
-        if (0 != sigA || (0x7FF == expB && 0 != sigB)) {
-            return u_as_f(propagate_NaN(uiA, uiB));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+    }
 
+    if (is_inf(a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF64UI);
     }
 
-    // a is finite
-
-    if (0x7FF == expB) {
-        return sigB ? u_as_f(propagate_NaN(uiA, uiB)) : a;
+    if (is_inf(b)) {
+        return a;
     }
 
     if (expA < expB - 1) {
         return a;
     }
 
-    if (0 == expB) {
-        if (0 == sigB) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(defaultNaNF64UI);
-        }
+    if (is_zero(b)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f(defaultNaNF64UI);
+    }
 
+    if (is_zero(a)) {
+        return a;
+    }
+
+    if (0 == expB) {
         exp16_sig64 const normExpSig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
 
     if (0 == expA) {
-        if (0 == sigA) {
-            return a;
-        }
-
         exp16_sig64 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

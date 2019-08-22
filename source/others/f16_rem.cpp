@@ -41,29 +41,27 @@ f16_rem(float16_t const a,
         float16_t const b)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int8_t expA = get_exp(uiA);
-    uint16_t sigA = get_frac(uiA);
-    uint16_t const uiB = f_as_u(b);
-    int8_t expB = get_exp(uiB);
-    uint16_t sigB = get_frac(uiB);
+    bool const signA = is_sign(a);
+    int8_t expA = get_exp(a);
+    uint16_t sigA = get_frac(a);
+    int8_t expB = get_exp(b);
+    uint16_t sigB = get_frac(b);
 
-    if (expA == 0x1F) {
-        if (sigA || ((expB == 0x1F) && sigB)) {
-            return u_as_f(propagate_NaN(uiA, uiB));
+    if (!is_finite(a)) {
+        if (is_NaN(a) || is_NaN(b)) {
+            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF16UI);
     }
 
-    if (expB == 0x1F) {
-        return sigB ? u_as_f(propagate_NaN(uiA, uiB)) : a;
+    if (!is_finite(b)) {
+        return is_NaN(b) ? u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))) : a;
     }
 
-    if (!expB) {
-        if (!sigB) {
+    if (0 == expB) {
+        if (is_zero(b)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f(defaultNaNF16UI);
         }
@@ -73,8 +71,8 @@ f16_rem(float16_t const a,
         sigB = normExpSig.sig;
     }
 
-    if (!expA) {
-        if (!sigA) {
+    if (0 == expA) {
+        if (is_zero(a)) {
             return a;
         }
 

@@ -42,27 +42,25 @@ f32_to_i32(float32_t const a,
            bool const exact)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    bool const isNaN = is_NaN(uiA);
 
-    if (isNaN) {
+    if (is_NaN(a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return i32_fromNaN;
     }
 
-    int16_t const exp = get_exp(uiA);
-    bool const sign = is_sign(uiA);
+    int16_t const exp = get_exp(a);
+    bool const sign = is_sign(a);
 
     if (255 == exp) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
 
-    if (is_zero(uiA)) {
+    if (is_zero(a)) {
         return 0;
     }
 
-    uint64_t const sig64 = static_cast<uint64_t>(get_frac(uiA) | 0x00800000) << 32;
+    uint64_t const sig64 = static_cast<uint64_t>(get_frac(a) | 0x00800000) << 32;
     int16_t const shiftDist = 0xAA - exp;
     return roundPackTo<int32_t>(sign, 0 < shiftDist ? softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
 }

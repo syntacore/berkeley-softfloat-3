@@ -41,9 +41,8 @@ f32_to_ui32_r_minMag(float32_t const a,
                      bool const exact)
 {
     using namespace softfloat::internals;
-    uint32_t const uiA = f_as_u(a);
-    int16_t const exp = get_exp(uiA);
-    uint32_t sig = get_frac(uiA);
+    int16_t const exp = get_exp(a);
+    uint32_t sig = get_frac(a);
 
     int16_t const shiftDist = 0x9E - exp;
 
@@ -55,12 +54,12 @@ f32_to_ui32_r_minMag(float32_t const a,
         return 0;
     }
 
-    bool const sign = is_sign(uiA);
+    bool const sign = is_sign(a);
 
     if (sign || shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0xFF && sig ? ui32_fromNaN :
+            is_NaN(a) ? ui32_fromNaN :
             sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 

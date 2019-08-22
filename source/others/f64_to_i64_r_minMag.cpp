@@ -41,21 +41,20 @@ f64_to_i64_r_minMag(float64_t const a,
                     bool const exact)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t const exp = get_exp(uiA);
-    uint64_t const sig = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int16_t const exp = get_exp(a);
+    uint64_t const sig = get_frac(a);
     int16_t const shiftDist = 0x433 - exp;
 
     if (shiftDist <= 0) {
         if (shiftDist < -10) {
-            if (uiA == packToF64UI(1, 0x43E, 0)) {
+            if (f_as_u(a) == packToF64UI(1, 0x43E, 0)) {
                 return INT64_MIN;
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                exp == 0x7FF && sig ? i64_fromNaN :
+                is_NaN(a) ? i64_fromNaN :
                 sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
 

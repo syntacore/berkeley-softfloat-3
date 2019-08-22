@@ -40,14 +40,13 @@ float64_t
 f64_sqrt(float64_t const a)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint64_t sigA = get_frac(uiA);
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
 
-    if (expA == 0x7FF) {
-        if (sigA) {
-            return u_as_f(propagate_NaN(uiA, 0));
+    if (!is_finite(a)) {
+        if (is_NaN(a)) {
+            return u_as_f(propagate_NaN(f_as_u(a), 0));
         }
 
         if (0 == signA) {
@@ -58,20 +57,16 @@ f64_sqrt(float64_t const a)
         return u_as_f(defaultNaNF64UI);
     }
 
-    if (signA) {
-        if (0 == (expA | sigA)) {
-            return a;
-        }
+    if (is_zero(a)) {
+        return a;
+    }
 
+    if (signA) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF64UI);
     }
 
     if (0 == expA) {
-        if (0 == sigA) {
-            return a;
-        }
-
         exp16_sig64 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

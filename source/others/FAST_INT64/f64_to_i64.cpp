@@ -46,17 +46,16 @@ f64_to_i64(float64_t const a,
            bool const exact)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t const exp = get_exp(uiA);
-    uint64_t const sig = get_frac(uiA) | (0 != exp ? UINT64_C(0x0010000000000000) : UINT64_C(0));
+    bool const sign = is_sign(a);
+    int16_t const exp = get_exp(a);
+    uint64_t const sig = get_frac(a) | (0 != exp ? UINT64_C(0x0010000000000000) : UINT64_C(0));
     int16_t const shiftDist = 0x433 - exp;
 
     if (shiftDist <= 0) {
         if (shiftDist < -11) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                0x7FF == exp && 0 != get_frac(uiA) ? i64_fromNaN :
+                is_NaN(a) ? i64_fromNaN :
                 sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
 

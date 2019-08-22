@@ -43,12 +43,10 @@ f16_to_ui32(float16_t const a,
             bool const exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int8_t const exp = get_exp(uiA);
-    uint16_t const frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    uint16_t const frac = get_frac(a);
 
-    if (exp == 0x1F) {
+    if (!is_finite(a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             frac ? ui32_fromNaN :
@@ -56,11 +54,12 @@ f16_to_ui32(float16_t const a,
     }
 
     uint32_t sig32 = frac;
+    int8_t const exp = get_exp(a);
 
-    if (exp) {
+    if (0 != exp) {
         sig32 |= 0x0400;
         {
-            int8_t shiftDist = exp - 0x19;
+            int8_t const shiftDist = exp - 0x19;
 
             if (0 <= shiftDist && !sign) {
                 return sig32 << shiftDist;

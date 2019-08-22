@@ -46,11 +46,11 @@ f64_roundToInt(float64_t const a,
                bool const exact)
 {
     using namespace softfloat::internals;
+    int16_t const exp = get_exp(a);
     uint64_t const uiA = f_as_u(a);
-    int16_t const exp = get_exp(uiA);
 
     if (exp <= 0x3FE) {
-        if (0 == (uiA & INT64_MAX)) {
+        if (is_zero(a)) {
             return a;
         }
 
@@ -62,7 +62,7 @@ f64_roundToInt(float64_t const a,
 
         switch (roundingMode) {
         case softfloat_round_near_even:
-            if (!get_frac(uiA)) {
+            if (0 == get_frac(a)) {
                 return u_as_f(uiZ);
                 break;
             }
@@ -77,14 +77,14 @@ f64_roundToInt(float64_t const a,
             break;
 
         case softfloat_round_min:
-            if (uiZ) {
+            if (0 != uiZ) {
                 return u_as_f(packToF64UI(1, 0x3FF, 0));
             }
 
             break;
 
         case softfloat_round_max:
-            if (!uiZ) {
+            if (0 == uiZ) {
                 return u_as_f(packToF64UI(0, 0x3FF, 0));
             }
 
@@ -95,7 +95,7 @@ f64_roundToInt(float64_t const a,
     }
 
     if (0x433 <= exp) {
-        if (exp == 0x7FF && get_frac(uiA)) {
+        if (is_NaN(a)) {
             return u_as_f(propagate_NaN(uiA, 0));
         }
 

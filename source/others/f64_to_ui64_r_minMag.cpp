@@ -40,20 +40,19 @@ uint64_t
 f64_to_ui64_r_minMag(float64_t a, bool exact)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    int16_t const exp = get_exp(uiA);
-    uint64_t sig = get_frac(uiA);
+    int16_t const exp = get_exp(a);
+    uint64_t sig = get_frac(a);
     int16_t const shiftDist = 0x433 - exp;
 
     if (53 <= shiftDist) {
-        if (exact && (exp | sig)) {
+        if (exact && 0 != (exp | sig)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
         return 0;
     }
 
-    bool const sign = is_sign(uiA);
+    bool const sign = is_sign(a);
 
     if (sign) {
         softfloat_raiseFlags(softfloat_flag_invalid);

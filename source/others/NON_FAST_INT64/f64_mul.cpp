@@ -48,61 +48,38 @@ f64_mul(float64_t a,
         float64_t b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    int16_t expA = get_exp(uiA);
-    uint64_t sigA = get_frac(uiA);
-    uint64_t const uiB = f_as_u(b);
-    bool const signB = is_sign(uiB);
-    int16_t expB = get_exp(uiB);
-    uint64_t sigB = get_frac(uiB);
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
+    bool const signB = is_sign(b);
+    int16_t expB = get_exp(b);
+    uint64_t sigB = get_frac(b);
     bool const signZ = signA != signB;
 
-    if (expA == 0x7FF) {
-        if (sigA || ((expB == 0x7FF) && sigB)) {
-            return u_as_f(propagate_NaN(uiA, uiB));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+    }
 
-        uint64_t const magBits = expB | sigB;
+    if ((is_inf(a) && is_zero(b)) || (is_zero(a) && is_inf(b))) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f(defaultNaNF64UI);
+    }
 
-        if (!magBits) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(defaultNaNF64UI);
-        }
-
+    if (is_inf(a) || is_inf(b)) {
         return u_as_f(packToF64UI(signZ, 0x7FF, 0));
     }
 
-    if (expB == 0x7FF) {
-        if (sigB) {
-            return u_as_f(propagate_NaN(uiA, uiB));
-        }
-
-        uint64_t const magBits = expA | sigA;
-
-        if (!magBits) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(defaultNaNF64UI);
-        }
-
-        return u_as_f(packToF64UI(signZ, 0x7FF, 0));
+    if (is_zero(a) || is_zero(b)) {
+        return u_as_f(packToF64UI(signZ, 0, 0));
     }
 
-    if (!expA) {
-        if (!sigA) {
-            return u_as_f(packToF64UI(signZ, 0, 0));
-        }
-
+    if (0 == expA) {
         exp16_sig64 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
 
-    if (!expB) {
-        if (!sigB) {
-            return u_as_f(packToF64UI(signZ, 0, 0));
-        }
-
+    if (0 == expB) {
         exp16_sig64 const normExpSig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -127,4 +104,3 @@ f64_mul(float64_t a,
 
     return softfloat_roundPackToF64(signZ, expZ, sigZ);
 }
-

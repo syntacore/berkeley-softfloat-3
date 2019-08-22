@@ -41,19 +41,19 @@ f64_le_quiet(float64_t const a,
              float64_t const b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    uint64_t const uiB = f_as_u(b);
 
-    if (is_NaN(uiA) || is_NaN(uiB)) {
-        if (is_sNaN(uiA) || is_sNaN(uiB)) {
+    if (is_NaN(a) || is_NaN(b)) {
+        if (is_sNaN(a) || is_sNaN(b)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 
         return false;
     }
 
-    bool const signA = is_sign(uiA);
-    bool const signB = is_sign(uiB);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
+    uint64_t const uiA = f_as_u(a);
+    uint64_t const uiB = f_as_u(b);
     return
         signA != signB ?
         signA || 0 == static_cast<decltype(uiA)>((uiA | uiB) << 1) :

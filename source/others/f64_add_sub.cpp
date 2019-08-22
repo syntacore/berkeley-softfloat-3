@@ -192,22 +192,18 @@ f64_add(float64_t a,
         float64_t b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    uint64_t const uiB = f_as_u(b);
-    bool signB = is_sign(uiB);
+    bool const signA = is_sign(a);
+    bool signB = is_sign(b);
     return
-        (signA == signB ? addMags : subMags)(uiA, uiB, signA);
+        (signA == signB ? addMags : subMags)(f_as_u(a), f_as_u(b), signA);
 }
 
 float64_t
 f64_sub(float64_t a, float64_t b)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const signA = is_sign(uiA);
-    uint64_t const uiB = f_as_u(b);
-    bool const signB = is_sign(uiB);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
     return
-        (signA == signB ? subMags : addMags)(uiA, uiB, signA);
+        (signA == signB ? subMags : addMags)(f_as_u(a), f_as_u(b), signA);
 }

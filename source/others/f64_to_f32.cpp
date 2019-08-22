@@ -40,12 +40,11 @@ float32_t
 f64_to_f32(float64_t a)
 {
     using namespace softfloat::internals;
-    uint64_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int16_t const exp = get_exp(uiA);
-    uint64_t const frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int16_t const exp = get_exp(a);
+    uint64_t const frac = get_frac(a);
 
-    if (0x7FF != exp) {
+    if (is_finite(a)) {
         uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac, 22));
 
         if (0 != (exp | frac32)) {
@@ -55,8 +54,8 @@ f64_to_f32(float64_t a)
         return make_signed_zero<float32_t>(sign);
     }
 
-    if (0 != frac) {
-        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(uiA)));
+    if (is_NaN(a)) {
+        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(f_as_u(a))));
     }
 
     return make_signed_inf<float32_t>(sign);

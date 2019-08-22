@@ -45,14 +45,13 @@ f16_to_extF80(float16_t const a)
 {
     using namespace softfloat::internals;
 
-    uint16_t const uiA = f_as_u(a);
-    bool const sign = is_sign(uiA);
-    int8_t exp = get_exp(uiA);
-    uint16_t frac = get_frac(uiA);
+    bool const sign = is_sign(a);
+    int8_t exp = get_exp(a);
+    uint16_t frac = get_frac(a);
 
-    if (0x1F == exp) {
+    if (!is_finite(a)) {
         if (0 != frac) {
-            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(uiA));
+            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(f_as_u(a)));
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;

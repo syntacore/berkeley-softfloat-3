@@ -158,6 +158,13 @@ is_sign(Ty const& v)
 }
 
 template<typename Ty>
+inline constexpr auto
+is_sign(Ty const v)->decltype(is_sign(f_as_u(v)))
+{
+    return is_sign(f_as_u(v));
+}
+
+template<typename Ty>
 Ty
 roundPackTo(bool,
             uint64_t,
@@ -486,30 +493,11 @@ get_exp(uint64_t const& a)
     return static_cast<int16_t>((a >> 52) & ~(~UINT32_C(0) << 11));
 }
 
-inline constexpr uint16_t
-expExtF80UI64(uint16_t const& a64)
+template<typename Ty>
+inline constexpr auto
+get_exp(Ty const a)->decltype(get_exp(f_as_u(a)))
 {
-    return static_cast<uint16_t>(0x7FFF & a64);
-}
-
-inline constexpr bool
-is_finite(uint16_t const& a)
-{
-    return
-        0x1F != get_exp(a);
-}
-
-inline constexpr bool
-is_finite(uint32_t const& a)
-{
-    return 255 != get_exp(a);
-}
-
-inline constexpr bool
-is_finite(uint64_t const& a)
-{
-    return
-        2047 != get_exp(a);
+    return get_exp(f_as_u(a));
 }
 
 inline constexpr uint16_t
@@ -528,6 +516,44 @@ inline constexpr uint64_t
 get_frac(uint64_t const& a)
 {
     return a & ~(~UINT64_C(0) << 52);
+}
+
+inline constexpr uint16_t
+expExtF80UI64(uint16_t const& a64)
+{
+    return static_cast<uint16_t>(0x7FFF & a64);
+}
+
+template<typename Ty>
+inline constexpr auto
+get_frac(Ty const a)->decltype(get_frac(f_as_u(a)))
+{
+    return get_frac(f_as_u(a));
+}
+
+inline constexpr bool
+is_finite(uint16_t const& a)
+{
+    return 0x1F != get_exp(a);
+}
+
+inline constexpr bool
+is_finite(uint32_t const& a)
+{
+    return 0xFF != get_exp(a);
+}
+
+inline constexpr bool
+is_finite(uint64_t const& a)
+{
+    return 0x7FF != get_exp(a);
+}
+
+template<typename Ty>
+inline constexpr auto
+is_finite(Ty const a)->decltype(is_finite(f_as_u(a)))
+{
+    return is_finite(f_as_u(a));
 }
 
 inline constexpr bool
@@ -550,51 +576,33 @@ is_zero(uint64_t const &a)
     return 0 == (~(~UINT64_C(0) << 63) & a);
 }
 
-inline constexpr bool
-is_inf(uint16_t const a)
+template<typename Ty>
+inline constexpr
+typename std::enable_if<std::is_integral<Ty>::value,bool>::type
+is_zero(Ty const a)
 {
-    return
-        !is_finite(a) &&
-        0 == get_frac(a);
+    return 0 == get_exp(a) && 0 == get_frac(a);
 }
 
-inline constexpr bool
-is_inf(uint32_t const a)
+template<typename Ty>
+inline constexpr auto
+is_zero(Ty const a)->decltype(is_zero(f_as_u(a)))
 {
-    return
-        !is_finite(a) &&
-        0 == get_frac(a);
+    return is_zero(f_as_u(a));
 }
 
-inline constexpr bool
-is_inf(uint64_t const a)
+template<typename Ty>
+inline constexpr auto
+is_inf(Ty const a)->decltype(!is_finite(a) && 0 == get_frac(a))
 {
-    return
-        !is_finite(a) &&
-        0 == get_frac(a);
+    return !is_finite(a) && 0 == get_frac(a);
 }
 
-inline constexpr bool
-is_NaN(uint16_t const a)
+template<typename Ty>
+inline constexpr auto
+is_NaN(Ty const a)->decltype(!is_finite(a) && 0 != get_frac(a))
 {
-    return
-        !is_finite(a) && 0 != get_frac(a);
-}
-
-inline constexpr bool
-is_NaN(uint32_t const& a)
-{
-    return
-        !is_finite(a) &&
-        0 != get_frac(a);
-}
-
-inline constexpr bool
-is_NaN(uint64_t const& a)
-{
-    return
-        !is_finite(a) &&
-        0 != get_frac(a);
+    return !is_finite(a) && 0 != get_frac(a);
 }
 
 inline constexpr bool
@@ -634,6 +642,13 @@ is_sNaN(uint64_t const uiA)
     return
         UINT64_C(0x7FF0000000000000) == (uiA & UINT64_C(0x7FF8000000000000)) &&
         0 != (uiA & UINT64_C(0x0007FFFFFFFFFFFF));
+}
+
+template<typename Ty>
+inline constexpr auto
+is_sNaN(Ty const a)->decltype(is_sNaN(f_as_u(a)))
+{
+    return is_sNaN(f_as_u(a));
 }
 
 inline constexpr bool
