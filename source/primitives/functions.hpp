@@ -105,70 +105,34 @@ extern const uint_least8_t softfloat_countLeadingZeros8[256];
 /**
 @returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, sizeof(Ty) * CHAR_BIT is returned.
 */
-template<typename Ty>
-uint8_t
-count_leading_zeros(Ty);
-
-template<>
 inline uint8_t
-count_leading_zeros<uint16_t>(uint16_t a)
+count_leading_zeros(uint8_t a)
 {
-    uint8_t count = 8;
-
-    if (0x100 <= a) {
-        count = 0;
-        a >>= 8;
-    }
-
-    return static_cast<uint8_t>(count + softfloat_countLeadingZeros8[a]);
+    return softfloat_countLeadingZeros8[a];
 }
 
-template<>
 inline uint8_t
-count_leading_zeros<uint32_t>(uint32_t a)
+count_leading_zeros(uint16_t a)
 {
-    uint8_t count = 0;
-
-    if (a < 0x10000) {
-        count = 16;
-        a <<= 16;
-    }
-
-    if (a < 0x1000000) {
-        count += 8;
-        a <<= 8;
-    }
-
-    return static_cast<uint8_t>(count + softfloat_countLeadingZeros8[a >> 24]);
+    return 0 == (a >> CHAR_BIT) ?
+        count_leading_zeros(uint8_t(a)) + CHAR_BIT :
+        count_leading_zeros(uint8_t(a >> CHAR_BIT));
 }
 
-template<>
 inline uint8_t
-count_leading_zeros<uint64_t>(uint64_t a)
+count_leading_zeros(uint32_t a)
 {
-    uint8_t count = 0;
-    uint32_t a32 = a >> 32;
+    return 0 == (a >> sizeof(uint16_t) * CHAR_BIT) ?
+        count_leading_zeros(uint16_t(a)) + sizeof(uint16_t) * CHAR_BIT :
+        count_leading_zeros(uint16_t(a >> sizeof(uint16_t) * CHAR_BIT));
+}
 
-    if (0 == a32) {
-        count = 32;
-        /**
-        @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-        */
-        a32 = static_cast<uint32_t>(a);
-    }
-
-    /* From here, result is current count + count leading zeros of `a32'. */
-    if (a32 < 0x10000) {
-        count += 16;
-        a32 <<= 16;
-    }
-
-    if (a32 < 0x1000000) {
-        count += 8;
-        a32 <<= 8;
-    }
-
-    return static_cast<uint8_t>(count + softfloat_countLeadingZeros8[a32 >> 24]);
+inline uint8_t
+count_leading_zeros(uint64_t a)
+{
+    return 0 == (a >> sizeof(uint32_t) * CHAR_BIT) ?
+        count_leading_zeros(uint32_t(a)) + sizeof(uint32_t) * CHAR_BIT :
+        count_leading_zeros(uint32_t(a >> sizeof(uint32_t) * CHAR_BIT));
 }
 
 extern const uint16_t softfloat_approxRecip_1k0s[16];
