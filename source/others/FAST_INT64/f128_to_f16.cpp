@@ -53,16 +53,16 @@ f128_to_f16(float128_t const a)
 
     if (exp == 0x7FFF) {
         if (frac64) {
-            return to_float(softfloat_commonNaNToF16UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
+            return u_as_f(softfloat_commonNaNToF16UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
         }
 
-        return to_float(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(packToF16UI(sign, 0x1F, 0));
     }
 
     uint16_t const frac16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(frac64, 34));
 
     if (!(exp | frac16)) {
-        return to_float(packToF16UI(sign, 0, 0));
+        return u_as_f(packToF16UI(sign, 0, 0));
     }
 
     exp -= 0x3FF1;

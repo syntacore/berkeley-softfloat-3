@@ -48,7 +48,7 @@ i32_to_f16(int32_t a)
     int8_t const shiftDist = count_leading_zeros(absA) - 21;
 
     if (0 <= shiftDist) {
-        return to_float(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : uint16_t(0));
+        return u_as_f(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : uint16_t(0));
     }
 
     int8_t const shiftDist1 = shiftDist + 4;

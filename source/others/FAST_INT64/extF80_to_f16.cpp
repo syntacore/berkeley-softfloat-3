@@ -52,16 +52,16 @@ extF80_to_f16(extFloat80_t a)
 
     if (exp == 0x7FFF) {
         if (sig & INT64_MAX) {
-            return to_float(softfloat_commonNaNToF16UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
+            return u_as_f(softfloat_commonNaNToF16UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
         }
 
-        return to_float(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(packToF16UI(sign, 0x1F, 0));
     }
 
     uint16_t const sig16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(sig, 49));
 
     if (!(exp | sig16)) {
-        return to_float(packToF16UI(sign, 0, 0));
+        return u_as_f(packToF16UI(sign, 0, 0));
     }
 
     exp -= 0x3FF1;

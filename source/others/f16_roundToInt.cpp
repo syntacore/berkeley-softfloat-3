@@ -63,40 +63,40 @@ f16_roundToInt(float16_t a,
         switch (roundingMode) {
         case softfloat_round_near_even:
             if (!get_frac(uiA)) {
-                return to_float(uiZ);
+                return u_as_f(uiZ);
             }
 
             [[fallthrough]];
 
         case softfloat_round_near_maxMag:
             if (exp == 0xE) {
-                return to_float(static_cast<uint16_t>(uiZ | packToF16UI(0, 0xF, 0u)));
+                return u_as_f(static_cast<uint16_t>(uiZ | packToF16UI(0, 0xF, 0u)));
             }
 
             break;
 
         case softfloat_round_min:
             if (uiZ) {
-                return to_float(packToF16UI(1, 0xF, 0));
+                return u_as_f(packToF16UI(1, 0xF, 0));
             }
 
             break;
 
         case softfloat_round_max:
             if (!uiZ) {
-                return to_float(packToF16UI(0, 0xF, 0));
+                return u_as_f(packToF16UI(0, 0xF, 0));
             }
 
             break;
         }
 
-        return to_float(uiZ);
+        return u_as_f(uiZ);
     }
 
     if (0x19 <= exp) {
         return
             exp == 0x1F && 0 != get_frac(uiA) ?
-            to_float(propagate_NaN(uiA, 0)) : a;
+            u_as_f(propagate_NaN(uiA, 0)) : a;
     }
 
     uint16_t uiZ = uiA;
@@ -121,5 +121,5 @@ f16_roundToInt(float16_t a,
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    return to_float(uiZ);
+    return u_as_f(uiZ);
 }

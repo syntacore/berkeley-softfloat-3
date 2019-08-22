@@ -61,7 +61,7 @@ addMags(uint32_t const uiA,
         /* if same exponent, fractional are aligned */
         if (0 == expA) {
             /** if a and b are subnormal(s) or zero(s), result is simple sum, possible carry of high sum bit to exponent is valid */
-            return to_float(uiA + sigB);
+            return u_as_f(uiA + sigB);
         }
 
         /** add hidden bits to operands if fractional are normal aligned */
@@ -70,7 +70,7 @@ addMags(uint32_t const uiA,
 
         /** if lowest bit is 0 and exponent allow add carry bit of sum without float class change pack shift right significand with carry bit to exponent */
         if (0 == (sigZ & 1) && expA < 0xFE) {
-            return to_float(packToF32UI(signA, expA, sigZ >> 1));
+            return u_as_f(packToF32UI(signA, expA, sigZ >> 1));
         }
 
         return softfloat_roundPackToF32(signA, expA, sigZ << 6);
@@ -129,11 +129,11 @@ subMags(uint32_t const uiA,
     if (0 == expDiff) {
         if (max_exp == expA) {
             if (0 != sigA || 0 != sigB) {
-                return to_float(propagate_NaN(uiA, uiB));
+                return u_as_f(propagate_NaN(uiA, uiB));
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(defaultNaNF32UI);
+            return u_as_f(defaultNaNF32UI);
         }
 
         int32_t const sigDiff = static_cast<int32_t>(sigA - sigB);
@@ -152,7 +152,7 @@ subMags(uint32_t const uiA,
         int8_t const shiftDist = count_leading_zeros(static_cast<uint32_t>(sigAbsDiff)) - 8;
         int16_t const expZ = expA - shiftDist;
         return
-            to_float(expZ < 0 ?
+            u_as_f(expZ < 0 ?
                       packToF32UI(signZ, 0, static_cast<uint32_t>(sigAbsDiff << expA)) :
                       packToF32UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
     }
@@ -167,12 +167,12 @@ subMags(uint32_t const uiA,
             softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
             0 == sigB_1 ?
             make_signed_inf<float32_t>(!signZ) :
-            to_float(propagate_NaN(uiA, uiB));
+            u_as_f(propagate_NaN(uiA, uiB));
     }
 
     return
         max_exp == expA ?
-        to_float(0 != sigA_1 ? propagate_NaN(uiA, uiB) : uiA) :
+        u_as_f(0 != sigA_1 ? propagate_NaN(uiA, uiB) : uiA) :
         softfloat_normRoundPackToF32(signZ,
                                      expA - 1,
                                      (sigA_1 | 0x40000000) - softfloat_shiftRightJam32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
@@ -190,7 +190,7 @@ f32_add(float32_t const a,
 
     if (is_NaN(uiA) || is_NaN(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
-        return to_float(propagate_NaN(uiA, uiB));
+        return u_as_f(propagate_NaN(uiA, uiB));
     }
 
     return
@@ -208,7 +208,7 @@ f32_sub(float32_t const a,
 
     if (is_NaN(uiA) || is_NaN(uiB)) {
         /** propagate NaN if operand(s) is NaN*/
-        return to_float(propagate_NaN(uiA, uiB));
+        return u_as_f(propagate_NaN(uiA, uiB));
     }
 
     return (is_sign(uiA) == is_sign(uiB) ? subMags : addMags)(uiA, uiB);

@@ -45,7 +45,7 @@ f32_mul(float32_t a,
     uint32_t const uiB = f_as_u(b);
 
     if (is_NaN(uiA) || is_NaN(uiB)) {
-        return to_float(propagate_NaN(uiA, uiB));
+        return u_as_f(propagate_NaN(uiA, uiB));
     }
 
     bool const signA = is_sign(uiA);
@@ -65,7 +65,7 @@ f32_mul(float32_t a,
 
         if (is_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(defaultNaNF32UI);
+            return u_as_f(defaultNaNF32UI);
         }
 
         return make_signed_inf<float32_t>(signZ);

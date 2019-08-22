@@ -53,15 +53,15 @@ extF80M_to_f16(const extFloat80_t* aPtr)
 
     if (0x7FFF == exp) {
         if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            return to_float(softfloat_commonNaNToF16UI(softfloat_extF80MToCommonNaN(*aSPtr)));
+            return u_as_f(softfloat_commonNaNToF16UI(softfloat_extF80MToCommonNaN(*aSPtr)));
         }
 
-        return to_float(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(packToF16UI(sign, 0x1F, 0));
     }
 
     if (0 == (sig & INT64_MIN)) {
         if (0 == sig) {
-            return to_float(packToF16UI(sign, 0, 0));
+            return u_as_f(packToF16UI(sign, 0, 0));
         }
 
         exp += softfloat_normExtF80SigM(&sig);

@@ -71,7 +71,7 @@ f128M_to_f32(const float128_t* aPtr)
     }
 
     if (frac64) {
-        return to_float(softfloat_commonNaNToF32UI(softfloat_f128MToCommonNaN(aWPtr)));
+        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f128MToCommonNaN(aWPtr)));
     }
 
     return make_signed_inf<float32_t>(sign);

@@ -56,7 +56,7 @@ f64_to_f32(float64_t a)
     }
 
     if (0 != frac) {
-        return to_float(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(uiA)));
+        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(uiA)));
     }
 
     return make_signed_inf<float32_t>(sign);

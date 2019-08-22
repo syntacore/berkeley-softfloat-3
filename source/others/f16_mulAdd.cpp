@@ -51,7 +51,7 @@ f16_mulAdd(float16_t const a,
     uint16_t const uiC = f_as_u(c);
 
     if (is_NaN(uiA) || is_NaN(uiB) || is_sNaN(uiC)) {
-        return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
+        return u_as_f(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
@@ -65,11 +65,11 @@ f16_mulAdd(float16_t const a,
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(propagate_NaN(defaultNaNF16UI, uiC));
+            return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
         }
 
         if (is_NaN(uiC)) {
-            return to_float(propagate_NaN(defaultNaNF16UI, uiC));
+            return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
         }
 
         if (is_finite(uiC) || signProd == signC) {
@@ -79,16 +79,16 @@ f16_mulAdd(float16_t const a,
 
         /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(propagate_NaN(defaultNaNF16UI, uiC));
+        return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
     }
 
     if (is_NaN(uiC)) {
-        return to_float(propagate_NaN(defaultNaNF16UI, uiC));
+        return u_as_f(propagate_NaN(defaultNaNF16UI, uiC));
     }
 
     if (is_inf(uiC)) {
         /** if c is infinity while a and b are finite, return c */
-        return to_float(uiC);
+        return u_as_f(uiC);
     }
 
     // a, b, c are finite
@@ -102,7 +102,7 @@ f16_mulAdd(float16_t const a,
             // a is zero, result is c
             return is_zero(uiC) && signProd != signC ?
                 make_signed_zero<float16_t>(softfloat_round_min == softfloat_roundingMode) :
-                to_float(uiC);
+                u_as_f(uiC);
         }
 
         // a is subnormal
@@ -119,7 +119,7 @@ f16_mulAdd(float16_t const a,
             // b is zero, result is c
             return is_zero(uiC) && signProd != signC ?
                 make_signed_zero<float16_t>(softfloat_round_min == softfloat_roundingMode) :
-                to_float(uiC);
+                u_as_f(uiC);
         }
 
         // b is subnormal
@@ -196,7 +196,7 @@ f16_mulAdd(float16_t const a,
         sig32Z = sigProd - sig32C;
 
         if (0 == sig32Z) {
-            return to_float(packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+            return u_as_f(packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
         }
 
         if (0 != (sig32Z & 0x80000000)) {

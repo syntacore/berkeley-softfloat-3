@@ -49,7 +49,7 @@ softfloat_normRoundPackToF16(bool sign,
     exp = sig ? exp : 0;
 
     if (4 <= shiftDist && static_cast<unsigned>(exp) < 0x1Du) {
-        return to_float(packToF16UI(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << (shiftDist - 4))));
+        return u_as_f(packToF16UI(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << (shiftDist - 4))));
     }
 
     return softfloat_roundPackToF16(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << shiftDist));

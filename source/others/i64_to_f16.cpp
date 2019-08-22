@@ -45,7 +45,7 @@ i64_to_f16(int64_t a)
     int8_t shiftDist = count_leading_zeros(absA) - 53;
 
     if (0 <= shiftDist) {
-        return to_float(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : uint16_t(0));
+        return u_as_f(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : uint16_t(0));
     }
 
     shiftDist += 4;

@@ -42,6 +42,6 @@ i32_to_f32(int32_t const a)
     using namespace softfloat::internals;
     bool const sign = a < 0;
     return
-        0 == (a & INT32_MAX) ? to_float(sign ? packToF32UI(true, 0x9E, 0) : 0) :
+        0 == (a & INT32_MAX) ? u_as_f(sign ? packToF32UI(true, 0x9E, 0) : 0) :
         softfloat_normRoundPackToF32(sign, 0x9C, static_cast<uint32_t>(sign ? -a : a));
 }

@@ -67,7 +67,7 @@ softfloat_roundPackToF16(bool sign,
             }
         } else if (0x1D < exp || 0x8000 <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            return to_float(static_cast<uint16_t>(packToF16UI(sign, 0x1F, 0u) - !roundIncrement));
+            return u_as_f(static_cast<uint16_t>(packToF16UI(sign, 0x1F, 0u) - !roundIncrement));
         }
     }
 
@@ -77,7 +77,7 @@ softfloat_roundPackToF16(bool sign,
 
     sig = static_cast<uint16_t>((sig + roundIncrement) >> 4);
     sig &= ~static_cast<uint16_t>(!(roundBits ^ 8) & !!(softfloat_round_near_even == softfloat_roundingMode));
-    return to_float(packToF16UI(sign, static_cast<int8_t>(sig ? exp : 0), sig));
+    return u_as_f(packToF16UI(sign, static_cast<int8_t>(sig ? exp : 0), sig));
 }
 
 }  // namespace internals

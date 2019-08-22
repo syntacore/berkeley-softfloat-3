@@ -48,7 +48,7 @@ f32_sqrt(float32_t a)
 
     if (0xFF == expA) {
         if (0 != sigA) {
-            return to_float(propagate_NaN(uiA, UINT32_C(0)));
+            return u_as_f(propagate_NaN(uiA, UINT32_C(0)));
         }
 
         if (!signA) {
@@ -56,7 +56,7 @@ f32_sqrt(float32_t a)
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(defaultNaNF32UI);
+        return u_as_f(defaultNaNF32UI);
     }
 
     if (signA) {
@@ -65,7 +65,7 @@ f32_sqrt(float32_t a)
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(defaultNaNF32UI);
+        return u_as_f(defaultNaNF32UI);
     }
 
     if (0 == expA) {

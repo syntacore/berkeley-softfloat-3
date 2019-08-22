@@ -55,16 +55,16 @@ f128M_to_f16(const float128_t* aPtr)
 
     if (exp == 0x7FFF) {
         if (frac32) {
-            return to_float(softfloat_commonNaNToF16UI(softfloat_f128MToCommonNaN(aWPtr)));
+            return u_as_f(softfloat_commonNaNToF16UI(softfloat_f128MToCommonNaN(aWPtr)));
         }
 
-        return to_float(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(packToF16UI(sign, 0x1F, 0));
     }
 
     uint16_t const frac16 = static_cast<uint16_t>(frac32 >> 2 | (frac32 & 3));
 
     if (0 == (exp | frac16)) {
-        return to_float(packToF16UI(sign, 0, 0));
+        return u_as_f(packToF16UI(sign, 0, 0));
     }
 
     exp -= 0x3FF1;

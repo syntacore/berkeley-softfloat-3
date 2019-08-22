@@ -60,37 +60,37 @@ f64_mul(float64_t a,
 
     if (expA == 0x7FF) {
         if (sigA || ((expB == 0x7FF) && sigB)) {
-            return to_float(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(uiA, uiB));
         }
 
         uint64_t const magBits = expB | sigB;
 
         if (!magBits) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(defaultNaNF64UI);
+            return u_as_f(defaultNaNF64UI);
         }
 
-        return to_float(packToF64UI(signZ, 0x7FF, 0));
+        return u_as_f(packToF64UI(signZ, 0x7FF, 0));
     }
 
     if (expB == 0x7FF) {
         if (sigB) {
-            return to_float(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(uiA, uiB));
         }
 
         uint64_t const magBits = expA | sigA;
 
         if (!magBits) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(defaultNaNF64UI);
+            return u_as_f(defaultNaNF64UI);
         }
 
-        return to_float(packToF64UI(signZ, 0x7FF, 0));
+        return u_as_f(packToF64UI(signZ, 0x7FF, 0));
     }
 
     if (!expA) {
         if (!sigA) {
-            return to_float(packToF64UI(signZ, 0, 0));
+            return u_as_f(packToF64UI(signZ, 0, 0));
         }
 
         exp16_sig64 const normExpSig(sigA);
@@ -100,7 +100,7 @@ f64_mul(float64_t a,
 
     if (!expB) {
         if (!sigB) {
-            return to_float(packToF64UI(signZ, 0, 0));
+            return u_as_f(packToF64UI(signZ, 0, 0));
         }
 
         exp16_sig64 const normExpSig(sigB);

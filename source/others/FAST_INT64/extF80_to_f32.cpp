@@ -52,7 +52,7 @@ extF80_to_f32(extFloat80_t a)
 
     if (exp == INT16_MAX) {
         if (sig & INT64_MAX) {
-            return to_float(softfloat_commonNaNToF32UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
+            return u_as_f(softfloat_commonNaNToF32UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
         }
 
         return make_signed_inf<float32_t>(sign);

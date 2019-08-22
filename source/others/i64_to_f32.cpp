@@ -45,7 +45,7 @@ i64_to_f32(int64_t const a)
     int8_t shiftDist = count_leading_zeros(absA) - 40;
 
     if (0 <= shiftDist) {
-        return to_float(a ? packToF32UI(sign, 0x95 - shiftDist, static_cast<uint32_t>(absA) << shiftDist) : 0);
+        return u_as_f(a ? packToF32UI(sign, 0x95 - shiftDist, static_cast<uint32_t>(absA) << shiftDist) : 0);
     }
 
     int8_t const shiftDist_1 = shiftDist + 7;

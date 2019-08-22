@@ -52,7 +52,7 @@ f64_mulAdd(float64_t a,
     uint64_t const uiC = f_as_u(c);
 
     if (is_sNaN(uiC) || is_NaN(uiA) || is_NaN(uiB)) {
-        return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
+        return u_as_f(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
     }
 
     bool const signA = is_sign(uiA);
@@ -66,11 +66,11 @@ f64_mulAdd(float64_t a,
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(propagate_NaN(defaultNaNF64UI, uiC));
+            return u_as_f(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
         if (is_NaN(uiC)) {
-            return to_float(propagate_NaN(defaultNaNF64UI, uiC));
+            return u_as_f(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
         if (is_finite(uiC) || signProd == signC) {
@@ -80,15 +80,15 @@ f64_mulAdd(float64_t a,
 
         /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(propagate_NaN(defaultNaNF64UI, uiC));
+        return u_as_f(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
     if (is_NaN(uiC)) {
-        return to_float(propagate_NaN(defaultNaNF64UI, uiC));
+        return u_as_f(propagate_NaN(defaultNaNF64UI, uiC));
     }
 
     if (is_inf(uiC)) {
-        return to_float(uiC);
+        return u_as_f(uiC);
     }
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
@@ -100,7 +100,7 @@ f64_mulAdd(float64_t a,
         if (0 == sigA) {
             return is_zero(uiC) && signProd != signC ?
                    make_signed_zero<float64_t>(softfloat_round_min == softfloat_roundingMode) :
-                   to_float(uiC);
+                   u_as_f(uiC);
         }
 
         exp16_sig64 const normExpSig(sigA);
@@ -115,7 +115,7 @@ f64_mulAdd(float64_t a,
         if (0 == sigB) {
             return is_zero(uiC) && signProd != signC ?
                    make_signed_zero<float64_t>(softfloat_round_min == softfloat_roundingMode) :
-                   to_float(uiC);
+                   u_as_f(uiC);
         }
 
         exp16_sig64 const normExpSig(sigB);
@@ -197,7 +197,7 @@ f64_mulAdd(float64_t a,
         sig128Z.v64 = sig128Z.v64 - sigC;
 
         if (0 == (sig128Z.v64 | sig128Z.v0)) {
-            return to_float(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
+            return u_as_f(packToF64UI(softfloat_round_min == softfloat_roundingMode, 0, 0));
         }
 
         if (0 != (sig128Z.v64 & UINT64_C(0x8000000000000000))) {

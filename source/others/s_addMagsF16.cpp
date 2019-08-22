@@ -51,11 +51,11 @@ softfloat_addMagsF16(uint16_t const& uiA,
 
     if (0 == expDiff) {
         if (0 == expA) {
-            return to_float(static_cast<uint16_t>(uiA + sigB));
+            return u_as_f(static_cast<uint16_t>(uiA + sigB));
         }
 
         if (0x1F == expA) {
-            return to_float(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
+            return u_as_f(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         bool const signZ = is_sign(uiA);
@@ -63,7 +63,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
         uint16_t const sigZ = 0x0800u + sigA + sigB;
 
         if (0 == (sigZ & 1) && expZ < 0x1E) {
-            return to_float(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
+            return u_as_f(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
         }
 
         return softfloat_roundPackToF16(signZ, expZ, static_cast<uint16_t>(sigZ << 3));
@@ -78,7 +78,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
 
     if (expDiff < 0) {
         if (expB == 0x1F) {
-            return to_float(sigB ? propagate_NaN(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
+            return u_as_f(sigB ? propagate_NaN(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
         }
 
         if (expDiff <= -13) {
@@ -96,7 +96,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
                 }
             }
 
-            return to_float(uiZ);
+            return u_as_f(uiZ);
         }
 
         expZ = expB;
@@ -107,7 +107,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
         uint16_t uiZ = uiA;
 
         if (expA == 0x1F) {
-            return to_float(sigA ? propagate_NaN(uiA, uiB) : uiZ);
+            return u_as_f(sigA ? propagate_NaN(uiA, uiB) : uiZ);
         }
 
         if (13 <= expDiff) {
@@ -123,7 +123,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
                 }
             }
 
-            return to_float(uiZ);
+            return u_as_f(uiZ);
         }
 
         expZ = expA;
@@ -148,7 +148,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
     }
 
     if (0 == (sigZ & 0xF) && expZ < 0x1E) {
-        return to_float(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 4)));
+        return u_as_f(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 4)));
     }
 
     return softfloat_roundPackToF16(signZ, expZ, sigZ);

@@ -68,7 +68,7 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
             }
         } else if (0xFD < exp || 0x80000000 <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            return to_float(packToF32UI(sign, 0xFF, 0) - !roundIncrement);
+            return u_as_f(packToF32UI(sign, 0xFF, 0) - !roundIncrement);
         }
     }
     if (0 != roundBits) {
@@ -77,7 +77,7 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     bool const exact_mid_point = 0 == (roundBits ^ 0x40);
     bool const to_even = exact_mid_point && softfloat_round_near_even == roundingMode;
     uint32_t const sig1 = ((sig + roundIncrement) >> 7) & ~static_cast<uint32_t>(to_even);
-    return to_float(packToF32UI(sign, 0 != sig1 ? exp : 0, sig1));
+    return u_as_f(packToF32UI(sign, 0 != sig1 ? exp : 0, sig1));
 }
 
 }  // namespace internals

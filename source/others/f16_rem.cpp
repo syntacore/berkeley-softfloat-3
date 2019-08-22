@@ -51,21 +51,21 @@ f16_rem(float16_t const a,
 
     if (expA == 0x1F) {
         if (sigA || ((expB == 0x1F) && sigB)) {
-            return to_float(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(defaultNaNF16UI);
+        return u_as_f(defaultNaNF16UI);
     }
 
     if (expB == 0x1F) {
-        return sigB ? to_float(propagate_NaN(uiA, uiB)) : a;
+        return sigB ? u_as_f(propagate_NaN(uiA, uiB)) : a;
     }
 
     if (!expB) {
         if (!sigB) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return to_float(defaultNaNF16UI);
+            return u_as_f(defaultNaNF16UI);
         }
 
         exp8_sig16 const normExpSig{sigB};

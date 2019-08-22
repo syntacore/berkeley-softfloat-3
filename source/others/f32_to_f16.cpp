@@ -47,15 +47,15 @@ f32_to_f16(float32_t a)
 
     if (exp == 0xFF) {
         if (frac) {
-            return to_float(softfloat_commonNaNToF16UI(softfloat_f32UIToCommonNaN(uiA)));
+            return u_as_f(softfloat_commonNaNToF16UI(softfloat_f32UIToCommonNaN(uiA)));
         }
 
-        return to_float(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(packToF16UI(sign, 0x1F, 0));
     }
 
     uint16_t const frac16 = static_cast<uint16_t>(frac >> 9 | ((frac & 0x1FF) != 0));
     return
-        !(exp | frac16) ? to_float(packToF16UI(sign, 0, 0)) :
+        !(exp | frac16) ? u_as_f(packToF16UI(sign, 0, 0)) :
         softfloat_roundPackToF16(sign, exp - 0x71, frac16 | 0x4000u);
 }
 

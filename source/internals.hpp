@@ -131,6 +131,24 @@ f_as_u(Ty const v)->decltype(v.v)
     return v.v;
 }
 
+inline constexpr float16_t
+u_as_f(uint16_t v)
+{
+    return float16_t{v};
+}
+
+inline constexpr float32_t
+u_as_f(uint32_t v)
+{
+    return float32_t{v};
+}
+
+inline constexpr float64_t
+u_as_f(uint64_t v)
+{
+    return float64_t{v};
+}
+
 template<typename Ty>
 inline constexpr
 typename std::enable_if<std::is_integral<Ty>::value, bool>::type
@@ -450,24 +468,6 @@ packToF128UI96(bool const sign,
 #endif
 
 
-inline constexpr float16_t
-to_float(uint16_t v)
-{
-    return float16_t{v};
-}
-
-inline constexpr float32_t
-to_float(uint32_t v)
-{
-    return float32_t{v};
-}
-
-inline constexpr float64_t
-to_float(uint64_t v)
-{
-    return float64_t{v};
-}
-
 inline constexpr int8_t
 get_exp(uint16_t const& a)
 {
@@ -689,21 +689,21 @@ template<>
 inline constexpr float16_t
 make_signed_inf<float16_t>(bool sign)
 {
-    return to_float(packToF16UI(sign, 0x1F, 0));
+    return u_as_f(packToF16UI(sign, 0x1F, 0));
 }
 
 template<>
 inline constexpr float32_t
 make_signed_inf<float32_t>(bool sign)
 {
-    return to_float(packToF32UI(sign, 0xFF, 0u));
+    return u_as_f(packToF32UI(sign, 0xFF, 0u));
 }
 
 template<>
 inline constexpr float64_t
 make_signed_inf<float64_t>(bool sign)
 {
-    return to_float(packToF64UI(sign, 0x7FF, 0u));
+    return u_as_f(packToF64UI(sign, 0x7FF, 0u));
 }
 
 template<typename Ty>
@@ -735,21 +735,21 @@ template<>
 inline constexpr float16_t
 make_signed_zero<float16_t>(bool sign)
 {
-    return to_float(make_signed_zero<uint16_t>(sign));
+    return u_as_f(make_signed_zero<uint16_t>(sign));
 }
 
 template<>
 inline constexpr float32_t
 make_signed_zero<float32_t>(bool sign)
 {
-    return to_float(make_signed_zero<uint32_t>(sign));
+    return u_as_f(make_signed_zero<uint32_t>(sign));
 }
 
 template<>
 inline constexpr float64_t
 make_signed_zero<float64_t>(bool sign)
 {
-    return to_float(make_signed_zero<uint64_t>(sign));
+    return u_as_f(make_signed_zero<uint64_t>(sign));
 }
 
 /**
@@ -765,7 +765,7 @@ softfloat_normRoundPackToF64(bool const sign,
     int16_t const exp_1 = exp - shiftDist;
 
     if (10 <= shiftDist && static_cast<uint16_t>(exp_1) < 0x7FD) {
-        return to_float(packToF64UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 10)));
+        return u_as_f(packToF64UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 10)));
     }
 
     return softfloat_roundPackToF64(sign, exp_1, sig << shiftDist);
@@ -780,7 +780,7 @@ softfloat_normRoundPackToF32(bool const sign,
     int16_t const exp_1 = exp - shiftDist;
 
     if (7 <= shiftDist && static_cast<uint16_t>(exp_1) < 0xFD) {
-        return to_float(packToF32UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 7)));
+        return u_as_f(packToF32UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 7)));
     }
 
     return softfloat_roundPackToF32(sign, exp_1, sig << shiftDist);

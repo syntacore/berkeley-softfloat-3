@@ -51,15 +51,15 @@ extF80_to_f64(extFloat80_t a)
     uint64_t sig = uiA0;
 
     if (0 == (exp | sig)) {
-        return to_float(packToF64UI(sign, 0, 0));
+        return u_as_f(packToF64UI(sign, 0, 0));
     }
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            return to_float(softfloat_commonNaNToF64UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
+            return u_as_f(softfloat_commonNaNToF64UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
         }
 
-        return to_float(packToF64UI(sign, 0x7FF, 0));
+        return u_as_f(packToF64UI(sign, 0x7FF, 0));
     }
 
     sig = softfloat_shortShiftRightJam64(sig, 1);

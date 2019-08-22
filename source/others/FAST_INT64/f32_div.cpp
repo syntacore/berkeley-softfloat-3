@@ -123,7 +123,7 @@ f32_div(float32_t const a,
 
     if (0xFF == expA) {
         if (0 != sigA) {
-            return to_float(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(uiA, uiB));
         }
 
         if (0xFF != expB) {
@@ -131,22 +131,22 @@ f32_div(float32_t const a,
         }
 
         if (0 != sigB) {
-            return to_float(propagate_NaN(uiA, uiB));
+            return u_as_f(propagate_NaN(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(defaultNaNF32UI);
+        return u_as_f(defaultNaNF32UI);
     }
 
     if (0xFF == expB) {
-        return sigB ? to_float(propagate_NaN(uiA, uiB)) : make_signed_zero<float32_t>(signZ);
+        return sigB ? u_as_f(propagate_NaN(uiA, uiB)) : make_signed_zero<float32_t>(signZ);
     }
 
     if (0 == expB) {
         if (0 == sigB) {
             if (0 == (expA | sigA)) {
                 softfloat_raiseFlags(softfloat_flag_invalid);
-                return to_float(defaultNaNF32UI);
+                return u_as_f(defaultNaNF32UI);
             }
 
             softfloat_raiseFlags(softfloat_flag_infinite);
