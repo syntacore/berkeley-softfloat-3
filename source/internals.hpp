@@ -125,6 +125,13 @@ extern THREAD_LOCAL uint8_t extF80_roundingPrecision;
 extern THREAD_LOCAL softfloat_tininess softfloat_detectTininess;
 
 template<typename Ty>
+inline constexpr auto
+f_as_u(Ty const v)->decltype(v.v)
+{
+    return v.v;
+}
+
+template<typename Ty>
 inline constexpr
 typename std::enable_if<std::is_integral<Ty>::value, bool>::type
 is_sign(Ty const& v)
@@ -442,24 +449,6 @@ packToF128UI96(bool const sign,
 
 #endif
 
-
-inline constexpr uint16_t
-f_as_u(float16_t const& v)
-{
-    return v.v;
-}
-
-inline constexpr uint32_t
-f_as_u(float32_t const& v)
-{
-    return v.v;
-}
-
-inline constexpr uint64_t
-f_as_u(float64_t const& v)
-{
-    return v.v;
-}
 
 inline constexpr float16_t
 to_float(uint16_t v)
