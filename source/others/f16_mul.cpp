@@ -51,38 +51,40 @@ f16_mul(float16_t a,
     uint16_t sigB = get_frac(uiB);
     bool const signZ = signA != signB;
 
-    if (expA == 0x1F) {
-        if (sigA || ((expB == 0x1F) && sigB)) {
+    static constexpr int8_t const max_exp = 0x1F;
+
+    if (expA == max_exp) {
+        if (0 != sigA || (expB == max_exp && sigB)) {
             return to_float(propagate_NaN(uiA, uiB));
         }
 
         uint16_t const magBits = static_cast<uint16_t>(expB | sigB);
 
-        if (!magBits) {
+        if (0 == magBits) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return to_float(defaultNaNF16UI);
         }
 
-        return to_float(packToF16UI(signZ, 0x1F, 0));
+        return to_float(packToF16UI(signZ, max_exp, 0));
     }
 
-    if (expB == 0x1F) {
-        if (sigB) {
+    if (expB == max_exp) {
+        if (0 != sigB) {
             return to_float(propagate_NaN(uiA, uiB));
         }
 
         uint16_t const magBits = static_cast<uint16_t>(expA | sigA);
 
-        if (!magBits) {
+        if (0 == magBits) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return to_float(defaultNaNF16UI);
         }
 
-        return to_float(packToF16UI(signZ, 0x1F, 0));
+        return to_float(packToF16UI(signZ, max_exp, 0));
     }
 
-    if (!expA) {
-        if (!sigA) {
+    if (0 == expA) {
+        if (0 == sigA) {
             return to_float(packToF16UI(signZ, 0, 0));
         }
 
@@ -91,8 +93,8 @@ f16_mul(float16_t a,
         sigA = normExpSig.sig;
     }
 
-    if (!expB) {
-        if (!sigB) {
+    if (0 == expB) {
+        if (0 == sigB) {
             return to_float(packToF16UI(signZ, 0, 0));
         }
 
@@ -107,7 +109,7 @@ f16_mul(float16_t a,
     uint32_t const sig32Z = static_cast<uint32_t>(sigA) * sigB;
     uint16_t sigZ = sig32Z >> 16;
 
-    if (sig32Z & 0xFFFF) {
+    if (0 != (sig32Z & 0xFFFF)) {
         sigZ |= 1;
     }
 
