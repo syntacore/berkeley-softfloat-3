@@ -644,6 +644,22 @@ is_sNaN(uint64_t const uiA)
         0 != (uiA & UINT64_C(0x0007FFFFFFFFFFFF));
 }
 
+inline constexpr bool
+is_sNaN(uint16_t const uiA64,
+        uint64_t const uiA0)
+{
+    return
+        UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & uiA64) &&
+        0 == (UINT64_C(0x4000000000000000) & uiA0) &&
+        0 != (UINT64_C(0x3FFFFFFFFFFFFFFF) & uiA0);
+}
+
+inline constexpr bool
+is_sNaN(extFloat80_t const& a)
+{
+    return is_sNaN(a.signExp, a.signif);
+}
+
 template<typename Ty>
 inline constexpr auto
 is_sNaN(Ty const a)->decltype(is_sNaN(f_as_u(a)))

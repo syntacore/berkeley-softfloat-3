@@ -97,8 +97,8 @@ softfloat_propagateNaNExtF80UI(uint16_t const uiA64,
                                uint16_t const uiB64,
                                uint64_t const uiB0)
 {
-    bool const isSigNaNA = softfloat_isSigNaNExtF80UI(uiA64, uiA0);
-    bool const isSigNaNB = softfloat_isSigNaNExtF80UI(uiB64, uiB0);
+    bool const isSigNaNA = is_sNaN(uiA64, uiA0);
+    bool const isSigNaNB = is_sNaN(uiB64, uiB0);
     /* Make NaNs non-signaling. */
     uint64_t const uiNonsigA0 = uiA0 | UINT64_C(0xC000000000000000);
     uint64_t const uiNonsigB0 = uiB0 | UINT64_C(0xC000000000000000);

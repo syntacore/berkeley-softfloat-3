@@ -214,28 +214,6 @@ The bit pattern for a default generated 80-bit extended floating-point NaN.
 uint16_t const defaultNaNExtF80UI64 = 0xFFFFu;
 uint64_t const defaultNaNExtF80UI0 = UINT64_C(0xC000000000000000);
 
-/**
-Returns true when the 80-bit unsigned integer formed from concatenating
-16-bit `uiA64' and 64-bit `uiA0' has the bit pattern of an 80-bit extended
-floating-point signaling NaN.
-Note:  This macro evaluates its arguments more than once.
-*/
-inline constexpr bool
-softfloat_isSigNaNExtF80UI(uint16_t const uiA64,
-                           uint64_t const uiA0)
-{
-    return
-        0x7FFF == (uiA64 & 0x7FFF) &&
-        0 == (uiA0 & UINT64_C(0x4000000000000000)) &&
-        0 != (uiA0 & UINT64_C(0x3FFFFFFFFFFFFFFF));
-}
-
-inline constexpr bool
-softfloat_isSigNaNExtF80UI(extFloat80_t const& a)
-{
-    return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
-}
-
 #ifdef SOFTFLOAT_FAST_INT64
 
 /**
@@ -254,7 +232,7 @@ inline commonNaN
 softfloat_extF80UIToCommonNaN(uint16_t const uiA64,
                               uint64_t const uiA0)
 {
-    if (softfloat_isSigNaNExtF80UI(uiA64, uiA0)) {
+    if (is_sNaN(uiA64, uiA0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 

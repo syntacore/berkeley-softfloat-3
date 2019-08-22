@@ -47,7 +47,7 @@ extF80_lt_quiet(extFloat80_t a,
     using namespace softfloat::internals;
 
     if (is_NaN(a) || is_NaN(b)) {
-        if (softfloat_isSigNaNExtF80UI(a) || softfloat_isSigNaNExtF80UI(a)) {
+        if (is_sNaN(a) || is_sNaN(a)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 

@@ -44,5 +44,5 @@ bool
 extF80_isSignalingNaN(extFloat80_t a)
 {
     using namespace softfloat::internals;
-    return softfloat_isSigNaNExtF80UI(a);
+    return is_sNaN(a);
 }

@@ -267,28 +267,6 @@ softfloat_commonNaNToF64UI(commonNaN const&)
     return defaultNaNF64UI;
 }
 
-/**
-Returns true when the 80-bit unsigned integer formed from concatenating
-16-bit `uiA64' and 64-bit `uiA0' has the bit pattern of an 80-bit extended
-floating-point signaling NaN.
-Note:  This macro evaluates its arguments more than once.
-*/
-inline constexpr bool
-softfloat_isSigNaNExtF80UI(uint16_t const& uiA64,
-                           uint64_t const& uiA0)
-{
-    return
-        UINT16_C(0x7FFF) == (UINT16_C(0x7FFF) & uiA64) &&
-        0 == (UINT64_C(0x4000000000000000) & uiA0) &&
-        0 != (UINT64_C(0x3FFFFFFFFFFFFFFF) & uiA0);
-}
-
-inline constexpr bool
-softfloat_isSigNaNExtF80UI(extFloat80_t const& a)
-{
-    return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
-}
-
 #ifdef SOFTFLOAT_FAST_INT64
 
 /*
@@ -375,7 +353,7 @@ softfloat_propagateNaNExtF80UI(uint16_t const& uiA64,
                                uint64_t const& uiB0)
 {
 
-    if (softfloat_isSigNaNExtF80UI(uiA64, uiA0) || softfloat_isSigNaNExtF80UI(uiB64, uiB0)) {
+    if (is_sNaN(uiA64, uiA0) || is_sNaN(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
@@ -463,7 +441,7 @@ softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
                               extFloat80M const* const bSPtr,
                               extFloat80M* const zSPtr)
 {
-    if (softfloat_isSigNaNExtF80UI(*aSPtr) || (bSPtr && softfloat_isSigNaNExtF80UI(*bSPtr))) {
+    if (is_sNaN(*aSPtr) || (bSPtr && is_sNaN(*bSPtr))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
