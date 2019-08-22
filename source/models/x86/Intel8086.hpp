@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SOFTFLOAT_MODEL_INTEL8086_HPP_
 
 #include "internals.hpp"
+#include "primitives/types.hpp"
 
 namespace softfloat {
 namespace internals {
@@ -99,6 +100,11 @@ struct commonNaN
         z.signExp = packToExtF80UI64(sign, 0x7FFF);
         z.signif = UINT64_C(0xC000000000000000) | v64 >> 1;
         return z;
+    }
+
+    explicit operator uint128()const
+    {
+        return uint128{!!static_cast<uint16_t>(sign) << 15 | 0x7FFFu, UINT64_C(0xC000000000000000) | v64 >> 1};
     }
 
     bool sign;
@@ -253,17 +259,6 @@ softfloat_extF80UIToCommonNaN(uint16_t const uiA64,
     }
 
     return commonNaN{0 != (uiA64 >> 15), uiA0 << 1, 0};
-}
-
-/**
-Converts the common NaN pointed to by `aPtr' into an 80-bit extended
-floating-point NaN, and returns the bit pattern of this value as an unsigned
-integer.
-*/
-inline constexpr uint128
-softfloat_commonNaNToExtF80UI(commonNaN const& a)
-{
-    return uint128{!!static_cast<uint16_t>(a.sign) << 15 | 0x7FFFu, UINT64_C(0xC000000000000000) | a.v64 >> 1};
 }
 
 /**

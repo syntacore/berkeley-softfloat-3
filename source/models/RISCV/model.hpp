@@ -126,6 +126,12 @@ struct commonNaN
         return z;
     }
 
+    explicit operator uint128()const
+    {
+        return uint128{defaultNaNExtF80UI64, defaultNaNExtF80UI0};
+    }
+
+
 private:
     bool sign;
     uint64_t v64;
@@ -351,17 +357,6 @@ softfloat_f128UIToCommonNaN(uint64_t const& uiA64,
     }
 
     return commonNaN{false, 0, 0};
-}
-
-/**
-Converts the common NaN pointed to by `aPtr' into an 80-bit extended
-floating-point NaN, and returns the bit pattern of this value as an unsigned
-integer.
-*/
-inline constexpr uint128
-softfloat_commonNaNToExtF80UI(commonNaN const&)
-{
-    return uint128{defaultNaNExtF80UI64, defaultNaNExtF80UI0};
 }
 
 /**

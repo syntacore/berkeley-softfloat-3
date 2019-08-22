@@ -50,8 +50,8 @@ f16_to_extF80(float16_t const a)
     uint16_t frac = get_frac(a);
 
     if (!is_finite(a)) {
-        if (0 != frac) {
-            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f16UIToCommonNaN(f_as_u(a)));
+        if (is_NaN(a)) {
+            uint128 const uiZ = uint128(softfloat_f16UIToCommonNaN(f_as_u(a)));
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;

@@ -57,7 +57,7 @@ f128_to_extF80(float128_t const a)
     uint64_t uiZ0;
     if (exp == 0x7FFF) {
         if (frac64 | frac0) {
-            uint128 const uiZ = softfloat_commonNaNToExtF80UI(softfloat_f128UIToCommonNaN(uiA64, uiA0));
+            uint128 const uiZ = uint128(softfloat_f128UIToCommonNaN(uiA64, uiA0));
             uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         } else {

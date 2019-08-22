@@ -179,8 +179,6 @@ static_assert(64 == CHAR_BIT * sizeof(float64_t), "Bad size of float64_t");
 static_assert(80 <= CHAR_BIT * sizeof(extFloat80M) && CHAR_BIT * sizeof(extFloat80M) <= 128, "Bad size of extFloat80M");
 static_assert(128 == CHAR_BIT * sizeof(float128_t), "Bad size of float128_t");
 
-#ifdef SOFTFLOAT_FAST_INT64
-
 struct uint128
 {
     uint128() = default;
@@ -242,8 +240,6 @@ struct uint128_extra
     uint128 v;
     uint64_t extra;
 };
-
-#endif
 
 }  // namespace internals
 }  // namespace softfloat
