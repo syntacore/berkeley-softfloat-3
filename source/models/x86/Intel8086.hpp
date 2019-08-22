@@ -85,6 +85,14 @@ struct commonNaN
         , v0(a_v0)
     {}
 
+    commonNaN(extFloat80M const& a)
+        : commonNaN{is_sign(a.signExp), a.signif << 1, 0}
+    {
+        if (extF80M_isSignalingNaN(&a)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+        }
+    }
+
     explicit operator extFloat80M()const
     {
         extFloat80M z;
@@ -353,30 +361,6 @@ softfloat_propagateNaNF128UI(uint128 const& a,
 }
 
 #else
-
-/**
-The following functions are needed only when `SOFTFLOAT_FAST_INT64' is not
-defined.
-*/
-
-/**
-Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is
-a NaN, converts this NaN to the common NaN form, and stores the resulting
-common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
-NaN, the invalid exception is raised.
-*/
-/**
-@bug use extFloat80_t
-*/
-inline commonNaN
-softfloat_extF80MToCommonNaN(extFloat80M const& a)
-{
-    if (extF80M_isSignalingNaN(&a)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return commonNaN{is_sign(a.signExp), a.signif << 1, 0};
-}
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values

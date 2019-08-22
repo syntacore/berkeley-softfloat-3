@@ -110,6 +110,14 @@ struct commonNaN
         , v0(a_v0)
     {}
 
+    commonNaN(extFloat80_t const& a)
+        : commonNaN{false, 0, 0}
+    {
+        if (0 == (a.signif & UINT64_C(0x4000000000000000))) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+        }
+    }
+
     explicit operator extFloat80M()const
     {
         extFloat80M z;
@@ -427,22 +435,6 @@ static uint32_t const defaultNaNF128UI96 = UINT32_C(0x7FFF8000);
 static uint32_t const defaultNaNF128UI64 = UINT32_C(0);
 static uint32_t const defaultNaNF128UI32 = UINT32_C(0);
 static uint32_t const defaultNaNF128UI0 = UINT32_C(0);
-
-/**
-Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is
-a NaN, converts this NaN to the common NaN form, and stores the resulting
-common NaN at the location pointed to by `zPtr'.  If the NaN is a signaling
-NaN, the invalid exception is raised.
-*/
-inline commonNaN
-softfloat_extF80MToCommonNaN(extFloat80_t const& a)
-{
-    if (0 == (a.signif & UINT64_C(0x4000000000000000))) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return commonNaN{false, 0, 0};
-}
 
 /**
 Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,
