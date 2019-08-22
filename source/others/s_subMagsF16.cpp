@@ -53,7 +53,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
     if (0 == expDiff) {
         if (expA == 0x1F) {
             if (0 != (sigA | sigB)) {
-                return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+                return to_float(propagate_NaN(uiA, uiB));
             }
 
             softfloat_raiseFlags(softfloat_flag_invalid);
@@ -96,7 +96,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
         signZ = !signZ;
 
         if (expB == 0x1F) {
-            return to_float(sigB ? softfloat_propagateNaNF16UI(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
+            return to_float(sigB ? propagate_NaN(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
         }
 
         if (expDiff <= -13) {
@@ -122,7 +122,7 @@ softfloat_subMagsF16(uint16_t const& uiA,
         expDiff = -expDiff;
     } else {
         if (expA == 0x1F) {
-            return to_float(sigA ? softfloat_propagateNaNF16UI(uiA, uiB) : uiA);
+            return to_float(sigA ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         if (13 <= expDiff) {

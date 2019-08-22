@@ -47,7 +47,7 @@ f16_sqrt(float16_t a)
 
     if (expA == 0x1F) {
         if (sigA) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, 0));
+            return to_float(propagate_NaN(uiA, 0));
         }
 
         if (!signA) {

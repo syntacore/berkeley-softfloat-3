@@ -54,33 +54,44 @@ static softfloat_tininess const init_detectTininess = softfloat_tininess_afterRo
 The values to return on conversions to 32-bit integer formats that raise an
 invalid exception.
 */
-static uint32_t const ui32_fromPosOverflow = UINT32_MAX;
-static uint32_t const ui32_fromNegOverflow = 0;
-static uint32_t const ui32_fromNaN = UINT32_MAX;
-static int32_t const i32_fromPosOverflow = INT32_MAX;
-static int32_t const i32_fromNegOverflow = INT32_MIN;
-static int32_t const i32_fromNaN = INT32_MAX;
+static constexpr uint32_t const ui32_fromPosOverflow = UINT32_MAX;
+static constexpr uint32_t const ui32_fromNegOverflow = 0;
+static constexpr uint32_t const ui32_fromNaN = UINT32_MAX;
+static constexpr int32_t const i32_fromPosOverflow = INT32_MAX;
+static constexpr int32_t const i32_fromNegOverflow = INT32_MIN;
+static constexpr int32_t const i32_fromNaN = INT32_MAX;
 
 /**
 The values to return on conversions to 64-bit integer formats that raise an
 invalid exception.
 */
-static uint64_t const ui64_fromPosOverflow = UINT64_MAX;
-static uint64_t const ui64_fromNegOverflow = 0;
-static uint64_t const ui64_fromNaN = UINT64_MAX;
-static int64_t const i64_fromPosOverflow = INT64_MAX;
-static int64_t const i64_fromNegOverflow = INT64_MIN;
-static int64_t const i64_fromNaN = INT64_MAX;
+static constexpr uint64_t const ui64_fromPosOverflow = UINT64_MAX;
+static constexpr uint64_t const ui64_fromNegOverflow = 0;
+static constexpr uint64_t const ui64_fromNaN = UINT64_MAX;
+static constexpr int64_t const i64_fromPosOverflow = INT64_MAX;
+static constexpr int64_t const i64_fromNegOverflow = INT64_MIN;
+static constexpr int64_t const i64_fromNaN = INT64_MAX;
 
 /**
 The bit pattern for a default generated 16-bit floating-point NaN.
 */
-static uint16_t const defaultNaNF16UI = UINT16_C(0x7E00);
+static constexpr uint16_t const defaultNaNF16UI = UINT16_C(0x7E00);
 
 /**
 The bit pattern for a default generated 32-bit floating-point NaN.
 */
-static uint32_t const defaultNaNF32UI = UINT32_C(0x7FC00000);
+static constexpr uint32_t const defaultNaNF32UI = UINT32_C(0x7FC00000);
+
+/**
+The bit pattern for a default generated 64-bit floating-point NaN.
+*/
+static constexpr uint64_t const defaultNaNF64UI = UINT64_C(0x7FF8000000000000);
+
+/**
+The bit pattern for a default generated 80-bit extended floating-point NaN.
+*/
+static constexpr uint16_t const defaultNaNExtF80UI64 = 0x7FFFu;
+static constexpr uint64_t const defaultNaNExtF80UI0 = UINT64_C(0xC000000000000000);
 
 /**
 "Common NaN" structure, used to transfer NaN representations from one format
@@ -138,14 +149,48 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint16_t
-softfloat_propagateNaNF16UI(uint16_t const& uiA,
-                            uint16_t const& uiB)
+propagate_NaN(uint16_t const& uiA,
+              uint16_t const& uiB)
 {
     if (is_sNaN(uiA) || is_sNaN(uiB)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
     return defaultNaNF16UI;
+}
+
+/**
+Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
+point values, at least one of which is a NaN, returns the bit pattern of
+the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
+signaling NaN, the invalid exception is raised.
+*/
+static inline uint32_t
+propagate_NaN(uint32_t const& uiA,
+              uint32_t const& uiB)
+{
+    if (is_sNaN(uiA) || is_sNaN(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+    }
+
+    return defaultNaNF32UI;
+}
+
+/**
+Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
+point values, at least one of which is a NaN, returns the bit pattern of
+the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
+signaling NaN, the invalid exception is raised.
+*/
+static inline uint64_t
+propagate_NaN(uint64_t const& uiA,
+              uint64_t const& uiB)
+{
+    if (is_sNaN(uiA) || is_sNaN(uiB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+    }
+
+    return defaultNaNF64UI;
 }
 
 /**
@@ -175,11 +220,6 @@ softfloat_commonNaNToF32UI(commonNaN const&)
 }
 
 /**
-The bit pattern for a default generated 64-bit floating-point NaN.
-*/
-static uint64_t const defaultNaNF64UI = UINT64_C(0x7FF8000000000000);
-
-/**
 Assuming `uiA' has the bit pattern of a 64-bit floating-point NaN, converts
 this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
@@ -206,12 +246,6 @@ softfloat_commonNaNToF64UI(commonNaN const&)
 }
 
 /**
-The bit pattern for a default generated 80-bit extended floating-point NaN.
-*/
-static uint16_t const defaultNaNExtF80UI64 = 0x7FFFu;
-static uint64_t const defaultNaNExtF80UI0 = UINT64_C(0xC000000000000000);
-
-/**
 Returns true when the 80-bit unsigned integer formed from concatenating
 16-bit `uiA64' and 64-bit `uiA0' has the bit pattern of an 80-bit extended
 floating-point signaling NaN.
@@ -231,47 +265,6 @@ inline constexpr bool
 softfloat_isSigNaNExtF80UI(extFloat80_t const& a)
 {
     return softfloat_isSigNaNExtF80UI(a.signExp, a.signif);
-}
-
-template<typename Ty>
-inline Ty
-propagate_NaN(Ty const& uiA,
-              Ty const& uiB);
-
-
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
-template<>
-inline uint32_t
-propagate_NaN<uint32_t>(uint32_t const& uiA,
-                        uint32_t const& uiB)
-{
-    if (is_sNaN(uiA) || is_sNaN(uiB)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return defaultNaNF32UI;
-}
-
-/**
-Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
-point values, at least one of which is a NaN, returns the bit pattern of
-the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
-signaling NaN, the invalid exception is raised.
-*/
-static inline uint64_t
-propagate_NaN(uint64_t const& uiA,
-                            uint64_t const& uiB)
-{
-    if (is_sNaN(uiA) || is_sNaN(uiB)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return defaultNaNF64UI;
 }
 
 #ifdef SOFTFLOAT_FAST_INT64

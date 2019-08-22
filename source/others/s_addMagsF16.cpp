@@ -55,7 +55,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
         }
 
         if (0x1F == expA) {
-            return to_float(0 != (sigA | sigB) ? softfloat_propagateNaNF16UI(uiA, uiB) : uiA);
+            return to_float(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
         }
 
         bool const signZ = is_sign(uiA);
@@ -78,7 +78,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
 
     if (expDiff < 0) {
         if (expB == 0x1F) {
-            return to_float(sigB ? softfloat_propagateNaNF16UI(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
+            return to_float(sigB ? propagate_NaN(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
         }
 
         if (expDiff <= -13) {
@@ -107,7 +107,7 @@ softfloat_addMagsF16(uint16_t const& uiA,
         uint16_t uiZ = uiA;
 
         if (expA == 0x1F) {
-            return to_float(sigA ? softfloat_propagateNaNF16UI(uiA, uiB) : uiZ);
+            return to_float(sigA ? propagate_NaN(uiA, uiB) : uiZ);
         }
 
         if (13 <= expDiff) {

@@ -83,8 +83,6 @@ f32_mulAdd(float32_t const a,
         return to_float(propagate_NaN(defaultNaNF32UI, uiC));
     }
 
-    int16_t expC = get_exp(uiC);
-
     if (is_inf(uiC)) {
         /** if c is infinity while a and b are finite, return c */
         return to_float(uiC);
@@ -93,7 +91,6 @@ f32_mulAdd(float32_t const a,
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     int16_t expA = get_exp(uiA);
     uint32_t sigA = get_frac(uiA);
-    uint32_t sigC = get_frac(uiC);
 
     if (0 == expA) {
         /* a is zero or subnormal */
@@ -118,7 +115,7 @@ f32_mulAdd(float32_t const a,
         if (0 == sigB) {
             /* b is zero */
             return
-                0 == (expC | sigC) && signProd != signC ?
+                is_zero(uiC) && signProd != signC ?
                 make_signed_zero<float32_t>(softfloat_round_min == softfloat_roundingMode) :
                 to_float(uiC);
         }
@@ -139,6 +136,9 @@ f32_mulAdd(float32_t const a,
     }
 
     bool signZ = signProd;
+
+    int16_t expC = get_exp(uiC);
+    uint32_t sigC = get_frac(uiC);
 
     if (0 == expC) {
         if (0 == sigC) {

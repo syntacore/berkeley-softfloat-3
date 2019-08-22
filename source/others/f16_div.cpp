@@ -129,7 +129,7 @@ f16_div(float16_t const a,
 
     if (0x1F == expA) {
         if (0 != sigA) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         if (0x1F != expB) {
@@ -137,7 +137,7 @@ f16_div(float16_t const a,
         }
 
         if (0 != sigB) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -146,7 +146,7 @@ f16_div(float16_t const a,
 
     if (0x1F == expB) {
         if (sigB) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         return to_float(packToF16UI(signZ, 0, 0));

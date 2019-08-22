@@ -70,7 +70,7 @@ f64_mulAdd(float64_t const a,
         }
 
         if (is_NaN(uiC)) {
-            return to_float(propagate_NaN(defaultNaNF32UI, uiC));
+            return to_float(propagate_NaN(defaultNaNF64UI, uiC));
         }
 
         if (is_finite(uiC) || signProd == signC) {

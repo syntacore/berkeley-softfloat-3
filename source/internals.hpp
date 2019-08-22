@@ -562,7 +562,7 @@ is_zero(uint64_t const &a)
 }
 
 inline constexpr bool
-is_inf(uint32_t const& a)
+is_inf(uint16_t const a)
 {
     return
         !is_finite(a) &&
@@ -570,7 +570,15 @@ is_inf(uint32_t const& a)
 }
 
 inline constexpr bool
-is_inf(uint64_t const& a)
+is_inf(uint32_t const a)
+{
+    return
+        !is_finite(a) &&
+        0 == get_frac(a);
+}
+
+inline constexpr bool
+is_inf(uint64_t const a)
 {
     return
         !is_finite(a) &&
@@ -616,7 +624,15 @@ is_NaN(extFloat80_t const& a)
 }
 
 inline constexpr bool
-is_sNaN(uint32_t const& uiA)
+is_sNaN(uint16_t const uiA)
+{
+    return
+        UINT16_C(0x7C00) == (UINT16_C(0x7E00) & uiA) &&
+        0 != (UINT16_C(0x01FF) & uiA);
+}
+
+inline constexpr bool
+is_sNaN(uint32_t const uiA)
 {
     return
         (~(~UINT32_C(0) << 8) << 23) == (((~(~UINT32_C(0) << 8) << 23) | (~(~UINT32_C(0) << 1) << 22)) & uiA) &&
@@ -681,6 +697,13 @@ Ty
 make_signed_inf(bool sign);
 
 template<>
+inline constexpr float16_t
+make_signed_inf<float16_t>(bool sign)
+{
+    return to_float(packToF16UI(sign, 0x1F, 0));
+}
+
+template<>
 inline constexpr float32_t
 make_signed_inf<float32_t>(bool sign)
 {
@@ -699,6 +722,13 @@ Ty
 make_signed_zero(bool sign = false);
 
 template<>
+inline constexpr uint16_t
+make_signed_zero<uint16_t>(bool sign)
+{
+    return packToF16UI(sign, 0, 0u);
+}
+
+template<>
 inline constexpr uint32_t
 make_signed_zero<uint32_t>(bool sign)
 {
@@ -710,6 +740,13 @@ inline constexpr uint64_t
 make_signed_zero<uint64_t>(bool sign)
 {
     return packToF64UI(sign, 0, 0u);
+}
+
+template<>
+inline constexpr float16_t
+make_signed_zero<float16_t>(bool sign)
+{
+    return to_float(make_signed_zero<uint16_t>(sign));
 }
 
 template<>

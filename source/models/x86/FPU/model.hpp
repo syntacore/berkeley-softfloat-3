@@ -44,7 +44,7 @@ namespace internals {
 inline namespace Intel_8086 {
 
 uint16_t
-softfloat_propagateNaNF16UI(uint16_t const uiA,
+propagate_NaN(uint16_t const uiA,
                             uint16_t const uiB);
 
 template<typename Ty>

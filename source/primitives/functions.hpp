@@ -44,18 +44,6 @@ namespace softfloat {
 namespace internals {
 
 /**
-Returns true when 16-bit unsigned integer `uiA' has the bit pattern of a
-16-bit floating-point signaling NaN.
-*/
-inline constexpr bool
-is_sNaN(uint16_t const uiA)
-{
-    return
-        UINT16_C(0x7C00) == (UINT16_C(0x7E00) & uiA) &&
-        0 != (UINT16_C(0x01FF) & uiA);
-}
-
-/**
 Shifts `a' right by the number of bits given in `dist', which must be in
 the range 1 to 63.  If any nonzero bits are shifted off, they are "jammed"
 into the least-significant bit of the shifted value by setting the least-

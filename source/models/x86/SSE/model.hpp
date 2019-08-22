@@ -50,8 +50,8 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 inline uint16_t
-softfloat_propagateNaNF16UI(uint16_t const uiA,
-                            uint16_t const uiB)
+propagate_NaN(uint16_t const uiA,
+              uint16_t const uiB)
 {
     static uint16_t const quite_nan_bit = UINT16_C(0x0200);
     bool const isSigNaNA = is_sNaN(uiA);
@@ -67,21 +67,15 @@ softfloat_propagateNaNF16UI(uint16_t const uiA,
     return static_cast<uint16_t>(quite_nan_bit | (is_NaN(uiA) ? uiA : uiB));
 }
 
-template<typename Ty>
-inline Ty
-propagate_NaN(Ty const& uiA,
-              Ty const& uiB);
-
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
 point values, at least one of which is a NaN, returns the bit pattern of
 the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
-template<>
 inline uint32_t
-propagate_NaN<uint32_t>(uint32_t const& uiA,
-                        uint32_t const& uiB)
+propagate_NaN(uint32_t const& uiA,
+              uint32_t const& uiB)
 {
     static uint32_t const quietNaN_bit = UINT32_C(0x00400000);
 
@@ -121,7 +115,7 @@ signaling NaN, the invalid exception is raised.
 */
 inline uint64_t
 propagate_NaN(uint64_t const uiA,
-                            uint64_t const uiB)
+              uint64_t const uiB)
 {
     bool const isSigNaNA = is_sNaN(uiA);
 

@@ -53,7 +53,7 @@ f16_mul(float16_t a,
 
     if (expA == 0x1F) {
         if (sigA || ((expB == 0x1F) && sigB)) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         uint16_t const magBits = static_cast<uint16_t>(expB | sigB);
@@ -68,7 +68,7 @@ f16_mul(float16_t a,
 
     if (expB == 0x1F) {
         if (sigB) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         uint16_t const magBits = static_cast<uint16_t>(expA | sigA);

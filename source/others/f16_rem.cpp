@@ -51,7 +51,7 @@ f16_rem(float16_t const a,
 
     if (expA == 0x1F) {
         if (sigA || ((expB == 0x1F) && sigB)) {
-            return to_float(softfloat_propagateNaNF16UI(uiA, uiB));
+            return to_float(propagate_NaN(uiA, uiB));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -59,7 +59,7 @@ f16_rem(float16_t const a,
     }
 
     if (expB == 0x1F) {
-        return sigB ? to_float(softfloat_propagateNaNF16UI(uiA, uiB)) : a;
+        return sigB ? to_float(propagate_NaN(uiA, uiB)) : a;
     }
 
     if (!expB) {

@@ -50,108 +50,59 @@ f16_mulAdd(float16_t const a,
     uint16_t const uiB = f_as_u(b);
     uint16_t const uiC = f_as_u(c);
 
+    if (is_NaN(uiA) || is_NaN(uiB) || is_sNaN(uiC)) {
+        return to_float(propagate_NaN(propagate_NaN(uiA, uiB), uiC));
+    }
+
     bool const signA = is_sign(uiA);
-    int8_t expA = get_exp(uiA);
-    uint16_t sigA = get_frac(uiA);
-
     bool const signB = is_sign(uiB);
-    int8_t expB = get_exp(uiB);
-    uint16_t sigB = get_frac(uiB);
-
     bool const signC = is_sign(uiC);
-    int8_t expC = get_exp(uiC);
-    uint16_t sigC = get_frac(uiC);
-
     bool const signProd = signA != signB;
 
-    static constexpr int8_t const max_exp = 0x1F;
+    if (is_inf(uiA) || is_inf(uiB)) {
+        /* a or b is inf, product is inf or undefined, check other operand for zero */
+        bool const is_product_undefined = is_inf(uiA) ? is_zero(uiB) : is_zero(uiA);
 
-    if (!is_finite(uiA)) {
-        // a is inf or NaN
-        if (0 != sigA || (max_exp == expB && 0 != sigB)) {
-            // a is NaN or b is NaN
-            return to_float(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
+        if (is_product_undefined) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return to_float(propagate_NaN(defaultNaNF16UI, uiC));
         }
 
-        if (!is_zero(uiB)) {
-            uint16_t const infinity = packToF16UI(signProd, max_exp, 0);
-
-            if (max_exp != expC) {
-                return to_float(infinity);
-            }
-
-            // c is inf or NaN
-            assert(max_exp == expC);
-
-            if (0 != sigC) {
-                // c is NaN
-                return to_float(softfloat_propagateNaNF16UI(infinity, uiC));
-            }
-
-            // c is inf
-            if (signProd == signC) {
-                return to_float(infinity);
-            }
-
-            // result is (inf - inf)
+        if (is_NaN(uiC)) {
+            return to_float(propagate_NaN(defaultNaNF16UI, uiC));
         }
 
-        // (a * b) is (inf * 0) or result is (inf - inf)
+        if (is_finite(uiC) || signProd == signC) {
+            /* if summand c is finite or same sign return product as result*/
+            return make_signed_inf<float16_t>(signProd);
+        }
+
+        /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(softfloat_propagateNaNF16UI(defaultNaNF16UI, uiC));
+        return to_float(propagate_NaN(defaultNaNF16UI, uiC));
     }
 
-    // a is finite
-    assert(max_exp != expA);
-
-    if (max_exp == expB) {
-        // b is inf or NaN
-        if (0 != sigB) {
-            // b is NaN
-            return to_float(softfloat_propagateNaNF16UI(softfloat_propagateNaNF16UI(uiA, uiB), uiC));
-        }
-
-        // b is inf
-        assert(0 == sigB);
-        uint16_t const is_zero_a = 0 != expA && 0 != sigA;
-
-        if (!is_zero_a) {
-            uint16_t const infinity = packToF16UI(signProd, max_exp, 0);
-
-            if (max_exp != expC) {
-                return to_float(infinity);
-            }
-
-            if (0 != sigC) {
-                return to_float(softfloat_propagateNaNF16UI(infinity, uiC));
-            }
-
-            if (signProd == signC) {
-                return to_float(infinity);
-            }
-        }
-
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return to_float(softfloat_propagateNaNF16UI(defaultNaNF16UI, uiC));
+    if (is_NaN(uiC)) {
+        return to_float(propagate_NaN(defaultNaNF16UI, uiC));
     }
 
-    // a and b are finite
-
-    if (max_exp == expC) {
-        // result is inf or NaN
-        return to_float(sigC ? softfloat_propagateNaNF16UI(0, uiC) : uiC);
+    if (is_inf(uiC)) {
+        /** if c is infinity while a and b are finite, return c */
+        return to_float(uiC);
     }
 
     // a, b, c are finite
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
+    int8_t expA = get_exp(uiA);
+    uint16_t sigA = get_frac(uiA);
 
     if (0 == expA) {
+        /* a is zero or subnormal */
         if (0 == sigA) {
             // a is zero, result is c
-            return to_float(
-                       0 == (expC | sigC) && signProd != signC ?
-                       packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0) :
-                       uiC);
+            return is_zero(uiC) && signProd != signC ?
+                make_signed_zero<float16_t>(softfloat_round_min == softfloat_roundingMode) :
+                to_float(uiC);
         }
 
         // a is subnormal
@@ -160,12 +111,15 @@ f16_mulAdd(float16_t const a,
         sigA = normExpSig.sig;
     }
 
+    int8_t expB = get_exp(uiB);
+    uint16_t sigB = get_frac(uiB);
+
     if (0 == expB) {
         if (0 == sigB) {
             // b is zero, result is c
-            return to_float(
-                       0 == (expC | sigC) && signProd != signC ?
-                       packToF16UI(softfloat_round_min == softfloat_roundingMode, 0, 0) : uiC);
+            return is_zero(uiC) && signProd != signC ?
+                make_signed_zero<float16_t>(softfloat_round_min == softfloat_roundingMode) :
+                to_float(uiC);
         }
 
         // b is subnormal
@@ -183,6 +137,9 @@ f16_mulAdd(float16_t const a,
         --expProd;
         sigProd <<= 1;
     }
+
+    int8_t expC = get_exp(uiC);
+    uint16_t sigC = get_frac(uiC);
 
     if (0 == expC) {
         if (0 == sigC) {
@@ -246,19 +203,17 @@ f16_mulAdd(float16_t const a,
             signZ = !signZ;
             sig32Z = static_cast<uint32_t>(-static_cast<int32_t>(sig32Z));
         }
-    } else {
+    } else /*if (0 < expDiff)*/ {
         expZ = expProd;
         sig32Z = sigProd - softfloat_shiftRightJam32(sig32C, static_cast<uint16_t>(expDiff));
     }
 
     int8_t const shiftDist = count_leading_zeros(sig32Z) - 1;
     int8_t const shiftDist_1 = shiftDist - 16;
+    uint16_t const sigZ =
+        shiftDist_1 < 0 ?
+        sig32Z >> -shiftDist_1 | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist_1 & 31))) :
+        sig32Z << shiftDist_1;
 
-    return softfloat_roundPackToF16(signZ,
-                                    expZ - shiftDist,
-                                    static_cast<uint16_t>(
-                                        shiftDist_1 < 0 ?
-                                        sig32Z >> -shiftDist_1 | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist_1 & 31))) :
-                                        sig32Z << shiftDist_1)
-                                   );
+    return softfloat_roundPackToF16(signZ, expZ - shiftDist, sigZ);
 }

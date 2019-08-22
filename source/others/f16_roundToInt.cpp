@@ -96,7 +96,7 @@ f16_roundToInt(float16_t a,
     if (0x19 <= exp) {
         return
             exp == 0x1F && 0 != get_frac(uiA) ?
-            to_float(softfloat_propagateNaNF16UI(uiA, 0)) : a;
+            to_float(propagate_NaN(uiA, 0)) : a;
     }
 
     uint16_t uiZ = uiA;
