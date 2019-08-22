@@ -158,19 +158,6 @@ The bit pattern for a default generated 64-bit floating-point NaN.
 uint64_t const defaultNaNF64UI = UINT64_C(0xFFF8000000000000);
 
 /**
-Returns true when 64-bit unsigned integer `uiA' has the bit pattern of a
-64-bit floating-point signaling NaN.
-Note:  This macro evaluates its argument more than once.
-*/
-inline constexpr bool
-is_sNaN(uint64_t uiA)
-{
-    return
-        UINT64_C(0x7FF0000000000000) == (uiA & UINT64_C(0x7FF8000000000000)) &&
-        0 != (uiA & UINT64_C(0x0007FFFFFFFFFFFF));
-}
-
-/**
 Assuming `uiA' has the bit pattern of a 64-bit floating-point NaN, converts
 this NaN to the common NaN form, and stores the resulting common NaN at the
 location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid

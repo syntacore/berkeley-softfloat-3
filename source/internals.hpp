@@ -491,6 +491,38 @@ get_exp(uint32_t const& a)
     return static_cast<int16_t>((a >> 23) & ~(~UINT32_C(0) << 8));
 }
 
+inline constexpr int16_t
+get_exp(uint64_t const& a)
+{
+    return static_cast<int16_t>((a >> 52) & ~(~UINT32_C(0) << 11));
+}
+
+inline constexpr uint16_t
+expExtF80UI64(uint16_t const& a64)
+{
+    return static_cast<uint16_t>(0x7FFF & a64);
+}
+
+inline constexpr bool
+is_finite(uint16_t const& a)
+{
+    return
+        0x1F != get_exp(a);
+}
+
+inline constexpr bool
+is_finite(uint32_t const& a)
+{
+    return 255 != get_exp(a);
+}
+
+inline constexpr bool
+is_finite(uint64_t const& a)
+{
+    return
+        2047 != get_exp(a);
+}
+
 inline constexpr uint16_t
 get_frac(uint16_t const& a)
 {
@@ -503,54 +535,16 @@ get_frac(uint32_t const& a)
     return a & ~(~UINT32_C(0) << 23);
 }
 
-inline constexpr uint16_t
-packToF16UI(bool sign,
-            int8_t const& expnt,
-            uint16_t const& sig)
+inline constexpr uint64_t
+get_frac(uint64_t const& a)
 {
-    return
-        static_cast<uint16_t>(
-        (static_cast<uint16_t>(!!sign) << 15) +
-        (static_cast<uint16_t>(expnt) << 10) +
-            sig);
-}
-
-/**
-@bug return signed 16-bits value instead unsigned 8-bits value
-*/
-inline constexpr uint32_t
-packToF32UI(bool sign,
-            int16_t const& expnt,
-            uint32_t const& sgnf)
-{
-    return
-        (static_cast<uint32_t>(!!sign) << 31) |
-        ((static_cast<uint32_t>(expnt) << 23) + sgnf);
-}
-
-template<typename Ty>
-Ty
-make_signed_inf(bool sign);
-
-template<>
-inline constexpr float32_t
-make_signed_inf<float32_t>(bool sign)
-{
-    return to_float(packToF32UI(sign, 0xFF, 0u));
+    return a & ~(~UINT64_C(0) << 52);
 }
 
 inline constexpr bool
-is_finite(uint32_t const& a)
+is_zero(uint16_t const &a)
 {
-    return 255 != get_exp(a);
-}
-
-inline constexpr bool
-is_inf(uint32_t const& a)
-{
-    return
-        !is_finite(a) &&
-        0 == get_frac(a);
+    return 0 == get_exp(a) && 0 == get_frac(a);
 }
 
 inline constexpr bool
@@ -562,84 +556,25 @@ is_zero(uint32_t const& a)
 }
 
 inline constexpr bool
-is_subnormal(uint32_t const& a)
+is_zero(uint64_t const &a)
 {
-    return
-        0 == get_exp(a) &&
-        0 != get_frac(a);
-}
-
-inline constexpr int16_t
-get_exp(uint64_t const& a)
-{
-    return static_cast<int16_t>((a >> 52) & ~(~UINT32_C(0) << 11));
-}
-
-inline constexpr uint64_t
-get_frac(uint64_t const& a)
-{
-    return a & ~(~UINT64_C(0) << 52);
-}
-
-inline constexpr uint64_t
-packToF64UI(bool sign, int16_t const& expnt, uint64_t const& sgnf)
-{
-    return
-        (static_cast<uint64_t>(!!sign) << 63) |
-        ((static_cast<uint64_t>(expnt) << 52) + sgnf);
-}
-
-template<>
-inline constexpr float64_t
-make_signed_inf<float64_t>(bool sign)
-{
-    return to_float(packToF64UI(sign, 0x7FF, 0u));
-}
-
-template<typename Ty>
-Ty
-make_signed_zero(bool sign = false);
-
-template<>
-inline constexpr uint32_t
-make_signed_zero<uint32_t>(bool sign)
-{
-    return packToF32UI(sign, 0, 0u);
-}
-
-template<>
-inline constexpr uint64_t
-make_signed_zero<uint64_t>(bool sign)
-{
-    return packToF64UI(sign, 0, 0u);
-}
-
-template<>
-inline constexpr float64_t
-make_signed_zero<float64_t>(bool sign)
-{
-    return to_float(make_signed_zero<uint64_t>(sign));
-}
-
-template<>
-inline constexpr float32_t
-make_signed_zero<float32_t>(bool sign)
-{
-    return to_float(make_signed_zero<uint32_t>(sign));
+    return 0 == (~(~UINT64_C(0) << 63) & a);
 }
 
 inline constexpr bool
-is_finite(uint64_t const& a)
+is_inf(uint32_t const& a)
 {
     return
-        2047 != get_exp(a);
+        !is_finite(a) &&
+        0 == get_frac(a);
 }
 
 inline constexpr bool
-is_finite(uint16_t const& a)
+is_inf(uint64_t const& a)
 {
     return
-        0x1F != get_exp(a);
+        !is_finite(a) &&
+        0 == get_frac(a);
 }
 
 inline constexpr bool
@@ -689,29 +624,49 @@ is_sNaN(uint32_t const& uiA)
 }
 
 inline constexpr bool
-is_inf(uint64_t const& a)
+is_sNaN(uint64_t const uiA)
 {
     return
-        !is_finite(a) &&
-        0 == get_frac(a);
+        UINT64_C(0x7FF0000000000000) == (uiA & UINT64_C(0x7FF8000000000000)) &&
+        0 != (uiA & UINT64_C(0x0007FFFFFFFFFFFF));
 }
 
 inline constexpr bool
-is_zero(uint64_t const &a)
+is_subnormal(uint32_t const& a)
 {
-    return 0 == (~(~UINT64_C(0) << 63) & a);
-}
-
-inline constexpr bool
-is_zero(uint16_t const &a)
-{
-    return 0 == get_exp(a) && 0 == get_frac(a);
+    return
+        0 == get_exp(a) &&
+        0 != get_frac(a);
 }
 
 inline constexpr uint16_t
-expExtF80UI64(uint16_t const& a64)
+packToF16UI(bool sign,
+            int8_t const& expnt,
+            uint16_t const& sig)
 {
-    return static_cast<uint16_t>(0x7FFF & a64);
+    return
+        static_cast<uint16_t>(
+        (static_cast<uint16_t>(!!sign) << 15) +
+        (static_cast<uint16_t>(expnt) << 10) +
+            sig);
+}
+
+inline constexpr uint32_t
+packToF32UI(bool sign,
+            int16_t const& expnt,
+            uint32_t const& sgnf)
+{
+    return
+        (static_cast<uint32_t>(!!sign) << 31) |
+        ((static_cast<uint32_t>(expnt) << 23) + sgnf);
+}
+
+inline constexpr uint64_t
+packToF64UI(bool sign, int16_t const& expnt, uint64_t const& sgnf)
+{
+    return
+        (static_cast<uint64_t>(!!sign) << 63) |
+        ((static_cast<uint64_t>(expnt) << 52) + sgnf);
 }
 
 inline constexpr uint16_t
@@ -719,6 +674,56 @@ packToExtF80UI64(bool const sign,
                  uint16_t const expnt)
 {
     return static_cast<uint16_t>((!!sign << 15) | expnt);
+}
+
+template<typename Ty>
+Ty
+make_signed_inf(bool sign);
+
+template<>
+inline constexpr float32_t
+make_signed_inf<float32_t>(bool sign)
+{
+    return to_float(packToF32UI(sign, 0xFF, 0u));
+}
+
+template<>
+inline constexpr float64_t
+make_signed_inf<float64_t>(bool sign)
+{
+    return to_float(packToF64UI(sign, 0x7FF, 0u));
+}
+
+template<typename Ty>
+Ty
+make_signed_zero(bool sign = false);
+
+template<>
+inline constexpr uint32_t
+make_signed_zero<uint32_t>(bool sign)
+{
+    return packToF32UI(sign, 0, 0u);
+}
+
+template<>
+inline constexpr uint64_t
+make_signed_zero<uint64_t>(bool sign)
+{
+    return packToF64UI(sign, 0, 0u);
+}
+
+template<>
+inline constexpr float32_t
+make_signed_zero<float32_t>(bool sign)
+{
+    return to_float(make_signed_zero<uint32_t>(sign));
+}
+
+template<>
+inline constexpr float64_t
+make_signed_zero<float64_t>(bool sign)
+{
+    return to_float(make_signed_zero<uint64_t>(sign));
 }
 
 /**
