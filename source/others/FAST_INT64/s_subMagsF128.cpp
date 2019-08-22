@@ -52,8 +52,8 @@ softfloat_subMagsF128(uint64_t const uiA64,
 {
     int32_t const expA = expF128UI64(uiA64);
     int32_t const expB = expF128UI64(uiB64);
-    uint128 const sigA = softfloat_shortShiftLeft128(fracF128UI64(uiA64), uiA0, 4);
-    uint128 const sigB = softfloat_shortShiftLeft128(fracF128UI64(uiB64), uiB0, 4);
+    uint128 const sigA = softfloat_shortShiftLeft128(uint128{fracF128UI64(uiA64), uiA0}, 4);
+    uint128 const sigB = softfloat_shortShiftLeft128(uint128{fracF128UI64(uiB64), uiB0}, 4);
     int32_t const expDiff = expA - expB;
 
     if (!(0 < expDiff)) {
@@ -104,19 +104,19 @@ softfloat_subMagsF128(uint64_t const uiA64,
 
         if (0 != expA) {
             auto const sigA_1 = softfloat_shiftRightJam128(sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0, static_cast<uint32_t>(-expDiff));
-            uint128 const sigZ = softfloat_sub128(sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0, sigA_1.v64, sigA_1.v0);
+            uint128 const sigZ = softfloat_sub128(uint128{sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0}, sigA_1);
             return softfloat_normRoundPackToF128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
         }
 
         auto const expDiff_1 = expDiff + 1;
 
         if (0 == expDiff_1) {
-            uint128 const sigZ = softfloat_sub128(sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0, sigA.v64, sigA.v0);
+            uint128 const sigZ = softfloat_sub128(uint128{sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0}, sigA);
             return softfloat_normRoundPackToF128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
         }
 
         auto const sigA_1 = softfloat_shiftRightJam128(sigA, static_cast<uint32_t>(-expDiff_1));
-        uint128 const sigZ = softfloat_sub128(sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0, sigA_1.v64, sigA_1.v0);
+        uint128 const sigZ = softfloat_sub128(uint128{sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0}, sigA_1);
         return softfloat_normRoundPackToF128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
     }
 
@@ -130,19 +130,19 @@ softfloat_subMagsF128(uint64_t const uiA64,
 
     if (0 != expB) {
         auto const sigB_1 = softfloat_shiftRightJam128(sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0, static_cast<uint32_t>(expDiff));
-        uint128 const sigZ = softfloat_sub128(sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0, sigB_1.v64, sigB_1.v0);
+        uint128 const sigZ = softfloat_sub128(uint128{sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0}, sigB_1);
         return softfloat_normRoundPackToF128(signZ, expA - 5, sigZ.v64, sigZ.v0);
     }
 
     auto const expDiff_1 = expDiff - 1;
 
     if (0 == expDiff_1) {
-        uint128 const sigZ = softfloat_sub128(sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0, sigB.v64, sigB.v0);
+        uint128 const sigZ = softfloat_sub128(uint128{sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0}, sigB);
         return softfloat_normRoundPackToF128(signZ, expA - 5, sigZ.v64, sigZ.v0);
     }
 
     auto const sigB_1 = softfloat_shiftRightJam128(sigB, static_cast<uint32_t>(expDiff_1));
-    uint128 const sigZ = softfloat_sub128(sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0, sigB_1.v64, sigB_1.v0);
+    uint128 const sigZ = softfloat_sub128(uint128{sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0}, sigB_1);
     return softfloat_normRoundPackToF128(signZ, expA - 5, sigZ.v64, sigZ.v0);
 }
 

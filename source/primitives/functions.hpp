@@ -261,14 +261,6 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' left by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-softfloat_shortShiftLeft128(uint64_t const& a64,
-                            uint64_t const& a0,
-                            uint8_t dist)
-{
-    return uint128{a64 << dist | a0 >> (63u & -static_cast<int8_t>(dist)), a0 << dist};
-}
-
-inline constexpr uint128
 softfloat_shortShiftLeft128(uint128 const& a,
                             uint8_t const dist)
 {
@@ -279,14 +271,6 @@ softfloat_shortShiftLeft128(uint128 const& a,
 Shifts the 128 bits formed by concatenating `a64' and `a0' right by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
-inline constexpr uint128
-softfloat_shortShiftRight128(uint64_t const& a64,
-                             uint64_t const& a0,
-                             uint8_t const dist)
-{
-    return uint128{a64 >> dist, a64 << (63 & -dist) | a0 >> dist};
-}
-
 inline constexpr uint128
 softfloat_shortShiftRight128(uint128 const& a,
                              uint8_t const dist)
@@ -314,22 +298,14 @@ bit of the shifted value by setting the least-significant bit to 1.  This
 shifted-and-jammed value is returned.
 */
 inline uint128
-softfloat_shortShiftRightJam128(uint64_t const& a64,
-                                uint64_t const& a0,
+softfloat_shortShiftRightJam128(uint128 const& a,
                                 uint8_t const dist)
 {
     auto const negDist = 63 & -static_cast<int8_t>(dist);
     return uint128{
-        a64 >> dist,
-        a64 << negDist | a0 >> dist | !!(0 != (a0 << negDist))
+        a.v64 >> dist,
+        a.v64 << negDist | a.v0 >> dist | !!(0 != (a.v0 << negDist))
     };
-}
-
-inline uint128
-softfloat_shortShiftRightJam128(uint128 const& a,
-                                uint8_t const dist)
-{
-    return softfloat_shortShiftRightJam128(a.v64, a.v0, dist);
 }
 
 /**
@@ -337,25 +313,16 @@ This function is the same as `softfloat_shiftRightJam128Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
 inline uint128_extra
-softfloat_shortShiftRightJam128Extra(uint64_t a64,
-                                     uint64_t a0,
-                                     uint64_t extra,
-                                     uint8_t dist)
-{
-    auto const uNegDist = 63 & -static_cast<int8_t>(dist);
-    uint128_extra z;
-    z.v.v64 = a64 >> dist;
-    z.v.v0 = a64 << uNegDist | a0 >> dist;
-    z.extra = a0 << uNegDist | (0 != extra);
-    return z;
-}
-
-inline uint128_extra
 softfloat_shortShiftRightJam128Extra(uint128 const& a,
                                      uint64_t const& extra,
                                      uint8_t const dist)
 {
-    return softfloat_shortShiftRightJam128Extra(a.v64, a.v0, extra, dist);
+    auto const uNegDist = 63 & -static_cast<int8_t>(dist);
+    uint128_extra z;
+    z.v.v64 = a.v64 >> dist;
+    z.v.v0 = a.v64 << uNegDist | a.v0 >> dist;
+    z.extra = a.v0 << uNegDist | (0 != extra);
+    return z;
 }
 
 /**
@@ -459,19 +426,10 @@ Returns the sum of the 128-bit integer formed by concatenating `a64' and
 addition is modulo 2^128, so any carry out is lost.
 */
 inline constexpr uint128
-softfloat_add128(uint64_t a64,
-                 uint64_t a0,
-                 uint64_t b64,
-                 uint64_t b0)
-{
-    return uint128{a64 + b64 + !!(a0 + b0 < a0), a0 + b0};
-}
-
-inline constexpr uint128
 softfloat_add128(uint128 const& a,
                  uint128 const& b)
 {
-    return softfloat_add128(a.v64, a.v0, b.v64, b.v0);
+    return uint128{a.v64 + b.v64 + !!(a.v0 + b.v0 < a.v0), a.v0 + b.v0};
 }
 
 /**
@@ -509,19 +467,10 @@ and `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.
 The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 */
 inline constexpr uint128
-softfloat_sub128(uint64_t const& a64,
-                 uint64_t const& a0,
-                 uint64_t const& b64,
-                 uint64_t const& b0)
-{
-    return uint128{a64 - b64 - !!(a0 < b0), a0 - b0};
-}
-
-inline constexpr uint128
 softfloat_sub128(uint128 const& a,
                  uint128 const& b)
 {
-    return softfloat_sub128(a.v64, a.v0, b.v64, b.v0);
+    return uint128{a.v64 - b.v64 - !!(a.v0 < b.v0), a.v0 - b.v0};
 }
 
 /**

@@ -60,6 +60,6 @@ i64_to_f128(int64_t const a)
         return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});
     }
 
-    uint128 const zSig = softfloat_shortShiftLeft128(0, absA, static_cast<uint8_t>(shiftDist));
+    uint128 const zSig = softfloat_shortShiftLeft128(uint128{0, absA}, static_cast<uint8_t>(shiftDist));
     return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, zSig.v64), zSig.v0});
 }

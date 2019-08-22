@@ -60,7 +60,7 @@ softfloat_normRoundPackToExtF80(bool const sign,
     exp -= shiftDist;
 
     if (0 != shiftDist) {
-        uint128 const sig128 = softfloat_shortShiftLeft128(sig, sigExtra, shiftDist);
+        uint128 const sig128 = softfloat_shortShiftLeft128(uint128{sig, sigExtra}, shiftDist);
         sig = sig128.v64;
         sigExtra = sig128.v0;
     }

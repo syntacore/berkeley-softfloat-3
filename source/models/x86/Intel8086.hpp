@@ -307,7 +307,7 @@ softfloat_f128UIToCommonNaN(uint64_t const uiA64,
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
-    uint128 const NaNSig = softfloat_shortShiftLeft128(uiA64, uiA0, 16);
+    uint128 const NaNSig = softfloat_shortShiftLeft128(uint128{uiA64, uiA0}, 16);
     return commonNaN{0 != (uiA64 >> 63), NaNSig.v64, NaNSig.v0};
 }
 
@@ -318,7 +318,7 @@ NaN, and returns the bit pattern of this value as an unsigned integer.
 inline uint128
 softfloat_commonNaNToF128UI(commonNaN const& a)
 {
-    uint128 const uiZ = softfloat_shortShiftRight128(a.v64, a.v0, 16);
+    uint128 const uiZ = softfloat_shortShiftRight128(uint128{a.v64, a.v0}, 16);
     return uint128{uiZ.v64 | static_cast<uint64_t>(!!a.sign) << 63 | UINT64_C(0x7FFF800000000000), uiZ.v0};
 }
 

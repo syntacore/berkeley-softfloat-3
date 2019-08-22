@@ -88,7 +88,6 @@ f128_to_extF80(float128_t const a)
     }
 
     uint128 const sig128 =
-        softfloat_shortShiftLeft128(
-            frac64 | UINT64_C(0x0001000000000000), frac0, 15);
+        softfloat_shortShiftLeft128(uint128{frac64 | UINT64_C(0x0001000000000000), frac0}, 15);
     return softfloat_roundPackToExtF80(sign, exp, sig128.v64, sig128.v0, 80);
 }

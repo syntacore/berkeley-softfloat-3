@@ -70,6 +70,6 @@ f64_to_f128(float64_t a)
         frac = normExpSig.sig;
     }
 
-    uint128 const frac128 = softfloat_shortShiftLeft128(0, frac, 60);
+    uint128 const frac128 = softfloat_shortShiftLeft128(uint128{0, frac}, 60);
     return static_cast<float128_t>(uint128{packToF128UI64(sign, exp + 0x3C00, frac128.v64),frac128.v0});
 }

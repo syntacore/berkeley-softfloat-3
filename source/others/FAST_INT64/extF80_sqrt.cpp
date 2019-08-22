@@ -116,9 +116,9 @@ extF80_sqrt(extFloat80_t const a)
 
     if (0 != expA) {
         sig32Z >>= 1;
-        rem = softfloat_shortShiftLeft128(0, sigA, 61);
+        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 61);
     } else {
-        rem = softfloat_shortShiftLeft128(0, sigA, 62);
+        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 62);
     }
 
     rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
@@ -146,7 +146,7 @@ extF80_sqrt(extFloat80_t const a)
         */
         term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
         x64 = static_cast<uint32_t>(q << 5) * static_cast<uint64_t>(static_cast<uint32_t>(q));
-        term = softfloat_add128(term.v64, term.v0, 0, x64);
+        term = softfloat_add128(term, uint128{0, x64});
         rem = softfloat_shortShiftLeft128(rem, 28);
         rem = softfloat_sub128(rem, term);
 

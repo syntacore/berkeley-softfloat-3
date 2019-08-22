@@ -74,14 +74,14 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
             --expDiff;
 
             if (0 == expDiff) {
-                uint128 const sig128_6 = softfloat_sub128(uiA0, 0, uiB0, 0);
+                uint128 const sig128_6 = softfloat_sub128(uint128{uiA0, 0}, uint128{uiB0, 0});
                 return
                     softfloat_normRoundPackToExtF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_roundingPrecision);
             }
         }
 
         uint128 const sig128_2 = softfloat_shiftRightJam128(uiB0, 0, static_cast<uint32_t>(expDiff));
-        uint128 const sig128_1 = softfloat_sub128(uiA0, 0, sig128_2.v64, sig128_2.v0);
+        uint128 const sig128_1 = softfloat_sub128(uint128{uiA0, 0}, sig128_2);
         return
             softfloat_normRoundPackToExtF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_roundingPrecision);
     }
@@ -106,14 +106,14 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
             ++expDiff;
 
             if (0 == expDiff) {
-                uint128 const sig128_7 = softfloat_sub128(uiB0, 0, uiA0, 0);
+                uint128 const sig128_7 = softfloat_sub128(uint128{uiB0, 0}, uint128{uiA0, 0});
                 return
                     softfloat_normRoundPackToExtF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_roundingPrecision);
             }
         }
 
         uint128 const sig128_4 = softfloat_shiftRightJam128(uiA0, 0, static_cast<uint32_t>(-expDiff));
-        uint128 const sig128_3 = softfloat_sub128(uiB0, 0, sig128_4.v64, sig128_4.v0);
+        uint128 const sig128_3 = softfloat_sub128(uint128{uiB0, 0}, sig128_4);
         return
             softfloat_normRoundPackToExtF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_roundingPrecision);
     }
@@ -137,12 +137,12 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
     int32_t const expZ = 0 == expA ? 1 : expA;
 
     if (uiA0 > uiB0) {
-        uint128 const sig128 = softfloat_sub128(uiA0, 0, uiB0, 0);
+        uint128 const sig128 = softfloat_sub128(uint128{uiA0, 0}, uint128{uiB0, 0});
         return softfloat_normRoundPackToExtF80(signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
     }
 
     if (uiA0 < uiB0) {
-        uint128 const sig128 = softfloat_sub128(uiB0, 0, uiA0, 0);
+        uint128 const sig128 = softfloat_sub128(uint128{uiB0, 0}, uint128{uiA0, 0});
         return softfloat_normRoundPackToExtF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
     }
 

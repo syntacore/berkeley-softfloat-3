@@ -146,9 +146,9 @@ extF80_div(extFloat80_t const a,
 
     if (sigA < sigB) {
         --expZ;
-        rem = softfloat_shortShiftLeft128(0, sigA, 32);
+        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 32);
     } else {
-        rem = softfloat_shortShiftLeft128(0, sigA, 31);
+        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 31);
     }
 
     uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32);
@@ -164,21 +164,21 @@ extF80_div(extFloat80_t const a,
             break;
         }
 
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
+        rem = softfloat_shortShiftLeft128(rem, 29);
         rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
-            rem = softfloat_add128(rem.v64, rem.v0, sigB >> 32, sigB << 32);
+            rem = softfloat_add128(rem, uint128{sigB >> 32, sigB << 32});
         }
 
         sigZ = (sigZ << 29) + q;
     }
 
     if (((q + 1) & 0x3FFFFF) < 2) {
-        rem = softfloat_shortShiftLeft128(rem.v64, rem.v0, 29);
+        rem = softfloat_shortShiftLeft128(rem, 29);
         rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
-        uint128 const term = softfloat_shortShiftLeft128(0, sigB, 32);
+        uint128 const term = softfloat_shortShiftLeft128(uint128{0, sigB}, 32);
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;

@@ -188,7 +188,7 @@ f64_mulAdd(float64_t a,
 
     if (expDiff < 0) {
         signProd = signC;
-        sig128Z = softfloat_sub128(sigC, 0, sig128Z.v64, sig128Z.v0);
+        sig128Z = softfloat_sub128(uint128{sigC, 0}, sig128Z);
     } else if (0 == expDiff) {
         sig128Z.v64 = sig128Z.v64 - sigC;
 
@@ -198,7 +198,7 @@ f64_mulAdd(float64_t a,
 
         if (0 != (sig128Z.v64 & UINT64_C(0x8000000000000000))) {
             signProd = !signProd;
-            sig128Z = softfloat_sub128(0, 0, sig128Z.v64, sig128Z.v0);
+            sig128Z = softfloat_sub128(uint128{0, 0}, sig128Z);
         }
     } else {
         assert(0 < expDiff);
@@ -221,7 +221,7 @@ f64_mulAdd(float64_t a,
                                      expZ_1,
                                      sigZ | !!(0 != sig128Z.v0));
     } else {
-        uint128 const sig128Z_1 = softfloat_shortShiftLeft128(sig128Z.v64, sig128Z.v0, static_cast<uint8_t>(shiftDist));
+        uint128 const sig128Z_1 = softfloat_shortShiftLeft128(sig128Z, static_cast<uint8_t>(shiftDist));
         return softfloat_roundPackToF64(signProd,
                                         expZ_1,
                                         sig128Z_1.v64 | !!(0 != sig128Z_1.v0));

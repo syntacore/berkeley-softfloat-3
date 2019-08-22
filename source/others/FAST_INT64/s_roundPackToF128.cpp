@@ -136,7 +136,7 @@ softfloat_roundPackToF128(bool const sign,
     }
 
     if (doIncrement) {
-        uint128 const sig128 = softfloat_add128(sig64, sig0, 0, 1);
+        uint128 const sig128 = softfloat_add128(uint128{sig64, sig0}, uint128{0, 1});
         return float128_t(uint128{
             packToF128UI64(sign, exp, sig128.v64),
             sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven)});

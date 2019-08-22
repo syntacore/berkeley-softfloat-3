@@ -60,7 +60,7 @@ f128_to_f64(float128_t const a)
         return u_as_f(packToF64UI(sign, 0x7FF, 0));
     }
 
-    uint128 const frac128 = softfloat_shortShiftLeft128(frac64, frac0, 14);
+    uint128 const frac128 = softfloat_shortShiftLeft128(uint128{frac64, frac0}, 14);
     frac64 = frac128.v64 | (frac128.v0 != 0);
 
     if (!(exp | frac64)) {

@@ -44,11 +44,12 @@ namespace softfloat {
 namespace internals {
 
 exp32_sig128
-softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
+softfloat_normSubnormalF128Sig(uint64_t sig64,
+                               uint64_t sig0)
 {
     exp32_sig128 z;
 
-    if (!sig64) {
+    if (0 == sig64) {
         int8_t const shiftDist = count_leading_zeros(sig0) - 15;
         z.exp = -63 - shiftDist;
 
@@ -62,11 +63,10 @@ softfloat_normSubnormalF128Sig(uint64_t sig64, uint64_t sig0)
     } else {
         int8_t const shiftDist = count_leading_zeros(sig64) - 15;
         z.exp = 1 - shiftDist;
-        z.sig = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(shiftDist));
+        z.sig = softfloat_shortShiftLeft128(uint128{sig64, sig0}, static_cast<uint8_t>(shiftDist));
     }
 
     return z;
-
 }
 
 }  // namespace internals

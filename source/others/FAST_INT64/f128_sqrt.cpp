@@ -123,8 +123,8 @@ f128_sqrt(float128_t const a)
 
     /* Repeating this loop is a rare occurrence.*/
     for (;;) {
-        uint128 const tmp_1 = softfloat_shortShiftLeft128(0, sig64Z, 32);
-        uint128 const tmp_2 = softfloat_add128(tmp_1.v64, tmp_1.v0, 0, static_cast<uint64_t>(q_2) << 6);
+        uint128 const tmp_1 = softfloat_shortShiftLeft128(uint128{0, sig64Z}, 32);
+        uint128 const tmp_2 = softfloat_add128(tmp_1, uint128{0, static_cast<uint64_t>(q_2) << 6});
         uint128 const tmp_3 = softfloat_mul128By32(tmp_2, q_2);
         rem_2 = softfloat_sub128(y_0, tmp_3);
 
@@ -139,18 +139,18 @@ f128_sqrt(float128_t const a)
 
     uint32_t q_1 = ((static_cast<uint32_t>(rem_2.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     uint64_t sigZExtra = static_cast<uint64_t>(static_cast<uint64_t>(q_1) << 59);
-    uint128 const term_1 = softfloat_shortShiftLeft128(0, qs[1], 53);
-    uint128 sigZ = softfloat_add128(static_cast<uint64_t>(qs[2]) << 18, (static_cast<uint64_t>(qs[0]) << 24) + (q_1 >> 5), term_1.v64, term_1.v0);
+    uint128 const term_1 = softfloat_shortShiftLeft128(uint128{0, qs[1]}, 53);
+    uint128 sigZ = softfloat_add128(uint128{static_cast<uint64_t>(qs[2]) << 18, (static_cast<uint64_t>(qs[0]) << 24) + (q_1 >> 5)}, term_1);
 
     if ((q_1 & 0xF) <= 2) {
         q_1 &= ~3;
         sigZExtra = static_cast<uint64_t>(static_cast<uint64_t>(q_1) << 59);
         uint128 y = softfloat_shortShiftLeft128(sigZ, 6);
         y.v0 |= sigZExtra >> 58;
-        uint128 const term_2 = softfloat_sub128(y.v64, y.v0, 0, q_1);
+        uint128 const term_2 = softfloat_sub128(y, uint128{0, q_1});
         uint128 const y_1 = softfloat_mul64ByShifted32To128(term_2.v0, q_1);
         uint128 const term_3 = softfloat_mul64ByShifted32To128(term_2.v64, q_1);
-        uint128 const term_4 = softfloat_add128(term_3.v64, term_3.v0, 0, y_1.v64);
+        uint128 const term_4 = softfloat_add128(term_3, uint128{0, y_1.v64});
         uint128 const rem_3 = softfloat_shortShiftLeft128(rem_2, 20);
         uint128 const term_5 = softfloat_sub128(term_4, rem_3);
 
@@ -163,7 +163,7 @@ f128_sqrt(float128_t const a)
             if (sigZExtra) {
                 --sigZExtra;
             } else {
-                sigZ = softfloat_sub128(sigZ.v64, sigZ.v0, 0, 1);
+                sigZ = softfloat_sub128(sigZ, uint128{0, 1});
                 sigZExtra = ~UINT64_C(0);
             }
         }

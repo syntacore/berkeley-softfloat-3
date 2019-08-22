@@ -184,11 +184,10 @@ f128_div(float128_t const a,
     }
 
     uint64_t const sigZExtra = static_cast<uint64_t>(q) << 60;
-    uint128 const term = softfloat_shortShiftLeft128(0, qs[1], 54);
+    uint128 const term = softfloat_shortShiftLeft128(uint128{0, qs[1]}, 54);
     uint128 const sigZ =
-        softfloat_add128(static_cast<uint64_t>(qs[2]) << 19,
-                         (static_cast<uint64_t>(qs[0]) << 25) + (q >> 4),
-                         term.v64,
-                         term.v0);
+        softfloat_add128(
+            uint128{static_cast<uint64_t>(qs[2]) << 19, (static_cast<uint64_t>(qs[0]) << 25) + (q >> 4)},
+            term);
     return softfloat_roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
 }

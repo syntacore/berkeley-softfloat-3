@@ -326,7 +326,7 @@ softfloat_mulAddF128(Mul_add_operations const op,
             }
         } else {
             if (0 == shiftDist_1) {
-                uint128 const x128 = softfloat_shortShiftRight128(sig256Z[indexWord(4, 1)], sig256Z[indexWord(4, 0)], 1);
+                uint128 const x128 = softfloat_shortShiftRight128(uint128{sig256Z[indexWord(4, 1)], sig256Z[indexWord(4, 0)]}, 1);
                 sig256Z[indexWord(4, 1)] = (sigZ.v0 << 63) | x128.v64;
                 sig256Z[indexWord(4, 0)] = x128.v0;
                 sigZ = softfloat_shortShiftRight128(sigZ, 1);
@@ -383,7 +383,7 @@ softfloat_mulAddF128(Mul_add_operations const op,
                     sigZExtra = sig256Z[indexWord(4, 1)] | sig256Z[indexWord(4, 0)];
 
                     if (0 != sigZExtra) {
-                        sigZ = softfloat_sub128(sigZ.v64, sigZ.v0, 0, 1);
+                        sigZ = softfloat_sub128(sigZ, uint128{0, 1});
                     }
 
                     if (0 == (sigZ.v64 & UINT64_C(0x0100000000000000))) {
@@ -476,7 +476,7 @@ softfloat_mulAddF128(Mul_add_operations const op,
             if (0 != shiftDist_2_2) {
                 auto const shiftDist_2_1 = -shiftDist_2_2;
                 sigZ = softfloat_shortShiftLeft128(sigZ, static_cast<uint8_t>(shiftDist_2_1));
-                uint128 const x128 = softfloat_shortShiftLeft128(0, sigZExtra, static_cast<uint8_t>(shiftDist_2_1));
+                uint128 const x128 = softfloat_shortShiftLeft128(uint128{0, sigZExtra}, static_cast<uint8_t>(shiftDist_2_1));
                 sigZ.v0 |= x128.v64;
                 sigZExtra = x128.v0;
             }

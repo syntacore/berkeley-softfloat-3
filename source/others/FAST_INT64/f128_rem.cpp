@@ -155,7 +155,7 @@ f128_rem(float128_t const a,
             }
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
-                auto const rem_1 = softfloat_sub128(0, 0, rem.v64, rem.v0);
+                auto const rem_1 = softfloat_sub128(uint128{0, 0}, rem);
                 return softfloat_normRoundPackToF128(!signA, expB - 1, rem_1.v64, rem_1.v0);
             }
 
@@ -176,7 +176,7 @@ f128_rem(float128_t const a,
     }
 
     if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
-        auto const rem_1 = softfloat_sub128(0, 0, rem.v64, rem.v0);
+        auto const rem_1 = softfloat_sub128(uint128{0, 0}, rem);
         return softfloat_normRoundPackToF128(!signA, expB - 1, rem_1.v64, rem_1.v0);
     }
 

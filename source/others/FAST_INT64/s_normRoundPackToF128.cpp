@@ -60,7 +60,7 @@ softfloat_normRoundPackToF128(bool const sign,
 
     if (0 <= shiftDist) {
         if (0 != shiftDist) {
-            uint128 const sig128 = softfloat_shortShiftLeft128(sig64, sig0, static_cast<uint8_t>(shiftDist));
+            uint128 const sig128 = softfloat_shortShiftLeft128(uint128{sig64, sig0}, static_cast<uint8_t>(shiftDist));
             sig64 = sig128.v64;
             sig0 = sig128.v0;
         }
@@ -72,7 +72,7 @@ softfloat_normRoundPackToF128(bool const sign,
         return softfloat_roundPackToF128(sign, exp, sig64, sig0, 0);
     }
 
-    uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sig64, sig0, 0, static_cast<uint8_t>(-shiftDist));
+    uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(uint128{sig64, sig0}, 0, static_cast<uint8_t>(-shiftDist));
     return softfloat_roundPackToF128(sign, exp, sig128Extra.v.v64, sig128Extra.v.v0, sig128Extra.extra);
 }
 

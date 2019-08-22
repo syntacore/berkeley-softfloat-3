@@ -47,7 +47,7 @@ i64_to_extF80(int64_t const a)
     uint16_t uiZ64 = 0;
     uint64_t absA = 0;
 
-    if (a) {
+    if (0 != a) {
         bool const sign = (a < 0);
         /**
         @bug for INT64_MIN
