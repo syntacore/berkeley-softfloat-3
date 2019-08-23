@@ -59,7 +59,7 @@ addMags(uint32_t const uiA,
 
     if (0 == expDiff) {
         /* if same exponent, fractional are aligned */
-        if (0 == expA) {
+        if (is_denormalized(uiA)) {
             /** if a and b are subnormal(s) or zero(s), result is simple sum, possible carry of high sum bit to exponent is valid */
             return u_as_f(uiA + sigB);
         }
@@ -127,7 +127,7 @@ subMags(uint32_t const uiA,
     static int16_t const max_exp = 0xFF;
 
     if (0 == expDiff) {
-        if (max_exp == expA) {
+        if (!is_finite(uiA)) {
             if (0 != sigA || 0 != sigB) {
                 return u_as_f(propagate_NaN(uiA, uiB));
             }
@@ -187,7 +187,6 @@ f32_add(float32_t const a,
     using namespace softfloat::internals;
 
     if (is_NaN(a) || is_NaN(b)) {
-        /** propagate NaN if operand(s) is NaN*/
         return propagate_NaN(a, b);
     }
 

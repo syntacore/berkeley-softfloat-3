@@ -556,39 +556,25 @@ is_finite(Ty const a)->decltype(is_finite(f_as_u(a)))
     return is_finite(f_as_u(a));
 }
 
-inline constexpr bool
-is_zero(uint16_t const &a)
-{
-    return 0 == get_exp(a) && 0 == get_frac(a);
-}
-
-inline constexpr bool
-is_zero(uint32_t const& a)
-{
-    return
-        0 == get_exp(a) &&
-        0 == get_frac(a);
-}
-
-inline constexpr bool
-is_zero(uint64_t const &a)
-{
-    return 0 == (~(~UINT64_C(0) << 63) & a);
-}
-
 template<typename Ty>
-inline constexpr
-typename std::enable_if<std::is_integral<Ty>::value,bool>::type
-is_zero(Ty const a)
+inline constexpr auto
+is_denormalized(Ty const a)->decltype(get_exp(a) == 0)
 {
-    return 0 == get_exp(a) && 0 == get_frac(a);
+    return 0 == get_exp(a);
 }
 
 template<typename Ty>
 inline constexpr auto
-is_zero(Ty const a)->decltype(is_zero(f_as_u(a)))
+is_zero(Ty const a)->decltype(is_denormalized(a) && 0 == get_frac(a))
 {
-    return is_zero(f_as_u(a));
+    return is_denormalized(a) && 0 == get_frac(a);
+}
+
+template<typename Ty>
+inline constexpr auto
+is_subnormal(Ty const a)->decltype(is_denormalized(a) && 0 != get_frac(a))
+{
+    return is_denormalized(a) && 0 != get_frac(a);
 }
 
 template<typename Ty>
@@ -665,14 +651,6 @@ inline constexpr auto
 is_sNaN(Ty const a)->decltype(is_sNaN(f_as_u(a)))
 {
     return is_sNaN(f_as_u(a));
-}
-
-inline constexpr bool
-is_subnormal(uint32_t const& a)
-{
-    return
-        0 == get_exp(a) &&
-        0 != get_frac(a);
 }
 
 inline constexpr uint16_t
