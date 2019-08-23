@@ -48,36 +48,39 @@ f64_mul(float64_t a,
         float64_t b)
 {
     using namespace softfloat::internals;
-    bool const signA = is_sign(a);
-    int16_t expA = get_exp(a);
-    uint64_t sigA = get_frac(a);
-    bool const signB = is_sign(b);
-    int16_t expB = get_exp(b);
-    uint64_t sigB = get_frac(b);
-    bool const signZ = signA != signB;
 
     if (is_NaN(a) || is_NaN(b)) {
-        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+        return propagate_NaN(a, b);
     }
 
-    if ((is_inf(a) && is_zero(b)) || (is_zero(a) && is_inf(b))) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f(defaultNaNF64UI);
-    }
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
+    bool const signZ = signA != signB;
 
     if (is_inf(a) || is_inf(b)) {
-        return u_as_f(packToF64UI(signZ, 0x7FF, 0));
+        if (is_zero(a)  || is_zero(b)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f(defaultNaNF64UI);
+        }
+
+        return make_signed_inf<float64_t>(signZ);
     }
 
     if (is_zero(a) || is_zero(b)) {
-        return u_as_f(packToF64UI(signZ, 0, 0));
+        return make_signed_zero<float64_t>(signZ);
     }
+
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
 
     if (0 == expA) {
         exp16_sig64 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
+
+    int16_t expB = get_exp(b);
+    uint64_t sigB = get_frac(b);
 
     if (0 == expB) {
         exp16_sig64 const normExpSig(sigB);

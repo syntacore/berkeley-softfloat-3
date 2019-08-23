@@ -94,9 +94,7 @@ f16_roundToInt(float16_t a,
     }
 
     if (0x19 <= exp) {
-        return
-            exp == 0x1F && 0 != get_frac(a) ?
-            u_as_f(propagate_NaN(f_as_u(a), 0)) : a;
+        return is_NaN(a) ? propagate_NaN(a, a) : a;
     }
 
     uint16_t uiZ = uiA;

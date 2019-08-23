@@ -188,7 +188,7 @@ f32_add(float32_t const a,
 
     if (is_NaN(a) || is_NaN(b)) {
         /** propagate NaN if operand(s) is NaN*/
-        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+        return propagate_NaN(a, b);
     }
 
     return
@@ -203,7 +203,7 @@ f32_sub(float32_t const a,
 
     if (is_NaN(a) || is_NaN(b)) {
         /** propagate NaN if operand(s) is NaN*/
-        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+        return propagate_NaN(a, b);
     }
 
     return (is_sign(a) == is_sign(b) ? subMags : addMags)(f_as_u(a), f_as_u(b));

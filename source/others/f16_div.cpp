@@ -125,52 +125,44 @@ f16_div(float16_t const a,
     uint16_t sigB = get_frac(b);
     bool const signZ = signA != signB;
 
-    if (!is_finite(a)) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return propagate_NaN(a, b);
+    }
 
+    if (is_inf(a)) {
         if (is_finite(b)) {
             return u_as_f(packToF16UI(signZ, 0x1F, 0));
-        }
-
-        if (is_NaN(b)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF16UI);
     }
 
-    if (!is_finite(b)) {
-        if (is_NaN(b)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+    if (is_inf(b)) {
+        return u_as_f(packToF16UI(signZ, 0, 0));
+    }
+
+    if (is_zero(b)) {
+        if (is_zero(a)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f(defaultNaNF16UI);
         }
 
+        softfloat_raiseFlags(softfloat_flag_infinite);
+        return u_as_f(packToF16UI(signZ, 0x1F, 0));
+    }
+
+    if (is_zero(a)) {
         return u_as_f(packToF16UI(signZ, 0, 0));
     }
 
     if (0 == expB) {
-        if (is_zero(b)) {
-            if (0 == (expA | sigA)) {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f(defaultNaNF16UI);
-            }
-
-            softfloat_raiseFlags(softfloat_flag_infinite);
-            return u_as_f(packToF16UI(signZ, 0x1F, 0));
-        }
-
         exp8_sig16 const normExpSig{sigB};
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
 
     if (0 == expA) {
-        if (is_zero(a)) {
-            return u_as_f(packToF16UI(signZ, 0, 0));
-        }
-
         exp8_sig16 const normExpSig{sigA};
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

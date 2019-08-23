@@ -72,14 +72,8 @@ float64_t
 f64_rem(float64_t const a,
         float64_t const b)
 {
-    bool const signA = is_sign(a);
-    int16_t expA = get_exp(a);
-    uint64_t sigA = get_frac(a);
-    int16_t expB = get_exp(b);
-    uint64_t sigB = get_frac(b);
-
     if (is_NaN(a) || is_NaN(b)) {
-        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+        return propagate_NaN(a, b);
     }
 
     if (is_inf(a)) {
@@ -91,13 +85,19 @@ f64_rem(float64_t const a,
         return a;
     }
 
-    if (expA < expB - 1) {
-        return a;
-    }
-
     if (is_zero(b)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF64UI);
+    }
+
+    bool const signA = is_sign(a);
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
+    int16_t expB = get_exp(b);
+    uint64_t sigB = get_frac(b);
+
+    if (expA < expB - 1) {
+        return a;
     }
 
     if (is_zero(a)) {

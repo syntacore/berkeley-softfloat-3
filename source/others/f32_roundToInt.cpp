@@ -95,11 +95,7 @@ f32_roundToInt(float32_t const a,
     }
 
     if (0x96 <= exp) {
-        static constexpr int16_t const max_exp = 0xFF;
-        return
-            max_exp == exp && get_frac(a) ?
-            u_as_f(propagate_NaN(uiA, UINT32_C(0))) :
-            a;
+        return is_NaN(a) ? propagate_NaN(a, a) : a;
     }
 
     uint32_t uiZ = uiA;

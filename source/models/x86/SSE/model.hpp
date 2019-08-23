@@ -130,6 +130,15 @@ propagate_NaN(uint64_t const uiA,
     return (is_NaN(uiA) ? uiA : uiB) | UINT64_C(0x0008000000000000);
 }
 
+template<typename Ty>
+inline auto
+propagate_NaN(Ty const& a,
+              Ty const& b)->
+    decltype(u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))))
+{
+    return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+}
+
 }  // namespace Intel_8086
 }  // namespace internals
 }  // namespace softfloat

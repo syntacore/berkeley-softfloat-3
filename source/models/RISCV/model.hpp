@@ -215,6 +215,15 @@ propagate_NaN(uint64_t const& uiA,
     return defaultNaNF64UI;
 }
 
+template<typename Ty>
+inline auto
+propagate_NaN(Ty const& a,
+              Ty const& b)->
+    decltype(u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))))
+{
+    return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+}
+
 /**
 Assuming `uiA' has the bit pattern of a 32-bit floating-point NaN, converts
 this NaN to the common NaN form, and stores the resulting common NaN at the

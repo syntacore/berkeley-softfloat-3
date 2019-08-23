@@ -77,8 +77,8 @@ softfloat_addMagsF16(uint16_t const& uiA,
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
     if (expDiff < 0) {
-        if (expB == 0x1F) {
-            return u_as_f(sigB ? propagate_NaN(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
+        if (!is_finite(uiB)) {
+            return is_NaN(uiB) ? u_as_f(propagate_NaN(uiA, uiB)) : make_signed_inf<float16_t>(signZ);
         }
 
         if (expDiff <= -13) {

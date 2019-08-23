@@ -45,11 +45,11 @@ f32_sqrt(float32_t a)
     int16_t expA = get_exp(a);
     uint32_t sigA = get_frac(a);
 
-    if (!is_finite(a)) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(f_as_u(a), UINT32_C(0)));
-        }
+    if (is_NaN(a)) {
+        return propagate_NaN(a, a);
+    }
 
+    if (is_inf(a)) {
         if (!signA) {
             return a;
         }
@@ -58,20 +58,16 @@ f32_sqrt(float32_t a)
         return u_as_f(defaultNaNF32UI);
     }
 
-    if (signA) {
-        if (is_zero(a)) {
-            return a;
-        }
+    if (is_zero(a)) {
+        return a;
+    }
 
+    if (signA) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF32UI);
     }
 
     if (0 == expA) {
-        if (is_zero(a)) {
-            return a;
-        }
-
         exp16_sig32 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

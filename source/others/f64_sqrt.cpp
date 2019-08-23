@@ -40,15 +40,14 @@ float64_t
 f64_sqrt(float64_t const a)
 {
     using namespace softfloat::internals;
+
+    if (is_NaN(a)) {
+        return propagate_NaN(a, a);
+    }
+
     bool const signA = is_sign(a);
-    int16_t expA = get_exp(a);
-    uint64_t sigA = get_frac(a);
 
-    if (!is_finite(a)) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(f_as_u(a), 0));
-        }
-
+    if (is_inf(a)) {
         if (0 == signA) {
             return a;
         }
@@ -65,6 +64,9 @@ f64_sqrt(float64_t const a)
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF64UI);
     }
+
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
 
     if (0 == expA) {
         exp16_sig64 const normExpSig(sigA);

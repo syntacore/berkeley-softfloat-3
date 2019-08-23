@@ -48,7 +48,7 @@ f64_mulAdd(float64_t const a,
     using namespace softfloat::internals;
 
     if (is_sNaN(c) || is_NaN(a) || is_NaN(b)) {
-        return u_as_f(propagate_NaN(propagate_NaN(f_as_u(a), f_as_u(b)), f_as_u(c)));
+        return propagate_NaN(propagate_NaN(a, b), c);
     }
 
     bool const signA = is_sign(a);
@@ -62,11 +62,11 @@ f64_mulAdd(float64_t const a,
 
         if (is_product_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(propagate_NaN(defaultNaNF64UI, f_as_u(c)));
+            return propagate_NaN(u_as_f(defaultNaNF64UI), c);
         }
 
         if (is_NaN(c)) {
-            return u_as_f(propagate_NaN(defaultNaNF64UI, f_as_u(c)));
+            return propagate_NaN(u_as_f(defaultNaNF64UI), c);
         }
 
         if (is_finite(c) || signProd == signC) {
@@ -76,11 +76,11 @@ f64_mulAdd(float64_t const a,
 
         /* summands are different sign inf, undefined sum */
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return u_as_f(propagate_NaN(defaultNaNF64UI, f_as_u(c)));
+        return propagate_NaN(u_as_f(defaultNaNF64UI), c);
     }
 
     if (is_NaN(c)) {
-        return u_as_f(propagate_NaN(defaultNaNF64UI, f_as_u(c)));
+        return propagate_NaN(u_as_f(defaultNaNF64UI), c);
     }
 
     if (is_inf(c)) {

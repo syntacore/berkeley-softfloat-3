@@ -119,25 +119,24 @@ f32_div(float32_t const a,
     uint32_t sigB = get_frac(b);
     bool const signZ = signA != signB;
 
-    if (!is_finite(a)) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return propagate_NaN(a, b);
+    }
 
+    if (is_inf(a)) {
         if (is_finite(b)) {
+            /**
+            @todo check inf / 0 case
+            */
             return make_signed_inf<float32_t>(signZ);
-        }
-
-        if (is_NaN(b)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF32UI);
     }
 
-    if (!is_finite(b)) {
-        return is_NaN(b) ? u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))) : make_signed_zero<float32_t>(signZ);
+    if (is_inf(b)) {
+        return make_signed_zero<float32_t>(signZ);
     }
 
     if (is_zero(b)) {

@@ -51,17 +51,17 @@ f64_rem(float64_t const a,
     int16_t expB = get_exp(b);
     uint64_t sigB = get_frac(b);
 
-    if (!is_finite(a)) {
-        if (is_NaN(a) || is_NaN(b)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return propagate_NaN(a, b);
+    }
 
+    if (is_inf(a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF64UI);
     }
 
-    if (!is_finite(b)) {
-        return is_NaN(b) ? u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))) : a;
+    if (is_inf(b)) {
+        return a;
     }
 
     if (expA < expB - 1) {

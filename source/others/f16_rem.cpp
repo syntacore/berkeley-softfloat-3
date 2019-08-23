@@ -47,35 +47,35 @@ f16_rem(float16_t const a,
     int8_t expB = get_exp(b);
     uint16_t sigB = get_frac(b);
 
-    if (!is_finite(a)) {
-        if (is_NaN(a) || is_NaN(b)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return propagate_NaN(a, b);
+    }
 
+    if (is_inf(a)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF16UI);
     }
 
-    if (!is_finite(b)) {
-        return is_NaN(b) ? u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))) : a;
+    if (is_inf(b)) {
+        return a;
+    }
+
+    if (is_zero(b)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return u_as_f(defaultNaNF16UI);
+    }
+
+    if (is_zero(a)) {
+        return a;
     }
 
     if (0 == expB) {
-        if (is_zero(b)) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(defaultNaNF16UI);
-        }
-
         exp8_sig16 const normExpSig{sigB};
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
 
     if (0 == expA) {
-        if (is_zero(a)) {
-            return a;
-        }
-
         exp8_sig16 const normExpSig{sigA};
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

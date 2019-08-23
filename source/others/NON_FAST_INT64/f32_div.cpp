@@ -45,17 +45,14 @@ f32_div(float32_t a,
         float32_t b)
 {
     using namespace softfloat::internals;
-    bool const signA = is_sign(a);
-    int16_t expA = get_exp(a);
-    uint32_t sigA = get_frac(a);
-    bool const signB = is_sign(b);
-    int16_t expB = get_exp(b);
-    uint32_t sigB = get_frac(b);
-    bool const signZ = signA != signB;
 
     if (is_NaN(a) || is_NaN(b)) {
-        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+        return propagate_NaN(a, b);
     }
+
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
+    bool const signZ = signA != signB;
 
     if (is_inf(a)) {
         if (is_inf(b)) {
@@ -80,15 +77,21 @@ f32_div(float32_t a,
         return make_signed_inf<float32_t>(signZ);
     }
 
+    if (is_zero(a)) {
+        return make_signed_zero<float32_t>(signZ);
+    }
+
+    int16_t expB = get_exp(b);
+    uint32_t sigB = get_frac(b);
+
     if (0 == expB) {
         exp16_sig32 const normExpSig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
 
-    if (is_zero(a)) {
-        return make_signed_zero<float32_t>(signZ);
-    }
+    int16_t expA = get_exp(a);
+    uint32_t sigA = get_frac(a);
 
     if (0 == expA) {
         exp16_sig32 const normExpSig(sigA);

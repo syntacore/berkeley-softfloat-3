@@ -42,55 +42,53 @@ f64_div(float64_t const a,
 {
     using namespace softfloat::internals;
     bool const signA = is_sign(a);
-    int16_t expA = get_exp(a);
-    uint64_t sigA = get_frac(a);
     bool const signB = is_sign(b);
-    int16_t expB = get_exp(b);
-    uint64_t sigB = get_frac(b);
     bool const signZ = signA != signB;
 
-    if (!is_finite(a)) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
-        }
+    if (is_NaN(a) || is_NaN(b)) {
+        return propagate_NaN(a, b);
+    }
 
-        if (!is_finite(b)) {
-            if (is_NaN(b)) {
-                return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
-            }
-
+    if (is_inf(a)) {
+        if (is_inf(b)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return u_as_f(defaultNaNF64UI);
         }
 
-        return u_as_f(packToF64UI(signZ, 0x7FF, 0));
+        return make_signed_inf<float64_t>(signZ);
     }
 
-    if (!is_finite(b)) {
-        return u_as_f(sigB ? propagate_NaN(f_as_u(a), f_as_u(b)) : packToF64UI(signZ, 0, 0));
+    if (is_inf(b)) {
+        return make_signed_zero<float64_t>(signZ);
     }
 
-    if (0 == expB) {
-        if (is_zero(b)) {
-            if (is_zero(a)) {
-                softfloat_raiseFlags(softfloat_flag_invalid);
-                return u_as_f(defaultNaNF64UI);
-            }
-
-            softfloat_raiseFlags(softfloat_flag_infinite);
-            return u_as_f(packToF64UI(signZ, 0x7FF, 0));
+    if (is_zero(b)) {
+        if (is_zero(a)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+            return u_as_f(defaultNaNF64UI);
         }
 
+        softfloat_raiseFlags(softfloat_flag_infinite);
+        return make_signed_inf<float64_t>(signZ);
+    }
+
+    if (is_zero(a)) {
+        return make_signed_zero<float64_t>(signZ);
+    }
+
+    int16_t expB = get_exp(b);
+    uint64_t sigB = get_frac(b);
+
+    if (0 == expB) {
         exp16_sig64 const normExpSig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
 
-    if (0 == expA) {
-        if (is_zero(a)) {
-            return u_as_f(packToF64UI(signZ, 0, 0));
-        }
+    int16_t expA = get_exp(a);
+    uint64_t sigA = get_frac(a);
 
+    if (0 == expA) {
         exp16_sig64 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

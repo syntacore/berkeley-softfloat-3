@@ -43,7 +43,7 @@ f32_mul(float32_t a,
     using namespace softfloat::internals;
 
     if (is_NaN(a) || is_NaN(b)) {
-        return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
+        return propagate_NaN(a, b);
     }
 
     bool const signA = is_sign(a);
@@ -56,10 +56,8 @@ f32_mul(float32_t a,
 
     bool const signZ = signA != signB;
 
-    if (expA == 0xFF || expB == 0xFF) {
-        bool const is_undefined =
-            /* a is infinity */ expA == 0xFF ? /* b is zero */ 0 == expB && 0 == sigB :
-            /* b is infinity and a is zero */ 0 == expA && 0 == sigA;
+    if (is_inf(a) || is_inf(b)) {
+        bool const is_undefined = is_inf(a) ? is_zero(b) : is_zero(a);
 
         if (is_undefined) {
             softfloat_raiseFlags(softfloat_flag_invalid);
@@ -69,21 +67,17 @@ f32_mul(float32_t a,
         return make_signed_inf<float32_t>(signZ);
     }
 
-    if (0 == expA) {
-        if (0 == sigA) {
-            return make_signed_zero<float32_t>(signZ);
-        }
+    if (is_zero(a) || is_zero(b)) {
+        return make_signed_zero<float32_t>(signZ);
+    }
 
+    if (0 == expA) {
         exp16_sig32 const normExpSig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
 
     if (0 == expB) {
-        if (0 == sigB) {
-            return make_signed_zero<float32_t>(signZ);
-        }
-
         exp16_sig32 const normExpSig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;

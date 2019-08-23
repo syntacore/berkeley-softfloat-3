@@ -44,11 +44,11 @@ f16_sqrt(float16_t a)
     int8_t expA = get_exp(a);
     uint16_t sigA = get_frac(a);
 
-    if (!is_finite(a)) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(f_as_u(a), 0));
-        }
+    if (is_NaN(a)) {
+        return propagate_NaN(a, a);
+    }
 
+    if (is_inf(a)) {
         if (!signA) {
             return a;
         }
@@ -57,20 +57,16 @@ f16_sqrt(float16_t a)
         return u_as_f(defaultNaNF16UI);
     }
 
-    if (signA) {
-        if (is_zero(a)) {
-            return a;
-        }
+    if (is_zero(a)) {
+        return a;
+    }
 
+    if (signA) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return u_as_f(defaultNaNF16UI);
     }
 
     if (0 == expA) {
-        if (is_zero(a)) {
-            return a;
-        }
-
         exp8_sig16 const normExpSig{sigA};
         expA = normExpSig.exp;
         sigA = normExpSig.sig;

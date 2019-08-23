@@ -46,6 +46,10 @@ f64_roundToInt(float64_t const a,
                bool const exact)
 {
     using namespace softfloat::internals;
+    if (is_NaN(a)) {
+        return propagate_NaN(a, a);
+    }
+
     int16_t const exp = get_exp(a);
     uint64_t const uiA = f_as_u(a);
 
@@ -95,10 +99,6 @@ f64_roundToInt(float64_t const a,
     }
 
     if (0x433 <= exp) {
-        if (is_NaN(a)) {
-            return u_as_f(propagate_NaN(uiA, 0));
-        }
-
         return a;
     }
 
