@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(SRC_TARGET_x86_NON_FAST_INT64
-    ${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80M.cpp
-PARENT_SCOPE)
+add_library(softfloat_x86_nonfast_int64 INTERFACE)
+target_sources(softfloat_x86_nonfast_int64
+INTERFACE
+	${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80M.cpp
+)
+target_link_libraries(softfloat_x86_nonfast_int64
+INTERFACE
+	softfloat_x86
+	softfloat_others_nonfast_int64
+)

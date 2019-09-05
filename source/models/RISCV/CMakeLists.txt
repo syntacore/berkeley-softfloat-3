@@ -1,52 +1,28 @@
 cmake_minimum_required(VERSION 3.8)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 set(SOFTFLOAT_MODEL RISCV)
+add_library(softfloat_riscv INTERFACE)
+target_include_directories(softfloat_riscv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(softfloat_riscv INTERFACE SOFTFLOAT_FAST_DIV32TO16)
+target_sources(softfloat_riscv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/model.hpp)
+target_link_libraries(softfloat_riscv INTERFACE softfloat_others)
 
-add_definitions(-DSOFTFLOAT_FAST_DIV32TO16)
-
-set(INC_TARGET ${CMAKE_CURRENT_SOURCE_DIR}/model.hpp)
-
-set(COMMON
-    ${INC_SOFTFLOAT}
-    ${INC_OTHERS}
-    ${SRC_OTHERS}
-    ${INC_PRIMITIVES}
-    ${SRC_PRIMITIVES}
-    ${INC_TARGET}
-)
-set(FAST_INT64_ONLY_SRC
-    ${SRC_OTHERS_FAST_INT64}
-    ${SRC_PRIMITIVES_FAST_INT64}
-)
-set(NON_FAST_INT64_ONLY_SRC
-    ${SRC_OTHERS_NON_FAST_INT64}
-    ${SRC_PRIMITIVES_NON_FAST_INT64}
-)
-
-source_group(TREE ${SOFTFLOAT_ROOT} FILES
-    ${COMMON}
-    ${FAST_INT64_ONLY_SRC}
-    ${NON_FAST_INT64_ONLY_SRC}
-)
-
-add_library(softfloat-${SOFTFLOAT_MODEL}-fi64 EXCLUDE_FROM_ALL
-    ${COMMON}
-    ${FAST_INT64_ONLY_SRC}
-)
+add_library(softfloat-${SOFTFLOAT_MODEL}-fi64 EXCLUDE_FROM_ALL)
 target_link_libraries(softfloat-${SOFTFLOAT_MODEL}-fi64
-    PUBLIC softfloat-interface-fast-int64
-    PRIVATE softfloat-build
+PUBLIC
+	softfloat_interface_fast_int64
+PRIVATE
+	softfloat_others_fast_int64
+	softfloat_riscv
 )
 set_target_properties(softfloat-${SOFTFLOAT_MODEL}-fi64 PROPERTIES FOLDER "softfloat/${SOFTFLOAT_MODEL}")
 
-add_library(softfloat-${SOFTFLOAT_MODEL}-nfi64 EXCLUDE_FROM_ALL
-    ${COMMON}
-    ${NON_FAST_INT64_ONLY_SRC}
-)
+add_library(softfloat-${SOFTFLOAT_MODEL}-nfi64 EXCLUDE_FROM_ALL)
 target_link_libraries(softfloat-${SOFTFLOAT_MODEL}-nfi64
-    PUBLIC softfloat-interface
-    PRIVATE softfloat-build
+PUBLIC
+	softfloat_interface_nonfast_int64
+PRIVATE
+	softfloat_others_nonfast_int64
+	softfloat_riscv
 )
 set_target_properties(softfloat-${SOFTFLOAT_MODEL}-nfi64 PROPERTIES FOLDER "softfloat/${SOFTFLOAT_MODEL}")
