@@ -45,8 +45,6 @@ f16_mul(float16_t a,
     bool const signB = is_sign(b);
     bool const signZ = signA != signB;
 
-    static constexpr int8_t const max_exp = 0x1F;
-
     if (is_NaN(a) || is_NaN(b)) {
         return propagate_NaN(a, b);
     }
