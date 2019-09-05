@@ -54,7 +54,6 @@ f32_to_ui64_r_minMag(float32_t a,
     }
 
     bool const sign = is_sign(a);
-    static constexpr int16_t const max_exp = 0xFF;
 
     if (sign || shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
