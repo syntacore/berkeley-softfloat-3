@@ -94,5 +94,9 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/ui64_to_f32.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ui64_to_f64.cpp
 )
-add_subdirectory(FAST_INT64)
-add_subdirectory(NON_FAST_INT64)
+
+if(SOFTFLOAT_FAST_INT64)
+	add_subdirectory(FAST_INT64)
+else()
+	add_subdirectory(NON_FAST_INT64)
+endif(SOFTFLOAT_FAST_INT64)

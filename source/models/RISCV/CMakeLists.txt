@@ -1,28 +1,16 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(SOFTFLOAT_MODEL RISCV)
-add_library(softfloat_riscv INTERFACE)
-target_include_directories(softfloat_riscv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_definitions(softfloat_riscv INTERFACE SOFTFLOAT_FAST_DIV32TO16)
-target_sources(softfloat_riscv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/model.hpp)
-target_link_libraries(softfloat_riscv INTERFACE softfloat_others)
-
-add_library(softfloat-${SOFTFLOAT_MODEL}-fi64 EXCLUDE_FROM_ALL)
-target_link_libraries(softfloat-${SOFTFLOAT_MODEL}-fi64
-PUBLIC
-	softfloat_interface_fast_int64
+add_library(softfloat-riscv EXCLUDE_FROM_ALL)
+target_sources(softfloat-riscv
 PRIVATE
-	softfloat_others_fast_int64
-	softfloat_riscv
+	${CMAKE_CURRENT_SOURCE_DIR}/model.hpp
 )
-set_target_properties(softfloat-${SOFTFLOAT_MODEL}-fi64 PROPERTIES FOLDER "softfloat/${SOFTFLOAT_MODEL}")
-
-add_library(softfloat-${SOFTFLOAT_MODEL}-nfi64 EXCLUDE_FROM_ALL)
-target_link_libraries(softfloat-${SOFTFLOAT_MODEL}-nfi64
+target_include_directories(softfloat-riscv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(softfloat-riscv PRIVATE SOFTFLOAT_FAST_DIV32TO16)
+target_link_libraries(softfloat-riscv
 PUBLIC
-	softfloat_interface_nonfast_int64
+	softfloat_interface
 PRIVATE
-	softfloat_others_nonfast_int64
-	softfloat_riscv
+	softfloat_others
 )
-set_target_properties(softfloat-${SOFTFLOAT_MODEL}-nfi64 PROPERTIES FOLDER "softfloat/${SOFTFLOAT_MODEL}")
+set_target_properties(softfloat-riscv PROPERTIES FOLDER "softfloat")

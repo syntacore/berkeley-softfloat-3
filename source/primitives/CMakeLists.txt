@@ -12,5 +12,8 @@ INTERFACE
 )
 target_link_libraries(softfloat_primitives INTERFACE softfloat_build)
 
-add_subdirectory(FAST_INT64)
-add_subdirectory(NON_FAST_INT64)
+if(SOFTFLOAT_FAST_INT64)
+	add_subdirectory(FAST_INT64)
+else()
+	add_subdirectory(NON_FAST_INT64)
+endif(SOFTFLOAT_FAST_INT64)

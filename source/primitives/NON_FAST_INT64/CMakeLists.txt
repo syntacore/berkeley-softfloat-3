@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_library(softfloat_primitives_nonfast_int64 INTERFACE)
-target_link_libraries(softfloat_primitives_nonfast_int64
-INTERFACE
-	softfloat_primitives
-	softfloat_interface_nonfast_int64
-)
-target_sources(softfloat_primitives_nonfast_int64
+target_sources(softfloat_primitives
 INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/s_addCarryM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/s_addComplCarryM.cpp

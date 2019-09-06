@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_library(softfloat_others_fast_int64 INTERFACE)
-target_link_libraries(softfloat_others_fast_int64
-INTERFACE
-	softfloat_others
-	softfloat_primitives_fast_int64
-)
-target_sources(softfloat_others_fast_int64
+target_sources(softfloat_others
 INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_add.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_sub.cpp
