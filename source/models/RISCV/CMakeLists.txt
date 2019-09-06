@@ -13,4 +13,4 @@ PUBLIC
 PRIVATE
 	softfloat_others
 )
-set_target_properties(softfloat-riscv PROPERTIES FOLDER "softfloat")
+set_target_properties(softfloat-riscv PROPERTIES FOLDER "libs/softfloat")

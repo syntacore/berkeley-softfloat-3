@@ -12,7 +12,7 @@ PUBLIC
 PRIVATE
 	softfloat_x86
 )
-set_target_properties(softfloat_x86_SSE PROPERTIES FOLDER "softfloat")
+set_target_properties(softfloat_x86_SSE PROPERTIES FOLDER "libs/softfloat")
 
 if(SOFTFLOAT_FAST_INT64)
 	add_subdirectory(FAST_INT64)
