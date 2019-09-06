@@ -1,4 +1,4 @@
-﻿
+
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -6,7 +6,8 @@ Package, Release 3b, by John R. Hauser.
 
 Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
 All rights reserved.
-
+*/
+/*
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
@@ -40,56 +41,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning( disable : 5030)
 #endif
 
-#ifndef SOFTFLOAT_FAST_INT64
-#error Fast int64_t operations only
-#endif
-
-extFloat80_t
-extF80_roundToInt(extFloat80_t const a,
-                  uint8_t const roundingMode,
-                  bool const exact)
+void
+extF80M_roundToInt(extFloat80_t const* const aPtr,
+                   uint8_t roundingMode,
+                   bool exact,
+                   extFloat80_t* const zPtr)
 {
+#ifdef SOFTFLOAT_FAST_INT64
+    *zPtr = extF80_roundToInt(*aPtr, roundingMode, exact);
+#else
     using namespace softfloat::internals;
-
-    uint16_t const uiA64 = a.signExp;
+    uint16_t const uiA64 = aPtr->signExp;
     uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(1, 0));
     int32_t exp = expExtF80UI64(uiA64);
-    uint64_t sigA = a.signif;
+    uint64_t sigA = aPtr->signif;
 
-    if (0 == (sigA & UINT64_C(0x8000000000000000)) && 0x7FFF != exp) {
-        if (0 == sigA) {
-            extFloat80_t uZ;
-            uZ.signExp = signUI64;
-            uZ.signif = 0;
-            return uZ;
+    if (0 == (sigA & INT64_MIN) && 0x7FFF != exp) {
+        if (!sigA) {
+            zPtr->signExp = signUI64;
+            zPtr->signif = 0;
+            return;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
-        exp += normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-
-    if (0x403E <= exp) {
-        uint64_t sigZ;
-
-        if (exp == 0x7FFF) {
-            if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, sigA, 0, 0);
-                extFloat80_t uZ;
-                uZ.signExp = static_cast<uint16_t>(uiZ.v64);
-                uZ.signif = uiZ.v0;
-                return uZ;
-            }
-
-            sigZ = UINT64_C(0x8000000000000000);
-        } else {
-            sigZ = sigA;
-        }
-
-        extFloat80_t uZ;
-        uZ.signExp = static_cast<uint16_t>(signUI64 | exp);
-        uZ.signif = sigZ;
-        return uZ;
+        exp += softfloat_normExtF80SigM(&sigA);
     }
 
     if (exp <= 0x3FFE) {
@@ -97,12 +71,9 @@ extF80_roundToInt(extFloat80_t const a,
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        /**
-        @bug  warning: enumeration value ‘softfloat_round_minMag’ not handled in switch
-        */
         switch (roundingMode) {
         case softfloat_round_near_even:
-            if (0 == (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            if (0 == (sigA & INT64_MAX)) {
                 break;
             }
 
@@ -110,41 +81,62 @@ extF80_roundToInt(extFloat80_t const a,
 
         case softfloat_round_near_maxMag:
             if (0x3FFE == exp) {
-                extFloat80_t uZ;
-                uZ.signExp = signUI64 | 0x3FFFu;
-                uZ.signif = UINT64_C(0x8000000000000000);
-                return uZ;
+                zPtr->signExp = uint16_t(signUI64 | 0x3FFF);
+                zPtr->signif = static_cast<uint64_t>(INT64_MIN);
+                return;
             }
 
             break;
 
         case softfloat_round_min:
-            if (0 != signUI64) {
-                extFloat80_t uZ;
-                uZ.signExp = signUI64 | 0x3FFFu;
-                uZ.signif = UINT64_C(0x8000000000000000);
-                return uZ;
+            if (signUI64) {
+                zPtr->signExp = static_cast<uint16_t>(signUI64 | UINT16_C(0x3FFF));
+                zPtr->signif = static_cast<uint64_t>(INT64_MIN);
+                return;
             }
 
             break;
 
         case softfloat_round_max:
-            if (0 == signUI64) {
-                extFloat80_t uZ;
-                uZ.signExp = signUI64 | 0x3FFFu;
-                uZ.signif = UINT64_C(0x8000000000000000);
-                return uZ;
+            if (!signUI64) {
+                zPtr->signExp = static_cast<uint16_t>(signUI64 | UINT16_C(0x3FFF));
+                zPtr->signif = static_cast<uint64_t>(INT64_MIN);
+                return;
             }
 
             break;
         }
 
-        extFloat80_t uZ;
-        uZ.signExp = signUI64;
-        uZ.signif = 0;
-        return uZ;
+        zPtr->signExp = signUI64;
+        zPtr->signif = 0;
+        return;
     }
 
+    if (0x403E <= exp) {
+        uint64_t sigZ;
+
+        if (INT16_MAX == exp) {
+            if (0 != (sigA & INT64_MAX)) {
+                softfloat_propagateNaNExtF80M(aPtr, 0, zPtr);
+                return;
+            }
+
+            sigZ = static_cast<uint64_t>(INT64_MIN);
+        } else {
+            sigZ = sigA;
+        }
+
+        /**
+        @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data
+        */
+        zPtr->signExp = static_cast<uint16_t>(signUI64 | exp);
+        zPtr->signif = sigZ;
+        return;
+    }
+
+    /**
+    @todo Warning   C4244   '=': conversion from 'int32_t' to 'uint16_t', possible loss of data
+    */
     uint16_t uiZ64 = static_cast<uint16_t>(signUI64 | exp);
     uint64_t const lastBitMask = static_cast<uint64_t>(1) << (0x403E - exp);
     uint64_t const roundBitsMask = lastBitMask - 1;
@@ -155,13 +147,11 @@ extF80_roundToInt(extFloat80_t const a,
     } else if (softfloat_round_near_even == roundingMode) {
         sigZ += lastBitMask >> 1;
 
-        if (!(sigZ & roundBitsMask)) {
+        if (0 == (sigZ & roundBitsMask)) {
             sigZ &= ~lastBitMask;
         }
-    } else if (softfloat_round_minMag != roundingMode) {
-        if ((0 != signUI64) != (softfloat_round_max == roundingMode)) {
-            sigZ += roundBitsMask;
-        }
+    } else if (softfloat_round_minMag != roundingMode && ((0 != signUI64) != (softfloat_round_max == roundingMode))) {
+        sigZ += roundBitsMask;
     }
 
     sigZ &= ~roundBitsMask;
@@ -171,13 +161,12 @@ extF80_roundToInt(extFloat80_t const a,
         sigZ = UINT64_C(0x8000000000000000);
     }
 
-    if (exact && sigZ != sigA) {
+    if (exact && (sigZ != sigA)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    extFloat80_t uZ;
-    uZ.signExp = uiZ64;
-    uZ.signif = sigZ;
-    return uZ;
+    zPtr->signExp = uiZ64;
+    zPtr->signif = sigZ;
+    return;
+#endif
 }
-

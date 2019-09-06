@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float128_t
 f128_roundToInt(float128_t const a,
-                softfloat_round_mode const roundingMode,
+                uint8_t const roundingMode,
                 bool const exact)
 {
     using namespace softfloat::internals;
