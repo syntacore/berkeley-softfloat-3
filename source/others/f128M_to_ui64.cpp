@@ -44,9 +44,9 @@ f128M_to_ui64(float128_t const* const aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_to_ui64(*aPtr, roundingMode, exact);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
 
-    uint32_t const *const aWPtr = (const uint32_t*)aPtr;
+    uint32_t const *const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = is_sign(uiA96);
     int32_t const exp = expF128UI96(uiA96);

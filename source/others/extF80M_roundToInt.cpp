@@ -43,14 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
 extF80M_roundToInt(extFloat80_t const* const aPtr,
-                   uint8_t roundingMode,
+                   softfloat_round_mode roundingMode,
                    bool exact,
                    extFloat80_t* const zPtr)
 {
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = extF80_roundToInt(*aPtr, roundingMode, exact);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     uint16_t const uiA64 = aPtr->signExp;
     uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(1, 0));
     int32_t exp = expExtF80UI64(uiA64);

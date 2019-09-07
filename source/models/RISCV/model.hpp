@@ -43,8 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-inline namespace riscv {
-
 /**
 Default value for `softfloat_detectTininess'.
 */
@@ -276,7 +274,7 @@ softfloat_commonNaNToF64UI(commonNaN const&)
     return defaultNaNF64UI;
 }
 
-#ifdef SOFTFLOAT_FAST_INT64
+namespace fast_int64 {
 
 /*
 The following functions are needed only when `SOFTFLOAT_FAST_INT64' is
@@ -408,8 +406,9 @@ softfloat_propagateNaNF128UI(uint128 const& a,
     return softfloat_propagateNaNF128UI(a.v64, a.v0, b.v64, b.v0);
 }
 
-#else
+}  // namespace fast_int64
 
+namespace slow_int64 {
 /**
 The bit pattern for a default generated 128-bit floating-point NaN.
 */
@@ -497,9 +496,7 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
     zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
 }
 
-#endif
-
-}  // namespace riscv
+}  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat
 

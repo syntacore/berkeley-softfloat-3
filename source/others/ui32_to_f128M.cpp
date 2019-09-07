@@ -43,8 +43,9 @@ ui32_to_f128M(uint32_t a,
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = ui32_to_f128(a);
 #else
-    using namespace softfloat::internals;
-    uint32_t *const zWPtr = (uint32_t *)zPtr;
+    using namespace softfloat::internals::slow_int64;
+
+    uint32_t *const zWPtr = reinterpret_cast<uint32_t *>(zPtr);
     uint32_t uiZ96 = 0;
     uint32_t uiZ64 = 0;
     if (0 != a) {

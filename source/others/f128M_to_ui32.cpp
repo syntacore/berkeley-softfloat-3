@@ -44,7 +44,8 @@ f128M_to_ui32(float128_t const* const aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_to_ui32(*aPtr, roundingMode, exact);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
+
     static bool const fromNaN_is_same_as_pos_overflow = ui32_fromNaN == ui32_fromPosOverflow;
     static bool const fromNaN_is_same_as_neg_overflow = ui32_fromNaN == ui32_fromNegOverflow;
     static bool const fromNaN_is_same_as_both_overflow = fromNaN_is_same_as_pos_overflow && fromNaN_is_same_as_neg_overflow;

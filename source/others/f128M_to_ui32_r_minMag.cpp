@@ -46,8 +46,9 @@ f128M_to_ui32_r_minMag(float128_t const* aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_to_ui32_r_minMag(*aPtr, exact);
 #else
-    using namespace softfloat::internals;
-    uint32_t const* aWPtr = (uint32_t const*)aPtr;
+    using namespace softfloat::internals::slow_int64;
+
+    uint32_t const* aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t uiA96 = aWPtr[indexWordHi(4)];
     int32_t exp = expF128UI96(uiA96);
     uint64_t sig64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];

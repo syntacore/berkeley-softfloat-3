@@ -48,7 +48,8 @@ f128M_rem(float128_t const* const aPtr,
 
 #else
 
-using namespace softfloat::internals;
+using namespace softfloat::internals::slow_int64;
+
 namespace {
 static inline void
 copyA(uint32_t const uiA96,

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float16_t
 f16_roundToInt(float16_t a,
-               uint8_t roundingMode,
+               softfloat_round_mode roundingMode,
                bool exact)
 {
     using namespace softfloat::internals;

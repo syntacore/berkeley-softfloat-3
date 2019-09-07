@@ -36,13 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-#ifndef SOFTFLOAT_FAST_INT64
-#error Fast int64_t operations only
-#endif
-
 namespace softfloat {
 namespace internals {
-namespace Intel_8086 {
+namespace fast_int64 {
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
@@ -76,6 +72,6 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
         uint128{uiB64 | UINT64_C(0x0000'8000'0000'0000), uiB0};
 }
 
-}  // namespace Intel_8086
+}  // namespace fast_int64
 }  // namespace internals
 }  // namespace softfloat

@@ -42,7 +42,7 @@ f128M_to_f32(const float128_t* aPtr)
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_to_f32(*aPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     uint32_t const* const aWPtr = (const uint32_t*)aPtr;
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = is_sign(uiA96);

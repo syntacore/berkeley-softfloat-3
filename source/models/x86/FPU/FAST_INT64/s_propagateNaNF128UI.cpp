@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-namespace Intel_8086 {
+namespace fast_int64 {
 
 namespace {
 static uint64_t const non_signal_bit = UINT64_C(0x0000'8000'0000'0000);
@@ -106,6 +106,6 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
         uiNonsigA64 < uiNonsigB64 ? nsA : nsB;
 }
 
-}  // namespace Intel_8086
+}  // namespace fast_int64
 }  // namespace internals
 }  // namespace softfloat

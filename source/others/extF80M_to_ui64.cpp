@@ -44,7 +44,7 @@ extF80M_to_ui64(extFloat80_t const *const aSPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return extF80_to_ui64(*aSPtr, roundingMode, exact);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
     int32_t const exp = expExtF80UI64(uiA64);

@@ -36,12 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-#ifdef SOFTFLOAT_FAST_INT64
-#error For non-fast int64_t only
-#endif
-
 namespace softfloat {
 namespace internals {
+namespace slow_int64 {
 
 bool
 softfloat_addComplCarryM(size_t size_words,
@@ -70,5 +67,6 @@ softfloat_addComplCarryM(size_t size_words,
     return carry;
 }
 
+}
 }  // namespace internals
 }  // namespace softfloat

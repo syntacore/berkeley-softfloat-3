@@ -36,12 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-#ifdef SOFTFLOAT_FAST_INT64
-#error For non-fast int64_t only
-#endif
-
 namespace softfloat {
 namespace internals {
+namespace slow_int64 {
 
 void
 softfloat_sub1XM(uint8_t size_words,
@@ -59,5 +56,6 @@ softfloat_sub1XM(uint8_t size_words,
     }
 }
 
+}  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat

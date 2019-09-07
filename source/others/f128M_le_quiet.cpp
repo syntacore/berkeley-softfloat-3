@@ -43,7 +43,7 @@ f128M_le_quiet(const float128_t* aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_le_quiet(*aPtr, *bPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     const uint32_t* aWPtr, *bWPtr;
     uint32_t uiA96, uiB96;
     bool signA, signB;

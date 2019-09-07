@@ -36,12 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-#ifdef SOFTFLOAT_FAST_INT64
-#error For non-fast int64_t only
-#endif
-
 namespace softfloat {
 namespace internals {
+namespace slow_int64 {
 
 void
 softfloat_mul128MTo256M(uint32_t const *aPtr,
@@ -94,5 +91,6 @@ softfloat_mul128MTo256M(uint32_t const *aPtr,
     } while (zPtr != lastZPtr);
 }
 
+}  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat

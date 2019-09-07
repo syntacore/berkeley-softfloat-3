@@ -43,8 +43,9 @@ f128M_to_i32_r_minMag(const float128_t* aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_to_i32_r_minMag(*aPtr, exact);
 #else
-    using namespace softfloat::internals;
-    uint32_t const* aWPtr = (const uint32_t*)aPtr;
+    using namespace softfloat::internals::slow_int64;
+
+    uint32_t const* aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
     bool const sign = is_sign(uiA96);
     int32_t const exp = expF128UI96(uiA96);

@@ -36,13 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-#ifdef SOFTFLOAT_FAST_INT64
-#error For non-fast int64_t only
-#endif
-
 namespace softfloat {
 namespace internals {
-namespace Intel_8086 {
+namespace slow_int64 {
 
 namespace {
 static inline void
@@ -115,6 +111,6 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
     result_copy(zWPtr, isA ? aWPtr : bWPtr);
 }
 
-}  // namespace Intel_8086
+}  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat

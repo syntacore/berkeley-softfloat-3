@@ -203,7 +203,8 @@ uint32_t
 softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
                               uint32_t a);
 
-#ifdef SOFTFLOAT_FAST_INT64
+namespace fast_int64 {
+using namespace internals;
 
 /**
 Returns true if the 128-bit unsigned integer formed by concatenating `a64'
@@ -554,7 +555,11 @@ softfloat_mul128To256M(uint128 const& a,
     softfloat_mul128To256M(a.v64, a.v0, b.v64, b.v0, zPtr);
 }
 
-#else
+}  // namespace fast_int64
+
+namespace slow_int64 {
+
+using namespace internals;
 
 /**
 The following functions are needed only when `SOFTFLOAT_FAST_INT64' is not
@@ -1148,7 +1153,7 @@ softfloat_remStep160MBy32(uint32_t const* remPtr,
     softfloat_remStepMBy32(5, remPtr, dist, bPtr, q, zPtr);
 }
 
-#endif
+}  // namespace slow_int64
 
 }  // namespace internals
 }  // namespace softfloat

@@ -43,7 +43,8 @@ ui64_to_extF80M(uint64_t a,
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = ui64_to_extF80(a);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
+
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
 

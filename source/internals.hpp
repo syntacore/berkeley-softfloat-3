@@ -197,7 +197,7 @@ softfloat_roundPackToF64(bool,
                          int16_t,
                          uint64_t);
 
-#ifdef SOFTFLOAT_FAST_INT64
+namespace fast_int64 {
 
 struct exp32_sig64
 {
@@ -372,7 +372,9 @@ is_NaN(uint128 const& a)
     return is_NaN(a.v64, a.v0);
 }
 
-#else
+}  // namespace fast_int64
+
+namespace slow_int64 {
 
 template<typename Ty>
 Ty
@@ -471,9 +473,7 @@ packToF128UI96(bool const sign,
 {
     return (static_cast<uint32_t>((!!sign) << 31) + (static_cast<uint32_t>(expnt) << 16)) + sig96;
 }
-
-#endif
-
+}  // namespace slow_int64
 
 inline constexpr int8_t
 get_exp(uint16_t const& a)

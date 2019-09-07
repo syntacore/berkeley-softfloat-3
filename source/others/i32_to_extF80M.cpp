@@ -43,7 +43,7 @@ i32_to_extF80M(int32_t const a,
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = i32_to_extF80(a);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
 
     if (0 == a) {
         zPtr->signExp = 0;

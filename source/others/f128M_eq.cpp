@@ -43,7 +43,7 @@ f128M_eq(float128_t const* aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_eq(*aPtr, *bPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
 
     uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const* const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);

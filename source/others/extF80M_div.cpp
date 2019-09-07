@@ -45,7 +45,7 @@ extF80M_div(extFloat80_t const* const aSPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     *zSPtr = extF80_div(*aSPtr, *bSPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     uint16_t const uiA64 = aSPtr->signExp;
     int32_t expA = expExtF80UI64(uiA64);
     uint16_t const uiB64 = bSPtr->signExp;

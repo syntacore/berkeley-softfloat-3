@@ -71,7 +71,8 @@ int64_t
 f128M_to_i64_r_minMag(const float128_t* aPtr,
                       bool exact)
 {
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
+
     uint32_t sig[4];
     uint64_t uiZ;
     auto const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);

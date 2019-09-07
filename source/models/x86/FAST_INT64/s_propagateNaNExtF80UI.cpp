@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-namespace Intel_8086 {
+namespace fast_int64 {
 
 namespace {
 static uint128
@@ -128,6 +128,6 @@ softfloat_propagateNaNExtF80UI(uint16_t const uiA64,
     return return_larger_magnitude(uiA64, uiNonsigA0, uiB64, uiNonsigB0);
 }
 
-}  // namespace Intel_8086
+}  // namespace fast_int64
 }  // namespace internals
 }  // namespace softfloat

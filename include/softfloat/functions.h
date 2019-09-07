@@ -98,7 +98,7 @@ extern "C" {
     int64_t f16_to_i64_r_minMag(float16_t, bool);
     float32_t f16_to_f32(float16_t);
     float64_t f16_to_f64(float16_t);
-    float16_t f16_roundToInt(float16_t, uint8_t, bool);
+    float16_t f16_roundToInt(float16_t, softfloat_round_mode, bool);
     float16_t f16_add(float16_t, float16_t);
     float16_t f16_sub(float16_t, float16_t);
     float16_t f16_mul(float16_t, float16_t);
@@ -211,7 +211,7 @@ extern "C" {
     float32_t extF80M_to_f32(extFloat80_t const*);
     float64_t extF80M_to_f64(extFloat80_t const*);
     void extF80M_to_f128M(extFloat80_t const*, float128_t*);
-    void extF80M_roundToInt(extFloat80_t const*, uint8_t, bool, extFloat80_t*);
+    void extF80M_roundToInt(extFloat80_t const*, softfloat_round_mode, bool, extFloat80_t*);
     void extF80M_mul(extFloat80_t const*, extFloat80_t const*, extFloat80_t*);
     void extF80M_div(extFloat80_t const*, extFloat80_t const*, extFloat80_t*);
     void extF80M_rem(extFloat80_t const*, extFloat80_t const*, extFloat80_t*);
@@ -245,9 +245,6 @@ extern "C" {
     bool f128M_eq_signaling(const float128_t*, const float128_t*);
     bool f128M_le_quiet(const float128_t*, const float128_t*);
     bool f128M_lt_quiet(const float128_t*, const float128_t*);
-
-#ifdef SOFTFLOAT_FAST_INT64
-
     extFloat80_t ui32_to_extF80(uint32_t);
     extFloat80_t ui64_to_extF80(uint64_t);
     extFloat80_t i32_to_extF80(int32_t);
@@ -255,7 +252,6 @@ extern "C" {
     extFloat80_t f16_to_extF80(float16_t);
     extFloat80_t f32_to_extF80(float32_t);
     extFloat80_t f64_to_extF80(float64_t);
-
     uint32_t extF80_to_ui32(extFloat80_t, softfloat_round_mode, bool);
     uint64_t extF80_to_ui64(extFloat80_t, softfloat_round_mode, bool);
     int32_t extF80_to_i32(extFloat80_t, softfloat_round_mode, bool);
@@ -264,13 +260,11 @@ extern "C" {
     uint64_t extF80_to_ui64_r_minMag(extFloat80_t, bool);
     int32_t extF80_to_i32_r_minMag(extFloat80_t, bool);
     int64_t extF80_to_i64_r_minMag(extFloat80_t, bool);
-
     float16_t extF80_to_f16(extFloat80_t);
     float32_t extF80_to_f32(extFloat80_t);
     float64_t extF80_to_f64(extFloat80_t);
     float128_t extF80_to_f128(extFloat80_t);
-
-    extFloat80_t extF80_roundToInt(extFloat80_t, uint8_t, bool);
+    extFloat80_t extF80_roundToInt(extFloat80_t, softfloat_round_mode, bool);
     extFloat80_t extF80_add(extFloat80_t, extFloat80_t);
     extFloat80_t extF80_sub(extFloat80_t, extFloat80_t);
     extFloat80_t extF80_mul(extFloat80_t, extFloat80_t);
@@ -293,22 +287,18 @@ extern "C" {
     float128_t f16_to_f128(float16_t);
     float128_t f32_to_f128(float32_t);
     float128_t f64_to_f128(float64_t);
-
     uint32_t f128_to_ui32(float128_t, softfloat_round_mode, bool);
     uint64_t f128_to_ui64(float128_t, softfloat_round_mode, bool);
     int32_t f128_to_i32(float128_t, softfloat_round_mode, bool);
     int64_t f128_to_i64(float128_t, softfloat_round_mode, bool);
-
     uint32_t f128_to_ui32_r_minMag(float128_t, bool);
     uint64_t f128_to_ui64_r_minMag(float128_t, bool);
     int32_t f128_to_i32_r_minMag(float128_t, bool);
     int64_t f128_to_i64_r_minMag(float128_t, bool);
-
     float16_t f128_to_f16(float128_t);
     float32_t f128_to_f32(float128_t);
     float64_t f128_to_f64(float128_t);
     extFloat80_t f128_to_extF80(float128_t);
-
     float128_t f128_roundToInt(float128_t, uint8_t, bool);
     float128_t f128_add(float128_t, float128_t);
     float128_t f128_sub(float128_t, float128_t);
@@ -325,7 +315,6 @@ extern "C" {
     bool f128_le_quiet(float128_t, float128_t);
     bool f128_lt_quiet(float128_t, float128_t);
     bool f128_isSignalingNaN(float128_t);
-#endif
 
     inline bool
         extF80M_isSignalingNaN(extFloat80_t const* const aPtr)

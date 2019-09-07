@@ -43,7 +43,7 @@ f128M_eq_signaling(const float128_t* aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return f128_eq_signaling(*aPtr, *bPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     const uint32_t* aWPtr, *bWPtr;
     uint32_t wordA, wordB, uiA96, uiB96;
     bool possibleOppositeZeros;

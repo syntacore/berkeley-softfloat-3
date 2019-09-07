@@ -44,7 +44,9 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
 {
     return extF80_to_i32_r_minMag(*aPtr, exact);
 }
+
 #else
+
 namespace {
 static int32_t
 invalid(bool sign, int32_t exp, uint64_t sig)

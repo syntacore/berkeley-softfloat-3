@@ -43,7 +43,7 @@ f16_to_f128M(float16_t a,
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = f16_to_f128(a);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     uint32_t* const zWPtr = (uint32_t*)zPtr;
     bool const sign = is_sign(a);
     int8_t const exp = get_exp(a);

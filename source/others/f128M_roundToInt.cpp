@@ -52,7 +52,7 @@ f128M_roundToInt(float128_t const* const aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = f128_roundToInt(*aPtr, roundingMode, exact);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
 
     typedef uint32_t el_type;
     auto const aWPtr = reinterpret_cast<el_type const*>(aPtr);

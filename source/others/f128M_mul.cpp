@@ -44,7 +44,7 @@ f128M_mul(float128_t const* const aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = f128_mul(*aPtr, *bPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
 
     uint32_t const* const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
     uint32_t const* const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);

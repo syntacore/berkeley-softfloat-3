@@ -43,7 +43,7 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
 #ifdef SOFTFLOAT_FAST_INT64
     *zPtr = extF80_sqrt(*aPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
     uint16_t uiA64 = aPtr->signExp;
     uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(true, 0u));
     int32_t expA = expExtF80UI64(uiA64);

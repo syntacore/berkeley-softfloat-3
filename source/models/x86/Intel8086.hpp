@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-inline namespace Intel_8086 {
 
 /**
 Default value for `softfloat_detectTininess'.
@@ -214,7 +213,7 @@ The bit pattern for a default generated 80-bit extended floating-point NaN.
 uint16_t const defaultNaNExtF80UI64 = 0xFFFFu;
 uint64_t const defaultNaNExtF80UI0 = UINT64_C(0xC000000000000000);
 
-#ifdef SOFTFLOAT_FAST_INT64
+namespace fast_int64 {
 
 /**
 The following functions are needed only when `SOFTFLOAT_FAST_INT64' is
@@ -333,8 +332,9 @@ softfloat_propagateNaNF128UI(uint128 const& a,
     return softfloat_propagateNaNF128UI(a.v64, a.v0, b.v64, b.v0);
 }
 
-#else
+}  // namespace fast_int64
 
+namespace slow_int64 {
 /**
 Assuming at least one of the two 80-bit extended floating-point values
 pointed to by `aSPtr' and `bSPtr' is a NaN, stores the combined NaN result
@@ -405,8 +405,7 @@ softfloat_propagateNaNF128M(uint32_t const* aWPtr,
                             uint32_t const* bWPtr,
                             uint32_t* zWPtr);
 
-#endif  /* SOFTFLOAT_FAST_INT64 */
-}  // namespace Intel_8086
+}  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat
 

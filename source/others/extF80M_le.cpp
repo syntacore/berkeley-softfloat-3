@@ -44,7 +44,7 @@ extF80M_le(extFloat80_t const* const aPtr,
 #ifdef SOFTFLOAT_FAST_INT64
     return extF80_le(*aPtr, *bPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
 
     if (is_NaN(*aPtr) || is_NaN(*bPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);

@@ -43,7 +43,8 @@ extF80M_to_f32(const extFloat80_t* aPtr)
 #ifdef SOFTFLOAT_FAST_INT64
     return extF80_to_f32(*aPtr);
 #else
-    using namespace softfloat::internals;
+    using namespace softfloat::internals::slow_int64;
+
     extFloat80M const* aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
