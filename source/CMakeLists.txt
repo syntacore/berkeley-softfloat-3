@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 
+set(SOFTFLOAT_FAST_INT64 OFF CACHE BOOL "SOFTFLOAT_FAST_INT64")
+set(SOFTFLOAT_FAST_DIV64TO32 OFF CACHE BOOL "SOFTFLOAT_FAST_DIV64TO32")
+
 add_library(softfloat_build INTERFACE)
+target_compile_definitions(softfloat_build
+INTERFACE
+	$<$<BOOL:${SOFTFLOAT_FAST_INT64}>:SOFTFLOAT_FAST_INT64>
+	$<$<BOOL:${SOFTFLOAT_FAST_DIV64TO32}>:SOFTFLOAT_FAST_DIV64TO32>
+)
 target_sources(softfloat_build INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/internals.hpp)
 target_include_directories(softfloat_build INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(softfloat_build

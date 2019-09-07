@@ -16,12 +16,4 @@ INTERFACE
 target_include_directories(softfloat_interface INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_definitions(softfloat_interface INTERFACE $<$<BOOL:${IS_BIG_ENDIAN}>:BIG_ENDIAN>)
 
-set(SOFTFLOAT_FAST_INT64 OFF CACHE BOOL "SOFTFLOAT_FAST_INT64")
-set(SOFTFLOAT_FAST_DIV64TO32 OFF CACHE BOOL "SOFTFLOAT_FAST_DIV64TO32")
-target_compile_definitions(softfloat_interface
-INTERFACE
-	$<$<BOOL:${SOFTFLOAT_FAST_INT64}>:SOFTFLOAT_FAST_INT64>
-	$<$<BOOL:${SOFTFLOAT_FAST_DIV64TO32}>:SOFTFLOAT_FAST_DIV64TO32>
-)
-
 add_subdirectory(source)
