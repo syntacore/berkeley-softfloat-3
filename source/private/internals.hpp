@@ -237,6 +237,21 @@ roundPackTo(bool,
             softfloat_round_mode,
             bool);
 
+extern template
+int64_t
+roundPackTo<int64_t>(bool const sign,
+                     uint64_t sig,
+                     uint64_t sigExtra,
+                     softfloat_round_mode roundingMode,
+                     bool exact);
+extern template
+uint64_t
+roundPackTo<uint64_t>(bool const sign,
+                      uint64_t sig,
+                      uint64_t sigExtra,
+                      softfloat_round_mode roundingMode,
+                      bool exact);
+
 inline
 exp32_sig64
 softfloat_normSubnormalExtF80Sig(uint64_t const& sig)
@@ -382,6 +397,20 @@ roundPackMTo(bool,
              uint32_t const*,
              softfloat_round_mode,
              bool);
+
+extern template
+int64_t
+roundPackMTo<int64_t>(bool const sign,
+                      uint32_t const* const extSigPtr,
+                      softfloat_round_mode const roundingMode,
+                      bool const exact);
+
+extern template
+uint64_t
+roundPackMTo<uint64_t>(bool const sign,
+                       uint32_t const* const extSigPtr,
+                       softfloat_round_mode const roundingMode,
+                       bool const exact);
 
 bool
 softfloat_tryPropagateNaNExtF80M(extFloat80M const*,

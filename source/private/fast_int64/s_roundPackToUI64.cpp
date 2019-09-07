@@ -81,9 +81,9 @@ template
 uint64_t
 roundPackTo<uint64_t>(bool const sign,
                       uint64_t sig,
-                      uint64_t const sigExtra,
-                      softfloat_round_mode const roundingMode,
-                      bool const exact);
+                      uint64_t sigExtra,
+                      softfloat_round_mode roundingMode,
+                      bool exact);
 }  // namespace fast_int64
 }  // namespace internals
 }  // namespace softfloat

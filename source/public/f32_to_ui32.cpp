@@ -62,11 +62,10 @@ f32_to_ui32(float32_t const a,
     int16_t const exp = get_exp(a);
     uint64_t const sig64 = static_cast<uint64_t>(get_frac(a) | (0 != exp ? 0x00800000 : 0)) << 32;
     int16_t const shiftDist = 0xAA - exp;
-    return
-        roundPackTo<uint32_t>(sign,
-                              0 < shiftDist ?
-                              softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) :
-                              sig64,
-                              roundingMode,
-                              exact);
+    return roundPackTo<uint32_t>(sign,
+                                 0 < shiftDist ?
+                                 softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) :
+                                 sig64,
+                                 roundingMode,
+                                 exact);
 }

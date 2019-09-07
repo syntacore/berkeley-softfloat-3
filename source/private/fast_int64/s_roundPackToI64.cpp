@@ -81,11 +81,11 @@ roundPackTo<int64_t>(bool const sign,
 
 template
 int64_t
-roundPackTo<int64_t>(bool sign,
-                     uint64_t sig,
-                     uint64_t const sigExtra,
-                     softfloat_round_mode const roundingMode,
-                     bool const exact);
+roundPackTo<int64_t>(bool,
+                     uint64_t,
+                     uint64_t,
+                     softfloat_round_mode,
+                     bool);
 
 }  // namespace fast_int64
 }  // namespace internals

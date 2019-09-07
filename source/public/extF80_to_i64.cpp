@@ -66,7 +66,6 @@ extF80_to_i64(extFloat80_t const a,
         sigExtra = sig64Extra.extra;
     }
 
-    return
-        roundPackTo<int64_t>(sign, sig, sigExtra, roundingMode, exact);
+    return roundPackTo<int64_t>(sign, sig, sigExtra, roundingMode, exact);
 }
 

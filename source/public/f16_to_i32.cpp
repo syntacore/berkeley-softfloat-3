@@ -72,6 +72,5 @@ f16_to_i32(float16_t a,
         }
     }
 
-    return
-        roundPackTo<int32_t>(sign, static_cast<uint32_t>(sig32), roundingMode, exact);
+    return roundPackTo<int32_t>(sign, static_cast<uint32_t>(sig32), roundingMode, exact);
 }
