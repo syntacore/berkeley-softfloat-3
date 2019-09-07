@@ -6,9 +6,12 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/Intel8086.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/s_propagateNaNExtF80UI.cpp
 )
-target_compile_definitions(softfloat_x86 INTERFACE SOFTFLOAT_FAST_DIV32TO16)
 target_include_directories(softfloat_x86 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(softfloat_x86 INTERFACE softfloat_others)
+target_link_libraries(softfloat_x86
+INTERFACE
+	softfloat_public
+	softfloat_private
+)
 
 add_subdirectory(FPU)
 add_subdirectory(SSE)

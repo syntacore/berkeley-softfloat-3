@@ -1,9 +1,10 @@
 ﻿cmake_minimum_required(VERSION 3.0)
 
-add_library(softfloat_others INTERFACE)
-target_link_libraries(softfloat_others INTERFACE softfloat_primitives)
-target_sources(softfloat_others
+add_library(softfloat_public INTERFACE)
+target_link_libraries(softfloat_public INTERFACE softfloat_private)
+target_sources(softfloat_public
 INTERFACE
+	${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_add.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_div.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_eq.cpp
@@ -207,47 +208,9 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f64.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/i64_to_f128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_addExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_addF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsExtF80.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF128.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_compareNonnormExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_invalidExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_invalidF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_isNaNF128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF128.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_mulAddF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normExtF80SigM.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackMToExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackMToF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToExtF80.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF128.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normSubnormalF128Sig.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackMToExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackMToF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackMToI64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackMToUI64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToExtF80.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF32.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF128.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToI32.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToI64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToUI32.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToUI64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_shiftNormSigF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsExtF80.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF128.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_tryPropagateNaNExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_tryPropagateNaNF128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/softfloat_flags.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/softfloat_rounding_mode.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/softfloat_state.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_extF80.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_extF80M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ui32_to_f16.cpp

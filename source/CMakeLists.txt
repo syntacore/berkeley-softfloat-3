@@ -9,8 +9,6 @@ INTERFACE
 	$<$<BOOL:${SOFTFLOAT_FAST_INT64}>:SOFTFLOAT_FAST_INT64>
 	$<$<BOOL:${SOFTFLOAT_FAST_DIV64TO32}>:SOFTFLOAT_FAST_DIV64TO32>
 )
-target_sources(softfloat_build INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/internals.hpp)
-target_include_directories(softfloat_build INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(softfloat_build
 INTERFACE
 	cxx_auto_type
@@ -40,7 +38,8 @@ if(NOT(MSVC))
 	target_compile_options(softfloat_build INTERFACE -Wall)
 endif()
 
-add_subdirectory(primitives)
-add_subdirectory(others)
+add_subdirectory(private)
+add_subdirectory(public)
+
 add_subdirectory(models/x86)
 add_subdirectory(models/RISCV)
