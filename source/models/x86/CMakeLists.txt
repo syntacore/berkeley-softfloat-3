@@ -9,8 +9,7 @@ INTERFACE
 target_include_directories(softfloat_x86 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(softfloat_x86
 INTERFACE
-	softfloat_public
-	softfloat_private
+	softfloat_build
 )
 
 add_subdirectory(FPU)

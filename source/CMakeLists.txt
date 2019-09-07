@@ -4,6 +4,10 @@ set(SOFTFLOAT_FAST_INT64 OFF CACHE BOOL "SOFTFLOAT_FAST_INT64")
 set(SOFTFLOAT_FAST_DIV64TO32 OFF CACHE BOOL "SOFTFLOAT_FAST_DIV64TO32")
 
 add_library(softfloat_build INTERFACE)
+target_link_libraries(softfloat_build
+INTERFACE
+	softfloat_interface
+)
 target_compile_definitions(softfloat_build
 INTERFACE
 	$<$<BOOL:${SOFTFLOAT_FAST_INT64}>:SOFTFLOAT_FAST_INT64>
