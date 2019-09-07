@@ -17,3 +17,33 @@ target_include_directories(softfloat_interface INTERFACE ${CMAKE_CURRENT_SOURCE_
 target_compile_definitions(softfloat_interface INTERFACE $<$<BOOL:${IS_BIG_ENDIAN}>:BIG_ENDIAN>)
 
 add_subdirectory(source)
+
+add_library(softfloat-riscv EXCLUDE_FROM_ALL)
+target_link_libraries(softfloat-riscv
+PUBLIC
+	softfloat_interface
+PRIVATE
+	softfloat_imp-riscv
+	softfloat_public
+)
+set_target_properties(softfloat-riscv PROPERTIES FOLDER "libs/softfloat")
+
+add_library(softfloat-x86-FPU EXCLUDE_FROM_ALL)
+target_link_libraries(softfloat-x86-FPU
+PUBLIC
+	softfloat_interface
+PRIVATE
+	softfloat_imp-x86-FPU
+	softfloat_public
+)
+set_target_properties(softfloat-x86-FPU PROPERTIES FOLDER "libs/softfloat")
+
+add_library(softfloat-x86-SSE EXCLUDE_FROM_ALL)
+target_link_libraries(softfloat-x86-SSE
+PUBLIC
+	softfloat_interface
+PRIVATE
+	softfloat_imp-x86-SSE
+	softfloat_public
+)
+set_target_properties(softfloat-x86-SSE PROPERTIES FOLDER "libs/softfloat")
