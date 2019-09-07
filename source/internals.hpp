@@ -448,11 +448,11 @@ softfloat_addF128M(uint32_t const*,
                    uint32_t*,
                    bool);
 void
-softfloat_mulAddF128M(uint32_t const*,
+softfloat_mulAddF128M(Mul_add_operations,
                       uint32_t const*,
                       uint32_t const*,
-                      uint32_t*,
-                      Mul_add_operations);
+                      uint32_t const*,
+                      uint32_t*);
 
 inline constexpr uint16_t
 expF128UI96(uint32_t const& a96)

@@ -62,11 +62,11 @@ f128M_mulAdd(float128_t const* const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    softfloat_mulAddF128M(reinterpret_cast<const uint32_t*>(aPtr),
+    softfloat_mulAddF128M(softfloat_mulAdd_madd,
+                          reinterpret_cast<const uint32_t*>(aPtr),
                           reinterpret_cast<const uint32_t*>(bPtr), 
                           reinterpret_cast<const uint32_t*>(cPtr),
-                          reinterpret_cast<uint32_t*>(zPtr),
-                          softfloat_mulAdd_madd);
+                          reinterpret_cast<uint32_t*>(zPtr));
 #endif
 
 }

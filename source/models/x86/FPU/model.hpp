@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-inline namespace Intel_8086 {
 
 uint16_t
 propagate_NaN(uint16_t const uiA,
@@ -85,7 +84,6 @@ propagate_NaN(Ty const& a,
     return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
 }
 
-}  // namespace Intel_8086
 }  // namespace internals
 }  // namespace softfloat
 

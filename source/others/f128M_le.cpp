@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#include <algorithm>
+
 bool
 f128M_le(float128_t const *const aPtr,
          float128_t const *const bPtr)

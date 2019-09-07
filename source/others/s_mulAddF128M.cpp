@@ -41,11 +41,11 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_mulAddF128M(uint32_t const* const aWPtr,
+softfloat_mulAddF128M(Mul_add_operations op,
+                      uint32_t const* const aWPtr,
                       uint32_t const* const bWPtr,
                       uint32_t const* const cWPtr,
-                      uint32_t* const zWPtr,
-                      uint8_t op)
+                      uint32_t* const zWPtr)
 {
 
     uint32_t const uiA96 = aWPtr[indexWordHi(4)];
