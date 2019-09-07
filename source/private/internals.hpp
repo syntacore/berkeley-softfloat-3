@@ -237,14 +237,14 @@ roundPackTo(bool,
             softfloat_round_mode,
             bool);
 
-extern template
+template<>
 int64_t
 roundPackTo<int64_t>(bool const sign,
                      uint64_t sig,
                      uint64_t sigExtra,
                      softfloat_round_mode roundingMode,
                      bool exact);
-extern template
+template<>
 uint64_t
 roundPackTo<uint64_t>(bool const sign,
                       uint64_t sig,
@@ -398,14 +398,14 @@ roundPackMTo(bool,
              softfloat_round_mode,
              bool);
 
-extern template
+template<>
 int64_t
 roundPackMTo<int64_t>(bool const sign,
                       uint32_t const* const extSigPtr,
                       softfloat_round_mode const roundingMode,
                       bool const exact);
 
-extern template
+template<>
 uint64_t
 roundPackMTo<uint64_t>(bool const sign,
                        uint32_t const* const extSigPtr,
