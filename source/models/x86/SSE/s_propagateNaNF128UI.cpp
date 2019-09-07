@@ -73,5 +73,55 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
 }
 
 }  // namespace fast_int64
+
+namespace slow_int64 {
+
+namespace {
+
+static inline void
+result_copy(uint32_t* const zWPtr,
+            uint32_t const* const ptr)
+{
+    zWPtr[indexWordHi(4)] = ptr[indexWordHi(4)] | 0x00008000;
+    zWPtr[indexWord(4, 2)] = ptr[indexWord(4, 2)];
+    zWPtr[indexWord(4, 1)] = ptr[indexWord(4, 1)];
+    zWPtr[indexWord(4, 0)] = ptr[indexWord(4, 0)];
+}
+
+}  // namespace
+
+/**
+Assuming at least one of the two 128-bit floating-point values pointed to by
+`aWPtr' and `bWPtr' is a NaN, stores the combined NaN result at the location
+pointed to by `zWPtr'.  If either original floating-point value is a
+signaling NaN, the invalid exception is raised.  Each of `aWPtr', `bWPtr',
+and `zWPtr' points to an array of four 32-bit elements that concatenate in
+the platform's normal endian order to form a 128-bit floating-point value.
+*/
+void
+softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
+                            uint32_t const* const bWPtr,
+                            uint32_t* const zWPtr)
+{
+    bool const isSigNaNA = f128M_isSignalingNaN(reinterpret_cast<float128_t const*>(aWPtr));
+    bool const isSigNaNB = f128M_isSignalingNaN(reinterpret_cast<float128_t const*>(bWPtr));
+
+    if (isSigNaNA || (bWPtr && isSigNaNB)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+
+        if (isSigNaNA) {
+            result_copy(zWPtr, aWPtr);
+            return;
+        }
+    }
+
+    if (softfloat_isNaNF128M(aWPtr)) {
+        result_copy(zWPtr, aWPtr);
+    } else {
+        result_copy(zWPtr, bWPtr);
+    }
+}
+
+}  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat

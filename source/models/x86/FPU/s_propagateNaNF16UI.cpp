@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-namespace Intel_8086 {
 
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
@@ -77,6 +76,5 @@ propagate_NaN(uint16_t uiA, uint16_t uiB)
     }
 }
 
-}  // namespace Intel_8086
 }  // namespace internals
 }  // namespace softfloat

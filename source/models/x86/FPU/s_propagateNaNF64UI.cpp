@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-namespace Intel_8086 {
 
 uint64_t
 propagate_NaN(uint64_t uiA,
@@ -70,6 +69,5 @@ propagate_NaN(uint64_t uiA,
         uiNonsigA < uiNonsigB ? uiNonsigA : uiNonsigB;
 }
 
-}  // namespace Intel_8086
 }  // namespace internals
 }  // namespace softfloat
