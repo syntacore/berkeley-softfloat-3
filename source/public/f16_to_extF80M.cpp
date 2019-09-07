@@ -40,7 +40,7 @@ void
 f16_to_extF80M(float16_t const a,
                extFloat80_t* zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = f16_to_extF80(a);
 #else
     using namespace softfloat::internals;

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
 extF80M_to_f64(extFloat80_t const* const aPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return extF80_to_f64(*aPtr);
 #else
     using namespace softfloat::internals::slow_int64;

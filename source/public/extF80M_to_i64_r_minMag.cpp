@@ -41,7 +41,7 @@ int64_t
 extF80M_to_i64_r_minMag(extFloat80_t const* aPtr,
                         bool exact)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return extF80_to_i64_r_minMag(*aPtr, exact);
 #else
     using namespace softfloat::internals;

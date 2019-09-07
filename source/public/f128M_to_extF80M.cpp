@@ -40,7 +40,7 @@ void
 f128M_to_extF80M(const float128_t* aPtr,
                  extFloat80_t* zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = f128_to_extF80(*aPtr);
 #else
     using namespace softfloat::internals::slow_int64;

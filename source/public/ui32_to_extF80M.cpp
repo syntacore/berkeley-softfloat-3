@@ -40,7 +40,7 @@ void
 ui32_to_extF80M(uint32_t a,
                 extFloat80_t *const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = ui32_to_extF80(a);
 #else
     using namespace softfloat::internals::slow_int64;

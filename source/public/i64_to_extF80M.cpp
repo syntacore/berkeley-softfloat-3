@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void
 i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = i64_to_extF80(a);
 #else
     using namespace softfloat::internals::slow_int64;

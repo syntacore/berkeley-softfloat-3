@@ -42,7 +42,7 @@ extF80M_sub(extFloat80_t const *const aPtr,
             extFloat80_t const *const bPtr,
             extFloat80_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
 
     using namespace softfloat::internals::fast_int64;
 

@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace {
 
-#ifdef SOFTFLOAT_FAST_DIV32TO16
+#if (SOFTFLOAT_FAST_DIV32TO16)
 
 static inline float16_t
 make_result(uint16_t const sigA,

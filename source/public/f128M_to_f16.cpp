@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float16_t
 f128M_to_f16(const float128_t* aPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return f128_to_f16(*aPtr);
 #else
     using namespace softfloat::internals::slow_int64;

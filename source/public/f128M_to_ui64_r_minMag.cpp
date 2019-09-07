@@ -40,7 +40,7 @@ uint64_t
 f128M_to_ui64_r_minMag(float128_t const* const aPtr,
                        bool const exact)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return f128_to_ui64_r_minMag(*aPtr, exact);
 #else
     using namespace softfloat::internals::slow_int64;

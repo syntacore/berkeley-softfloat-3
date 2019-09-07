@@ -36,18 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
 
 namespace {
 
-#ifdef SOFTFLOAT_FAST_DIV64TO32
+#if (SOFTFLOAT_FAST_DIV64TO32)
 
 static inline float32_t
 make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
 {
     using namespace softfloat::internals;
+
     uint64_t sig64A;
-    uint32_t sigZ;
 
     if (sigA < sigB) {
         --expZ;
@@ -56,7 +56,7 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
         sig64A = static_cast<uint64_t>(sigA) << 30;
     }
 
-    sigZ = sig64A / sigB;
+    uint32_t sigZ = sig64A / sigB;
 
     if (0 == (sigZ & 0x3F)) {
         sigZ |= !!(static_cast<uint64_t>(sigB) * sigZ != sig64A);
@@ -228,17 +228,13 @@ f32_div(float32_t a,
     }
 
     {
-#ifdef SOFTFLOAT_FAST_DIV64TO32
-        uint64_t sig64A;
-        uint32_t sigZ;
-#else
-        uint32_t sigZ;
-        uint64_t rem;
-#endif
         int16_t expZ = expA - expB + 0x7E;
         sigA |= 0x00800000;
         sigB |= 0x00800000;
-#ifdef SOFTFLOAT_FAST_DIV64TO32
+
+#if (SOFTFLOAT_FAST_DIV64TO32)
+
+        uint64_t sig64A;
 
         if (sigA < sigB) {
             --expZ;
@@ -247,9 +243,9 @@ f32_div(float32_t a,
             sig64A = static_cast<uint64_t>(sigA) << 30;
         }
 
-        sigZ = sig64A / sigB;
+        uint32_t sigZ = sig64A / sigB;
 
-        if (!(sigZ & 0x3F)) {
+        if (0 == (sigZ & 0x3F)) {
             sigZ |= (static_cast<uint64_t>(sigB) * sigZ != sig64A);
         }
 
@@ -263,18 +259,18 @@ f32_div(float32_t a,
         }
 
         sigB <<= 8;
-        sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecip32_1(sigB)) >> 32;
+        uint32_t sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecip32_1(sigB)) >> 32;
 
         sigZ += 2;
 
         if ((sigZ & 0x3F) < 2) {
             sigZ &= ~3;
-            rem = (static_cast<uint64_t>(sigA) << 32) - static_cast<uint64_t>(sigZ << 1) * sigB;
+            uint64_t const rem = (static_cast<uint64_t>(sigA) << 32) - static_cast<uint64_t>(sigZ << 1) * sigB;
 
-            if (rem & UINT64_C(0x8000000000000000)) {
+            if (0 != (rem & UINT64_C(0x8000000000000000))) {
                 sigZ -= 4;
             } else {
-                if (rem) {
+                if (0 != rem) {
                     sigZ |= 1;
                 }
             }

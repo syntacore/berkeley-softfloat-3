@@ -41,7 +41,7 @@ f64_to_i64(float64_t const a,
            softfloat_round_mode const roundingMode,
            bool const exact)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     using namespace softfloat::internals::fast_int64;
 
     bool const sign = is_sign(a);

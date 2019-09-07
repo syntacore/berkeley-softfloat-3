@@ -42,7 +42,7 @@ extF80M_div(extFloat80_t const* const aSPtr,
             extFloat80_t const* const bSPtr,
             extFloat80_t* const zSPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zSPtr = extF80_div(*aSPtr, *bSPtr);
 #else
     using namespace softfloat::internals::slow_int64;

@@ -40,7 +40,7 @@ bool
 f128M_eq_signaling(const float128_t* aPtr,
                    const float128_t* bPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return f128_eq_signaling(*aPtr, *bPtr);
 #else
     using namespace softfloat::internals::slow_int64;

@@ -40,7 +40,7 @@ void
 f64_to_f128M(float64_t a,
              float128_t* zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = f64_to_f128(a);
 #else
     using namespace softfloat::internals::slow_int64;

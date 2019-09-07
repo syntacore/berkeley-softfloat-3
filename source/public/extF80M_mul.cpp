@@ -42,7 +42,7 @@ extF80M_mul(extFloat80_t const* const aPtr,
             extFloat80_t const* const bPtr,
             extFloat80_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = extF80_mul(*aPtr, *bPtr);
 #else
     using namespace softfloat::internals::slow_int64;

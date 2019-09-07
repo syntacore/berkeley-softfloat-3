@@ -40,7 +40,7 @@ void
 f128M_sqrt(float128_t const* const aPtr,
            float128_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = f128_sqrt(*aPtr);
 #else
     using namespace softfloat::internals::slow_int64;

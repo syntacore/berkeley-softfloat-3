@@ -41,7 +41,7 @@ void
 i32_to_f128M(int32_t a,
              float128_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = i32_to_f128(a);
 #else
     using namespace softfloat::internals::slow_int64;
@@ -60,5 +60,5 @@ i32_to_f128M(int32_t a,
         zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(normAbsA);
         zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x402Eu - shiftDist, normAbsA >> 32);
     }
-#endif // SOFTFLOAT_FAST_INT64
+#endif
 }

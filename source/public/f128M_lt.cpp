@@ -40,7 +40,7 @@ bool
 f128M_lt(const float128_t* aPtr,
          const float128_t* bPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return f128_lt(*aPtr, *bPtr);
 #else
     using namespace softfloat::internals::slow_int64;

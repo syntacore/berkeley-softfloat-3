@@ -40,7 +40,7 @@ void
 i32_to_extF80M(int32_t const a,
                extFloat80_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = i32_to_extF80(a);
 #else
     using namespace softfloat::internals::slow_int64;
@@ -55,5 +55,5 @@ i32_to_extF80M(int32_t const a,
         zPtr->signExp = packToExtF80UI64(sign, 0x401Eu - shiftDist);
         zPtr->signif = static_cast<uint64_t>(absA) << (shiftDist + 32);
     }
-#endif  // SOFTFLOAT_FAST_INT64
+#endif
 }

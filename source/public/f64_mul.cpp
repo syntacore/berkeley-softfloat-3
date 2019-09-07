@@ -43,7 +43,7 @@ float64_t
 f64_mul(float64_t const a,
         float64_t const b)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     using namespace softfloat::internals::fast_int64;
 
     bool const signA = is_sign(a);

@@ -47,7 +47,7 @@ extF80M_roundToInt(extFloat80_t const* const aPtr,
                    bool exact,
                    extFloat80_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = extF80_roundToInt(*aPtr, roundingMode, exact);
 #else
     using namespace softfloat::internals::slow_int64;

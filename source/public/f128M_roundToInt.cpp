@@ -49,7 +49,7 @@ f128M_roundToInt(float128_t const* const aPtr,
                  bool const exact,
                  float128_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = f128_roundToInt(*aPtr, roundingMode, exact);
 #else
     using namespace softfloat::internals::slow_int64;

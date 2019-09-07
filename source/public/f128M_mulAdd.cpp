@@ -42,7 +42,7 @@ f128M_mulAdd(float128_t const* const aPtr,
              float128_t const* const cPtr,
              float128_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     using namespace softfloat::internals::fast_int64;
 
     uint64_t const* const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);

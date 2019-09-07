@@ -41,7 +41,7 @@ extF80M_to_ui64(extFloat80_t const *const aSPtr,
                 softfloat_round_mode const roundingMode,
                 bool const exact)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     return extF80_to_ui64(*aSPtr, roundingMode, exact);
 #else
     using namespace softfloat::internals::slow_int64;

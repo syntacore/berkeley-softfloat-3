@@ -217,7 +217,7 @@ namespace fast_int64 {
 
 /**
 The following functions are needed only when `SOFTFLOAT_FAST_INT64' is
-defined.
+true.
 */
 
 /**

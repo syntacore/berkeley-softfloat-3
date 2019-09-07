@@ -41,7 +41,7 @@ f32_to_ui64(float32_t const a,
             softfloat_round_mode const roundingMode,
             bool const exact)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
 
     using namespace softfloat::internals::fast_int64;
 

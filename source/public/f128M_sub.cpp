@@ -41,7 +41,7 @@ f128M_sub(float128_t const* const aPtr,
           float128_t const* const bPtr,
           float128_t* const  zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     using namespace softfloat::internals::fast_int64;
 
     auto const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);

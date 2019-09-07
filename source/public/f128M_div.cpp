@@ -41,7 +41,7 @@ f128M_div(float128_t const* const aPtr,
           float128_t const* const bPtr,
           float128_t* const zPtr)
 {
-#ifdef SOFTFLOAT_FAST_INT64
+#if (SOFTFLOAT_FAST_INT64)
     *zPtr = f128_div(*aPtr, *bPtr);
 #else
     using namespace softfloat::internals::slow_int64;
