@@ -161,8 +161,8 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
         }
     }
 
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    auto const uiA96 = aWPtr[indexWordHi(4)];
+    auto const uiB96 = bWPtr[indexWordHi(4)];
     auto const wordMagA_3 = uiA96 & 0x7FFFFFFF;
     auto const wordMagB_3 = uiB96 & 0x7FFFFFFF;
     auto const wordMagA_2 = aWPtr[indexWord(4, 2)];
@@ -172,11 +172,24 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
     auto const wordMagA_0 = aWPtr[indexWord(4, 0)];
     auto const wordMagB_0 = bWPtr[indexWord(4, 0)];
     bool const isA =
-        !(wordMagA_3 < wordMagB_3) && wordMagB_3 < wordMagA_3 ||
-        !(wordMagA_2 < wordMagB_2) && (wordMagB_2 < wordMagA_2 ||
-                                       !(wordMagA_1 < wordMagB_1) && (wordMagB_1 < wordMagA_1 ||
-                                               !(wordMagA_0 < wordMagB_0) && (wordMagB_0 < wordMagA_0 ||
-                                                       uiA96 < uiB96)));
+        (!(wordMagA_3 < wordMagB_3) && wordMagB_3 < wordMagA_3) ||
+        (
+            !(wordMagA_2 < wordMagB_2) &&
+            (
+                wordMagB_2 < wordMagA_2 ||
+                (
+                    !(wordMagA_1 < wordMagB_1) &&
+                    (
+                        wordMagB_1 < wordMagA_1 ||
+                        (
+                            !(wordMagA_0 < wordMagB_0) &&
+                            (wordMagB_0 < wordMagA_0 || uiA96 < uiB96)
+                        )
+                    )
+                )
+
+            )
+        );
     result_copy(zWPtr, isA ? aWPtr : bWPtr);
 }
 
