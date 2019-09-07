@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PRIMITIVES_FUNCTIONS_H_
 
 #include "primitives/types.hpp"
-#include <cstddef>
 
 namespace softfloat {
 namespace internals {

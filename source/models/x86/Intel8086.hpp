@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SOFTFLOAT_MODEL_INTEL8086_HPP_
 
 #include "internals.hpp"
-#include "primitives/types.hpp"
 
 namespace softfloat {
 namespace internals {

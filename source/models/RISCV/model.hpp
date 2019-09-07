@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RISCV_TARGET_HPP_
 #define RISCV_TARGET_HPP_
 
-#include "softfloat/functions.h"
-#include "primitives/types.hpp"
 #include "internals.hpp"
 
 namespace softfloat {
