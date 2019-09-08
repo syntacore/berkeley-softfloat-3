@@ -51,10 +51,10 @@ If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
 uint128
-softfloat_propagateNaNF128UI(uint64_t const& uiA64,
-                             uint64_t const& uiA0,
-                             uint64_t const& uiB64,
-                             uint64_t const& uiB0)
+propagate_NaN(uint64_t const& uiA64,
+              uint64_t const& uiA0,
+              uint64_t const& uiB64,
+              uint64_t const& uiB0)
 {
     if (is_sNaN(uiA64, uiA0) || is_sNaN(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);

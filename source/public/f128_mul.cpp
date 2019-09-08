@@ -58,7 +58,7 @@ f128_mul(float128_t const a,
             0 != (sigA.v64 | sigA.v0) ||
             (0x7FFF == expB && 0 != (sigB.v64 | sigB.v0))
         ) {
-            return float128_t(softfloat_propagateNaNF128UI(aa, bb));
+            return float128_t(propagate_NaN(aa, bb));
         }
 
         uint64_t const magBits = expB | sigB.v64 | sigB.v0;
@@ -73,7 +73,7 @@ f128_mul(float128_t const a,
 
     if (0x7FFF == expB) {
         if (0 == (sigB.v64 | sigB.v0)) {
-            return float128_t(softfloat_propagateNaNF128UI(aa, bb));
+            return float128_t(propagate_NaN(aa, bb));
         }
 
         uint64_t const magBits = expA | sigA.v64 | sigA.v0;

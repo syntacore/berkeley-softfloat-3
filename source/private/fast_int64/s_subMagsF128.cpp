@@ -58,7 +58,7 @@ softfloat_subMagsF128(uint64_t const uiA64,
 
             if (0x7FFF == expA) {
                 if (0 != (sigA.v64 | sigA.v0 | sigB.v64 | sigB.v0)) {
-                    return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
+                    return float128_t(propagate_NaN(uiA64, uiA0, uiB64, uiB0));
                 }
 
                 softfloat_raiseFlags(softfloat_flag_invalid);
@@ -93,7 +93,7 @@ softfloat_subMagsF128(uint64_t const uiA64,
 
         if (0x7FFF == expB) {
             if (0 != (sigB.v64 | sigB.v0)) {
-                return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
+                return float128_t(propagate_NaN(uiA64, uiA0, uiB64, uiB0));
             }
 
             return float128_t(uint128{packToF128UI64(!signZ, 0x7FFF, 0), 0});
@@ -119,7 +119,7 @@ softfloat_subMagsF128(uint64_t const uiA64,
 
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0)) {
-            return float128_t(softfloat_propagateNaNF128UI(uiA64, uiA0, uiB64, uiB0));
+            return float128_t(propagate_NaN(uiA64, uiA0, uiB64, uiB0));
         }
 
         return float128_t(uint128{uiA64, uiA0});

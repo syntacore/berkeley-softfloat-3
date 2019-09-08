@@ -55,7 +55,7 @@ f128_roundToInt(float128_t const a,
     if (0x402F <= exp) {
         if (0x406F <= exp) {
             if (0x7FFF == exp && 0 != (fracF128UI64(uA.v64) | uA.v0)) {
-                return float128_t(softfloat_propagateNaNF128UI(uA, uint128{0, 0}));
+                return float128_t(propagate_NaN(uA, uint128{0, 0}));
             }
 
             return a;

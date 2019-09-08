@@ -46,10 +46,10 @@ static uint64_t const suppress_sign_mask = UINT64_C(0x7FFF'FFFF'FFFF'FFFF);
 }
 
 uint128
-softfloat_propagateNaNF128UI(uint64_t const& uiA64,
-                             uint64_t const& uiA0,
-                             uint64_t const& uiB64,
-                             uint64_t const& uiB0)
+propagate_NaN(uint64_t const& uiA64,
+              uint64_t const& uiA0,
+              uint64_t const& uiB64,
+              uint64_t const& uiB0)
 {
     bool const isSigNaNA = is_sNaN(uiA64, uiA0);
     bool const isSigNaNB = is_sNaN(uiB64, uiB0);

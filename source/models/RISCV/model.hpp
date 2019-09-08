@@ -388,10 +388,10 @@ If either original floating-point value is a signaling NaN, the invalid
 exception is raised.
 */
 inline uint128
-softfloat_propagateNaNF128UI(uint64_t const& uiA64,
-                             uint64_t const& uiA0,
-                             uint64_t const& uiB64,
-                             uint64_t const& uiB0)
+propagate_NaN(uint64_t const& uiA64,
+              uint64_t const& uiA0,
+              uint64_t const& uiB64,
+              uint64_t const& uiB0)
 {
     if (is_sNaN(uiA64, uiA0) || is_sNaN(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -401,10 +401,10 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
 }
 
 inline uint128
-softfloat_propagateNaNF128UI(uint128 const& a,
-                             uint128 const& b)
+propagate_NaN(uint128 const& a,
+              uint128 const& b)
 {
-    return softfloat_propagateNaNF128UI(a.v64, a.v0, b.v64, b.v0);
+    return propagate_NaN(a.v64, a.v0, b.v64, b.v0);
 }
 
 }  // namespace riscv
