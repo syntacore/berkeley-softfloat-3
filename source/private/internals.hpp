@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <type_traits>
 
+#if !defined(SOFTFLOAT_FAST_INT64) || !defined(SOFTFLOAT_FAST_DIV64TO32) || !defined(SOFTFLOAT_FAST_DIV32TO16)
+#error SOFTFLOAT_FAST_INT64, SOFTFLOAT_FAST_DIV64TO32 and SOFTFLOAT_FAST_DIV32TO16 should be defined as 0/1
+#endif
+
 #ifndef THREAD_LOCAL
 #define THREAD_LOCAL thread_local
 #endif
