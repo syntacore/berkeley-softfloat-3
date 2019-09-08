@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PRIMITIVES_FUNCTIONS_H_
-#define PRIMITIVES_FUNCTIONS_H_
+#ifndef PRIMITIVES_FUNCTIONS_HPP_
+#define PRIMITIVES_FUNCTIONS_HPP_
 
 #include "primitives/types.hpp"
 
@@ -1157,4 +1157,4 @@ softfloat_remStep160MBy32(uint32_t const* remPtr,
 }  // namespace internals
 }  // namespace softfloat
 
-#endif  /* PRIMITIVES_FUNCTIONS_H_ */
+#endif  /* PRIMITIVES_FUNCTIONS_HPP_ */
