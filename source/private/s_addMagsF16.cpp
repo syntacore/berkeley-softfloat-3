@@ -43,6 +43,8 @@ float16_t
 softfloat_addMagsF16(uint16_t const& uiA,
                      uint16_t const& uiB)
 {
+    using namespace softfloat::internals;
+
     int8_t const expA = get_exp(uiA);
     uint16_t const sigA = get_frac(uiA);
     int8_t const expB = get_exp(uiB);

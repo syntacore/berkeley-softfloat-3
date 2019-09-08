@@ -46,7 +46,7 @@ f128_le_quiet(float128_t const a,
     uint128 const bb{b};
 
     if (is_NaN(aa) || is_NaN(bb)) {
-        if (softfloat_isSigNaNF128UI(aa) || softfloat_isSigNaNF128UI(bb)) {
+        if (is_sNaN(aa) || is_sNaN(bb)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
         }
 

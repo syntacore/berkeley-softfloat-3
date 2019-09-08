@@ -56,7 +56,7 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
                              uint64_t const& uiB64,
                              uint64_t const& uiB0)
 {
-    if (softfloat_isSigNaNF128UI(uiA64, uiA0) || softfloat_isSigNaNF128UI(uiB64, uiB0)) {
+    if (is_sNaN(uiA64, uiA0) || is_sNaN(uiB64, uiB0)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
 #if 0
 
