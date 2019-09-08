@@ -47,3 +47,11 @@ PRIVATE
 	softfloat_public
 )
 set_target_properties(softfloat-x86-SSE PROPERTIES FOLDER "libs/softfloat")
+
+add_custom_target(softfloat-all
+DEPENDS
+	softfloat-riscv
+	softfloat-x86-FPU
+	softfloat-x86-SSE
+)
+set_target_properties(softfloat-all PROPERTIES FOLDER "libs/softfloat")
