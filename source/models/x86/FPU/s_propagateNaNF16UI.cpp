@@ -40,7 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-
+namespace x86 {
+namespace FPU {
 /**
 Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-
 point values, at least one of which is a NaN, returns the bit pattern of
@@ -76,5 +77,7 @@ propagate_NaN(uint16_t uiA, uint16_t uiB)
     }
 }
 
+}  // namespace FPU
+}  // namespace x86
 }  // namespace internals
 }  // namespace softfloat

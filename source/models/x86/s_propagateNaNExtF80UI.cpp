@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 namespace fast_int64 {
-
+namespace x86 {
 namespace {
 static uint128
 return_larger_magnitude(uint16_t const uiA64,
@@ -124,9 +124,11 @@ softfloat_propagateNaNExtF80UI(uint16_t const uiA64,
     return return_larger_magnitude(uiA64, uiNonsigA0, uiB64, uiNonsigB0);
 }
 
+}  // namespace x86
 }  // namespace fast_int64
 
 namespace slow_int64 {
+namespace x86 {
 
 /**
 Assuming at least one of the two 80-bit extended floating-point values
@@ -180,6 +182,7 @@ softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
     }
 }
 
+}  // namespace x86
 }  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat

@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace softfloat {
 namespace internals {
 namespace fast_int64 {
+namespace x86 {
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
@@ -66,16 +67,16 @@ softfloat_propagateNaNF128UI(uint64_t const& uiA64,
 #endif
     }
 
-    return 
+    return
         is_NaN(uiA64, uiA0) ?
         uint128{uiA64 | UINT64_C(0x0000'8000'0000'0000), uiA0} :
         uint128{uiB64 | UINT64_C(0x0000'8000'0000'0000), uiB0};
 }
-
+}  // namespace x86
 }  // namespace fast_int64
 
 namespace slow_int64 {
-
+namespace x86 {
 namespace {
 
 static inline void
@@ -122,6 +123,7 @@ softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
     }
 }
 
+}  // namespace x86
 }  // namespace slow_int64
 }  // namespace internals
 }  // namespace softfloat

@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
+inline namespace x86 {
+inline namespace FPU {
 
 uint16_t
 propagate_NaN(uint16_t const uiA,
@@ -83,6 +85,23 @@ propagate_NaN(Ty const& a,
 {
     return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
 }
+
+}  // namespace FPU
+}  // namespace x86
+
+namespace slow_int64 {
+inline namespace x86 {
+inline namespace FPU {
+}  // namespace FPU
+}  // namespace x86
+}  // namespace slow_int64
+
+namespace fast_int64 {
+inline namespace x86 {
+inline namespace FPU {
+}  // namespace FPU
+}  // namespace x86
+}  // namespace fast_int64
 
 }  // namespace internals
 }  // namespace softfloat
