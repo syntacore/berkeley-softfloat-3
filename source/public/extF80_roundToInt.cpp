@@ -70,7 +70,7 @@ extF80_roundToInt(extFloat80_t const a,
 
         if (exp == 0x7FFF) {
             if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, sigA, 0, 0);
+                uint128 const uiZ = propagate_NaN(uiA64, sigA, 0, 0);
                 extFloat80_t uZ;
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;

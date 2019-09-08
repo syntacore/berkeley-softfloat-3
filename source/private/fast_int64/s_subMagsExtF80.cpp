@@ -54,7 +54,7 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
     if (0 < expDiff) {
         if (0x7FFF == expA) {
             if (0 != (uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
                 extFloat80_t uZ;
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
@@ -86,7 +86,7 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
     if (expDiff < 0) {
         if (expB == 0x7FFF) {
             if (0 != (uiB0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-                uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+                uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
                 extFloat80_t uZ;
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
@@ -117,7 +117,7 @@ softfloat_subMagsExtF80(uint16_t const uiA64,
 
     if (0x7FFF == expA) {
         if (0 != ((uiA0 | uiB0) & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            uint128 const uiZ = softfloat_propagateNaNExtF80UI(uiA64, uiA0, uiB64, uiB0);
+            uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;

@@ -47,7 +47,7 @@ extF80_sqrt(extFloat80_t const a)
 
     if (0x7FFF == expA) {
         if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigA)) {
-            uint128 const uiZ = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, 0, 0);
+            uint128 const uiZ = propagate_NaN(a.signExp, a.signif, 0, 0);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;

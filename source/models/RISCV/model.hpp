@@ -355,7 +355,7 @@ result.  If either original floating-point value is a signaling NaN, the
 invalid exception is raised.
 */
 inline uint128
-softfloat_propagateNaNExtF80UI(uint16_t const& uiA64,
+propagate_NaN(uint16_t const& uiA64,
                                uint64_t const& uiA0,
                                uint16_t const& uiB64,
                                uint64_t const& uiB0)

@@ -54,7 +54,7 @@ extF80_mul(extFloat80_t const a,
         extFloat80_t uZ_1;
 
         if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigA) || (expB == 0x7FFF && 0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigB))) {
-            auto const uiZ_1 = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, b.signExp, b.signif);
+            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             uZ_1.signExp = static_cast<uint16_t>(uiZ_1.v64);
             uZ_1.signif = uiZ_1.v0;
         } else if (0 == (expB | sigB)) {
@@ -73,7 +73,7 @@ extF80_mul(extFloat80_t const a,
         extFloat80_t uZ_1;
 
         if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & sigB)) {
-            auto const uiZ_1 = softfloat_propagateNaNExtF80UI(a.signExp, a.signif, b.signExp, b.signif);
+            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             uZ_1.signExp = static_cast<uint16_t>(uiZ_1.v64);
             uZ_1.signif = uiZ_1.v0;
         } else if (0 == (expA | sigA)) {
