@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 uint64_t
-extF80M_to_ui64(extFloat80_t const *const aSPtr,
+extF80M_to_ui64(extFloat80_t const* const aSPtr,
                 softfloat_round_mode const roundingMode,
                 bool const exact)
 {
@@ -45,25 +45,31 @@ extF80M_to_ui64(extFloat80_t const *const aSPtr,
     return extF80_to_ui64(*aSPtr, roundingMode, exact);
 #else
     using namespace softfloat::internals::slow_int64;
-    uint16_t const uiA64 = aSPtr->signExp;
-    bool const sign = is_sign(uiA64);
-    int32_t const exp = exp_extF80_UI64(uiA64);
+
+    bool const sign = is_sign(aSPtr->signExp);
+    int32_t const exp = exp_extF80_UI64(aSPtr->signExp);
     uint64_t const sig = aSPtr->signif;
     int32_t const shiftDist = 0x403E - exp;
+
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == INT16_MAX && (sig & INT64_MAX) ? ui64_fromNaN :
-            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+            INT16_MAX == exp && 0 != (sig & INT64_MAX) ?
+            ui64_fromNaN :
+            sign ?
+            ui64_fromNegOverflow :
+            ui64_fromPosOverflow;
     }
 
     uint32_t extSig[3];
     extSig[index_word(3, 2)] = sig >> 32;
     extSig[index_word(3, 1)] = static_cast<uint32_t>(sig);
     extSig[index_word(3, 0)] = 0;
-    if (shiftDist) {
+
+    if (0 != shiftDist) {
         shift_right_jam_M_96(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
+
     return round_pack_to_M<uint64_t>(sign, extSig, roundingMode, exact);
 #endif
 }
