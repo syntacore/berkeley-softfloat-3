@@ -36,70 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
-/**
-@todo split to different implementations
-*/
 float64_t
 f64_mul(float64_t const a,
         float64_t const b)
 {
 #if (SOFTFLOAT_FAST_INT64)
     using namespace softfloat::internals::fast_int64;
-
-    bool const signA = is_sign(a);
-    bool const signB = is_sign(b);
-    bool const signZ = signA != signB;
-
-    if (is_NaN(a) || is_NaN(b)) {
-        return propagate_NaN(a, b);
-    }
-
-    if (is_inf(a) || is_inf(b)) {
-        if (is_zero(a) || is_zero(b)) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return u_as_f(defaultNaNF64UI);
-        }
-
-        return u_as_f(pack_to_F64_UI(signZ, 0x7FF, 0));
-    }
-
-    if (is_zero(a) || is_zero(b)) {
-        return u_as_f(pack_to_F64_UI(signZ, 0, 0));
-    }
-
-    int16_t expA = get_exp(a);
-    uint64_t sigA = get_frac(a);
-
-    if (0 == expA) {
-        exp16_sig64 const normExpSig(sigA);
-        expA = normExpSig.exp;
-        sigA = normExpSig.sig;
-    }
-
-    int16_t expB = get_exp(b);
-    uint64_t sigB = get_frac(b);
-
-    if (0 == expB) {
-        exp16_sig64 const normExpSig(sigB);
-        expB = normExpSig.exp;
-        sigB = normExpSig.sig;
-    }
-
-    int16_t const expZ = expA + expB - 0x3FF;
-    auto const sigA_1 = (sigA | UINT64_C(0x0010000000000000)) << 10;
-    auto const sigB_1 = (sigB | UINT64_C(0x0010000000000000)) << 11;
-    uint128 const sig128Z = mul_64_to_128(sigA_1, sigB_1);
-    uint64_t const sigZ = sig128Z.v64 | !!(0 != sig128Z.v0);
-
-    if (sigZ < UINT64_C(0x4000000000000000)) {
-        return round_pack_to_F64(signZ, expZ - 1, sigZ << 1);
-    }
-
-    return round_pack_to_F64(signZ, expZ, sigZ);
-
 #else
     using namespace softfloat::internals::slow_int64;
-
+#endif
     if (is_NaN(a) || is_NaN(b)) {
         return propagate_NaN(a, b);
     }
@@ -139,24 +84,25 @@ f64_mul(float64_t const a,
         sigB = normExpSig.sig;
     }
 
-    int16_t expZ = expA + expB - 0x3FF;
-    sigA = (sigA | UINT64_C(0x0010000000000000)) << 10;
-    sigB = (sigB | UINT64_C(0x0010000000000000)) << 11;
+    int16_t const expZ = expA + expB - 0x3FF;
+    auto const sigA_1 = (sigA | UINT64_C(0x0010000000000000)) << 10;
+    auto const sigB_1 = (sigB | UINT64_C(0x0010000000000000)) << 11;
+
+#if (SOFTFLOAT_FAST_INT64)
+    uint128 const sig128Z = mul_64_to_128(sigA_1, sigB_1);
+    uint64_t const sigZ = sig128Z.v64 | !!(0 != sig128Z.v0);
+
+#else
     uint32_t sig128Z[4];
-    mul_M_64_to_128(sigA, sigB, sig128Z);
-    uint64_t sigZ =
-        static_cast<uint64_t>(sig128Z[index_word(4, 3)]) << 32 | sig128Z[index_word(4, 2)];
-
-    if (sig128Z[index_word(4, 1)] || sig128Z[index_word(4, 0)]) {
-        sigZ |= 1;
-    }
-
-    if (sigZ < UINT64_C(0x4000000000000000)) {
-        --expZ;
-        sigZ <<= 1;
-    }
-
-    return round_pack_to_F64(signZ, expZ, sigZ);
-
+    mul_M_64_to_128(sigA_1, sigB_1, sig128Z);
+    uint64_t const sigZ =
+        static_cast<uint64_t>(sig128Z[index_word(4, 3)]) << 32 |
+        sig128Z[index_word(4, 2)] |
+        !!(0 != sig128Z[index_word(4, 1)] || 0 != sig128Z[index_word(4, 0)]);
 #endif
+
+    return
+        sigZ < UINT64_C(0x4000'0000'0000'0000) ?
+        round_pack_to_F64(signZ, expZ - 1, sigZ << 1) :
+        round_pack_to_F64(signZ, expZ,     sigZ);
 }
