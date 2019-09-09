@@ -46,11 +46,9 @@ extF80M_to_ui64_r_minMag(extFloat80_t const* const aPtr,
     using namespace softfloat::internals;
 
     extFloat80M const* const aSPtr = aPtr;
-    uint16_t const uiA64 = aSPtr->signExp;
-    int32_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = aSPtr->signif;
+    int32_t const exp = exp_extF80_UI64(aSPtr->signExp);
 
-    if (0 == sig && 0x7FFF != exp) {
+    if (0 == aSPtr->signif && 0x7FFF != exp) {
         return 0;
     }
 
@@ -64,23 +62,23 @@ extF80M_to_ui64_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    bool const sign = is_sign(uiA64);
+    bool const sign = is_sign(aSPtr->signExp);
 
     if (shiftDist < 0) {
         if (!sign && -63 < shiftDist) {
             auto const shiftDist_1 = -shiftDist;
-            uint64_t const z = sig << shiftDist_1;
+            uint64_t const z = aSPtr->signif << shiftDist_1;
 
-            if (z >> shiftDist_1 == sig) {
+            if (z >> shiftDist_1 == aSPtr->signif) {
                 return z;
             }
         }
     } else {
         assert(0 <= shiftDist && shiftDist < 64);
-        uint64_t const z = sig >> shiftDist;
+        uint64_t const z = aSPtr->signif >> shiftDist;
 
         if (!sign || 0 == z) {
-            if (exact && 0 != shiftDist && z << shiftDist != sig) {
+            if (exact && 0 != shiftDist && z << shiftDist != aSPtr->signif) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
@@ -90,7 +88,7 @@ extF80M_to_ui64_r_minMag(extFloat80_t const* const aPtr,
 
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
-        0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ?
+        0x7FFF == exp && 0 != (aSPtr->signif & UINT64_C(0x7FFFFFFFFFFFFFFF)) ?
         ui64_fromNaN :
         sign ?
         ui64_fromNegOverflow :
