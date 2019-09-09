@@ -37,27 +37,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float16_t
-extF80_to_f16(extFloat80_t a)
+extF80_to_f16(extFloat80_t const a)
 {
     using namespace softfloat::internals::fast_int64;
 
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 = a.signif;
-    bool const sign = is_sign(uiA64);
-    int32_t exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = uiA0;
+    bool const sign = is_sign(a.signExp);
+    int32_t exp = exp_extF80_UI64(a.signExp);
 
-    if (exp == 0x7FFF) {
-        if (sig & INT64_MAX) {
-            return u_as_f(commonNaN_to_F16UI(commonNaN_from_extF80UI(uiA64, uiA0)));
+    if (0x7FFF == exp) {
+        if (0 != (a.signif & INT64_MAX)) {
+            return u_as_f(commonNaN_to_F16UI(commonNaN_from_extF80UI(a.signExp, a.signif)));
         }
 
-        return u_as_f(pack_to_F16_UI(sign, 0x1F, 0));
+        return make_signed_inf<float16_t>(sign);
     }
 
-    uint16_t const sig16 = static_cast<uint16_t>(short_shift_right_jam_64(sig, 49));
+    uint16_t const sig16 = static_cast<uint16_t>(short_shift_right_jam_64(a.signif, 49));
 
-    if (!(exp | sig16)) {
+    if (0 == (exp | sig16)) {
         return u_as_f(pack_to_F16_UI(sign, 0, 0));
     }
 
