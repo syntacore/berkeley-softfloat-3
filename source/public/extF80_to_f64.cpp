@@ -37,34 +37,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float64_t
-extF80_to_f64(extFloat80_t a)
+extF80_to_f64(extFloat80_t const a)
 {
     using namespace softfloat::internals::fast_int64;
 
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 =  a.signif;
-    bool const sign = is_sign(uiA64);
-    int32_t exp = exp_extF80_UI64(uiA64);
-    uint64_t sig = uiA0;
+    bool const sign = is_sign(a.signExp);
+    int32_t exp = exp_extF80_UI64(a.signExp);
 
-    if (0 == (exp | sig)) {
-        return u_as_f(pack_to_F64_UI(sign, 0, 0));
+    if (0 == (exp | a.signif)) {
+        return make_signed_zero<float64_t>(sign);
     }
 
-    if (exp == 0x7FFF) {
-        if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            return u_as_f(commonNaN_to_F64UI(commonNaN_from_extF80UI(uiA64, uiA0)));
+    if (0x7FFF == exp) {
+        if (0 != (a.signif & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            return u_as_f(commonNaN_to_F64UI(commonNaN_from_extF80UI(a.signExp, a.signif)));
         }
 
-        return u_as_f(pack_to_F64_UI(sign, 0x7FF, 0));
+        return make_signed_inf<float64_t>(sign);
     }
 
-    sig = short_shift_right_jam_64(sig, 1);
+    auto const sig_1 = short_shift_right_jam_64(a.signif, 1);
     exp -= 0x3C01;
 
     if (exp < -0x1000) {
         exp = -0x1000;
     }
 
-    return round_pack_to_F64(sign, static_cast<int16_t>(exp), sig);
+    return round_pack_to_F64(sign, static_cast<int16_t>(exp), sig_1);
 }
