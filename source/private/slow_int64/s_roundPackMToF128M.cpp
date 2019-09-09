@@ -36,6 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#ifdef BIG_ENDIAN
+#define INIT_UINTM4( v3, v2, v1, v0 ) { v3, v2, v1, v0 }
+#else
+#define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
+#endif  // BIG_ENDIAN
+
 namespace softfloat {
 namespace internals {
 namespace slow_int64 {

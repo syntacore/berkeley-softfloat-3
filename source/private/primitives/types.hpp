@@ -108,8 +108,6 @@ indexMultiwordLoBut(size_t,
     return n;
 }
 
-#define INIT_UINTM4( v3, v2, v1, v0 ) { v3, v2, v1, v0 }
-
 #else
 
 static int const wordIncr = 1;
@@ -168,8 +166,6 @@ indexMultiwordLoBut(size_t,
 {
     return 0u;
 }
-
-#define INIT_UINTM4( v3, v2, v1, v0 ) { v0, v1, v2, v3 }
 
 #endif
 

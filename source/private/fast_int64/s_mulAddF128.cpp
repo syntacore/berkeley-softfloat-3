@@ -409,7 +409,7 @@ mulAddF128(Mul_add_operations const op,
 
                 if (0 != (sigZ.v64 & UINT64_C(0x8000000000000000))) {
                     signZ = !signZ;
-                    uint64_t const zero256[4] = INIT_UINTM4(0, 0, 0, 0);
+                    uint64_t const zero256[4] = {0, 0, 0, 0};
                     sub256M(zero256, sig256Z, sig256Z);
                 }
             } else {
