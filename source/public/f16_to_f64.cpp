@@ -47,7 +47,7 @@ f16_to_f64(float16_t const a)
 
     if (0x1F == exp) {
         if (0 != frac) {
-            return u_as_f(commonNaN_to_F64UI(commonNaN_from_f16UI(f_as_u(a))));
+            return u_as_f(commonNaN_to_F64UI(commonNaN(f_as_u(a))));
         }
 
         return u_as_f(pack_to_F64_UI(sign, 0x7FF, 0));

@@ -153,8 +153,8 @@ subMags(uint32_t const uiA,
         int16_t const expZ = expA - shiftDist;
         return
             u_as_f(expZ < 0 ?
-                      pack_to_F32_UI(signZ, 0, static_cast<uint32_t>(sigAbsDiff << expA)) :
-                      pack_to_F32_UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
+                   pack_to_F32_UI(signZ, 0, static_cast<uint32_t>(sigAbsDiff << expA)) :
+                   pack_to_F32_UI(signZ, expZ, static_cast<uint32_t>(sigAbsDiff << shiftDist)));
     }
 
     bool const signZ = is_sign(uiA);
@@ -174,8 +174,8 @@ subMags(uint32_t const uiA,
         max_exp == expA ?
         u_as_f(0 != sigA_1 ? propagate_NaN(uiA, uiB) : uiA) :
         norm_round_pack_to_F32(signZ,
-                                     expA - 1,
-                                     (sigA_1 | 0x40000000) - shift_right_jam_32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
+                               expA - 1,
+                               (sigA_1 | 0x40000000) - shift_right_jam_32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
 }
 
 }  // namespace

@@ -164,18 +164,6 @@ private:
 };
 
 /**
-Assuming `uiA' has the bit pattern of a 16-bit floating-point NaN, converts
-this NaN to the common NaN form, and stores the resulting common NaN at the
-location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
-exception is raised.
-*/
-inline commonNaN
-commonNaN_from_f16UI(uint16_t const& uiA)
-{
-    return commonNaN{uiA};
-}
-
-/**
 Converts the common NaN pointed to by `aPtr' into a 16-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */

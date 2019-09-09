@@ -47,7 +47,7 @@ f16_to_f32(float16_t const a)
 
     if (!is_finite(a)) {
         return is_NaN(a) ?
-            u_as_f(commonNaN_to_F32UI(commonNaN_from_f16UI(f_as_u(a)))) :
+            u_as_f(commonNaN_to_F32UI(commonNaN(f_as_u(a)))) :
             make_signed_inf<float32_t>(sign);
     }
 
