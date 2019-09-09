@@ -37,25 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float32_t
-extF80_to_f32(extFloat80_t a)
+extF80_to_f32(extFloat80_t const a)
 {
     using namespace softfloat::internals::fast_int64;
 
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 = a.signif;
-    bool const sign = is_sign(uiA64);
-    int32_t exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = uiA0;
+    bool const sign = is_sign(a.signExp);
+    int32_t exp = exp_extF80_UI64(a.signExp);
 
     if (exp == INT16_MAX) {
-        if (sig & INT64_MAX) {
-            return u_as_f(commonNaN_to_F32UI(commonNaN_from_extF80UI(uiA64, uiA0)));
+        if (a.signif & INT64_MAX) {
+            return u_as_f(commonNaN_to_F32UI(commonNaN_from_extF80UI(a.signExp, a.signif)));
         }
 
         return make_signed_inf<float32_t>(sign);
     }
 
-    uint32_t const sig32 = static_cast<uint32_t>(short_shift_right_jam_64(sig, 33));
+    uint32_t const sig32 = static_cast<uint32_t>(short_shift_right_jam_64(a.signif, 33));
 
     if (exp | sig32) {
         exp -= 0x3F81;
