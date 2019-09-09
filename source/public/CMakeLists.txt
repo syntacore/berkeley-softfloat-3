@@ -5,7 +5,7 @@ target_link_libraries(softfloat_public INTERFACE softfloat_private)
 target_sources(softfloat_public
 INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
-	${CMAKE_CURRENT_SOURCE_DIR}/extF80_add.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/extF80_add_sub.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_div.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_eq.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_eq_signaling.cpp
@@ -18,7 +18,6 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_rem.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_roundToInt.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_sqrt.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/extF80_sub.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_to_f16.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_to_f32.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_to_f64.cpp
@@ -31,7 +30,6 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_to_ui32_r_minMag.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_to_ui64.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80_to_ui64_r_minMag.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_add.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_div.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_eq.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_eq_signaling.cpp
@@ -43,7 +41,6 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_rem.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_roundToInt.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_sqrt.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_sub.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_to_f16.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_to_f32.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/extF80M_to_f64.cpp

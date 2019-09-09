@@ -264,19 +264,6 @@ norm_round_pack_to_extF80(bool,
                           uint64_t,
                           uint8_t);
 
-extFloat80_t
-add_magnitudes(uint16_t,
-               uint64_t,
-               uint16_t,
-               uint64_t,
-               bool);
-extFloat80_t
-sub_magnitudes(uint16_t,
-               uint64_t,
-               uint16_t,
-               uint64_t,
-               bool);
-
 exp32_sig128
 norm_subnormal_F128Sig(uint64_t,
                        uint64_t);
@@ -394,12 +381,6 @@ norm_round_pack_to_M_extF80(bool,
                             uint32_t*,
                             uint8_t const&,
                             extFloat80M*);
-
-void
-add_M_extF80(extFloat80M const* const,
-             extFloat80M const* const,
-             extFloat80M* const,
-             bool);
 
 int
 compare_non_norm_M_extF80(extFloat80M const*,
