@@ -37,6 +37,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "model.hpp"
 
+#if !(SOFTFLOAT_FAST_INT64)
+namespace {
+static uint32_t
+invalid(bool const sign,
+        int32_t const exp,
+        uint64_t const sig)
+{
+    using namespace softfloat::internals;
+
+    return
+        INT16_MAX == exp && 0 != (sig & INT64_MAX) ?
+        ui32_fromNaN :
+        sign ?
+        ui32_fromNegOverflow :
+        ui32_fromPosOverflow;
+}
+}  // namespace
+#endif
+
 uint32_t
 extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
                          bool const exact)
@@ -45,11 +64,11 @@ extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
     return extF80_to_ui32_r_minMag(*aPtr, exact);
 #else
     using namespace softfloat::internals;
-    uint16_t uiA64 = aPtr->signExp;
-    int32_t exp = exp_extF80_UI64(uiA64);
-    uint64_t sig = aPtr->signif;
 
-    if (!sig && exp != INT16_MAX) {
+    int32_t const exp = exp_extF80_UI64(aPtr->signExp);
+    uint64_t const sig = aPtr->signif;
+
+    if (0 == sig && INT16_MAX != exp) {
         return 0;
     }
 
@@ -63,47 +82,39 @@ extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    bool const sign = is_sign(uiA64);
+    bool const sign = is_sign(aPtr->signExp);
 
     if (shiftDist < 0) {
         if (sign || sig >> 32 || (shiftDist <= -31)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                exp == INT16_MAX && 0 != (sig & INT64_MAX) ? ui32_fromNaN :
-                sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+            return invalid(sign, exp, sig);
         }
 
         uint64_t const shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(sig)) << -shiftDist;
 
         if (0 != (shiftedSig >> 32)) {
             softfloat_raiseFlags(softfloat_flag_invalid);
-            return
-                exp == INT16_MAX && 0 != (sig & INT64_MAX) ? ui32_fromNaN :
-                sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+            return invalid(sign, exp, sig);
         }
 
         return static_cast<uint32_t>(shiftedSig);
     }
 
-    uint64_t const shiftedSig = 0 != shiftDist ? sig >>= shiftDist : sig;
+    uint64_t const shiftedSig = 0 != shiftDist ? sig >> shiftDist : sig;
 
     if (0 != (shiftedSig >> 32)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return
-            exp == INT16_MAX && 0 != (sig & INT64_MAX) ? ui32_fromNaN :
-            sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+        return invalid(sign, exp, sig);
     }
 
     uint32_t const z = static_cast<uint32_t>(shiftedSig);
 
-    if (sign && 0 != z) {
+    if (0 != sign && 0 != z) {
         softfloat_raiseFlags(softfloat_flag_invalid);
-        return
-            exp == INT16_MAX && 0 != (sig & INT64_MAX) ? ui32_fromNaN :
-            sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+        return invalid(sign, exp, sig);
     }
 
-    if (exact && shiftDist && (static_cast<uint64_t>(z) << shiftDist != sig)) {
+    if (exact && 0 != shiftDist && (static_cast<uint64_t>(z) << shiftDist != sig)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
