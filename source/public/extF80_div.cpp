@@ -43,12 +43,12 @@ extF80_div(extFloat80_t const a,
     using namespace softfloat::internals::fast_int64;
 
     bool const signA = is_sign(a.signExp);
-    int32_t expA = expExtF80UI64(a.signExp);
+    int32_t expA = exp_extF80_UI64(a.signExp);
     uint64_t sigA = a.signif;
     uint16_t const uiB64 = b.signExp;
     uint64_t const uiB0 = b.signif;
     bool const signB = is_sign(uiB64);
-    int32_t expB = expExtF80UI64(uiB64);
+    int32_t expB = exp_extF80_UI64(uiB64);
     uint64_t sigB = uiB0;
     bool const signZ = signA != signB;
 
@@ -61,7 +61,7 @@ extF80_div(extFloat80_t const a,
             return uZ;
         } else if (expB != 0x7FFF) {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(signZ, 0x7FFF);
+            uZ.signExp = pack_to_extF80_UI64(signZ, 0x7FFF);
             uZ.signif = UINT64_C(0x8000000000000000);
             return uZ;
         } else if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
@@ -88,7 +88,7 @@ extF80_div(extFloat80_t const a,
             return uZ;
         } else {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(signZ, 0);
+            uZ.signExp = pack_to_extF80_UI64(signZ, 0);
             uZ.signif = 0;
             return uZ;
         }
@@ -110,12 +110,12 @@ extF80_div(extFloat80_t const a,
 
             softfloat_raiseFlags(softfloat_flag_infinite);
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(signZ, 0x7FFF);
+            uZ.signExp = pack_to_extF80_UI64(signZ, 0x7FFF);
             uZ.signif = UINT64_C(0x8000000000000000);
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigB);
+        exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigB);
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -127,12 +127,12 @@ extF80_div(extFloat80_t const a,
     if (0 == (UINT64_C(0x8000000000000000) & sigA)) {
         if (0 == sigA) {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(signZ, 0);
+            uZ.signExp = pack_to_extF80_UI64(signZ, 0);
             uZ.signif = 0;
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -143,12 +143,12 @@ extF80_div(extFloat80_t const a,
 
     if (sigA < sigB) {
         --expZ;
-        rem = shortShiftLeft128(uint128{0, sigA}, 32);
+        rem = short_shift_left_128(uint128{0, sigA}, 32);
     } else {
-        rem = shortShiftLeft128(uint128{0, sigA}, 31);
+        rem = short_shift_left_128(uint128{0, sigA}, 31);
     }
 
-    uint32_t const recip32 = approxRecip32_1(sigB >> 32);
+    uint32_t const recip32 = approx_recip_32_1(sigB >> 32);
     uint64_t sigZ = 0;
     uint32_t q;
 
@@ -161,8 +161,8 @@ extF80_div(extFloat80_t const a,
             break;
         }
 
-        rem = shortShiftLeft128(rem, 29);
-        rem = sub(rem, mul64ByShifted32To128(sigB, q));
+        rem = short_shift_left_128(rem, 29);
+        rem = sub(rem, mul_64_by_shifted_32_to_128(sigB, q));
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
@@ -173,9 +173,9 @@ extF80_div(extFloat80_t const a,
     }
 
     if (((q + 1) & 0x3FFFFF) < 2) {
-        rem = shortShiftLeft128(rem, 29);
-        rem = sub(rem, mul64ByShifted32To128(sigB, q));
-        uint128 const term = shortShiftLeft128(uint128{0, sigB}, 32);
+        rem = short_shift_left_128(rem, 29);
+        rem = sub(rem, mul_64_by_shifted_32_to_128(sigB, q));
+        uint128 const term = short_shift_left_128(uint128{0, sigB}, 32);
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
@@ -190,5 +190,5 @@ extF80_div(extFloat80_t const a,
         }
     }
 
-    return roundPackToExtF80(signZ, expZ, (sigZ << 6) + (q >> 23), static_cast<uint64_t>(static_cast<uint64_t>(q) << 41), extF80_roundingPrecision);
+    return round_pack_to_extF80(signZ, expZ, (sigZ << 6) + (q >> 23), static_cast<uint64_t>(static_cast<uint64_t>(q) << 41), extF80_rounding_precision);
 }

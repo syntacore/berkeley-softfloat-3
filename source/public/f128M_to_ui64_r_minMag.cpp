@@ -46,10 +46,10 @@ f128M_to_ui64_r_minMag(float128_t const* const aPtr,
     using namespace softfloat::internals::slow_int64;
 
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     bool const sign = is_sign(uiA96);
-    int32_t const exp = expF128UI96(uiA96);
-    uint32_t sig96 = fracF128UI96(uiA96);
+    int32_t const exp = exp_F128_UI96(uiA96);
+    uint32_t sig96 = frac_F128_UI96(uiA96);
     int32_t const shiftDist = 0x403E - exp;
 
     if (0 <= shiftDist) {
@@ -59,15 +59,15 @@ f128M_to_ui64_r_minMag(float128_t const* const aPtr,
             }
 
             uint32_t sig[4];
-            sig[indexWord(4, 3)] = sig96;
-            sig[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
-            sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
-            sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
-            softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist + 17), sig);
-            uint64_t const z = static_cast<uint64_t>(sig[indexWord(4, 2)]) << 32 | sig[indexWord(4, 1)];
+            sig[index_word(4, 3)] = sig96;
+            sig[index_word(4, 2)] = aWPtr[index_word(4, 2)];
+            sig[index_word(4, 1)] = aWPtr[index_word(4, 1)];
+            sig[index_word(4, 0)] = aWPtr[index_word(4, 0)];
+            shift_right_jam_M_128(sig, static_cast<uint8_t>(shiftDist + 17), sig);
+            uint64_t const z = static_cast<uint64_t>(sig[index_word(4, 2)]) << 32 | sig[index_word(4, 1)];
 
             if (!sign || 0 == z) {
-                if (0 != sig[indexWordLo(4)]) {
+                if (0 != sig[index_word_lo(4)]) {
                     softfloat_raiseFlags(softfloat_flag_inexact);
                 }
 
@@ -83,8 +83,8 @@ f128M_to_ui64_r_minMag(float128_t const* const aPtr,
                     (
                         UINT64_C(0x8000000000000000) |
                         static_cast<uint64_t>(sig96) << 47 |
-                        static_cast<uint64_t>(aWPtr[indexWord(4, 2)]) << 15 |
-                        aWPtr[indexWord(4, 1)] >> 17
+                        static_cast<uint64_t>(aWPtr[index_word(4, 2)]) << 15 |
+                        aWPtr[index_word(4, 1)] >> 17
                     ) >> shiftDist;
             }
         }
@@ -92,7 +92,7 @@ f128M_to_ui64_r_minMag(float128_t const* const aPtr,
 
     softfloat_raiseFlags(softfloat_flag_invalid);
     return
-        0x7FFF == exp && (0 != sig96 || 0 != (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) ?
+        0x7FFF == exp && (0 != sig96 || 0 != (aWPtr[index_word(4, 2)] | aWPtr[index_word(4, 1)] | aWPtr[index_word(4, 0)])) ?
         ui64_fromNaN :
         sign ?
         ui64_fromNegOverflow :

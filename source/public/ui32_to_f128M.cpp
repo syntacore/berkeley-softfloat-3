@@ -51,12 +51,12 @@ ui32_to_f128M(uint32_t a,
     if (0 != a) {
         int8_t const shiftDist = count_leading_zeros(a) + 17;
         uint64_t const normA = static_cast<uint64_t>(a) << shiftDist;
-        uiZ96 = packToF128UI96(0, static_cast<unsigned>(0x402E - shiftDist), normA >> 32);
+        uiZ96 = pack_to_F128_UI96(0, static_cast<unsigned>(0x402E - shiftDist), normA >> 32);
         uiZ64 = static_cast<uint32_t>(normA);
     }
-    zWPtr[indexWord(4, 3)] = uiZ96;
-    zWPtr[indexWord(4, 2)] = uiZ64;
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[index_word(4, 3)] = uiZ96;
+    zWPtr[index_word(4, 2)] = uiZ64;
+    zWPtr[index_word(4, 1)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
 #endif
 }

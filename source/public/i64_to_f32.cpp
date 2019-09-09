@@ -45,13 +45,13 @@ i64_to_f32(int64_t const a)
     int8_t shiftDist = count_leading_zeros(absA) - 40;
 
     if (0 <= shiftDist) {
-        return u_as_f(a ? packToF32UI(sign, 0x95 - shiftDist, static_cast<uint32_t>(absA) << shiftDist) : 0);
+        return u_as_f(a ? pack_to_F32_UI(sign, 0x95 - shiftDist, static_cast<uint32_t>(absA) << shiftDist) : 0);
     }
 
     int8_t const shiftDist_1 = shiftDist + 7;
     uint32_t const sig =
         static_cast<uint32_t>(
-            shiftDist_1 < 0 ? shortShiftRightJam64(absA, static_cast<uint8_t>(-shiftDist_1)) :
+            shiftDist_1 < 0 ? short_shift_right_jam_64(absA, static_cast<uint8_t>(-shiftDist_1)) :
             absA << shiftDist_1);
-    return roundPackToF32(sign, 0x9C - shiftDist_1, sig);
+    return round_pack_to_F32(sign, 0x9C - shiftDist_1, sig);
 }

@@ -46,12 +46,12 @@ f128M_add(float128_t const *const aPtr,
 
     uint64_t const* const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);
     uint64_t const* const bWPtr = reinterpret_cast<uint64_t const*>(bPtr);
-    uint64_t const uiA64 = aWPtr[indexWord(2, 1)];
-    uint64_t const uiA0 = aWPtr[indexWord(2, 0)];
+    uint64_t const uiA64 = aWPtr[index_word(2, 1)];
+    uint64_t const uiA0 = aWPtr[index_word(2, 0)];
     bool const signA = is_sign(uiA64);
 
-    uint64_t const uiB64 = bWPtr[indexWord(2, 1)];
-    uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
+    uint64_t const uiB64 = bWPtr[index_word(2, 1)];
+    uint64_t const uiB0 = bWPtr[index_word(2, 0)];
     bool const signB = is_sign(uiB64);
 
     *zPtr =
@@ -60,6 +60,6 @@ f128M_add(float128_t const *const aPtr,
         sub_magnitudes(uiA64, uiA0, uiB64, uiB0, signA);
 #else
     using namespace softfloat::internals::slow_int64;
-    softfloat_addF128M((const uint32_t*)aPtr, (const uint32_t*)bPtr, (uint32_t*)zPtr, false);
+    add_M_F128((const uint32_t*)aPtr, (const uint32_t*)bPtr, (uint32_t*)zPtr, false);
 #endif
 }

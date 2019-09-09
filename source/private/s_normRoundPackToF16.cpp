@@ -40,19 +40,19 @@ namespace softfloat {
 namespace internals {
 
 float16_t
-normRoundPackToF16(bool sign,
-                   int16_t exp,
-                   uint16_t const& sig)
+norm_round_pack_to_F16(bool sign,
+                       int16_t exp,
+                       uint16_t const& sig)
 {
     int8_t const shiftDist = count_leading_zeros(sig) - 1;
     exp -= shiftDist;
     exp = sig ? exp : 0;
 
     if (4 <= shiftDist && static_cast<unsigned>(exp) < 0x1Du) {
-        return u_as_f(packToF16UI(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << (shiftDist - 4))));
+        return u_as_f(pack_to_F16_UI(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << (shiftDist - 4))));
     }
 
-    return roundPackToF16(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << shiftDist));
+    return round_pack_to_F16(sign, static_cast<int8_t>(exp), static_cast<uint16_t>(sig << shiftDist));
 }
 
 }  // namespace internals

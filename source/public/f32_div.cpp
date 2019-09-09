@@ -62,7 +62,7 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
         sigZ |= !!(static_cast<uint64_t>(sigB) * sigZ != sig64A);
     }
 
-    return roundPackToF32(signZ, expZ, sigZ);
+    return round_pack_to_F32(signZ, expZ, sigZ);
 }
 
 #else
@@ -82,7 +82,7 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
     }
 
     sigB <<= 8;
-    sigZ = (static_cast<uint64_t>(sigA) * approxRecip32_1(sigB)) >> 32;
+    sigZ = (static_cast<uint64_t>(sigA) * approx_recip_32_1(sigB)) >> 32;
 
     sigZ += 2;
 
@@ -97,7 +97,7 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
         }
     }
 
-    return roundPackToF32(signZ, expZ, sigZ);
+    return round_pack_to_F32(signZ, expZ, sigZ);
 }
 
 #endif
@@ -259,7 +259,7 @@ f32_div(float32_t a,
         }
 
         sigB <<= 8;
-        uint32_t sigZ = (static_cast<uint64_t>(sigA) * approxRecip32_1(sigB)) >> 32;
+        uint32_t sigZ = (static_cast<uint64_t>(sigA) * approx_recip_32_1(sigB)) >> 32;
 
         sigZ += 2;
 
@@ -277,7 +277,7 @@ f32_div(float32_t a,
         }
 
 #endif
-        return roundPackToF32(signZ, expZ, sigZ);
+        return round_pack_to_F32(signZ, expZ, sigZ);
     }
 }
 

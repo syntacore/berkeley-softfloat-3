@@ -61,7 +61,7 @@ addMags(uint64_t const uiA,
             return u_as_f(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
         }
 
-        return roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
+        return round_pack_to_F64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
     }
 
     int16_t expZ;
@@ -70,7 +70,7 @@ addMags(uint64_t const uiA,
 
     if (expDiff < 0) {
         if (expB == 0x7FF) {
-            return u_as_f(sigB ? propagate_NaN(uiA, uiB) : packToF64UI(signZ, 0x7FF, 0));
+            return u_as_f(sigB ? propagate_NaN(uiA, uiB) : pack_to_F64_UI(signZ, 0x7FF, 0));
         }
 
         expZ = expB;
@@ -81,7 +81,7 @@ addMags(uint64_t const uiA,
             sigA <<= 1;
         }
 
-        sigA = shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
+        sigA = shift_right_jam_64(sigA, static_cast<uint32_t>(-expDiff));
     } else {
         if (0x7FF == expA) {
             return u_as_f(sigA ? propagate_NaN(uiA, uiB) : uiA);
@@ -95,7 +95,7 @@ addMags(uint64_t const uiA,
             sigB <<= 1;
         }
 
-        sigB = shiftRightJam64(sigB, static_cast<uint32_t>(expDiff));
+        sigB = shift_right_jam_64(sigB, static_cast<uint32_t>(expDiff));
     }
 
     uint64_t sigZ = UINT64_C(0x2000000000000000) + sigA + sigB;
@@ -105,7 +105,7 @@ addMags(uint64_t const uiA,
         sigZ <<= 1;
     }
 
-    return roundPackToF64(signZ, expZ, sigZ);
+    return round_pack_to_F64(signZ, expZ, sigZ);
 }
 
 static float64_t
@@ -133,7 +133,7 @@ subMags(uint64_t const uiA,
         int64_t sigDiff = static_cast<int64_t>(sigA - sigB);
 
         if (0 == sigDiff) {
-            return u_as_f(packToF64UI(softfloat_round_min == softfloat_get_roundingMode(), 0, 0));
+            return u_as_f(pack_to_F64_UI(softfloat_round_min == softfloat_get_roundingMode(), 0, 0));
         }
 
         if (0 != expA) {
@@ -149,8 +149,8 @@ subMags(uint64_t const uiA,
         int16_t const expZ = expA - shiftDist;
         return
             u_as_f(expZ < 0 ?
-                      packToF64UI(signZ, 0, static_cast<uint64_t>(sigDiff << expA)) :
-                      packToF64UI(signZ, expZ, static_cast<uint64_t>(sigDiff << shiftDist)));
+                      pack_to_F64_UI(signZ, 0, static_cast<uint64_t>(sigDiff << expA)) :
+                      pack_to_F64_UI(signZ, expZ, static_cast<uint64_t>(sigDiff << shiftDist)));
     }
 
     uint64_t const sigA_shifted = sigA << 10;
@@ -163,14 +163,14 @@ subMags(uint64_t const uiA,
             return
                 u_as_f(0 != sigB_shifted ?
                           propagate_NaN(uiA, uiB) :
-                          packToF64UI(signZ, 0x7FF, 0));
+                          pack_to_F64_UI(signZ, 0x7FF, 0));
         }
 
         return
-            normRoundPackToF64(signZ,
+            norm_round_pack_to_F64(signZ,
                                          expB - 1,
                                          (sigB_shifted | UINT64_C(0x4000000000000000)) -
-                                         shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted),
+                                         shift_right_jam_64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted),
                                                  static_cast<uint32_t>(-expDiff)));
     }
 
@@ -179,10 +179,10 @@ subMags(uint64_t const uiA,
     }
 
     return
-        normRoundPackToF64(signZ,
+        norm_round_pack_to_F64(signZ,
                                      expA - 1,
                                      (sigA_shifted | UINT64_C(0x4000000000000000)) -
-                                     shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), static_cast<uint32_t>(expDiff)));
+                                     shift_right_jam_64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), static_cast<uint32_t>(expDiff)));
 }
 
 }  // namespace

@@ -47,8 +47,8 @@ add_magnitudes(uint16_t const uiA64,
                uint64_t const uiB0,
                bool signZ)
 {
-    int32_t const expA = expExtF80UI64(uiA64);
-    int32_t const expB = expExtF80UI64(uiB64);
+    int32_t const expA = exp_extF80_UI64(uiA64);
+    int32_t const expB = exp_extF80_UI64(uiB64);
     int32_t expDiff = expA - expB;
 
     if (0 == expDiff) {
@@ -70,12 +70,12 @@ add_magnitudes(uint16_t const uiA64,
         auto const sigZ_1 = uiA0 + uiB0;
 
         if (0 == expA) {
-            exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigZ_1);
-            return roundPackToExtF80(signZ, normExpSig.exp + 1, normExpSig.sig, 0, extF80_roundingPrecision);
+            exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigZ_1);
+            return round_pack_to_extF80(signZ, normExpSig.exp + 1, normExpSig.sig, 0, extF80_rounding_precision);
         }
 
         uint64_extra const sig64Extra = shortShiftRightJam64Extra(sigZ_1, 0, 1);
-        return roundPackToExtF80(signZ, expA + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_roundingPrecision);
+        return round_pack_to_extF80(signZ, expA + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_rounding_precision);
     }
 
     if (expDiff < 0) {
@@ -87,7 +87,7 @@ add_magnitudes(uint16_t const uiA64,
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
             } else {
-                uZ.signExp = packToExtF80UI64(signZ, 0x7FFF);
+                uZ.signExp = pack_to_extF80_UI64(signZ, 0x7FFF);
                 uZ.signif = uiB0;
             }
 
@@ -103,23 +103,23 @@ add_magnitudes(uint16_t const uiA64,
                 auto const sigZ_1 = uiA0 + uiB0;
 
                 if (0 != (UINT64_C(0x8000000000000000) & sigZ_1)) {
-                    return roundPackToExtF80(signZ, expZ, sigZ_1, 0, extF80_roundingPrecision);
+                    return round_pack_to_extF80(signZ, expZ, sigZ_1, 0, extF80_rounding_precision);
                 }
 
                 uint64_extra const sig64Extra = shortShiftRightJam64Extra(sigZ_1, 0, 1);
-                return roundPackToExtF80(signZ, expZ + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_roundingPrecision);
+                return round_pack_to_extF80(signZ, expZ + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_rounding_precision);
             }
         }
 
-        uint64_extra const sig64Extra = shiftRightJam64Extra(uiA0, 0, static_cast<uint32_t>(-expDiff));
+        uint64_extra const sig64Extra = shift_right_jam_64Extra(uiA0, 0, static_cast<uint32_t>(-expDiff));
         auto const sigZ_1 = sig64Extra.v + uiB0;
 
         if (0 != (sigZ_1 & UINT64_C(0x8000000000000000))) {
-            return roundPackToExtF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_roundingPrecision);
+            return round_pack_to_extF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_rounding_precision);
         }
 
         auto const sig64Extra_1 = shortShiftRightJam64Extra(sigZ_1, sig64Extra.extra, 1);
-        return roundPackToExtF80(signZ, expZ + 1, sig64Extra_1.v | UINT64_C(0x8000000000000000), sig64Extra_1.extra, extF80_roundingPrecision);
+        return round_pack_to_extF80(signZ, expZ + 1, sig64Extra_1.v | UINT64_C(0x8000000000000000), sig64Extra_1.extra, extF80_rounding_precision);
     }
 
     if (0x7FFF == expA) {
@@ -146,23 +146,23 @@ add_magnitudes(uint16_t const uiA64,
             auto const sigZ_1 = uiA0 + uiB0;
 
             if (0 != (UINT64_C(0x8000000000000000) & sigZ_1)) {
-                return roundPackToExtF80(signZ, expZ, sigZ_1, 0, extF80_roundingPrecision);
+                return round_pack_to_extF80(signZ, expZ, sigZ_1, 0, extF80_rounding_precision);
             }
 
             uint64_extra const sig64Extra = shortShiftRightJam64Extra(sigZ_1, 0, 1);
-            return roundPackToExtF80(signZ, expZ + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_roundingPrecision);
+            return round_pack_to_extF80(signZ, expZ + 1, UINT64_C(0x8000000000000000) | sig64Extra.v, sig64Extra.extra, extF80_rounding_precision);
         }
     }
 
-    uint64_extra const sig64Extra = shiftRightJam64Extra(uiB0, 0u, static_cast<uint32_t>(expDiff));
+    uint64_extra const sig64Extra = shift_right_jam_64Extra(uiB0, 0u, static_cast<uint32_t>(expDiff));
     auto const sigZ_1 = uiA0 + sig64Extra.v;
 
     if (0 != (sigZ_1 & UINT64_C(0x8000000000000000))) {
-        return roundPackToExtF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_roundingPrecision);
+        return round_pack_to_extF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_rounding_precision);
     }
 
     auto const sig64Extra_1 = shortShiftRightJam64Extra(sigZ_1, sig64Extra.extra, 1);
-    return roundPackToExtF80(signZ, expZ + 1, sig64Extra_1.v | UINT64_C(0x8000000000000000), sig64Extra_1.extra, extF80_roundingPrecision);
+    return round_pack_to_extF80(signZ, expZ + 1, sig64Extra_1.v | UINT64_C(0x8000000000000000), sig64Extra_1.extra, extF80_rounding_precision);
 }
 
 }  // namespace fast_int64

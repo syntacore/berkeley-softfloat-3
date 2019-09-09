@@ -71,21 +71,21 @@ f32_roundToInt(float32_t const a,
 
         case softfloat_round_near_maxMag:
             if (0x7E == exp) {
-                return u_as_f(uiZ | packToF32UI(false, 0x7F, 0));
+                return u_as_f(uiZ | pack_to_F32_UI(false, 0x7F, 0));
             }
 
             break;
 
         case softfloat_round_min:
             if (0 != uiZ) {
-                return u_as_f(packToF32UI(true, 0x7F, 0));
+                return u_as_f(pack_to_F32_UI(true, 0x7F, 0));
             }
 
             break;
 
         case softfloat_round_max:
             if (0 == uiZ) {
-                return u_as_f(packToF32UI(false, 0x7F, 0));
+                return u_as_f(pack_to_F32_UI(false, 0x7F, 0));
             }
 
             break;

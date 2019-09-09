@@ -56,10 +56,10 @@ copyA(uint32_t const uiA96,
       uint32_t const* const aWPtr,
       uint32_t zWPtr[4])
 {
-    zWPtr[indexWordHi(4)] = uiA96;
-    zWPtr[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
-    zWPtr[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
-    zWPtr[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
+    zWPtr[index_word_hi(4)] = uiA96;
+    zWPtr[index_word(4, 2)] = aWPtr[index_word(4, 2)];
+    zWPtr[index_word(4, 1)] = aWPtr[index_word(4, 1)];
+    zWPtr[index_word(4, 0)] = aWPtr[index_word(4, 0)];
 }
 }  // namespace
 
@@ -72,17 +72,17 @@ f128M_rem(float128_t const* const aPtr,
     auto const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    int32_t expA = expF128UI96(uiA96);
-    int32_t expB = expF128UI96(bWPtr[indexWordHi(4)]);
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
+    int32_t expA = exp_F128_UI96(uiA96);
+    int32_t expB = exp_F128_UI96(bWPtr[index_word_hi(4)]);
 
     if (0x7FFF == expA || 0x7FFF == expB) {
-        if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
+        if (try_propagate_NaN_M_F128(aWPtr, bWPtr, zWPtr)) {
             return;
         }
 
         if (expA == 0x7FFF) {
-            softfloat_invalidF128M(zWPtr);
+            invalid_M_F128(zWPtr);
             return;
         }
 
@@ -96,16 +96,16 @@ f128M_rem(float128_t const* const aPtr,
     }
 
     uint32_t x[4];
-    expB = softfloat_shiftNormSigF128M(bWPtr, 13, x);
+    expB = shift_norm_sig_M_F128(bWPtr, 13, x);
 
     if (-128 == expB) {
-        softfloat_invalidF128M(zWPtr);
+        invalid_M_F128(zWPtr);
         return;
     }
 
     uint32_t rem1[5];
-    uint32_t* remPtr = &rem1[indexMultiwordLo(5, 4)];
-    expA = softfloat_shiftNormSigF128M(aWPtr, 13, remPtr);
+    uint32_t* remPtr = &rem1[index_multiword_lo(5, 4)];
+    expA = shift_norm_sig_M_F128(aWPtr, 13, remPtr);
 
     if (expA == -128) {
         copyA(uiA96, aWPtr, zWPtr);
@@ -127,34 +127,34 @@ f128M_rem(float128_t const* const aPtr,
 
         if (expDiff) {
             --expB;
-            softfloat_add128M(x, x, x);
+            add_M_128(x, x, x);
             q = 0;
         } else {
-            q = 0u + !!(softfloat_compare128M(x, remPtr) <= 0);
+            q = 0u + !!(compare_M_128(x, remPtr) <= 0);
 
             if (q) {
-                softfloat_sub128M(remPtr, x, remPtr);
+                sub_M_128(remPtr, x, remPtr);
             }
         }
     } else {
         uint32_t const recip32 =
-            approxRecip32_1((static_cast<uint64_t>(x[indexWord(4, 3)]) << 32 | x[indexWord(4, 2)]) >> 30);
+            approx_recip_32_1((static_cast<uint64_t>(x[index_word(4, 3)]) << 32 | x[index_word(4, 2)]) >> 30);
         expDiff -= 30;
 
         uint64_t q64;
 
         for (;;) {
-            q64 = static_cast<uint64_t>(remPtr[indexWordHi(4)]) * recip32;
+            q64 = static_cast<uint64_t>(remPtr[index_word_hi(4)]) * recip32;
 
             if (expDiff < 0) {
                 break;
             }
 
             q = (q64 + 0x80000000) >> 32;
-            softfloat_remStep128MBy32(remPtr, 29, x, q, remPtr);
+            rem_step_by_32_M_128(remPtr, 29, x, q, remPtr);
 
-            if (remPtr[indexWordHi(4)] & 0x80000000) {
-                softfloat_add128M(remPtr, x, remPtr);
+            if (remPtr[index_word_hi(4)] & 0x80000000) {
+                add_M_128(remPtr, x, remPtr);
             }
 
             expDiff -= 29;
@@ -165,51 +165,51 @@ f128M_rem(float128_t const* const aPtr,
         /**
         @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data
         */
-        softfloat_remStep128MBy32(remPtr, static_cast<uint8_t>(expDiff + 30), x, q, remPtr);
+        rem_step_by_32_M_128(remPtr, static_cast<uint8_t>(expDiff + 30), x, q, remPtr);
 
-        if (0 != (remPtr[indexWordHi(4)] & 0x80000000)) {
-            altRemPtr = &rem2[indexMultiwordLo(5, 4)];
-            softfloat_add128M(remPtr, x, altRemPtr);
+        if (0 != (remPtr[index_word_hi(4)] & 0x80000000)) {
+            altRemPtr = &rem2[index_multiword_lo(5, 4)];
+            add_M_128(remPtr, x, altRemPtr);
             goto selectRem;
         }
     }
 
-    altRemPtr = &rem2[indexMultiwordLo(5, 4)];
+    altRemPtr = &rem2[index_multiword_lo(5, 4)];
 
     do {
         ++q;
         uint32_t* const newRemPtr = altRemPtr;
-        softfloat_sub128M(remPtr, x, newRemPtr);
+        sub_M_128(remPtr, x, newRemPtr);
         altRemPtr = remPtr;
         remPtr = newRemPtr;
-    } while (0 == (remPtr[indexWordHi(4)] & 0x80000000));
+    } while (0 == (remPtr[index_word_hi(4)] & 0x80000000));
 
 selectRem:
 
     {
-        softfloat_add128M(remPtr, altRemPtr, x);
+        add_M_128(remPtr, altRemPtr, x);
 
         if (
-            0 != (x[indexWordHi(4)] & 0x80000000) ||
+            0 != (x[index_word_hi(4)] & 0x80000000) ||
             (
                 0 != (q & 1) &&
-                0 == x[indexWord(4, 0)] &&
-                0 == x[indexWord(4, 1)] &&
-                0 == x[indexWord(4, 2)] &&
-                0 == x[indexWordHi(4)]
+                0 == x[index_word(4, 0)] &&
+                0 == x[index_word(4, 1)] &&
+                0 == x[index_word(4, 2)] &&
+                0 == x[index_word_hi(4)]
             )
         ) {
             remPtr = altRemPtr;
         }
 
-        if (0 != (remPtr[indexWordHi(4)] & 0x80000000)) {
+        if (0 != (remPtr[index_word_hi(4)] & 0x80000000)) {
             signRem = !signRem;
-            softfloat_negX128M(remPtr);
+            neg_M_X128(remPtr);
         }
 
-        remPtr -= indexMultiwordLo(5, 4);
-        remPtr[indexWordHi(5)] = 0;
-        softfloat_normRoundPackMToF128M(signRem, expB + 18, remPtr, zWPtr);
+        remPtr -= index_multiword_lo(5, 4);
+        remPtr[index_word_hi(5)] = 0;
+        norm_round_pack_to_M_F128(signRem, expB + 18, remPtr, zWPtr);
         return;
     }
 }

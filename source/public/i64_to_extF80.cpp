@@ -50,7 +50,7 @@ i64_to_extF80(int64_t const a)
         */
         absA = static_cast<uint64_t>(sign ? -a : a);
         auto const shiftDist = count_leading_zeros(absA);
-        uiZ64 = packToExtF80UI64(sign, 0x403Eu - shiftDist);
+        uiZ64 = pack_to_extF80_UI64(sign, 0x403Eu - shiftDist);
         absA <<= shiftDist;
     }
 

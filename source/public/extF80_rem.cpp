@@ -43,9 +43,9 @@ extF80_rem(extFloat80_t const a,
     using namespace softfloat::internals::fast_int64;
 
     bool const signA = is_sign(a.signExp);
-    int32_t expA = expExtF80UI64(a.signExp);
+    int32_t expA = exp_extF80_UI64(a.signExp);
     uint64_t sigA = a.signif;
-    int32_t expB = expExtF80UI64(b.signExp);
+    int32_t expB = exp_extF80_UI64(b.signExp);
     uint64_t sigB = b.signif;
 
     if (0x7FFF == expA) {
@@ -94,7 +94,7 @@ extF80_rem(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigB);
+        exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigB);
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -106,12 +106,12 @@ extF80_rem(extFloat80_t const a,
     if (0 == (sigA & UINT64_C(0x8000000000000000))) {
         if (0 == sigA) {
             extFloat80_t uZ;
-            uZ.signExp = static_cast<uint16_t>(packToExtF80UI64(signA, 0));
+            uZ.signExp = static_cast<uint16_t>(pack_to_extF80_UI64(signA, 0));
             uZ.signif = sigA >> 1;
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -125,13 +125,13 @@ extF80_rem(extFloat80_t const a,
         }
 
         extFloat80_t uZ;
-        uZ.signExp = static_cast<uint16_t>(packToExtF80UI64(signA, static_cast<uint16_t>(expA)));
+        uZ.signExp = static_cast<uint16_t>(pack_to_extF80_UI64(signA, static_cast<uint16_t>(expA)));
         uZ.signif = sigA;
         return uZ;
     }
 
-    uint128 rem = shortShiftLeft128(uint128{0, sigA}, 32);
-    uint128 shiftedSigB = shortShiftLeft128(uint128{0, sigB}, 32);
+    uint128 rem = short_shift_left_128(uint128{0, sigA}, 32);
+    uint128 shiftedSigB = short_shift_left_128(uint128{0, sigB}, 32);
 
     uint128 altRem;
     uint32_t q;
@@ -139,7 +139,7 @@ extF80_rem(extFloat80_t const a,
     if (expDiff < 1) {
         if (0 != expDiff) {
             --expB;
-            shiftedSigB = shortShiftLeft128(uint128{0, sigB}, 33);
+            shiftedSigB = short_shift_left_128(uint128{0, sigB}, 33);
             q = 0;
         } else {
             q = 0u + !!(sigB <= sigA);
@@ -149,7 +149,7 @@ extF80_rem(extFloat80_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = approxRecip32_1(sigB >> 32);
+        uint32_t const recip32 = approx_recip_32_1(sigB >> 32);
         expDiff -= 30;
 
         uint64_t q64;
@@ -162,8 +162,8 @@ extF80_rem(extFloat80_t const a,
             }
 
             q = (q64 + 0x80000000) >> 32;
-            rem = shortShiftLeft128(rem, 29);
-            uint128 term = mul64ByShifted32To128(sigB, q);
+            rem = short_shift_left_128(rem, 29);
+            uint128 term = mul_64_by_shifted_32_to_128(sigB, q);
             rem = sub(rem, term);
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
@@ -179,8 +179,8 @@ extF80_rem(extFloat80_t const a,
         /**
         @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data
         */
-        rem = shortShiftLeft128(rem, uint8_t(expDiff + 30));
-        rem = sub(rem, mul64ByShifted32To128(sigB, q));
+        rem = short_shift_left_128(rem, uint8_t(expDiff + 30));
+        rem = sub(rem, mul_64_by_shifted_32_to_128(sigB, q));
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
             altRem = add(rem, shiftedSigB);
@@ -197,7 +197,7 @@ extF80_rem(extFloat80_t const a,
                 rem = sub(uint128{0, 0}, rem);
             }
 
-            return normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
+            return norm_round_pack_to_extF80(signRem, expB + 32, rem.v64, rem.v0, 80);
         }
     }
 
@@ -223,5 +223,5 @@ extF80_rem(extFloat80_t const a,
         rem = sub(uint128{0, 0}, rem);
     }
 
-    return normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
+    return norm_round_pack_to_extF80(signRem, expB + 32, rem.v64, rem.v0, 80);
 }

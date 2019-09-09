@@ -67,7 +67,7 @@ extF80M_le_quiet(extFloat80_t const* const aPtr,
     }
 
     if (0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
-        return (softfloat_compareNonnormExtF80M(aPtr, bPtr) <= 0);
+        return (compare_non_norm_M_extF80(aPtr, bPtr) <= 0);
     }
 
     if (uiA64 == uiB64) {

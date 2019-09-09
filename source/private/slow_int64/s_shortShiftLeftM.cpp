@@ -41,14 +41,14 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_shortShiftLeftM(size_t size_words,
+short_shift_left_M(size_t size_words,
                           uint32_t const* const aPtr,
                           uint8_t const dist,
                           uint32_t* const zPtr)
 {
     uint8_t const uNegDist = 31u & -dist;
-    auto const lastIndex = indexWordLo(size_words);
-    auto index = indexWordHi(size_words);
+    auto const lastIndex = index_word_lo(size_words);
+    auto index = index_word_hi(size_words);
     uint32_t partWordZ = aPtr[index] << dist;
 
     while (index != lastIndex) {

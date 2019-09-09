@@ -41,13 +41,13 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_shortShiftRightJamM(size_t const size_words,
+short_shift_right_jam_M(size_t const size_words,
                               uint32_t const* const aPtr,
                               uint8_t const dist,
                               uint32_t* const zPtr)
 {
     uint8_t const uNegDist = 31u & -dist;
-    auto index = indexWordLo(size_words);
+    auto index = index_word_lo(size_words);
     uint32_t wordA = aPtr[index];
     uint32_t partWordZ = wordA >> dist;
 
@@ -55,7 +55,7 @@ softfloat_shortShiftRightJamM(size_t const size_words,
         partWordZ |= 1;
     }
 
-    auto const lastIndex = indexWordHi(size_words);
+    auto const lastIndex = index_word_hi(size_words);
 
     while (index != lastIndex) {
         wordA = aPtr[index + wordIncr];

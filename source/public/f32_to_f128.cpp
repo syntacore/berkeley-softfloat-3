@@ -50,11 +50,11 @@ f32_to_f128(float32_t a)
             return float128_t(commonNaN_to_F128UI(commonNaN_from_f32UI(f_as_u(a))));
         }
 
-        return float128_t(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
+        return float128_t(uint128{pack_to_F128_UI64(sign, 0x7FFF, 0), 0});
     }
 
     if (is_zero(a)) {
-        return float128_t(uint128{packToF128UI64(sign, 0, 0), 0});
+        return float128_t(uint128{pack_to_F128_UI64(sign, 0, 0), 0});
     }
 
     if (0 == exp) {
@@ -63,5 +63,5 @@ f32_to_f128(float32_t a)
         frac = normExpSig.sig;
     }
 
-    return float128_t(uint128{packToF128UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25), 0});
+    return float128_t(uint128{pack_to_F128_UI64(sign, exp + 0x3F80, static_cast<uint64_t>(frac) << 25), 0});
 }

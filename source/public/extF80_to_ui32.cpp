@@ -44,7 +44,7 @@ extF80_to_ui32(extFloat80_t const a,
     using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
     bool sign = is_sign(uiA64);
-    int32_t const exp = expExtF80UI64(uiA64);
+    int32_t const exp = exp_extF80_UI64(uiA64);
     uint64_t sig = a.signif;
 
     if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {
@@ -66,6 +66,6 @@ extF80_to_ui32(extFloat80_t const a,
         shiftDist = 1;
     }
 
-    sig = shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
-    return roundPackTo<uint32_t>(sign, sig, roundingMode, exact);
+    sig = shift_right_jam_64(sig, static_cast<uint32_t>(shiftDist));
+    return round_pack_to<uint32_t>(sign, sig, roundingMode, exact);
 }

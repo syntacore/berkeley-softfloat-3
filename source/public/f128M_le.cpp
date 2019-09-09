@@ -50,13 +50,13 @@ f128M_le(float128_t const *const aPtr,
     uint32_t const* aWPtr = reinterpret_cast<uint32_t const *>(aPtr);
     uint32_t const* bWPtr = reinterpret_cast<uint32_t const *>(bPtr);
 
-    if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
+    if (is_NaN_M_F128(aWPtr) || is_NaN_M_F128(bWPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
+    uint32_t const uiB96 = bWPtr[index_word_hi(4)];
     bool const signA = is_sign(uiA96);
     bool const signB = is_sign(uiB96);
 
@@ -69,22 +69,22 @@ f128M_le(float128_t const *const aPtr,
             return false;
         }
 
-        uint32_t wordA = aWPtr[indexWord(4, 2)];
-        uint32_t wordB = bWPtr[indexWord(4, 2)];
+        uint32_t wordA = aWPtr[index_word(4, 2)];
+        uint32_t wordB = bWPtr[index_word(4, 2)];
 
         if (0 != (wordA | wordB)) {
             return false;
         }
 
-        wordA = aWPtr[indexWord(4, 1)];
-        wordB = bWPtr[indexWord(4, 1)];
+        wordA = aWPtr[index_word(4, 1)];
+        wordB = bWPtr[index_word(4, 1)];
 
         if (0 != (wordA | wordB)) {
             return false;
         }
 
-        wordA = aWPtr[indexWord(4, 0)];
-        wordB = bWPtr[indexWord(4, 0)];
+        wordA = aWPtr[index_word(4, 0)];
+        wordB = bWPtr[index_word(4, 0)];
         return 0 == (wordA | wordB);
     }
 
@@ -92,6 +92,6 @@ f128M_le(float128_t const *const aPtr,
         std::swap(aWPtr, bWPtr);
     }
 
-    return (softfloat_compare128M(aWPtr, bWPtr) <= 0);
+    return (compare_M_128(aWPtr, bWPtr) <= 0);
 #endif
 }

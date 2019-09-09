@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 #include <cassert>
-#include <cstring> 
+#include <cstring>
 
 namespace softfloat {
 namespace internals {
@@ -46,14 +46,14 @@ namespace {
 
 static
 void
-softfloat_shortShiftRightJamM(size_t const size_words,
-                              uint64_t const* const aPtr,
-                              uint8_t const dist,
-                              uint64_t* const zPtr)
+short_shift_right_jam_M(size_t const size_words,
+                        uint64_t const* const aPtr,
+                        uint8_t const dist,
+                        uint64_t* const zPtr)
 {
     uint8_t const uNegDist = 63u & -static_cast<int8_t>(dist);
-    auto index = indexWordLo(size_words);
-    auto const lastIndex = indexWordHi(size_words);
+    auto index = index_word_lo(size_words);
+    auto const lastIndex = index_word_hi(size_words);
     uint64_t wordA = aPtr[index];
     uint64_t partWordZ = wordA >> dist;
 
@@ -85,7 +85,7 @@ is greater than 256, the stored result will be either 0 or 1, depending on
 whether the original 256 bits are all zeros.
 */
 static void
-softfloat_shiftRightJam256M(uint64_t const* aPtr,
+shift_right_jam_M_256(uint64_t const* aPtr,
                             uint32_t const dist,
                             uint64_t* const zPtr)
 {
@@ -103,7 +103,7 @@ softfloat_shiftRightJam256M(uint64_t const* aPtr,
 
         assert(wordDist <= 4);
 
-        uint64_t const* ptr1 = aPtr + indexMultiwordLo(4, wordDist);
+        uint64_t const* ptr1 = aPtr + index_multiword_lo(4, wordDist);
 
         for (uint32_t i = wordDist; 0 != i; --i) {
             wordJam = *ptr1++;
@@ -119,25 +119,25 @@ softfloat_shiftRightJam256M(uint64_t const* aPtr,
     assert(wordDist <= 4);
 
     if (wordDist < 4) {
-        aPtr += indexMultiwordHiBut(4, wordDist);
+        aPtr += index_multiword_hi_but(4, wordDist);
         uint8_t const innerDist = dist & 63;
 
         if (0 != innerDist) {
-            softfloat_shortShiftRightJamM(4u - wordDist,
-                                          aPtr,
-                                          innerDist,
-                                          zPtr + indexMultiwordLoBut(4, wordDist));
+            short_shift_right_jam_M(4u - wordDist,
+                                    aPtr,
+                                    innerDist,
+                                    zPtr + index_multiword_lo_but(4, wordDist));
 
             if (0 == wordDist) {
                 if (wordJam) {
-                    zPtr[indexWordLo(4)] |= 1;
+                    zPtr[index_word_lo(4)] |= 1;
                 }
 
                 return;
             }
         } else {
-            aPtr += indexWordLo(4 - wordDist);
-            ptr = zPtr + indexWordLo(4);
+            aPtr += index_word_lo(4 - wordDist);
+            ptr = zPtr + index_word_lo(4);
 
             /**
             @todo memmove
@@ -147,14 +147,14 @@ softfloat_shiftRightJam256M(uint64_t const* aPtr,
             }
         }
 
-        ptr = zPtr + indexMultiwordHi(4, wordDist);
+        ptr = zPtr + index_multiword_hi(4, wordDist);
     }
 
     assert(ptr);
     memset(ptr, 0, wordDist * sizeof(*ptr));
 
     if (wordJam) {
-        zPtr[indexWordLo(4)] |= 1;
+        zPtr[index_word_lo(4)] |= 1;
     }
 }
 
@@ -164,23 +164,23 @@ softfloat_shiftRightJam256M(uint64_t const* aPtr,
 @todo Merge fast int64 and non fast int 64
 */
 float128_t
-mulAddF128(Mul_add_operations const op,
-           uint64_t const& uiA64,
-           uint64_t const& uiA0,
-           uint64_t const& uiB64,
-           uint64_t const& uiB0,
-           uint64_t const& uiC64,
-           uint64_t const& uiC0)
+mul_add_F128(Mul_add_operations const op,
+             uint64_t const& uiA64,
+             uint64_t const& uiA0,
+             uint64_t const& uiB64,
+             uint64_t const& uiB0,
+             uint64_t const& uiC64,
+             uint64_t const& uiC0)
 {
     bool const signA = is_sign(uiA64);
-    int32_t expA = expF128UI64(uiA64);
-    uint128 sigA{fracF128UI64(uiA64), uiA0};
+    int32_t expA = exp_F128_UI64(uiA64);
+    uint128 sigA{frac_F128_UI64(uiA64), uiA0};
     bool const signB = is_sign(uiB64);
-    int32_t expB = expF128UI64(uiB64);
-    uint128 sigB{fracF128UI64(uiB64), uiB0};
+    int32_t expB = exp_F128_UI64(uiB64);
+    uint128 sigB{frac_F128_UI64(uiB64), uiB0};
     bool const signC = is_sign(uiC64) != (softfloat_mulAdd_subC == op);
-    int32_t expC = expF128UI64(uiC64);
-    uint128 sigC{fracF128UI64(uiC64), uiC0};
+    int32_t expC = exp_F128_UI64(uiC64);
+    uint128 sigC{frac_F128_UI64(uiC64), uiC0};
     bool signZ = (signA != signB) != (softfloat_mulAdd_subProd == op);
 
     if (0x7FFF == expA) {
@@ -190,7 +190,7 @@ mulAddF128(Mul_add_operations const op,
         }
 
         if (0 != (expB | sigB.v64 | sigB.v0)) {
-            uint128 const uiZ_1 = uint128{packToF128UI64(signZ, 0x7FFF, 0), 0};
+            uint128 const uiZ_1 = uint128{pack_to_F128_UI64(signZ, 0x7FFF, 0), 0};
 
             if (0x7FFF != expC) {
                 return static_cast<float128_t>(uiZ_1);
@@ -216,7 +216,7 @@ mulAddF128(Mul_add_operations const op,
         }
 
         if (0 != (expA | sigA.v64 | sigA.v0)) {
-            auto const uiZ_1 = uint128{packToF128UI64(signZ, 0x7FFF, 0), 0};
+            auto const uiZ_1 = uint128{pack_to_F128_UI64(signZ, 0x7FFF, 0), 0};
 
             if (0x7FFF != expC) {
                 return static_cast<float128_t>(uiZ_1);
@@ -248,13 +248,13 @@ mulAddF128(Mul_add_operations const op,
     if (0 == expA) {
         if (0 == (sigA.v64 | sigA.v0)) {
             if (0 == (expC | sigC.v64 | sigC.v0) && signZ != signC) {
-                return static_cast<float128_t>(uint128{packToF128UI64((softfloat_roundingMode == softfloat_round_min), 0, 0), 0});
+                return static_cast<float128_t>(uint128{pack_to_F128_UI64((softfloat_roundingMode == softfloat_round_min), 0, 0), 0});
             }
 
             return static_cast<float128_t>(uint128{uiC64, uiC0});
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigA);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -262,13 +262,13 @@ mulAddF128(Mul_add_operations const op,
     if (0 == expB) {
         if (0 == (sigB.v64 | sigB.v0)) {
             if (0 == (expC | sigC.v64 | sigC.v0) && signZ != signC) {
-                return static_cast<float128_t>(uint128{packToF128UI64((softfloat_roundingMode == softfloat_round_min), 0, 0), 0});
+                return static_cast<float128_t>(uint128{pack_to_F128_UI64((softfloat_roundingMode == softfloat_round_min), 0, 0), 0});
             }
 
             return static_cast<float128_t>(uint128{uiC64, uiC0});
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigB);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -276,13 +276,13 @@ mulAddF128(Mul_add_operations const op,
     int32_t expZ = expA + expB - 0x3FFE;
     sigA.v64 |= UINT64_C(0x0001000000000000);
     sigB.v64 |= UINT64_C(0x0001000000000000);
-    sigA = shortShiftLeft128(sigA, 8);
-    sigB = shortShiftLeft128(sigB, 15);
+    sigA = short_shift_left_128(sigA, 8);
+    sigB = short_shift_left_128(sigB, 15);
 
     uint64_t sig256Z[4];
-    mul128To256M(sigA, sigB, sig256Z);
+    mul_M_128_to_256(sigA, sigB, sig256Z);
 
-    uint128 sigZ{sig256Z[indexWord(4, 3)], sig256Z[indexWord(4, 2)]};
+    uint128 sigZ{sig256Z[index_word(4, 3)], sig256Z[index_word(4, 2)]};
 
     int32_t shiftDist_1 = 0;
 
@@ -294,19 +294,19 @@ mulAddF128(Mul_add_operations const op,
     if (0 == expC) {
         if (0 == (sigC.v64 | sigC.v0)) {
             shiftDist_1 += 8;
-            auto const sigZExtra_2 = sig256Z[indexWord(4, 1)] | sig256Z[indexWord(4, 0)];
+            auto const sigZExtra_2 = sig256Z[index_word(4, 1)] | sig256Z[index_word(4, 0)];
             auto const sigZExtra_1 = static_cast<uint64_t>(sigZ.v0 << (64 - shiftDist_1)) | (sigZExtra_2 != 0);
-            auto const sigZ_1 = shortShiftRight128(sigZ, static_cast<uint8_t>(shiftDist_1));
-            return roundPackToF128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
+            auto const sigZ_1 = short_shift_right_128(sigZ, static_cast<uint8_t>(shiftDist_1));
+            return round_pack_to_F128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigC);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigC);
         expC = normExpSig.exp;
         sigC = normExpSig.sig;
     }
 
     sigC.v64 |= UINT64_C(0x0001000000000000);
-    sigC = shortShiftLeft128(sigC, 8);
+    sigC = short_shift_left_128(sigC, 8);
 
     int32_t const expDiff = expZ - expC;
     uint64_t sig256C[4];
@@ -318,31 +318,31 @@ mulAddF128(Mul_add_operations const op,
             shiftDist_1 -= expDiff;
 
             if (0 != shiftDist_1) {
-                sigZ = shiftRightJam128(sigZ, static_cast<uint32_t>(shiftDist_1));
+                sigZ = shift_right_jam_128(sigZ, static_cast<uint32_t>(shiftDist_1));
             }
         } else {
             if (0 == shiftDist_1) {
-                uint128 const x128 = shortShiftRight128(uint128{sig256Z[indexWord(4, 1)], sig256Z[indexWord(4, 0)]}, 1);
-                sig256Z[indexWord(4, 1)] = (sigZ.v0 << 63) | x128.v64;
-                sig256Z[indexWord(4, 0)] = x128.v0;
-                sigZ = shortShiftRight128(sigZ, 1);
-                sig256Z[indexWord(4, 3)] = sigZ.v64;
-                sig256Z[indexWord(4, 2)] = sigZ.v0;
+                uint128 const x128 = short_shift_right_128(uint128{sig256Z[index_word(4, 1)], sig256Z[index_word(4, 0)]}, 1);
+                sig256Z[index_word(4, 1)] = (sigZ.v0 << 63) | x128.v64;
+                sig256Z[index_word(4, 0)] = x128.v0;
+                sigZ = short_shift_right_128(sigZ, 1);
+                sig256Z[index_word(4, 3)] = sigZ.v64;
+                sig256Z[index_word(4, 2)] = sigZ.v0;
             }
         }
     } else {
         if (0 != shiftDist_1) {
-            add256M(sig256Z, sig256Z, sig256Z);
+            add_M_256(sig256Z, sig256Z, sig256Z);
         }
 
         if (0 == expDiff) {
-            sigZ = uint128{sig256Z[indexWord(4, 3)], sig256Z[indexWord(4, 2)]};
+            sigZ = uint128{sig256Z[index_word(4, 3)], sig256Z[index_word(4, 2)]};
         } else {
-            sig256C[indexWord(4, 3)] = sigC.v64;
-            sig256C[indexWord(4, 2)] = sigC.v0;
-            sig256C[indexWord(4, 1)] = 0;
-            sig256C[indexWord(4, 0)] = 0;
-            softfloat_shiftRightJam256M(sig256C, static_cast<uint32_t>(expDiff), sig256C);
+            sig256C[index_word(4, 3)] = sigC.v64;
+            sig256C[index_word(4, 2)] = sigC.v0;
+            sig256C[index_word(4, 1)] = 0;
+            sig256C[index_word(4, 0)] = 0;
+            shift_right_jam_M_256(sig256C, static_cast<uint32_t>(expDiff), sig256C);
         }
     }
 
@@ -353,8 +353,8 @@ mulAddF128(Mul_add_operations const op,
             if (expDiff <= 0) {
                 sigZ = add(sigC, sigZ);
             } else {
-                add256M(sig256Z, sig256C, sig256Z);
-                sigZ = uint128{sig256Z[indexWord(4, 3)], sig256Z[indexWord(4, 2)]};
+                add_M_256(sig256Z, sig256C, sig256Z);
+                sigZ = uint128{sig256Z[index_word(4, 3)], sig256Z[index_word(4, 2)]};
             }
 
             if (sigZ.v64 & UINT64_C(0x0200000000000000)) {
@@ -362,10 +362,10 @@ mulAddF128(Mul_add_operations const op,
                 shiftDist_2 = 9;
             }
 
-            auto const sigZExtra_2 = sig256Z[indexWord(4, 1)] | sig256Z[indexWord(4, 0)];
+            auto const sigZExtra_2 = sig256Z[index_word(4, 1)] | sig256Z[index_word(4, 0)];
             auto const sigZExtra_1 = static_cast<uint64_t>(sigZ.v0 << (64 - shiftDist_2)) | (sigZExtra_2 != 0);
-            auto const sigZ_1 = shortShiftRight128(sigZ, static_cast<uint8_t>(shiftDist_2));
-            return roundPackToF128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
+            auto const sigZ_1 = short_shift_right_128(sigZ, static_cast<uint8_t>(shiftDist_2));
+            return round_pack_to_F128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
         }
 
         {
@@ -376,7 +376,7 @@ mulAddF128(Mul_add_operations const op,
 
                 if (expDiff < -1) {
                     sigZ = sub(sigC, sigZ);
-                    sigZExtra = sig256Z[indexWord(4, 1)] | sig256Z[indexWord(4, 0)];
+                    sigZExtra = sig256Z[index_word(4, 1)] | sig256Z[index_word(4, 0)];
 
                     if (0 != sigZExtra) {
                         sigZ = sub(sigZ, uint128{0, 1});
@@ -388,55 +388,55 @@ mulAddF128(Mul_add_operations const op,
                     }
 
                     auto const sigZExtra_1 = static_cast<uint64_t>(sigZ.v0 << (64 - shiftDist_2)) | !!(0 != sigZExtra);
-                    auto const sigZ_1 = shortShiftRight128(sigZ, static_cast<uint8_t>(shiftDist_2));
-                    return roundPackToF128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
+                    auto const sigZ_1 = short_shift_right_128(sigZ, static_cast<uint8_t>(shiftDist_2));
+                    return round_pack_to_F128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
                 }
 
-                sig256C[indexWord(4, 3)] = sigC.v64;
-                sig256C[indexWord(4, 2)] = sigC.v0;
-                sig256C[indexWord(4, 1)] = 0;
-                sig256C[indexWord(4, 0)] = 0;
-                sub256M(sig256C, sig256Z, sig256Z);
+                sig256C[index_word(4, 3)] = sigC.v64;
+                sig256C[index_word(4, 2)] = sigC.v0;
+                sig256C[index_word(4, 1)] = 0;
+                sig256C[index_word(4, 0)] = 0;
+                sub_M_256(sig256C, sig256Z, sig256Z);
             } else if (0 == expDiff) {
                 sigZ = sub(sigZ, sigC);
 
-                if (0 == (sigZ.v64 | sigZ.v0) && 0 == sig256Z[indexWord(4, 1)] && 0 == sig256Z[indexWord(4, 0)]) {
-                    return static_cast<float128_t>(uint128{packToF128UI64(softfloat_round_min == softfloat_roundingMode, 0, 0), 0});
+                if (0 == (sigZ.v64 | sigZ.v0) && 0 == sig256Z[index_word(4, 1)] && 0 == sig256Z[index_word(4, 0)]) {
+                    return static_cast<float128_t>(uint128{pack_to_F128_UI64(softfloat_round_min == softfloat_roundingMode, 0, 0), 0});
                 }
 
-                sig256Z[indexWord(4, 3)] = sigZ.v64;
-                sig256Z[indexWord(4, 2)] = sigZ.v0;
+                sig256Z[index_word(4, 3)] = sigZ.v64;
+                sig256Z[index_word(4, 2)] = sigZ.v0;
 
                 if (0 != (sigZ.v64 & UINT64_C(0x8000000000000000))) {
                     signZ = !signZ;
                     uint64_t const zero256[4] = {0, 0, 0, 0};
-                    sub256M(zero256, sig256Z, sig256Z);
+                    sub_M_256(zero256, sig256Z, sig256Z);
                 }
             } else {
-                sub256M(sig256Z, sig256C, sig256Z);
+                sub_M_256(sig256Z, sig256C, sig256Z);
 
                 if (1 < expDiff) {
-                    sigZ.v64 = sig256Z[indexWord(4, 3)];
-                    sigZ.v0 = sig256Z[indexWord(4, 2)];
+                    sigZ.v64 = sig256Z[index_word(4, 3)];
+                    sigZ.v0 = sig256Z[index_word(4, 2)];
 
                     if (0 == (sigZ.v64 & UINT64_C(0x0100000000000000))) {
                         --expZ;
                         shiftDist_2 = 7;
                     }
 
-                    auto const sigZExtra_2 = sig256Z[indexWord(4, 1)] | sig256Z[indexWord(4, 0)];
+                    auto const sigZExtra_2 = sig256Z[index_word(4, 1)] | sig256Z[index_word(4, 0)];
                     auto const sigZExtra_1 = static_cast<uint64_t>(sigZ.v0 << (64 - shiftDist_2)) | (sigZExtra_2 != 0);
-                    auto const sigZ_1 = shortShiftRight128(sigZ, static_cast<uint8_t>(shiftDist_2));
-                    return roundPackToF128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
+                    auto const sigZ_1 = short_shift_right_128(sigZ, static_cast<uint8_t>(shiftDist_2));
+                    return round_pack_to_F128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
                 }
             }
         }
 
-        sigZ = uint128{sig256Z[indexWord(4, 3)], sig256Z[indexWord(4, 2)]};
+        sigZ = uint128{sig256Z[index_word(4, 3)], sig256Z[index_word(4, 2)]};
 
         {
-            uint64_t sigZExtra = sig256Z[indexWord(4, 1)];
-            uint64_t const sig256Z0 = sig256Z[indexWord(4, 0)];
+            uint64_t sigZExtra = sig256Z[index_word(4, 1)];
+            uint64_t const sig256Z0 = sig256Z[index_word(4, 0)];
 
             if (0 != sigZ.v64) {
                 if (0 != sig256Z0) {
@@ -465,19 +465,19 @@ mulAddF128(Mul_add_operations const op,
 
             if (0 < shiftDist_2_2) {
                 auto const sigZExtra_1 = static_cast<uint64_t>(sigZ.v0 << (64 - shiftDist_2_2)) | !!(0 != sigZExtra);
-                auto const sigZ_1 = shortShiftRight128(sigZ, static_cast<uint8_t>(shiftDist_2_2));
-                return roundPackToF128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
+                auto const sigZ_1 = short_shift_right_128(sigZ, static_cast<uint8_t>(shiftDist_2_2));
+                return round_pack_to_F128(signZ, expZ - 1, sigZ_1.v64, sigZ_1.v0, sigZExtra_1);
             }
 
             if (0 != shiftDist_2_2) {
                 auto const shiftDist_2_1 = -shiftDist_2_2;
-                sigZ = shortShiftLeft128(sigZ, static_cast<uint8_t>(shiftDist_2_1));
-                uint128 const x128 = shortShiftLeft128(uint128{0, sigZExtra}, static_cast<uint8_t>(shiftDist_2_1));
+                sigZ = short_shift_left_128(sigZ, static_cast<uint8_t>(shiftDist_2_1));
+                uint128 const x128 = short_shift_left_128(uint128{0, sigZExtra}, static_cast<uint8_t>(shiftDist_2_1));
                 sigZ.v0 |= x128.v64;
                 sigZExtra = x128.v0;
             }
 
-            return roundPackToF128(signZ, expZ - 1, sigZ.v64, sigZ.v0, sigZExtra);
+            return round_pack_to_F128(signZ, expZ - 1, sigZ.v64, sigZ.v0, sigZExtra);
         }
     }
 }

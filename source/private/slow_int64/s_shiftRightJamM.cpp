@@ -43,7 +43,7 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_shiftRightJamM(size_t size_words,
+shift_right_jam_M(size_t size_words,
                          uint32_t const *aPtr,
                          uint32_t dist,
                          uint32_t *zPtr)
@@ -56,7 +56,7 @@ softfloat_shiftRightJamM(size_t size_words,
         if (size_words < wordDist) {
             wordDist = size_words;
         }
-        auto ptr1 = (uint32_t *)(aPtr + indexMultiwordLo(size_words, wordDist));
+        auto ptr1 = (uint32_t *)(aPtr + index_multiword_lo(size_words, wordDist));
         {
             auto i = wordDist;
             do {
@@ -70,38 +70,38 @@ softfloat_shiftRightJamM(size_t size_words,
     }
     if (wordDist < size_words) {
         uint8_t innerDist;
-        aPtr += indexMultiwordHiBut(size_words, wordDist);
+        aPtr += index_multiword_hi_but(size_words, wordDist);
         innerDist = dist & 31;
         if (innerDist) {
             /**
             @todo Warning C4244	'=': conversion from 'uint32_t' to 'uint8_t', possible loss of data
             */
-            softfloat_shortShiftRightJamM(
+            short_shift_right_jam_M(
                 size_words - wordDist,
                 aPtr,
                 innerDist,
-                zPtr + indexMultiwordLoBut(size_words, wordDist));
+                zPtr + index_multiword_lo_but(size_words, wordDist));
             if (!wordDist) {
                 if (wordJam) {
-                    zPtr[indexWordLo(size_words)] |= 1;
+                    zPtr[index_word_lo(size_words)] |= 1;
                 }
                 return;
             }
         } else {
-            aPtr += indexWordLo(size_words - wordDist);
-            ptr = zPtr + indexWordLo(size_words);
+            aPtr += index_word_lo(size_words - wordDist);
+            ptr = zPtr + index_word_lo(size_words);
             for (auto i = size_words - wordDist; i; --i) {
                 *ptr = *aPtr;
                 aPtr += wordIncr;
                 ptr += wordIncr;
             }
         }
-        ptr = zPtr + indexMultiwordHi(size_words, wordDist);
+        ptr = zPtr + index_multiword_hi(size_words, wordDist);
     }
     assert(ptr);
     memset(ptr, 0, wordDist * sizeof *ptr);
     if (wordJam) {
-        zPtr[indexWordLo(size_words)] |= 1;
+        zPtr[index_word_lo(size_words)] |= 1;
     }
 }
 

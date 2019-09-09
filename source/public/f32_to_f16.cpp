@@ -47,7 +47,7 @@ f32_to_f16(float32_t a)
             return u_as_f(commonNaN_to_F16UI(commonNaN_from_f32UI(f_as_u(a))));
         }
 
-        return u_as_f(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0x1F, 0));
     }
 
     int16_t const exp = get_exp(a);
@@ -55,7 +55,7 @@ f32_to_f16(float32_t a)
 
     uint16_t const frac16 = static_cast<uint16_t>(frac >> 9 | ((frac & 0x1FF) != 0));
     return
-        !(exp | frac16) ? u_as_f(packToF16UI(sign, 0, 0)) :
-        roundPackToF16(sign, exp - 0x71, frac16 | 0x4000u);
+        !(exp | frac16) ? u_as_f(pack_to_F16_UI(sign, 0, 0)) :
+        round_pack_to_F16(sign, exp - 0x71, frac16 | 0x4000u);
 }
 

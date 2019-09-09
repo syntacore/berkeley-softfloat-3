@@ -42,7 +42,7 @@ extF80_to_i64_r_minMag(extFloat80_t const a,
 {
     using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
-    int32_t const exp = expExtF80UI64(uiA64);
+    int32_t const exp = exp_extF80_UI64(uiA64);
     uint64_t const sig = a.signif;
     int32_t const shiftDist = 0x403E - exp;
 
@@ -57,7 +57,7 @@ extF80_to_i64_r_minMag(extFloat80_t const a,
     bool const sign = is_sign(uiA64);
 
     if (shiftDist <= 0) {
-        if (uiA64 == packToExtF80UI64(1, 0x403E) && sig == UINT64_C(0x8000000000000000)) {
+        if (uiA64 == pack_to_extF80_UI64(1, 0x403E) && sig == UINT64_C(0x8000000000000000)) {
             return -INT64_C(0x7FFFFFFFFFFFFFFF) - 1;
         }
 

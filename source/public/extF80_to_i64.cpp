@@ -45,7 +45,7 @@ extF80_to_i64(extFloat80_t const a,
 
     uint16_t const uiA64 = a.signExp;
     bool const sign = is_sign(uiA64);
-    int32_t const exp = expExtF80UI64(uiA64);
+    int32_t const exp = exp_extF80_UI64(uiA64);
     uint64_t sig = a.signif;
     int32_t const shiftDist = 0x403E - exp;
 
@@ -61,11 +61,11 @@ extF80_to_i64(extFloat80_t const a,
 
         sigExtra = 0;
     } else {
-        uint64_extra const sig64Extra = shiftRightJam64Extra(sig, 0u, static_cast<uint32_t>(shiftDist));
+        uint64_extra const sig64Extra = shift_right_jam_64Extra(sig, 0u, static_cast<uint32_t>(shiftDist));
         sig = sig64Extra.v;
         sigExtra = sig64Extra.extra;
     }
 
-    return roundPackTo<int64_t>(sign, sig, sigExtra, roundingMode, exact);
+    return round_pack_to<int64_t>(sign, sig, sigExtra, roundingMode, exact);
 }
 

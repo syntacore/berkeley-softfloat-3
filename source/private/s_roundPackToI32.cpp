@@ -41,10 +41,10 @@ namespace internals {
 
 template<>
 int32_t
-roundPackTo<int32_t>(bool const sign,
-                     uint64_t sig,
-                     softfloat_round_mode const roundingMode,
-                     bool const exact)
+round_pack_to<int32_t>(bool const sign,
+                       uint64_t sig,
+                       softfloat_round_mode const roundingMode,
+                       bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
     uint16_t roundIncrement =
@@ -80,10 +80,10 @@ roundPackTo<int32_t>(bool const sign,
 
 template
 int32_t
-roundPackTo<int32_t>(bool const sign,
-                     uint64_t sig,
-                     softfloat_round_mode const roundingMode,
-                     bool const exact);
+round_pack_to<int32_t>(bool const sign,
+                       uint64_t sig,
+                       softfloat_round_mode const roundingMode,
+                       bool const exact);
 
 }  // namespace internals
 }  // namespace softfloat

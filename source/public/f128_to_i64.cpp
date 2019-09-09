@@ -50,8 +50,8 @@ f128_to_i64(float128_t const a,
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
     bool const sign = is_sign(uiA64);
-    int32_t const exp = expF128UI64(uiA64);
-    uint64_t sig64 = fracF128UI64(uiA64);
+    int32_t const exp = exp_F128_UI64(uiA64);
+    uint64_t sig64 = frac_F128_UI64(uiA64);
     uint64_t sig0 = uiA0;
 
     int32_t const shiftDist = 0x402F - exp;
@@ -67,18 +67,18 @@ f128_to_i64(float128_t const a,
         sig64 |= UINT64_C(0x0001000000000000);
 
         if (shiftDist) {
-            uint128 const sig128 = shortShiftLeft128(uint128{sig64, sig0}, static_cast<uint8_t>(-shiftDist));
-            return roundPackTo<int64_t>(sign, sig128.v64, sig128.v0, roundingMode, exact);
+            uint128 const sig128 = short_shift_left_128(uint128{sig64, sig0}, static_cast<uint8_t>(-shiftDist));
+            return round_pack_to<int64_t>(sign, sig128.v64, sig128.v0, roundingMode, exact);
         }
 
-        return roundPackTo<int64_t>(sign, sig64, sig0, roundingMode, exact);
+        return round_pack_to<int64_t>(sign, sig64, sig0, roundingMode, exact);
     }
 
     if (0 != exp) {
         sig64 |= UINT64_C(0x0001000000000000);
     }
 
-    uint64_extra const sigExtra = shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
-    return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
+    uint64_extra const sigExtra = shift_right_jam_64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
+    return round_pack_to<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 }
 

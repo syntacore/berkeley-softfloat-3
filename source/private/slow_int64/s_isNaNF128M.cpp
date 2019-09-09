@@ -41,9 +41,9 @@ namespace internals {
 namespace slow_int64 {
 
 bool
-softfloat_isNaNF128M(const uint32_t* aWPtr)
+is_NaN_M_F128(const uint32_t* aWPtr)
 {
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
 
     if ((~uiA96 & 0x7FFF0000) != 0) {
         return false;
@@ -51,7 +51,7 @@ softfloat_isNaNF128M(const uint32_t* aWPtr)
 
     return
         (uiA96 & 0x0000FFFF) != 0 ||
-        (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0;
+        (aWPtr[index_word(4, 2)] | aWPtr[index_word(4, 1)] | aWPtr[index_word(4, 0)]) != 0;
 }
 
 }  // namespace slow_int64

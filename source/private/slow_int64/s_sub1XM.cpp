@@ -41,12 +41,12 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_sub1XM(size_t size_words,
+sub_1_M_X(size_t size_words,
                  uint32_t* zPtr)
 {
-    auto const lastIndex = indexWordHi(size_words);
+    auto const lastIndex = index_word_hi(size_words);
 
-    for (auto index = indexWordLo(size_words);; index += wordIncr) {
+    for (auto index = index_word_lo(size_words);; index += wordIncr) {
         uint32_t const wordA = zPtr[index];
         zPtr[index] = wordA - 1;
 

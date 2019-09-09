@@ -52,8 +52,8 @@ extF80M_roundToInt(extFloat80_t const* const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
     uint16_t const uiA64 = aPtr->signExp;
-    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(1, 0));
-    int32_t exp = expExtF80UI64(uiA64);
+    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & pack_to_extF80_UI64(1, 0));
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sigA = aPtr->signif;
 
     if (0 == (sigA & INT64_MIN) && 0x7FFF != exp) {
@@ -63,7 +63,7 @@ extF80M_roundToInt(extFloat80_t const* const aPtr,
             return;
         }
 
-        exp += softfloat_normExtF80SigM(&sigA);
+        exp += norm_M_extF80Sig(&sigA);
     }
 
     if (exp <= 0x3FFE) {
@@ -117,7 +117,7 @@ extF80M_roundToInt(extFloat80_t const* const aPtr,
 
         if (INT16_MAX == exp) {
             if (0 != (sigA & INT64_MAX)) {
-                propagate_NaN_ExtF80M(aPtr, 0, zPtr);
+                propagate_NaN_extF80M(aPtr, 0, zPtr);
                 return;
             }
 

@@ -44,8 +44,8 @@ namespace slow_int64 {
 @bug use extFloat80_t
 */
 int
-softfloat_compareNonnormExtF80M(extFloat80M const* const aSPtr,
-                                extFloat80M const* const bSPtr)
+compare_non_norm_M_extF80(extFloat80M const* const aSPtr,
+                          extFloat80M const* const bSPtr)
 {
     uint16_t const uiA64 = aSPtr->signExp;
     uint16_t const uiB64 = bSPtr->signExp;
@@ -61,8 +61,8 @@ softfloat_compareNonnormExtF80M(extFloat80M const* const aSPtr,
         return signB ? 1 : -1;
     }
 
-    int32_t expA = expExtF80UI64(uiA64);
-    int32_t expB = expExtF80UI64(uiB64);
+    int32_t expA = exp_extF80_UI64(uiA64);
+    int32_t expB = exp_extF80_UI64(uiB64);
 
     if (0x7FFF == expA) {
         if (0x7FFF == expB) {
@@ -81,7 +81,7 @@ softfloat_compareNonnormExtF80M(extFloat80M const* const aSPtr,
     }
 
     if (0 == (sigA & UINT64_C(0x8000000000000000))) {
-        expA = 0 != sigA ? expA + softfloat_normExtF80SigM(&sigA) : -128;
+        expA = 0 != sigA ? expA + norm_M_extF80Sig(&sigA) : -128;
     }
 
     if (0 == expB) {
@@ -89,7 +89,7 @@ softfloat_compareNonnormExtF80M(extFloat80M const* const aSPtr,
     }
 
     if (0 == (sigB & UINT64_C(0x8000000000000000))) {
-        expB = 0 != sigB ? expB + softfloat_normExtF80SigM(&sigB) : -128;
+        expB = 0 != sigB ? expB + norm_M_extF80Sig(&sigB) : -128;
     }
 
     if (signB) {

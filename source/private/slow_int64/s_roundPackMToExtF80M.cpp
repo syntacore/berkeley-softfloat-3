@@ -48,15 +48,15 @@ namespace slow_int64 {
 @param[out] zSPtr
 */
 void
-softfloat_roundPackMToExtF80M(bool sign,
-                              int32_t exp,
-                              uint32_t* extSigPtr,
-                              uint8_t const& roundingPrecision,
-                              extFloat80M* zSPtr)
+round_pack_to_M_extF80M(bool sign,
+                        int32_t exp,
+                        uint32_t* extSigPtr,
+                        uint8_t const& roundingPrecision,
+                        extFloat80M* zSPtr)
 {
     uint64_t sig =
-        static_cast<uint64_t>(extSigPtr[indexWord(3, 2)]) << 32 |
-        extSigPtr[indexWord(3, 1)];
+        static_cast<uint64_t>(extSigPtr[index_word(3, 2)]) << 32 |
+        extSigPtr[index_word(3, 1)];
 
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
@@ -73,7 +73,7 @@ softfloat_roundPackMToExtF80M(bool sign,
             roundMask = UINT64_C(0x000000FFFFFFFFFF);
         }
 
-        if (extSigPtr[indexWordLo(3)]) {
+        if (extSigPtr[index_word_lo(3)]) {
             sig |= 1;
         }
 
@@ -88,10 +88,10 @@ softfloat_roundPackMToExtF80M(bool sign,
         if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
             if (exp <= 0) {
                 bool const isTiny =
-                    softfloat_tininess_beforeRounding == detectTininess ||
+                    softfloat_tininess_beforeRounding == detect_tininess ||
                     exp < 0 ||
                     sig <= static_cast<uint64_t>(sig + roundIncrement);
-                sig = shiftRightJam64(sig, static_cast<uint32_t>(1 - exp));
+                sig = shift_right_jam_64(sig, static_cast<uint32_t>(1 - exp));
                 roundBits = sig & roundMask;
 
                 if (roundBits) {
@@ -111,7 +111,7 @@ softfloat_roundPackMToExtF80M(bool sign,
                 }
 
                 sig &= ~roundMask;
-                zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+                zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
                 zSPtr->signif = sig;
                 return;
             }
@@ -131,7 +131,7 @@ softfloat_roundPackMToExtF80M(bool sign,
                     sig = ~roundMask;
                 }
 
-                zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+                zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
                 zSPtr->signif = sig;
                 return;
             }
@@ -155,12 +155,12 @@ softfloat_roundPackMToExtF80M(bool sign,
         }
 
         sig &= ~roundMask;
-        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
         zSPtr->signif = sig;
         return;
     }
 
-    uint32_t sigExtra = extSigPtr[indexWordLo(3)];
+    uint32_t sigExtra = extSigPtr[index_word_lo(3)];
     bool doIncrement = UINT32_C(0x80000000) <= sigExtra;
 
     if (softfloat_round_near_even != softfloat_roundingMode && softfloat_round_near_maxMag != softfloat_roundingMode) {
@@ -186,22 +186,22 @@ softfloat_roundPackMToExtF80M(bool sign,
             }
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
         zSPtr->signif = sig;
         return;
     }
 
     if (exp <= 0) {
         bool const isTiny =
-            softfloat_tininess_beforeRounding == detectTininess ||
+            softfloat_tininess_beforeRounding == detect_tininess ||
             exp < 0 ||
             !doIncrement ||
             sig < UINT64_MAX;
         /**
         @todo use local variable for output
         */
-        softfloat_shiftRightJam96M(extSigPtr, static_cast<uint8_t>(1 - exp), extSigPtr);
-        sigExtra = extSigPtr[indexWordLo(3)];
+        shift_right_jam_M_96(extSigPtr, static_cast<uint8_t>(1 - exp), extSigPtr);
+        sigExtra = extSigPtr[index_word_lo(3)];
 
         if (sigExtra) {
             if (isTiny) {
@@ -215,7 +215,7 @@ softfloat_roundPackMToExtF80M(bool sign,
             softfloat_round_near_even == softfloat_roundingMode || softfloat_round_near_maxMag == softfloat_roundingMode ? static_cast<uint32_t>(INT32_MIN) <= sigExtra :
             (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode && 0 != sigExtra;
         exp = 0;
-        sig = static_cast<uint64_t>(extSigPtr[indexWord(3, 2)]) << 32 | extSigPtr[indexWord(3, 1)];
+        sig = static_cast<uint64_t>(extSigPtr[index_word(3, 2)]) << 32 | extSigPtr[index_word(3, 1)];
 
         if (doIncrement) {
             ++sig;
@@ -223,7 +223,7 @@ softfloat_roundPackMToExtF80M(bool sign,
             exp = 0 != (sig & UINT64_C(0x8000000000000000));
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
         zSPtr->signif = sig;
         return;
     }
@@ -244,7 +244,7 @@ softfloat_roundPackMToExtF80M(bool sign,
             sig = ~roundMask;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
         zSPtr->signif = sig;
         return;
     }

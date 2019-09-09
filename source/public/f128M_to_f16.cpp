@@ -45,25 +45,25 @@ f128M_to_f16(const float128_t* aPtr)
     using namespace softfloat::internals::slow_int64;
     uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
 
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     bool const sign = is_sign(uiA96);
-    int32_t exp = expF128UI96(uiA96);
+    int32_t exp = exp_F128_UI96(uiA96);
     uint32_t const frac32 =
-        fracF128UI96(uiA96) |
-        ((aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) != 0);
+        frac_F128_UI96(uiA96) |
+        ((aWPtr[index_word(4, 2)] | aWPtr[index_word(4, 1)] | aWPtr[index_word(4, 0)]) != 0);
 
     if (exp == 0x7FFF) {
         if (frac32) {
-            return u_as_f(commonNaN_to_F16UI(commonNaN_from_f128M(aWPtr)));
+            return u_as_f(commonNaN_to_F16UI(commonNaN_from_M_f128(aWPtr)));
         }
 
-        return u_as_f(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0x1F, 0));
     }
 
     uint16_t const frac16 = static_cast<uint16_t>(frac32 >> 2 | (frac32 & 3));
 
     if (0 == (exp | frac16)) {
-        return u_as_f(packToF16UI(sign, 0, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0, 0));
     }
 
     exp -= 0x3FF1;
@@ -72,6 +72,6 @@ f128M_to_f16(const float128_t* aPtr)
         exp = -0x40;
     }
 
-    return roundPackToF16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
+    return round_pack_to_F16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
 #endif
 }

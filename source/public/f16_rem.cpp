@@ -105,7 +105,7 @@ f16_rem(float16_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = approxRecip32_1(static_cast<uint32_t>(sigB) << 21);
+        uint32_t const recip32 = approx_recip_32_1(static_cast<uint32_t>(sigB) << 21);
         /*
         Changing the shift of `rem' here requires also changing the initial
         subtraction from `expDiff'.
@@ -159,5 +159,5 @@ f16_rem(float16_t const a,
         rem = static_cast<uint16_t>(-static_cast<int16_t>(rem));
     }
 
-    return normRoundPackToF16(signRem, expB, rem);
+    return norm_round_pack_to_F16(signRem, expB, rem);
 }

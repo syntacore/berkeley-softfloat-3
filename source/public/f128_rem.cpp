@@ -46,11 +46,11 @@ f128_rem(float128_t const a,
 
     uint128 const uA{a};
     bool const signA = is_sign(uA.v64);
-    int32_t expA = expF128UI64(uA.v64);
-    uint128 sigA{fracF128UI64(uA.v64), uA.v0};
+    int32_t expA = exp_F128_UI64(uA.v64);
+    uint128 sigA{frac_F128_UI64(uA.v64), uA.v0};
     uint128 const uB{b};
-    int32_t expB = expF128UI64(uB.v64);
-    uint128 sigB{fracF128UI64(uB.v64), uB.v0};
+    int32_t expB = exp_F128_UI64(uB.v64);
+    uint128 sigB{frac_F128_UI64(uB.v64), uB.v0};
 
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0) || (0x7FFF == expB && 0 != (sigB.v64 | sigB.v0))) {
@@ -74,7 +74,7 @@ f128_rem(float128_t const a,
             return static_cast<float128_t>(uint128{defaultNaNF128UI64, defaultNaNF128UI0});
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigB);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -84,7 +84,7 @@ f128_rem(float128_t const a,
             return a;
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigA);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -115,7 +115,7 @@ f128_rem(float128_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = approxRecip32_1(static_cast<uint32_t>(sigB.v64 >> 17));
+        uint32_t const recip32 = approx_recip_32_1(static_cast<uint32_t>(sigB.v64 >> 17));
         expDiff -= 30;
         uint64_t q64;
 
@@ -127,8 +127,8 @@ f128_rem(float128_t const a,
             }
 
             q = (q64 + 0x80000000) >> 32;
-            rem = shortShiftLeft128(rem, 29);
-            rem = sub(rem, mul128By32(sigB, q));
+            rem = short_shift_left_128(rem, 29);
+            rem = sub(rem, mul_128_by_32(sigB, q));
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
                 rem = add(rem, sigB);
@@ -140,8 +140,8 @@ f128_rem(float128_t const a,
         /* `expDiff' cannot be less than -29 here.*/
         assert(-29 <= expDiff);
         q = static_cast<uint32_t>(q64 >> 32) >> (~expDiff & 31);
-        rem = shortShiftLeft128(rem, static_cast<uint8_t>(expDiff + 30u));
-        rem = sub(rem, mul128By32(sigB, q));
+        rem = short_shift_left_128(rem, static_cast<uint8_t>(expDiff + 30u));
+        rem = sub(rem, mul_128_by_32(sigB, q));
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
             altRem = add(rem, sigB);
@@ -153,10 +153,10 @@ f128_rem(float128_t const a,
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
                 auto const rem_1 = sub(uint128{0, 0}, rem);
-                return normRoundPackToF128(!signA, expB - 1, rem_1.v64, rem_1.v0);
+                return norm_round_pack_to_F128(!signA, expB - 1, rem_1.v64, rem_1.v0);
             }
 
-            return normRoundPackToF128(signA, expB - 1, rem.v64, rem.v0);
+            return norm_round_pack_to_F128(signA, expB - 1, rem.v64, rem.v0);
         }
     }
 
@@ -174,8 +174,8 @@ f128_rem(float128_t const a,
 
     if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
         auto const rem_1 = sub(uint128{0, 0}, rem);
-        return normRoundPackToF128(!signA, expB - 1, rem_1.v64, rem_1.v0);
+        return norm_round_pack_to_F128(!signA, expB - 1, rem_1.v64, rem_1.v0);
     }
 
-    return normRoundPackToF128(signA, expB - 1, rem.v64, rem.v0);
+    return norm_round_pack_to_F128(signA, expB - 1, rem.v64, rem.v0);
 }

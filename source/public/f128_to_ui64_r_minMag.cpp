@@ -44,8 +44,8 @@ f128_to_ui64_r_minMag(float128_t const a,
 
     uint128 const aa{a};
     bool const sign = is_sign(aa.v64);
-    int32_t const exp = expF128UI64(aa.v64);
-    uint64_t sig64 = fracF128UI64(aa.v64);
+    int32_t const exp = exp_F128_UI64(aa.v64);
+    uint64_t sig64 = frac_F128_UI64(aa.v64);
 
     int32_t const shiftDist = 0x402F - exp;
 

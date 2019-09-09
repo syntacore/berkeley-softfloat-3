@@ -55,34 +55,34 @@ f16_to_f128M(float16_t a,
             return;
         }
 
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0x7FFF, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     if (0 != exp) {
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, exp + 0x3FF0u, static_cast<uint32_t>(frac) << 6);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     if (0 == frac) {
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     exp8_sig16 const normExpSig{frac};
-    zWPtr[indexWord(4, 3)] = packToF128UI96(sign, normExpSig.exp - 1 + 0x3FF0u, static_cast<uint32_t>(normExpSig.sig) << 6);
-    zWPtr[indexWord(4, 2)] = 0;
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, normExpSig.exp - 1 + 0x3FF0u, static_cast<uint32_t>(normExpSig.sig) << 6);
+    zWPtr[index_word(4, 2)] = 0;
+    zWPtr[index_word(4, 1)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
     return;
 #endif
 }

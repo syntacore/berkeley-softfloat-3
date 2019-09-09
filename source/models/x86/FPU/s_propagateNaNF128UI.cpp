@@ -115,10 +115,10 @@ static inline void
 result_copy(uint32_t* const zWPtr,
             uint32_t const* const ptr)
 {
-    zWPtr[indexWordHi(4)] = ptr[indexWordHi(4)] | 0x00008000;
-    zWPtr[indexWord(4, 2)] = ptr[indexWord(4, 2)];
-    zWPtr[indexWord(4, 1)] = ptr[indexWord(4, 1)];
-    zWPtr[indexWord(4, 0)] = ptr[indexWord(4, 0)];
+    zWPtr[index_word_hi(4)] = ptr[index_word_hi(4)] | 0x00008000;
+    zWPtr[index_word(4, 2)] = ptr[index_word(4, 2)];
+    zWPtr[index_word(4, 1)] = ptr[index_word(4, 1)];
+    zWPtr[index_word(4, 0)] = ptr[index_word(4, 0)];
 }
 }  // namespace
 
@@ -152,26 +152,26 @@ propagate_NaN_F128M(uint32_t const* const aWPtr,
         softfloat_raiseFlags(softfloat_flag_invalid);
 
         if (!isSigNaNA) {
-            result_copy(zWPtr, softfloat_isNaNF128M(aWPtr) ? aWPtr : bWPtr);
+            result_copy(zWPtr, is_NaN_M_F128(aWPtr) ? aWPtr : bWPtr);
             return;
         }
 
         if (!isSigNaNB) {
-            result_copy(zWPtr, softfloat_isNaNF128M(bWPtr) ? bWPtr : aWPtr);
+            result_copy(zWPtr, is_NaN_M_F128(bWPtr) ? bWPtr : aWPtr);
             return;
         }
     }
 
-    auto const uiA96 = aWPtr[indexWordHi(4)];
-    auto const uiB96 = bWPtr[indexWordHi(4)];
+    auto const uiA96 = aWPtr[index_word_hi(4)];
+    auto const uiB96 = bWPtr[index_word_hi(4)];
     auto const wordMagA_3 = uiA96 & 0x7FFFFFFF;
     auto const wordMagB_3 = uiB96 & 0x7FFFFFFF;
-    auto const wordMagA_2 = aWPtr[indexWord(4, 2)];
-    auto const wordMagB_2 = bWPtr[indexWord(4, 2)];
-    auto const wordMagA_1 = aWPtr[indexWord(4, 1)];
-    auto const wordMagB_1 = bWPtr[indexWord(4, 1)];
-    auto const wordMagA_0 = aWPtr[indexWord(4, 0)];
-    auto const wordMagB_0 = bWPtr[indexWord(4, 0)];
+    auto const wordMagA_2 = aWPtr[index_word(4, 2)];
+    auto const wordMagB_2 = bWPtr[index_word(4, 2)];
+    auto const wordMagA_1 = aWPtr[index_word(4, 1)];
+    auto const wordMagB_1 = bWPtr[index_word(4, 1)];
+    auto const wordMagA_0 = aWPtr[index_word(4, 0)];
+    auto const wordMagB_0 = bWPtr[index_word(4, 0)];
     bool const isA =
         (!(wordMagA_3 < wordMagB_3) && wordMagB_3 < wordMagA_3) ||
         (

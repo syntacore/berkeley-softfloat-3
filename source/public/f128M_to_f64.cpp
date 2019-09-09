@@ -45,28 +45,28 @@ f128M_to_f64(const float128_t* aPtr)
     using namespace softfloat::internals::slow_int64;
 
     uint32_t const* aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     bool const sign = is_sign(uiA96);
-    int32_t exp = expF128UI96(uiA96);
-    uint64_t frac64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];
+    int32_t exp = exp_F128_UI96(uiA96);
+    uint64_t frac64 = static_cast<uint64_t>(frac_F128_UI96(uiA96)) << 32 | aWPtr[index_word(4, 2)];
 
     if (exp == 0x7FFF) {
-        if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
-            return u_as_f(commonNaN_to_F64UI(commonNaN_from_f128M(aWPtr)));
+        if (frac64 || aWPtr[index_word(4, 1)] | aWPtr[index_word(4, 0)]) {
+            return u_as_f(commonNaN_to_F64UI(commonNaN_from_M_f128(aWPtr)));
         }
 
-        return u_as_f(packToF64UI(sign, 0x7FF, 0));
+        return u_as_f(pack_to_F64_UI(sign, 0x7FF, 0));
     }
 
-    uint32_t const frac32 = aWPtr[indexWord(4, 1)];
+    uint32_t const frac32 = aWPtr[index_word(4, 1)];
     frac64 = frac64 << 14 | frac32 >> 18;
 
-    if (0 != (frac32 & 0x0003FFFF) || 0 != aWPtr[indexWord(4, 0)]) {
+    if (0 != (frac32 & 0x0003FFFF) || 0 != aWPtr[index_word(4, 0)]) {
         frac64 |= 1;
     }
 
     if (0 == exp && 0 == frac64) {
-        return u_as_f(packToF64UI(sign, 0, 0));
+        return u_as_f(pack_to_F64_UI(sign, 0, 0));
     }
 
     exp -= 0x3C01;
@@ -79,6 +79,6 @@ f128M_to_f64(const float128_t* aPtr)
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
     return
-        roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
+        round_pack_to_F64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
 #endif
 }

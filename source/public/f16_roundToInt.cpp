@@ -58,7 +58,7 @@ f16_roundToInt(float16_t a,
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        uint16_t const uiZ = static_cast<uint16_t>(uiA & packToF16UI(1, 0, 0u));
+        uint16_t const uiZ = static_cast<uint16_t>(uiA & pack_to_F16_UI(1, 0, 0u));
 
         switch (roundingMode) {
         case softfloat_round_near_even:
@@ -70,21 +70,21 @@ f16_roundToInt(float16_t a,
 
         case softfloat_round_near_maxMag:
             if (exp == 0xE) {
-                return u_as_f(static_cast<uint16_t>(uiZ | packToF16UI(0, 0xF, 0u)));
+                return u_as_f(static_cast<uint16_t>(uiZ | pack_to_F16_UI(0, 0xF, 0u)));
             }
 
             break;
 
         case softfloat_round_min:
             if (uiZ) {
-                return u_as_f(packToF16UI(1, 0xF, 0));
+                return u_as_f(pack_to_F16_UI(1, 0xF, 0));
             }
 
             break;
 
         case softfloat_round_max:
             if (!uiZ) {
-                return u_as_f(packToF16UI(0, 0xF, 0));
+                return u_as_f(pack_to_F16_UI(0, 0xF, 0));
             }
 
             break;

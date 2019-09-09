@@ -57,11 +57,11 @@ f64_to_i64(float64_t const a,
                 sign ? i64_fromNegOverflow : i64_fromPosOverflow;
         }
 
-        return roundPackTo<int64_t>(sign, sig << -shiftDist, 0, roundingMode, exact);
+        return round_pack_to<int64_t>(sign, sig << -shiftDist, 0, roundingMode, exact);
     }
 
-    uint64_extra const sigExtra = shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
-    return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
+    uint64_extra const sigExtra = shift_right_jam_64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
+    return round_pack_to<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 
 #else
 
@@ -83,17 +83,17 @@ f64_to_i64(float64_t const a,
 
         sig <<= -shiftDist;
         uint32_t extSig[3];
-        extSig[indexWord(3, 0)] = 0;
-        extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
-        extSig[indexWord(3, 2)] = sig >> 32;
-        return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
+        extSig[index_word(3, 0)] = 0;
+        extSig[index_word(3, 1)] = static_cast<uint32_t>(sig);
+        extSig[index_word(3, 2)] = sig >> 32;
+        return round_pack_to_M<int64_t>(sign, extSig, roundingMode, exact);
     }
 
     uint32_t extSig[3];
-    extSig[indexWord(3, 0)] = 0;
-    extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
-    extSig[indexWord(3, 2)] = sig >> 32;
-    softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
-    return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
+    extSig[index_word(3, 0)] = 0;
+    extSig[index_word(3, 1)] = static_cast<uint32_t>(sig);
+    extSig[index_word(3, 2)] = sig >> 32;
+    shift_right_jam_M_96(extSig, static_cast<uint8_t>(shiftDist), extSig);
+    return round_pack_to_M<int64_t>(sign, extSig, roundingMode, exact);
 #endif
 }

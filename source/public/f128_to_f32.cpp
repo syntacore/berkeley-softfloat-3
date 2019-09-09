@@ -45,14 +45,14 @@ f128_to_f32(float128_t const a)
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expF128UI64(uiA64);
-    uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
+    int32_t exp = exp_F128_UI64(uiA64);
+    uint64_t const frac64 = frac_F128_UI64(uiA64) | (uiA0 != 0);
 
     if (INT16_MAX != exp) {
         /**
         @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
         */
-        uint32_t const frac32 = static_cast<uint32_t>(shortShiftRightJam64(frac64, 18));
+        uint32_t const frac32 = static_cast<uint32_t>(short_shift_right_jam_64(frac64, 18));
 
         if (0 != (exp | frac32)) {
             exp -= 0x3F81;
@@ -62,7 +62,7 @@ f128_to_f32(float128_t const a)
             }
 
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
-            return roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
+            return round_pack_to_F32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
         }
 
         return make_signed_zero<float32_t>(sign);

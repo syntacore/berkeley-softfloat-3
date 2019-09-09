@@ -46,7 +46,7 @@ extF80M_to_ui32_r_minMag(extFloat80_t const* const aPtr,
 #else
     using namespace softfloat::internals;
     uint16_t uiA64 = aPtr->signExp;
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sig = aPtr->signif;
 
     if (!sig && exp != INT16_MAX) {

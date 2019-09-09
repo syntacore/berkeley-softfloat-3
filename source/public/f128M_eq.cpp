@@ -47,12 +47,12 @@ f128M_eq(float128_t const* aPtr,
 
     uint32_t const* const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
     uint32_t const* const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
-    uint32_t wordA = aWPtr[indexWord(4, 2)];
-    uint32_t wordB = bWPtr[indexWord(4, 2)];
+    uint32_t wordA = aWPtr[index_word(4, 2)];
+    uint32_t wordB = bWPtr[index_word(4, 2)];
 
     if (wordA == wordB) {
-        uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-        uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+        uint32_t const uiA96 = aWPtr[index_word_hi(4)];
+        uint32_t const uiB96 = bWPtr[index_word_hi(4)];
         bool possibleOppositeZeros = false;
 
         if (uiA96 != uiB96) {
@@ -68,18 +68,18 @@ f128M_eq(float128_t const* aPtr,
         }
 
         auto const mashWord = wordA | wordB;
-        auto const wordA_2 = aWPtr[indexWord(4, 1)];
-        auto const wordB_2 = bWPtr[indexWord(4, 1)];
+        auto const wordA_2 = aWPtr[index_word(4, 1)];
+        auto const wordB_2 = bWPtr[index_word(4, 1)];
 
         if (wordA_2 == wordB_2) {
             auto const mashWord_1 = mashWord | wordA_2 | wordB_2;
-            auto const wordA_1 = aWPtr[indexWord(4, 0)];
-            auto const wordB_1 = bWPtr[indexWord(4, 0)];
+            auto const wordA_1 = aWPtr[index_word(4, 0)];
+            auto const wordB_1 = bWPtr[index_word(4, 0)];
 
             if (
                 wordA_1 == wordB_1 &&
                 !(possibleOppositeZeros && 0 != (mashWord_1 | wordA_1 | wordB_1)) &&
-                !softfloat_isNaNF128M(aWPtr) && !softfloat_isNaNF128M(bWPtr)
+                !is_NaN_M_F128(aWPtr) && !is_NaN_M_F128(bWPtr)
             ) {
                 return true;
             }

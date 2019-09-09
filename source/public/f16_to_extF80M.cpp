@@ -56,25 +56,25 @@ f16_to_extF80M(float16_t const a,
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
+        zSPtr->signExp = pack_to_extF80_UI64(sign, 0x7FFF);
         zSPtr->signif = UINT64_C(0x8000'0000'0000'0000);
         return;
     }
 
     if (0 != exp) {
-        zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3FF0));
+        zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp + 0x3FF0));
         zSPtr->signif = static_cast<uint64_t>(0x80000000 | static_cast<uint32_t>(frac) << 21) << 32;
         return;
     }
 
     if (0 == frac) {
-        zSPtr->signExp = packToExtF80UI64(sign, 0);
+        zSPtr->signExp = pack_to_extF80_UI64(sign, 0);
         zSPtr->signif = 0;
         return;
     }
 
     exp8_sig16 const normExpSig{frac};
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(normExpSig.exp + 0x3FF0));
+    zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(normExpSig.exp + 0x3FF0));
     zSPtr->signif = static_cast<uint64_t>(0x80000000 | static_cast<uint32_t>(normExpSig.sig) << 21) << 32;
 #endif
 }

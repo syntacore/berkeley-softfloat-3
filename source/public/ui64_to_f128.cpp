@@ -52,9 +52,9 @@ ui64_to_f128(uint64_t const a)
         zSig.v64 = a << (shiftDist - 64);
         zSig.v0 = 0;
     } else {
-        zSig = shortShiftLeft128(uint128{0u, a}, static_cast<uint8_t>(shiftDist));
+        zSig = short_shift_left_128(uint128{0u, a}, static_cast<uint8_t>(shiftDist));
     }
 
-    return float128_t(uint128{packToF128UI64(0, 0x406E - shiftDist, zSig.v64), zSig.v0});
+    return float128_t(uint128{pack_to_F128_UI64(0, 0x406E - shiftDist, zSig.v64), zSig.v0});
 }
 

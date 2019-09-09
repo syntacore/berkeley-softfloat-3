@@ -41,14 +41,14 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_invalidF128M(uint32_t *zWPtr)
+invalid_M_F128(uint32_t *zWPtr)
 {
 
     softfloat_raiseFlags(softfloat_flag_invalid);
-    zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
-    zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
-    zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
-    zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
+    zWPtr[index_word(4, 3)] = defaultNaNF128UI96;
+    zWPtr[index_word(4, 2)] = defaultNaNF128UI64;
+    zWPtr[index_word(4, 1)] = defaultNaNF128UI32;
+    zWPtr[index_word(4, 0)] = defaultNaNF128UI0;
 
 }
 

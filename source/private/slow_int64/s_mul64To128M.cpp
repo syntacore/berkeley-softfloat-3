@@ -41,9 +41,9 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_mul64To128M(uint64_t a,
-                      uint64_t b,
-                      uint32_t *zPtr)
+mul_M_64_to_128(uint64_t a,
+                uint64_t b,
+                uint32_t* zPtr)
 {
     uint32_t const a32 = a >> 32;
     uint32_t const a0 = static_cast<uint32_t>(a);
@@ -54,10 +54,10 @@ softfloat_mul64To128M(uint64_t a,
     uint64_t const mid2 = mid << 32;
     uint64_t const z0 = static_cast<uint64_t>(a0) * b0 + mid2;
     uint64_t const z64 = (static_cast<uint64_t>(a32) * b32 + ((static_cast<uint64_t>(mid < mid1) << 32) | (mid >> 32))) + (z0 < mid2);
-    zPtr[indexWord(4, 1)] = z0 >> 32;
-    zPtr[indexWord(4, 0)] = static_cast<uint32_t>(z0);
-    zPtr[indexWord(4, 3)] = z64 >> 32;
-    zPtr[indexWord(4, 2)] = static_cast<uint32_t>(z64);
+    zPtr[index_word(4, 1)] = z0 >> 32;
+    zPtr[index_word(4, 0)] = static_cast<uint32_t>(z0);
+    zPtr[index_word(4, 3)] = z64 >> 32;
+    zPtr[index_word(4, 2)] = static_cast<uint32_t>(z64);
 }
 
 }  // namespace slow_int64

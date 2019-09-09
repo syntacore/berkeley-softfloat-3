@@ -55,18 +55,18 @@ f32_to_f128M(float32_t a,
     }
 
     if (is_inf(a)) {
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0x7FFF, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     if (is_zero(a)) {
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
@@ -77,10 +77,10 @@ f32_to_f128M(float32_t a,
     }
 
     uint64_t const frac64 = static_cast<uint64_t>(frac) << 25;
-    zWPtr[indexWord(4, 3)] = packToF128UI96(sign, exp + 0x3F80u, frac64 >> 32);
-    zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(frac64);
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, exp + 0x3F80u, frac64 >> 32);
+    zWPtr[index_word(4, 2)] = static_cast<uint32_t>(frac64);
+    zWPtr[index_word(4, 1)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
     return;
 #endif
 }

@@ -42,19 +42,19 @@ namespace slow_int64 {
 
 template<>
 uint64_t
-roundPackMTo<uint64_t>(bool const sign,
-                       uint32_t const* const extSigPtr,
-                       softfloat_round_mode const roundingMode,
-                       bool const exact)
+round_pack_to_M<uint64_t>(bool const sign,
+                          uint32_t const* const extSigPtr,
+                          softfloat_round_mode const roundingMode,
+                          bool const exact)
 {
     bool const roundNearEven = softfloat_round_near_even == roundingMode;
-    uint32_t const sigExtra = extSigPtr[indexWordLo(3)];
+    uint32_t const sigExtra = extSigPtr[index_word_lo(3)];
     bool const doIncrement =
         !roundNearEven && softfloat_round_near_maxMag != roundingMode ?
         (sign ? softfloat_round_min : softfloat_round_max) == roundingMode && sigExtra :
         0x80000000 <= sigExtra;
 
-    uint64_t sig = static_cast<uint64_t>(extSigPtr[indexWord(3, 2)]) << 32 | extSigPtr[indexWord(3, 1)];
+    uint64_t sig = static_cast<uint64_t>(extSigPtr[index_word(3, 2)]) << 32 | extSigPtr[index_word(3, 1)];
 
     if (doIncrement) {
         ++sig;
@@ -83,10 +83,10 @@ roundPackMTo<uint64_t>(bool const sign,
 
 template
 uint64_t
-roundPackMTo<uint64_t>(bool const sign,
-                       uint32_t const* const extSigPtr,
-                       softfloat_round_mode const roundingMode,
-                       bool const exact);
+round_pack_to_M<uint64_t>(bool const sign,
+                          uint32_t const* const extSigPtr,
+                          softfloat_round_mode const roundingMode,
+                          bool const exact);
 
 }  // namespace slow_int64
 }  // namespace internals

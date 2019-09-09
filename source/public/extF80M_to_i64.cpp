@@ -49,7 +49,7 @@ extF80M_to_i64(const extFloat80_t* const aPtr,
 
     uint16_t const uiA64 = aPtr->signExp;
     bool const sign = is_sign(uiA64);
-    int32_t const exp = expExtF80UI64(uiA64);
+    int32_t const exp = exp_extF80_UI64(uiA64);
     uint64_t const sig = aPtr->signif;
     int32_t const shiftDist = 0x403E - exp;
 
@@ -61,14 +61,14 @@ extF80M_to_i64(const extFloat80_t* const aPtr,
     }
 
     uint32_t extSig[3];
-    extSig[indexWord(3, 2)] = sig >> 32;
-    extSig[indexWord(3, 1)] = static_cast<uint32_t>(sig);
-    extSig[indexWord(3, 0)] = 0;
+    extSig[index_word(3, 2)] = sig >> 32;
+    extSig[index_word(3, 1)] = static_cast<uint32_t>(sig);
+    extSig[index_word(3, 0)] = 0;
 
     if (shiftDist) {
-        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+        shift_right_jam_M_96(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
 
-    return roundPackMTo<int64_t>(sign, extSig, roundingMode, exact);
+    return round_pack_to_M<int64_t>(sign, extSig, roundingMode, exact);
 #endif
 }

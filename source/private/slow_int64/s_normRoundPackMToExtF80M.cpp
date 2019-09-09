@@ -50,25 +50,25 @@ namespace slow_int64 {
 @bug use extFloat80_t
 */
 void
-softfloat_normRoundPackMToExtF80M(bool sign,
-                                  int32_t exp,
-                                  uint32_t* extSigPtr,
-                                  uint8_t const& roundingPrecision,
-                                  extFloat80M* zSPtr)
+norm_round_pack_to_M_extF80(bool sign,
+                            int32_t exp,
+                            uint32_t* extSigPtr,
+                            uint8_t const& roundingPrecision,
+                            extFloat80M* zSPtr)
 {
     int16_t shiftDist = 0;
-    uint32_t wordSig = extSigPtr[indexWord(3, 2)];
+    uint32_t wordSig = extSigPtr[index_word(3, 2)];
 
     if (!wordSig) {
         shiftDist = 32;
-        wordSig = extSigPtr[indexWord(3, 1)];
+        wordSig = extSigPtr[index_word(3, 1)];
 
         if (!wordSig) {
             shiftDist = 64;
-            wordSig = extSigPtr[indexWord(3, 0)];
+            wordSig = extSigPtr[index_word(3, 0)];
 
             if (!wordSig) {
-                zSPtr->signExp = packToExtF80UI64(sign, 0);
+                zSPtr->signExp = pack_to_extF80_UI64(sign, 0);
                 zSPtr->signif = 0;
                 return;
             }
@@ -79,10 +79,10 @@ softfloat_normRoundPackMToExtF80M(bool sign,
 
     if (shiftDist) {
         exp -= shiftDist;
-        softfloat_shiftLeft96M(extSigPtr, static_cast<uint32_t>(shiftDist), extSigPtr);
+        shift_left_M_96(extSigPtr, static_cast<uint32_t>(shiftDist), extSigPtr);
     }
 
-    softfloat_roundPackMToExtF80M(sign, exp, extSigPtr, roundingPrecision, zSPtr);
+    round_pack_to_M_extF80M(sign, exp, extSigPtr, roundingPrecision, zSPtr);
 
 }
 

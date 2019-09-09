@@ -45,9 +45,9 @@ namespace internals {
 @param[in] sig mantissa bits [30..0]
 */
 float32_t
-roundPackToF32(bool sign,
-               int16_t exp,
-               uint32_t sig)
+round_pack_to_F32(bool sign,
+                  int16_t exp,
+                  uint32_t sig)
 {
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     assert(softfloat_round_near_even <= softfloat_roundingMode && softfloat_roundingMode <= softfloat_round_near_maxMag);
@@ -56,30 +56,34 @@ roundPackToF32(bool sign,
         softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? /* one half */ 0x40u :
         (sign ? softfloat_round_min : softfloat_round_max) == roundingMode ? 0x7Fu : 0u;
     uint32_t roundBits = sig & ~(~UINT32_C(0) << 7);
+
     if (0xFD <= static_cast<uint16_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == detectTininess ||
+                softfloat_tininess_beforeRounding == detect_tininess ||
                 exp < -1 ||
                 sig + roundIncrement < 0x80000000;
-            sig = shiftRightJam32(sig, static_cast<uint16_t>(-exp));
+            sig = shift_right_jam_32(sig, static_cast<uint16_t>(-exp));
             exp = 0;
             roundBits = sig & ~(~UINT32_C(0) << 7);
+
             if (isTiny && 0 != roundBits) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
             }
         } else if (0xFD < exp || 0x80000000 <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            return u_as_f(packToF32UI(sign, 0xFF, 0) - !roundIncrement);
+            return u_as_f(pack_to_F32_UI(sign, 0xFF, 0) - !roundIncrement);
         }
     }
+
     if (0 != roundBits) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
+
     bool const exact_mid_point = 0 == (roundBits ^ 0x40);
     bool const to_even = exact_mid_point && softfloat_round_near_even == roundingMode;
     uint32_t const sig1 = ((sig + roundIncrement) >> 7) & ~static_cast<uint32_t>(to_even);
-    return u_as_f(packToF32UI(sign, 0 != sig1 ? exp : 0, sig1));
+    return u_as_f(pack_to_F32_UI(sign, 0 != sig1 ? exp : 0, sig1));
 }
 
 }  // namespace internals

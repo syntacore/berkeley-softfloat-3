@@ -41,7 +41,7 @@ namespace internals {
 namespace fast_int64 {
 
 exp32_sig128
-normSubnormalF128Sig(uint64_t sig64,
+norm_subnormal_F128Sig(uint64_t sig64,
                                uint64_t sig0)
 {
     exp32_sig128 z;
@@ -60,7 +60,7 @@ normSubnormalF128Sig(uint64_t sig64,
     } else {
         int8_t const shiftDist = count_leading_zeros(sig64) - 15;
         z.exp = 1 - shiftDist;
-        z.sig = shortShiftLeft128(uint128{sig64, sig0}, static_cast<uint8_t>(shiftDist));
+        z.sig = short_shift_left_128(uint128{sig64, sig0}, static_cast<uint8_t>(shiftDist));
     }
 
     return z;

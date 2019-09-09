@@ -45,8 +45,8 @@ f128_to_extF80(float128_t const a)
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expF128UI64(uiA64);
-    uint64_t frac64 = fracF128UI64(uiA64);
+    int32_t exp = exp_F128_UI64(uiA64);
+    uint64_t frac64 = frac_F128_UI64(uiA64);
     uint64_t frac0 = uiA0;
 
     uint16_t uiZ64;
@@ -57,7 +57,7 @@ f128_to_extF80(float128_t const a)
             uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         } else {
-            uiZ64 = packToExtF80UI64(sign, 0x7FFF);
+            uiZ64 = pack_to_extF80_UI64(sign, 0x7FFF);
             uiZ0 = UINT64_C(0x8000000000000000);
         }
 
@@ -69,7 +69,7 @@ f128_to_extF80(float128_t const a)
 
     if (!exp) {
         if (!(frac64 | frac0)) {
-            uiZ64 = packToExtF80UI64(sign, 0);
+            uiZ64 = pack_to_extF80_UI64(sign, 0);
             uiZ0 = 0;
             extFloat80_t uZ;
             uZ.signExp = uiZ64;
@@ -77,13 +77,13 @@ f128_to_extF80(float128_t const a)
             return uZ;
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(frac64, frac0);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(frac64, frac0);
         exp = normExpSig.exp;
         frac64 = normExpSig.sig.v64;
         frac0 = normExpSig.sig.v0;
     }
 
     uint128 const sig128 =
-        shortShiftLeft128(uint128{frac64 | UINT64_C(0x0001000000000000), frac0}, 15);
-    return roundPackToExtF80(sign, exp, sig128.v64, sig128.v0, 80);
+        short_shift_left_128(uint128{frac64 | UINT64_C(0x0001000000000000), frac0}, 15);
+    return round_pack_to_extF80(sign, exp, sig128.v64, sig128.v0, 80);
 }

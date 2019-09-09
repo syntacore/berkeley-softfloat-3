@@ -47,8 +47,8 @@ f128_to_i32(float128_t const a,
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
     bool sign = is_sign(uiA64);
-    int32_t const exp = expF128UI64(uiA64);
-    uint64_t sig64 = fracF128UI64(uiA64);
+    int32_t const exp = exp_F128_UI64(uiA64);
+    uint64_t sig64 = frac_F128_UI64(uiA64);
     uint64_t const sig0 = uiA0;
 
     if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
@@ -72,9 +72,9 @@ f128_to_i32(float128_t const a,
     int32_t const shiftDist = 0x4023 - exp;
 
     if (0 < shiftDist) {
-        sig64 = shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
+        sig64 = shift_right_jam_64(sig64, static_cast<uint32_t>(shiftDist));
     }
 
-    return roundPackTo<int32_t>(sign, sig64, roundingMode, exact);
+    return round_pack_to<int32_t>(sign, sig64, roundingMode, exact);
 }
 

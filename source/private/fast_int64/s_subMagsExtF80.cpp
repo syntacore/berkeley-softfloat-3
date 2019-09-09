@@ -47,8 +47,8 @@ sub_magnitudes(uint16_t const uiA64,
                uint64_t const uiB0,
                bool const signZ)
 {
-    int32_t const expA = expExtF80UI64(uiA64);
-    int32_t const expB = expExtF80UI64(uiB64);
+    int32_t const expA = exp_extF80_UI64(uiA64);
+    int32_t const expB = exp_extF80_UI64(uiB64);
     int32_t expDiff = expA - expB;
 
     if (0 < expDiff) {
@@ -73,14 +73,14 @@ sub_magnitudes(uint16_t const uiA64,
             if (0 == expDiff) {
                 uint128 const sig128_6 = sub(uint128{uiA0, 0}, uint128{uiB0, 0});
                 return
-                    normRoundPackToExtF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_roundingPrecision);
+                    norm_round_pack_to_extF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_rounding_precision);
             }
         }
 
-        uint128 const sig128_2 = shiftRightJam128(uiB0, 0, static_cast<uint32_t>(expDiff));
+        uint128 const sig128_2 = shift_right_jam_128(uiB0, 0, static_cast<uint32_t>(expDiff));
         uint128 const sig128_1 = sub(uint128{uiA0, 0}, sig128_2);
         return
-            normRoundPackToExtF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_roundingPrecision);
+            norm_round_pack_to_extF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_rounding_precision);
     }
 
     if (expDiff < 0) {
@@ -94,7 +94,7 @@ sub_magnitudes(uint16_t const uiA64,
             }
 
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(!signZ, 0x7FFF);
+            uZ.signExp = pack_to_extF80_UI64(!signZ, 0x7FFF);
             uZ.signif = UINT64_C(0x8000000000000000);
             return uZ;
         }
@@ -105,14 +105,14 @@ sub_magnitudes(uint16_t const uiA64,
             if (0 == expDiff) {
                 uint128 const sig128_7 = sub(uint128{uiB0, 0}, uint128{uiA0, 0});
                 return
-                    normRoundPackToExtF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_roundingPrecision);
+                    norm_round_pack_to_extF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_rounding_precision);
             }
         }
 
-        uint128 const sig128_4 = shiftRightJam128(uiA0, 0, static_cast<uint32_t>(-expDiff));
+        uint128 const sig128_4 = shift_right_jam_128(uiA0, 0, static_cast<uint32_t>(-expDiff));
         uint128 const sig128_3 = sub(uint128{uiB0, 0}, sig128_4);
         return
-            normRoundPackToExtF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_roundingPrecision);
+            norm_round_pack_to_extF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_rounding_precision);
     }
 
     if (0x7FFF == expA) {
@@ -135,17 +135,17 @@ sub_magnitudes(uint16_t const uiA64,
 
     if (uiA0 > uiB0) {
         uint128 const sig128 = sub(uint128{uiA0, 0}, uint128{uiB0, 0});
-        return normRoundPackToExtF80(signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
+        return norm_round_pack_to_extF80(signZ, expZ, sig128.v64, sig128.v0, extF80_rounding_precision);
     }
 
     if (uiA0 < uiB0) {
         uint128 const sig128 = sub(uint128{uiB0, 0}, uint128{uiA0, 0});
-        return normRoundPackToExtF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_roundingPrecision);
+        return norm_round_pack_to_extF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_rounding_precision);
     }
 
     /* uiA0 == uiB0 */
     extFloat80_t uZ;
-    uZ.signExp = packToExtF80UI64(softfloat_round_min == softfloat_get_roundingMode(), 0);
+    uZ.signExp = pack_to_extF80_UI64(softfloat_round_min == softfloat_get_roundingMode(), 0);
     uZ.signif = 0;
     return uZ;
 }

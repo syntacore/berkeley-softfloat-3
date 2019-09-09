@@ -41,7 +41,7 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_shiftRightM(size_t const size_words,
+shift_right_M(size_t const size_words,
                       uint32_t const* aPtr,
                       uint32_t const dist,
                       uint32_t* zPtr)
@@ -49,23 +49,23 @@ softfloat_shiftRightM(size_t const size_words,
     uint32_t wordDist = dist >> 5;
 
     if (wordDist < size_words) {
-        aPtr += indexMultiwordHiBut(size_words, wordDist);
+        aPtr += index_multiword_hi_but(size_words, wordDist);
         uint8_t const innerDist = 31u & dist;
 
         if (innerDist) {
             /** @todo Warning   C4244   function': conversion from 'uint32_t' to 'uint8_t', possible loss of data */
-            softfloat_shortShiftRightM(
+            short_shift_right_M(
                 size_words - wordDist,
                 aPtr,
                 innerDist,
-                zPtr + indexMultiwordLoBut(size_words, wordDist));
+                zPtr + index_multiword_lo_but(size_words, wordDist));
 
             if (!wordDist) {
                 return;
             }
         } else {
-            aPtr += indexWordLo(size_words - wordDist);
-            uint32_t* destPtr = zPtr + indexWordLo(size_words);
+            aPtr += index_word_lo(size_words - wordDist);
+            uint32_t* destPtr = zPtr + index_word_lo(size_words);
 
             /**
             @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint8_t', possible loss of data
@@ -77,7 +77,7 @@ softfloat_shiftRightM(size_t const size_words,
             }
         }
 
-        zPtr += indexMultiwordHi(size_words, wordDist);
+        zPtr += index_multiword_hi(size_words, wordDist);
     } else {
         wordDist = size_words;
     }

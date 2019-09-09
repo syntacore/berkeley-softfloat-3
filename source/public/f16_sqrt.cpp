@@ -77,8 +77,8 @@ f16_sqrt(float16_t a)
     sigA |= 0x0400;
     int const index = (sigA >> 6 & 0xE) + expA;
     uint16_t const r0 =
-        approxRecipSqrt_1k0s[index] -
-        ((static_cast<uint32_t>(approxRecipSqrt_1k1s[index]) * (sigA & 0x7F)) >> 11);
+        approx_recip_sqrt_1k0s[index] -
+        ((static_cast<uint32_t>(approx_recip_sqrt_1k1s[index]) * (sigA & 0x7F)) >> 11);
     uint32_t ESqrR0 = (static_cast<uint32_t>(r0) * r0) >> 1;
 
     if (expA) {
@@ -114,5 +114,5 @@ f16_sqrt(float16_t a)
         }
     }
 
-    return roundPackToF16(0, expZ, sigZ);
+    return round_pack_to_F16(0, expZ, sigZ);
 }

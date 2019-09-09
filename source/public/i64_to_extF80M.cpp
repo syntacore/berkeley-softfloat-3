@@ -36,22 +36,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 void
-i64_to_extF80M(int64_t a, extFloat80_t *zPtr)
+i64_to_extF80M(int64_t a,
+               extFloat80_t* zPtr)
 {
 #if (SOFTFLOAT_FAST_INT64)
     *zPtr = i64_to_extF80(a);
 #else
     using namespace softfloat::internals::slow_int64;
-    extFloat80M *const zSPtr = zPtr;
+    extFloat80M* const zSPtr = zPtr;
     uint16_t uiZ64 = 0;
     uint64_t sigZ = 0;
+
     if (0 != a) {
         bool const sign = a < 0;
         uint64_t const absA = static_cast<uint64_t>(sign ? -a : a);
         auto const shiftDist = count_leading_zeros(absA);
-        uiZ64 = packToExtF80UI64(sign, 0x403Eu - shiftDist);
+        uiZ64 = pack_to_extF80_UI64(sign, 0x403Eu - shiftDist);
         sigZ = absA << shiftDist;
     }
+
     zSPtr->signExp = uiZ64;
     zSPtr->signif = sigZ;
 #endif

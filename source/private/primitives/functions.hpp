@@ -49,8 +49,8 @@ into the least-significant bit of the shifted value by setting the least-
 significant bit to 1.  This shifted-and-jammed value is returned.
 */
 inline constexpr uint64_t
-shortShiftRightJam64(uint64_t a,
-                     uint8_t dist)
+short_shift_right_jam_64(uint64_t a,
+                         uint8_t dist)
 {
     return
         (a >> (dist >= 63 ? 63 : dist)) |
@@ -67,8 +67,8 @@ greater than 32, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
 inline uint32_t
-shiftRightJam32(uint32_t a,
-                uint16_t dist)
+shift_right_jam_32(uint32_t a,
+                   uint16_t dist)
 {
     auto const dist1 = dist >= 31 ? 31 : dist;
     auto const mask = ~(~UINT32_C(0) << dist1);
@@ -86,8 +86,8 @@ greater than 64, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
 inline uint64_t
-shiftRightJam64(uint64_t a,
-                          uint32_t dist)
+shift_right_jam_64(uint64_t a,
+                   uint32_t dist)
 {
     auto const dist1 = dist >= 63 ? 63 : dist;
     auto const mask = ~(~UINT64_C(0) << dist1);
@@ -100,7 +100,7 @@ A constant table that translates an 8-bit unsigned integer (the array index)
 into the number of leading 0 bits before the most-significant 1 of that
 integer.  For integer zero (index 0), the corresponding table element is 8.
 */
-extern const uint_least8_t countLeadingZeros8[256];
+extern const uint_least8_t count_leading_zeros_8[256];
 
 /**
 @returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, sizeof(Ty) * CHAR_BIT is returned.
@@ -108,35 +108,35 @@ extern const uint_least8_t countLeadingZeros8[256];
 inline uint8_t
 count_leading_zeros(uint8_t a)
 {
-    return countLeadingZeros8[a];
+    return count_leading_zeros_8[a];
 }
 
 inline uint8_t
 count_leading_zeros(uint16_t a)
 {
     return 0 == (a >> CHAR_BIT) ?
-        count_leading_zeros(uint8_t(a)) + CHAR_BIT :
-        count_leading_zeros(uint8_t(a >> CHAR_BIT));
+           count_leading_zeros(uint8_t(a)) + CHAR_BIT :
+           count_leading_zeros(uint8_t(a >> CHAR_BIT));
 }
 
 inline uint8_t
 count_leading_zeros(uint32_t a)
 {
     return 0 == (a >> sizeof(uint16_t) * CHAR_BIT) ?
-        count_leading_zeros(uint16_t(a)) + sizeof(uint16_t) * CHAR_BIT :
-        count_leading_zeros(uint16_t(a >> sizeof(uint16_t) * CHAR_BIT));
+           count_leading_zeros(uint16_t(a)) + sizeof(uint16_t) * CHAR_BIT :
+           count_leading_zeros(uint16_t(a >> sizeof(uint16_t) * CHAR_BIT));
 }
 
 inline uint8_t
 count_leading_zeros(uint64_t a)
 {
     return 0 == (a >> sizeof(uint32_t) * CHAR_BIT) ?
-        count_leading_zeros(uint32_t(a)) + sizeof(uint32_t) * CHAR_BIT :
-        count_leading_zeros(uint32_t(a >> sizeof(uint32_t) * CHAR_BIT));
+           count_leading_zeros(uint32_t(a)) + sizeof(uint32_t) * CHAR_BIT :
+           count_leading_zeros(uint32_t(a >> sizeof(uint32_t) * CHAR_BIT));
 }
 
-extern const uint16_t approxRecip_1k0s[16];
-extern const uint16_t approxRecip_1k1s[16];
+extern const uint16_t approx_recip_1k0s[16];
+extern const uint16_t approx_recip_1k1s[16];
 
 /**
 Returns an approximation to the reciprocal of the number represented by `a',
@@ -153,7 +153,7 @@ reciprocal 1/A, and it differs from the true reciprocal by at most 2.006 ulp
 #if (SOFTFLOAT_FAST_DIV64TO32)
 
 inline uint32_t
-approxRecip32_1(uint32_t a)
+approx_recip_32_1(uint32_t a)
 {
     return static_cast<uint32_t>(INT64_MAX / static_cast<uint32_t>(a));
 }
@@ -161,13 +161,13 @@ approxRecip32_1(uint32_t a)
 #else
 
 inline uint32_t
-approxRecip32_1(uint32_t a)
+approx_recip_32_1(uint32_t a)
 {
     auto const index = a >> 27 & 0xF;
     uint16_t const eps = static_cast<uint16_t>(a >> 11);
     uint16_t const r0 =
-        approxRecip_1k0s[index] -
-        ((approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
+        approx_recip_1k0s[index] -
+        ((approx_recip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
     uint32_t const sigma0 = ~static_cast<uint32_t>((r0 * static_cast<uint64_t>(a)) >> 7);
     uint32_t const r =
         (static_cast<uint32_t>(r0) << 16) +
@@ -178,8 +178,8 @@ approxRecip32_1(uint32_t a)
 
 #endif
 
-extern const uint16_t approxRecipSqrt_1k0s[16];
-extern const uint16_t approxRecipSqrt_1k1s[16];
+extern const uint16_t approx_recip_sqrt_1k0s[16];
+extern const uint16_t approx_recip_sqrt_1k1s[16];
 
 /**
 Returns an approximation to the reciprocal of the square root of the number
@@ -200,8 +200,8 @@ returned is also always within the range 0.5 to 1; thus, the most-
 significant bit of the result is always set.
 */
 uint32_t
-approxRecipSqrt32_1(uint32_t oddExpA,
-                              uint32_t a);
+approx_recip_sqrt_32_1(uint32_t oddExpA,
+                       uint32_t a);
 
 namespace fast_int64 {
 using namespace internals;
@@ -213,16 +213,16 @@ concatenating `b64' and `b0'.
 */
 inline constexpr bool
 le(uint64_t const& a64,
-                uint64_t const& a0,
-                uint64_t const& b64,
-                uint64_t const& b0)
+   uint64_t const& a0,
+   uint64_t const& b64,
+   uint64_t const& b0)
 {
     return a64 < b64 || (a64 == b64 && a0 <= b0);
 }
 
 inline constexpr bool
 le(uint128 const& a,
-                uint128 const& b)
+   uint128 const& b)
 {
     return le(a.v64, a.v0, b.v64, b.v64);
 }
@@ -234,9 +234,9 @@ and `a0' is less than the 128-bit unsigned integer formed by concatenating
 */
 inline constexpr bool
 lt(uint64_t const& a64,
-                uint64_t const& a0,
-                uint64_t const& b64,
-                uint64_t const& b0)
+   uint64_t const& a0,
+   uint64_t const& b64,
+   uint64_t const& b0)
 {
     return
         a64 < b64 ||
@@ -245,7 +245,7 @@ lt(uint64_t const& a64,
 
 inline constexpr bool
 lt(uint128 const& a,
-                uint128 const& b)
+   uint128 const& b)
 {
     return lt(a.v64, a.v0, b.v64, b.v0);
 }
@@ -262,8 +262,8 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' left by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-shortShiftLeft128(uint128 const& a,
-                  uint8_t const dist)
+short_shift_left_128(uint128 const& a,
+                     uint8_t const dist)
 {
     return uint128{a.v64 << dist | a.v0 >> (63u & -static_cast<int8_t>(dist)), a.v0 << dist};
 }
@@ -273,14 +273,14 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' right by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-shortShiftRight128(uint128 const& a,
-                   uint8_t const dist)
+short_shift_right_128(uint128 const& a,
+                      uint8_t const dist)
 {
     return uint128{a.v64 >> dist, a.v64 << (63 & -dist) | a.v0 >> dist};
 }
 
 /**
-This function is the same as `shiftRightJam64Extra' (below),
+This function is the same as `shift_right_jam_64Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
 inline uint64_extra
@@ -299,24 +299,24 @@ bit of the shifted value by setting the least-significant bit to 1.  This
 shifted-and-jammed value is returned.
 */
 inline uint128
-shortShiftRightJam128(uint128 const& a,
-                      uint8_t const dist)
+short_shift_right_jam_128(uint128 const& a,
+                          uint8_t const dist)
 {
     auto const negDist = 63 & -static_cast<int8_t>(dist);
     return uint128{
         a.v64 >> dist,
-        a.v64 << negDist | a.v0 >> dist | !!(0 != (a.v0 << negDist))
+              a.v64 << negDist | a.v0 >> dist | !!(0 != (a.v0 << negDist))
     };
 }
 
 /**
-This function is the same as `shiftRightJam128Extra' (below),
+This function is the same as `shift_right_jam_128Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
 inline uint128_extra
-shortShiftRightJam128Extra(uint128 const& a,
-                           uint64_t const& extra,
-                           uint8_t const dist)
+short_shift_right_jam_128Extra(uint128 const& a,
+                               uint64_t const& extra,
+                               uint8_t const dist)
 {
     auto const uNegDist = 63 & -static_cast<int8_t>(dist);
     uint128_extra z;
@@ -343,9 +343,9 @@ field of the result.  The fractional part of the shifted value is modified
 as described above and returned in the `extra' field of the result.)
 */
 inline uint64_extra
-shiftRightJam64Extra(uint64_t a,
-                     uint64_t extra,
-                     uint32_t dist)
+shift_right_jam_64Extra(uint64_t a,
+                        uint64_t extra,
+                        uint32_t dist)
 {
     uint64_extra z;
 
@@ -372,15 +372,15 @@ greater than 128, the result will be either 0 or 1, depending on whether the
 original 128 bits are all zeros.
 */
 uint128
-shiftRightJam128(uint64_t a64,
-                 uint64_t a0,
-                 uint32_t dist);
+shift_right_jam_128(uint64_t a64,
+                    uint64_t a0,
+                    uint32_t dist);
 
 inline uint128
-shiftRightJam128(uint128 const& a,
-                 uint32_t const dist)
+shift_right_jam_128(uint128 const& a,
+                    uint32_t const dist)
 {
-    return shiftRightJam128(a.v64, a.v0, dist);
+    return shift_right_jam_128(a.v64, a.v0, dist);
 }
 
 /**
@@ -401,24 +401,24 @@ is modified as described above and returned in the `extra' field of the
 result.)
 */
 uint128_extra
-shiftRightJam128Extra(uint64_t a64,
-                                uint64_t a0,
-                                uint64_t extra,
-                                uint32_t dist);
+shift_right_jam_128Extra(uint64_t a64,
+                         uint64_t a0,
+                         uint64_t extra,
+                         uint32_t dist);
 
 inline uint128_extra
-shiftRightJam128Extra(uint128 const& a,
-                      uint64_t const& extra,
-                      uint32_t const& dist)
+shift_right_jam_128Extra(uint128 const& a,
+                         uint64_t const& extra,
+                         uint32_t const& dist)
 {
-    return shiftRightJam128Extra(a.v64, a.v0, extra, dist);
+    return shift_right_jam_128Extra(a.v64, a.v0, extra, dist);
 }
 
 inline uint128_extra
-shiftRightJam128Extra(uint128_extra const& a,
-                      uint32_t const& dist)
+shift_right_jam_128Extra(uint128_extra const& a,
+                         uint32_t const& dist)
 {
-    return shiftRightJam128Extra(a.v, a.extra, dist);
+    return shift_right_jam_128Extra(a.v, a.extra, dist);
 }
 
 /**
@@ -428,7 +428,7 @@ addition is modulo 2^128, so any carry out is lost.
 */
 inline constexpr uint128
 add(uint128 const& a,
-                 uint128 const& b)
+    uint128 const& b)
 {
     return uint128{a.v64 + b.v64 + !!(a.v0 + b.v0 < a.v0), a.v0 + b.v0};
 }
@@ -441,18 +441,18 @@ an array of four 64-bit elements that concatenate in the platform's normal
 endian order to form a 256-bit integer.
 */
 inline void
-add256M(uint64_t const* const aPtr,
-        uint64_t const* const bPtr,
-        uint64_t* const zPtr)
+add_M_256(uint64_t const* const aPtr,
+          uint64_t const* const bPtr,
+          uint64_t* const zPtr)
 {
     bool carry = false;
 
-    for (auto index = indexWordLo(4);; index += wordIncr) {
+    for (auto index = index_word_lo(4);; index += wordIncr) {
         uint64_t const wordA = aPtr[index];
         uint64_t const wordZ = wordA + bPtr[index] + !!carry;
         zPtr[index] = wordZ;
 
-        if (index == indexWordHi(4)) {
+        if (index == index_word_hi(4)) {
             break;
         }
 
@@ -483,22 +483,22 @@ by `zPtr'.  Each of `aPtr', `bPtr', and `zPtr' points to an array of four
 form a 256-bit integer.
 */
 void
-sub256M(uint64_t const* aPtr,
-                  uint64_t const* bPtr,
-                  uint64_t* zPtr);
+sub_M_256(uint64_t const* aPtr,
+          uint64_t const* bPtr,
+          uint64_t* zPtr);
 
 /**
 @return the 128-bit product of `a', `b', and 2^32.
 */
 inline uint128
-mul64ByShifted32To128(uint64_t const& a,
-                      uint32_t const& b)
+mul_64_by_shifted_32_to_128(uint64_t const& a,
+                            uint32_t const& b)
 {
     uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a)) * b;
     return
-        uint128{
+    uint128{
         mid << 32,
-        static_cast<uint64_t>(static_cast<uint32_t>(a >> 32)) * b + (mid >> 32)
+            static_cast<uint64_t>(static_cast<uint32_t>(a >> 32))* b + (mid >> 32)
     };
 }
 
@@ -506,8 +506,8 @@ mul64ByShifted32To128(uint64_t const& a,
 @returns the 128-bit product of `a' and `b'.
 */
 uint128
-mul64To128(uint64_t a,
-                     uint64_t b);
+mul_64_to_128(uint64_t a,
+              uint64_t b);
 
 /**
 @returns the product of the 128-bit integer formed by concatenating `a64' and
@@ -515,21 +515,21 @@ mul64To128(uint64_t a,
 bits are discarded.
 */
 inline uint128
-mul128By32(uint64_t const& a64,
-           uint64_t const& a0,
-           uint32_t const& b)
+mul_128_by_32(uint64_t const& a64,
+              uint64_t const& a0,
+              uint32_t const& b)
 {
     uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a0 >> 32)) * b;
     uint64_t const v0 = a0 * b;
     uint32_t const carry = static_cast<uint32_t>(static_cast<uint32_t>(v0 >> 32) - static_cast<uint32_t>(mid));
-    return uint128{a64 * b + static_cast<uint32_t>((mid + carry) >> 32), v0};
+    return uint128{a64* b + static_cast<uint32_t>((mid + carry) >> 32), v0};
 }
 
 inline uint128
-mul128By32(uint128 const& a,
-           uint32_t const& b)
+mul_128_by_32(uint128 const& a,
+              uint32_t const& b)
 {
-    return mul128By32(a.v64, a.v0, b);
+    return mul_128_by_32(a.v64, a.v0, b);
 }
 
 /**
@@ -540,18 +540,18 @@ Argument `zPtr' points to an array of four 64-bit elements that concatenate
 in the platform's normal endian order to form a 256-bit integer.
 */
 void
-mul128To256M(uint64_t const& a64,
-             uint64_t const& a0,
-             uint64_t const& b64,
-             uint64_t const& b0,
-             uint64_t* zPtr);
+mul_M_128_to_256(uint64_t const& a64,
+                 uint64_t const& a0,
+                 uint64_t const& b64,
+                 uint64_t const& b0,
+                 uint64_t* zPtr);
 
 inline void
-mul128To256M(uint128 const& a,
-             uint128 const& b,
-             uint64_t* const zPtr)
+mul_M_128_to_256(uint128 const& a,
+                 uint128 const& b,
+                 uint64_t* const zPtr)
 {
-    mul128To256M(a.v64, a.v0, b.v64, b.v0, zPtr);
+    mul_M_128_to_256(a.v64, a.v0, b.v64, b.v0, zPtr);
 }
 
 }  // namespace fast_int64
@@ -574,8 +574,8 @@ Each of `aPtr' and `bPtr' points to an array of three 32-bit elements that
 concatenate in the platform's normal endian order to form a 96-bit integer.
 */
 int
-softfloat_compare96M(uint32_t const* aPtr,
-                     uint32_t const* bPtr);
+compare_M_96(uint32_t const* aPtr,
+             uint32_t const* bPtr);
 
 /**
 Compares the two 128-bit unsigned integers pointed to by `aPtr' and `bPtr'.
@@ -586,8 +586,8 @@ Each of `aPtr' and `bPtr' points to an array of four 32-bit elements that
 concatenate in the platform's normal endian order to form a 128-bit integer.
 */
 int
-softfloat_compare128M(uint32_t const* aPtr,
-                      uint32_t const* bPtr);
+compare_M_128(uint32_t const* aPtr,
+              uint32_t const* bPtr);
 
 /**
 Extends `a' to 96 bits and shifts the value left by the number of bits given
@@ -597,14 +597,14 @@ location pointed to by `zPtr'.  Argument `zPtr' points to an array of three
 form a 96-bit integer.
 */
 inline void
-softfloat_shortShiftLeft64To96M(uint64_t a,
-                                uint8_t dist,
-                                uint32_t* zPtr)
+short_shift_left_M_64_to_96(uint64_t a,
+                           uint8_t dist,
+                           uint32_t* zPtr)
 {
-    zPtr[indexWord(3, 0)] = static_cast<uint32_t>(a) << dist;
+    zPtr[index_word(3, 0)] = static_cast<uint32_t>(a) << dist;
     a >>= 32 - dist;
-    zPtr[indexWord(3, 2)] = a >> 32;
-    zPtr[indexWord(3, 1)] = static_cast<uint32_t>(a);
+    zPtr[index_word(3, 2)] = a >> 32;
+    zPtr[index_word(3, 1)] = static_cast<uint32_t>(a);
 }
 
 /**
@@ -617,39 +617,54 @@ that concatenate in the platform's normal endian order to form an N-bit
 integer.
 */
 void
-softfloat_shortShiftLeftM(size_t size_words,
-                          uint32_t const* aPtr,
-                          uint8_t dist,
-                          uint32_t* zPtr);
+short_shift_left_M(size_t size_words,
+                   uint32_t const* aPtr,
+                   uint8_t dist,
+                   uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_shortShiftLeftM' with
+This function or macro is the same as `short_shift_left_M' with
 `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_shortShiftLeft96M(uint32_t const* aPtr, uint8_t dist, uint32_t* zPtr)
+short_shift_left_M_96(uint32_t const* aPtr,
+                     uint8_t dist,
+                     uint32_t* zPtr)
 {
-    softfloat_shortShiftLeftM(3u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    short_shift_left_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shortShiftLeftM' with
+This function or macro is the same as `short_shift_left_M' with
 `size_words' = 4 (N = 128).
 */
 inline void
-softfloat_shortShiftLeft128M(uint32_t const* aPtr, uint8_t dist, uint32_t* zPtr)
+short_shift_left_M_128(uint32_t const* aPtr,
+                       uint8_t dist,
+                       uint32_t* zPtr)
 {
-    softfloat_shortShiftLeftM(4u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    short_shift_left_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shortShiftLeftM' with
+This function or macro is the same as `short_shift_left_M' with
 `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_shortShiftLeft160M(uint32_t const* aPtr, uint8_t dist, uint32_t* zPtr)
+short_shift_left_M_160(uint32_t const* aPtr,
+                       uint8_t dist,
+                       uint32_t* zPtr)
 {
-    softfloat_shortShiftLeftM(5u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    short_shift_left_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
@@ -667,42 +682,51 @@ concatenate in the platform's normal endian order to form an N-bit integer.
 @param[out] zPtr pointer to store location for the shifted N-bit result.
 */
 void
-softfloat_shiftLeftM(size_t size_words,
-                     uint32_t const* aPtr,
-                     uint32_t dist,
-                     uint32_t* zPtr);
+shift_left_M(size_t size_words,
+             uint32_t const* aPtr,
+             uint32_t dist,
+             uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_shiftLeftM' with `size_words' = 3 (N = 96).
+This function or macro is the same as `shift_left_M' with `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_shiftLeft96M(uint32_t const* aPtr,
-                       uint32_t dist,
-                       uint32_t* zPtr)
+shift_left_M_96(uint32_t const* aPtr,
+                uint32_t dist,
+                uint32_t* zPtr)
 {
-    softfloat_shiftLeftM(3u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_left_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shiftLeftM' with `size_words' = 4 (N = 128).
+This function or macro is the same as `shift_left_M' with `size_words' = 4 (N = 128).
 */
 inline void
-softfloat_shiftLeft128M(uint32_t const* aPtr,
-                        uint32_t dist,
-                        uint32_t* zPtr)
+shift_left_M_128(uint32_t const* aPtr,
+                 uint32_t dist,
+                 uint32_t* zPtr)
 {
-    softfloat_shiftLeftM(4u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_left_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shiftLeftM' with `size_words' = 5 (N = 160).
+This function or macro is the same as `shift_left_M' with `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_shiftLeft160M(uint32_t const* aPtr,
-                        uint32_t dist,
-                        uint32_t* zPtr)
+shift_left_M_160(uint32_t const* aPtr,
+                 uint32_t dist,
+                 uint32_t* zPtr)
 {
-    softfloat_shiftLeftM(5u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_left_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
@@ -715,33 +739,39 @@ that concatenate in the platform's normal endian order to form an N-bit
 integer.
 */
 void
-softfloat_shortShiftRightM(size_t size_words,
-                           uint32_t const* aPtr,
-                           uint8_t dist,
-                           uint32_t* zPtr);
+short_shift_right_M(size_t size_words,
+                    uint32_t const* aPtr,
+                    uint8_t dist,
+                    uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_shortShiftRightM' with
+This function or macro is the same as `short_shift_right_M' with
 `size_words' = 4 (N = 128).
 */
 inline void
-shortShiftRight128M(uint32_t const* aPtr,
-                              uint8_t dist,
-                              uint32_t* zPtr)
+short_shift_right_M_128(uint32_t const* aPtr,
+                        uint8_t dist,
+                        uint32_t* zPtr)
 {
-    softfloat_shortShiftRightM(4u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    short_shift_right_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shortShiftRightM' with
+This function or macro is the same as `short_shift_right_M' with
 `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_shortShiftRight160M(uint32_t const* aPtr,
-                              uint8_t dist,
-                              uint32_t* zPtr)
+short_shift_right_M_160(uint32_t const* aPtr,
+                        uint8_t dist,
+                        uint32_t* zPtr)
 {
-    softfloat_shortShiftRightM(5u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    short_shift_right_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
@@ -755,21 +785,24 @@ to a `size_words'-long array of 32-bit elements that concatenate in the
 platform's normal endian order to form an N-bit integer.
 */
 void
-softfloat_shortShiftRightJamM(size_t size_words,
-                              uint32_t const* aPtr,
-                              uint8_t dist,
-                              uint32_t* zPtr);
+short_shift_right_jam_M(size_t size_words,
+                        uint32_t const* aPtr,
+                        uint8_t dist,
+                        uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_shortShiftRightJamM' with
+This function or macro is the same as `short_shift_right_jam_M' with
 `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_shortShiftRightJam160M(uint32_t const* aPtr,
-                                 uint8_t dist,
-                                 uint32_t* zPtr)
+short_shift_right_jam_M_160(uint32_t const* aPtr,
+                            uint8_t dist,
+                            uint32_t* zPtr)
 {
-    softfloat_shortShiftRightJamM(5u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    short_shift_right_jam_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
@@ -783,21 +816,24 @@ The value of `dist' can be arbitrarily large.  In particular, if `dist' is
 greater than N, the stored result will be 0.
 */
 void
-softfloat_shiftRightM(size_t size_words,
-                      uint32_t const* aPtr,
-                      uint32_t dist,
-                      uint32_t* zPtr);
+shift_right_M(size_t size_words,
+              uint32_t const* aPtr,
+              uint32_t dist,
+              uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_shiftRightM' with
+This function or macro is the same as `shift_right_M' with
 `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_shiftRight96M(uint32_t const* aPtr,
-                        uint8_t dist,
-                        uint32_t* zPtr)
+shift_right_M_96(uint32_t const* aPtr,
+                 uint8_t dist,
+                 uint32_t* zPtr)
 {
-    softfloat_shiftRightM(3u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_right_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
@@ -814,45 +850,54 @@ is greater than N, the stored result will be either 0 or 1, depending on
 whether the original N bits are all zeros.
 */
 void
-softfloat_shiftRightJamM(size_t size_words,
-                         uint32_t const* aPtr,
-                         uint32_t dist,
-                         uint32_t* zPtr);
+shift_right_jam_M(size_t size_words,
+                  uint32_t const* aPtr,
+                  uint32_t dist,
+                  uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_shiftRightJamM' with
+This function or macro is the same as `shift_right_jam_M' with
 `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_shiftRightJam96M(uint32_t const* aPtr,
-                           uint8_t dist,
-                           uint32_t* zPtr)
+shift_right_jam_M_96(uint32_t const* aPtr,
+                     uint8_t dist,
+                     uint32_t* zPtr)
 {
-    softfloat_shiftRightJamM(3u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_right_jam_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shiftRightJamM' with
+This function or macro is the same as `shift_right_jam_M' with
 `size_words' = 4 (N = 128).
 */
 inline void
-softfloat_shiftRightJam128M(uint32_t const* aPtr,
-                            uint8_t dist,
-                            uint32_t* zPtr)
+shift_right_jam_M_128(uint32_t const* aPtr,
+                      uint8_t dist,
+                      uint32_t* zPtr)
 {
-    softfloat_shiftRightJamM(4u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_right_jam_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_shiftRightJamM' with
+This function or macro is the same as `shift_right_jam_M' with
 `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_shiftRightJam160M(uint32_t const* aPtr,
-                            uint8_t dist,
-                            uint32_t* zPtr)
+shift_right_jam_M_160(uint32_t const* aPtr,
+                      uint8_t dist,
+                      uint32_t* zPtr)
 {
-    softfloat_shiftRightJamM(5u, aPtr, dist, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    shift_right_jam_M(num_words, aPtr, dist, zPtr);
 }
 
 /**
@@ -864,45 +909,54 @@ elements that concatenate in the platform's normal endian order to form an
 N-bit integer.
 */
 void
-softfloat_addM(size_t size_words,
-               uint32_t const* aPtr,
-               uint32_t const* bPtr,
-               uint32_t* zPtr);
+add_M(size_t size_words,
+      uint32_t const* aPtr,
+      uint32_t const* bPtr,
+      uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_addM' with `size_words'
+This function or macro is the same as `add_M' with `size_words'
 = 3 (N = 96).
 */
 inline void
-softfloat_add96M(uint32_t const* aPtr,
-                 uint32_t const* bPtr,
-                 uint32_t* zPtr)
+add_M_96(uint32_t const* aPtr,
+         uint32_t const* bPtr,
+         uint32_t* zPtr)
 {
-    softfloat_addM(3u, aPtr, bPtr, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    add_M(num_words, aPtr, bPtr, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_addM' with `size_words'
+This function or macro is the same as `add_M' with `size_words'
 = 4 (N = 128).
 */
 inline void
-softfloat_add128M(uint32_t const* aPtr,
-                  uint32_t const* bPtr,
-                  uint32_t* zPtr)
+add_M_128(uint32_t const* aPtr,
+          uint32_t const* bPtr,
+          uint32_t* zPtr)
 {
-    softfloat_addM(4u, aPtr, bPtr, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    add_M(num_words, aPtr, bPtr, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_addM' with `size_words'
+This function or macro is the same as `add_M' with `size_words'
 = 5 (N = 160).
 */
 inline void
-softfloat_add160M(uint32_t const* aPtr,
-                  uint32_t const* bPtr,
-                  uint32_t* zPtr)
+add_M_160(uint32_t const* aPtr,
+          uint32_t const* bPtr,
+          uint32_t* zPtr)
 {
-    softfloat_addM(5u, aPtr, bPtr, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    add_M(num_words, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -914,35 +968,38 @@ points to a `size_words'-long array of 32-bit elements that concatenate in
 the platform's normal endian order to form an N-bit integer.
 */
 bool
-softfloat_addCarryM(size_t size_words,
-                    uint32_t const* aPtr,
-                    uint32_t const* bPtr,
-                    bool carry,
-                    uint32_t* zPtr);
+add_carry_M(size_t size_words,
+            uint32_t const* aPtr,
+            uint32_t const* bPtr,
+            bool carry,
+            uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_addCarryM', except that
+This function or macro is the same as `add_carry_M', except that
 the value of the unsigned integer pointed to by `bPtr' is bit-wise completed
 before the addition.
 */
 bool
-softfloat_addComplCarryM(size_t size_words,
-                         uint32_t const* aPtr,
-                         uint32_t const* bPtr,
-                         bool carry,
-                         uint32_t* zPtr);
+add_compl_carry_M(size_t size_words,
+                  uint32_t const* aPtr,
+                  uint32_t const* bPtr,
+                  bool carry,
+                  uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_addComplCarryM' with
+This function or macro is the same as `add_compl_carry_M' with
 `size_words' = 3 (N = 96).
 */
 inline bool
-softfloat_addComplCarry96M(uint32_t const* aPtr,
-                           uint32_t const* bPtr,
-                           bool carry,
-                           uint32_t* zPtr)
+add_compl_carry_M_96(uint32_t const* aPtr,
+                     uint32_t const* bPtr,
+                     bool carry,
+                     uint32_t* zPtr)
 {
-    return softfloat_addComplCarryM(3u, aPtr, bPtr, carry, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    return add_compl_carry_M(num_words, aPtr, bPtr, carry, zPtr);
 }
 
 /**
@@ -952,45 +1009,57 @@ points to a `size_words'-long array of 32-bit elements that concatenate in
 the platform's normal endian order to form an N-bit integer.
 */
 void
-softfloat_negXM(uint8_t size_words,
-                uint32_t* zPtr);
+neg_M_X(uint8_t size_words,
+        uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_negXM' with `size_words'
+This function or macro is the same as `neg_M_X' with `size_words'
 = 3 (N = 96).
 */
 inline void
-softfloat_negX96M(uint32_t* zPtr)
+neg_M_X96(uint32_t* zPtr)
 {
-    softfloat_negXM(3, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    neg_M_X(num_words, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_negXM' with `size_words'
+This function or macro is the same as `neg_M_X' with `size_words'
 = 4 (N = 128).
 */
 inline void
-softfloat_negX128M(uint32_t* zPtr)
+neg_M_X128(uint32_t* zPtr)
 {
-    softfloat_negXM(4, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    neg_M_X(num_words, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_negXM' with `size_words' = 5 (N = 160).
+This function or macro is the same as `neg_M_X' with `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_negX160M(uint32_t* zPtr)
+neg_M_X160(uint32_t* zPtr)
 {
-    softfloat_negXM(5, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    neg_M_X(num_words, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_negXM' with `size_words' = 8 (N = 256).
+This function or macro is the same as `neg_M_X' with `size_words' = 8 (N = 256).
 */
 inline void
-softfloat_negX256M(uint32_t* zPtr)
+neg_M_X256(uint32_t* zPtr)
 {
-    softfloat_negXM(8, zPtr);
+    static constexpr size_t num_bits = 256u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    neg_M_X(num_words, zPtr);
 }
 
 /**
@@ -1001,25 +1070,31 @@ elements that concatenate in the platform's normal endian order to form an
 N-bit integer.
 */
 void
-softfloat_sub1XM(size_t size_words,
-                 uint32_t* zPtr);
+sub_1_M_X(size_t size_words,
+          uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_sub1XM' with `size_words' = 3 (N = 96).
+This function or macro is the same as `sub_1_M_X' with `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_sub1X96M(uint32_t* zPtr)
+sub_1_M_X96(uint32_t* zPtr)
 {
-    softfloat_sub1XM(3u, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    sub_1_M_X(num_words, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_sub1XM' with `size_words' = 5 (N = 160).
+This function or macro is the same as `sub_1_M_X' with `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_sub1X160M(uint32_t* zPtr)
+sub_1_M_X160(uint32_t* zPtr)
 {
-    softfloat_sub1XM(5u, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    sub_1_M_X(num_words, zPtr);
 }
 
 /**
@@ -1031,42 +1106,51 @@ array of 32-bit elements that concatenate in the platform's normal endian
 order to form an N-bit integer.
 */
 void
-softfloat_subM(size_t size_words,
-               uint32_t const* aPtr,
-               uint32_t const* bPtr,
-               uint32_t* zPtr);
+sub_M(size_t size_words,
+      uint32_t const* aPtr,
+      uint32_t const* bPtr,
+      uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_subM' with `size_words' = 3 (N = 96).
+This function or macro is the same as `sub_M' with `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_sub96M(uint32_t const* aPtr,
-                 uint32_t const* bPtr,
-                 uint32_t* zPtr)
+sub_M_96(uint32_t const* aPtr,
+         uint32_t const* bPtr,
+         uint32_t* zPtr)
 {
-    softfloat_subM(3u, aPtr, bPtr, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    sub_M(num_words, aPtr, bPtr, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_subM' with `size_words' = 4 (N = 128).
+This function or macro is the same as `sub_M' with `size_words' = 4 (N = 128).
 */
 inline void
-softfloat_sub128M(uint32_t const* aPtr,
-                  uint32_t const* bPtr,
-                  uint32_t* zPtr)
+sub_M_128(uint32_t const* aPtr,
+          uint32_t const* bPtr,
+          uint32_t* zPtr)
 {
-    softfloat_subM(4u, aPtr, bPtr, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    sub_M(num_words, aPtr, bPtr, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_subM' with `size_words' = 5 (N = 160).
+This function or macro is the same as `sub_M' with `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_sub160M(uint32_t const* aPtr,
-                  uint32_t const* bPtr,
-                  uint32_t* zPtr)
+sub_M_160(uint32_t const* aPtr,
+          uint32_t const* bPtr,
+          uint32_t* zPtr)
 {
-    softfloat_subM(5u, aPtr, bPtr, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    sub_M(num_words, aPtr, bPtr, zPtr);
 }
 
 /**
@@ -1076,9 +1160,9 @@ elements that concatenate in the platform's normal endian order to form a
 128-bit integer.
 */
 void
-softfloat_mul64To128M(uint64_t a,
-                      uint64_t b,
-                      uint32_t* zPtr);
+mul_M_64_to_128(uint64_t a,
+                uint64_t b,
+                uint32_t* zPtr);
 
 /**
 Multiplies the two 128-bit unsigned integers pointed to by `aPtr' and
@@ -1089,9 +1173,9 @@ Argument `zPtr' points to an array of eight 32-bit elements that concatenate
 to form a 256-bit integer.
 */
 void
-softfloat_mul128MTo256M(uint32_t const* aPtr,
-                        uint32_t const* bPtr,
-                        uint32_t* zPtr);
+mul_M_128_to_256(uint32_t const* aPtr,
+                 uint32_t const* bPtr,
+                 uint32_t* zPtr);
 
 /**
 Performs a "remainder reduction step" as follows:  Arguments `remPtr' and
@@ -1103,53 +1187,62 @@ to a `size_words'-long array of 32-bit elements that concatenate in the
 platform's normal endian order to form an N-bit integer.
 */
 void
-softfloat_remStepMBy32(uint8_t size_words,
-                       uint32_t const* remPtr,
-                       uint8_t dist,
-                       uint32_t const* bPtr,
-                       uint32_t q,
-                       uint32_t* zPtr);
+rem_step_by_32_M(uint8_t size_words,
+                 uint32_t const* remPtr,
+                 uint8_t dist,
+                 uint32_t const* bPtr,
+                 uint32_t q,
+                 uint32_t* zPtr);
 
 /**
-This function or macro is the same as `softfloat_remStepMBy32' with
+This function or macro is the same as `rem_step_by_32_M' with
 `size_words' = 3 (N = 96).
 */
 inline void
-softfloat_remStep96MBy32(uint32_t const* remPtr,
-                         uint8_t dist,
-                         uint32_t const* bPtr,
-                         uint32_t q,
-                         uint32_t* zPtr)
+rem_step_by_32_M_96(uint32_t const* remPtr,
+                    uint8_t dist,
+                    uint32_t const* bPtr,
+                    uint32_t q,
+                    uint32_t* zPtr)
 {
-    softfloat_remStepMBy32(3, remPtr, dist, bPtr, q, zPtr);
+    static constexpr size_t num_bits = 96u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    rem_step_by_32_M(num_words, remPtr, dist, bPtr, q, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_remStepMBy32' with
+This function or macro is the same as `rem_step_by_32_M' with
 `size_words' = 4 (N = 128).
 */
 inline void
-softfloat_remStep128MBy32(uint32_t const* remPtr,
-                          uint8_t dist,
-                          uint32_t const* bPtr,
-                          uint32_t q,
-                          uint32_t* zPtr)
+rem_step_by_32_M_128(uint32_t const* remPtr,
+                     uint8_t dist,
+                     uint32_t const* bPtr,
+                     uint32_t q,
+                     uint32_t* zPtr)
 {
-    softfloat_remStepMBy32(4, remPtr, dist, bPtr, q, zPtr);
+    static constexpr size_t num_bits = 128u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    rem_step_by_32_M(num_words, remPtr, dist, bPtr, q, zPtr);
 }
 
 /**
-This function or macro is the same as `softfloat_remStepMBy32' with
+This function or macro is the same as `rem_step_by_32_M' with
 `size_words' = 5 (N = 160).
 */
 inline void
-softfloat_remStep160MBy32(uint32_t const* remPtr,
-                          uint8_t dist,
-                          uint32_t const* bPtr,
-                          uint32_t q,
-                          uint32_t* zPtr)
+rem_step_M_160_by_32(uint32_t const* remPtr,
+                     uint8_t dist,
+                     uint32_t const* bPtr,
+                     uint32_t q,
+                     uint32_t* zPtr)
 {
-    softfloat_remStepMBy32(5, remPtr, dist, bPtr, q, zPtr);
+    static constexpr size_t num_bits = 160u;
+    static_assert(0 == num_bits % (CHAR_BIT * sizeof(uint32_t)), "bad number of bits");
+    static constexpr size_t num_words = num_bits / (CHAR_BIT * sizeof(uint32_t));
+    rem_step_by_32_M(num_words, remPtr, dist, bPtr, q, zPtr);
 }
 
 }  // namespace slow_int64

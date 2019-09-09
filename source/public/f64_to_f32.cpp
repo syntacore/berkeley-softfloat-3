@@ -45,10 +45,10 @@ f64_to_f32(float64_t a)
     uint64_t const frac = get_frac(a);
 
     if (is_finite(a)) {
-        uint32_t const frac32 = static_cast<uint32_t>(shortShiftRightJam64(frac, 22));
+        uint32_t const frac32 = static_cast<uint32_t>(short_shift_right_jam_64(frac, 22));
 
         if (0 != (exp | frac32)) {
-            return roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
+            return round_pack_to_F32(sign, exp - 0x381, frac32 | 0x40000000);
         }
 
         return make_signed_zero<float32_t>(sign);

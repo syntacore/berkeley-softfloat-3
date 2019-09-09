@@ -44,7 +44,7 @@ namespace slow_int64 {
 @bug use extFloat80_t
 */
 void
-softfloat_invalidExtF80M(extFloat80M* zSPtr)
+invalid_M_extF80(extFloat80M* zSPtr)
 {
     softfloat_raiseFlags(softfloat_flag_invalid);
     zSPtr->signExp = defaultNaNExtF80UI64;

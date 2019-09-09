@@ -95,7 +95,7 @@ struct commonNaN
     explicit operator extFloat80M()const
     {
         extFloat80M z;
-        z.signExp = packToExtF80UI64(sign, 0x7FFF);
+        z.signExp = pack_to_extF80_UI64(sign, 0x7FFF);
         z.signif = UINT64_C(0xC000000000000000) | v64 >> 1;
         return z;
     }
@@ -296,7 +296,7 @@ commonNaN_from_f128UI(uint64_t const uiA64,
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
-    uint128 const NaNSig = shortShiftLeft128(uint128{uiA64, uiA0}, 16);
+    uint128 const NaNSig = short_shift_left_128(uint128{uiA64, uiA0}, 16);
     return commonNaN{0 != (uiA64 >> 63), NaNSig.v64, NaNSig.v0};
 }
 
@@ -307,7 +307,7 @@ NaN, and returns the bit pattern of this value as an unsigned integer.
 inline uint128
 commonNaN_to_F128UI(commonNaN const& a)
 {
-    uint128 const uiZ = shortShiftRight128(uint128{a.v64, a.v0}, 16);
+    uint128 const uiZ = short_shift_right_128(uint128{a.v64, a.v0}, 16);
     return uint128{uiZ.v64 | static_cast<uint64_t>(!!a.sign) << 63 | UINT64_C(0x7FFF800000000000), uiZ.v0};
 }
 
@@ -348,7 +348,7 @@ value is a signaling NaN, the invalid exception is raised.
 @bug use extFloat80_t
 */
 void
-propagate_NaN_ExtF80M(extFloat80M const* aSPtr,
+propagate_NaN_extF80M(extFloat80M const* aSPtr,
                               extFloat80M const* bSPtr,
                               extFloat80M* zSPtr);
 
@@ -369,15 +369,15 @@ four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
 inline commonNaN
-commonNaN_from_f128M(uint32_t const* const aWPtr)
+commonNaN_from_M_f128(uint32_t const* const aWPtr)
 {
     if (f128M_isSignalingNaN((float128_t const*)aWPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
     commonNaN z;
-    z.sign = 0 != (aWPtr[indexWordHi(4)] >> 31);
-    softfloat_shortShiftLeft128M(aWPtr, 16, reinterpret_cast<uint32_t*>(&z.v0));
+    z.sign = 0 != (aWPtr[index_word_hi(4)] >> 31);
+    short_shift_left_M_128(aWPtr, 16, reinterpret_cast<uint32_t*>(&z.v0));
     return z;
 }
 
@@ -391,8 +391,8 @@ inline void
 commonNaN_to_F128M(commonNaN const& a,
                            uint32_t* const zWPtr)
 {
-    shortShiftRight128M(reinterpret_cast<uint32_t const*>(&a.v0), 16u, zWPtr);
-    zWPtr[indexWordHi(4)] |= static_cast<uint32_t>(!!a.sign) << 31 | UINT32_C(0x7FFF8000);
+    short_shift_right_M_128(reinterpret_cast<uint32_t const*>(&a.v0), 16u, zWPtr);
+    zWPtr[index_word_hi(4)] |= static_cast<uint32_t>(!!a.sign) << 31 | UINT32_C(0x7FFF8000);
 }
 
 /**

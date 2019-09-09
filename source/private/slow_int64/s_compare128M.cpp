@@ -41,11 +41,11 @@ namespace internals {
 namespace slow_int64 {
 
 int
-softfloat_compare128M(uint32_t const *const aPtr,
+compare_M_128(uint32_t const *const aPtr,
                       uint32_t const *const bPtr)
 {
-    auto const lastIndex = indexWordLo(4);
-    for (auto index = indexWordHi(4);; index -= wordIncr) {
+    auto const lastIndex = index_word_lo(4);
+    for (auto index = index_word_hi(4);; index -= wordIncr) {
         uint32_t const wordA = aPtr[index];
         uint32_t const wordB = bPtr[index];
 

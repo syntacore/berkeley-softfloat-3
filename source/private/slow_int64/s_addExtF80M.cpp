@@ -45,30 +45,30 @@ namespace slow_int64 {
 @bug use extFloat80_t
 */
 void
-softfloat_addExtF80M(extFloat80M const* aSPtr,
-                     extFloat80M const* bSPtr,
-                     extFloat80M* const zSPtr,
-                     bool negateB)
+add_M_extF80(extFloat80M const* aSPtr,
+             extFloat80M const* bSPtr,
+             extFloat80M* const zSPtr,
+             bool negateB)
 {
     typedef void(*round_packer_ptr)(bool, int32_t, uint32_t*, uint8_t const&, extFloat80M*);
 
     uint16_t const uiA64 = aSPtr->signExp;
-    int32_t expA = expExtF80UI64(uiA64);
+    int32_t expA = exp_extF80_UI64(uiA64);
     uint16_t const uiB64 = bSPtr->signExp;
-    int32_t expB = expExtF80UI64(uiB64);
+    int32_t expB = exp_extF80_UI64(uiB64);
 
     if (0x7FFF == expA || 0x7FFF == expB) {
-        if (softfloat_tryPropagateNaNExtF80M(aSPtr, bSPtr, zSPtr)) {
+        if (try_propagate_NaN_M_extF80(aSPtr, bSPtr, zSPtr)) {
             return;
         }
 
         uint16_t uiZ64 = uiA64;
 
         if (0x7FFF == expB) {
-            uiZ64 = static_cast<uint16_t>(uiB64 ^ packToExtF80UI64(negateB, 0));
+            uiZ64 = static_cast<uint16_t>(uiB64 ^ pack_to_extF80_UI64(negateB, 0));
 
             if (0x7FFF == expA && uiZ64 != uiA64) {
-                softfloat_invalidExtF80M(zSPtr);
+                invalid_M_extF80(zSPtr);
                 return;
             }
         }
@@ -98,37 +98,37 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
 
     uint64_t sigZ = aSPtr->signif;
     uint64_t sigB = bSPtr->signif;
-    round_packer_ptr roundPackRoutinePtr = softfloat_roundPackMToExtF80M;
+    round_packer_ptr roundPackRoutinePtr = round_pack_to_M_extF80M;
     int32_t const expDiff = expA - expB;
 
     if (0 != expDiff) {
         uint32_t extSigX[3];
-        extSigX[indexWord(3, 2)] = sigB >> 32;
-        extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigB);
-        extSigX[indexWord(3, 0)] = 0;
-        softfloat_shiftRightJam96M(extSigX, static_cast<uint8_t>(expDiff), extSigX);
+        extSigX[index_word(3, 2)] = sigB >> 32;
+        extSigX[index_word(3, 1)] = static_cast<uint32_t>(sigB);
+        extSigX[index_word(3, 0)] = 0;
+        shift_right_jam_M_96(extSigX, static_cast<uint8_t>(expDiff), extSigX);
         sigB =
-            static_cast<uint64_t>(extSigX[indexWord(3, 2)]) << 32 |
-            extSigX[indexWord(3, 1)];
+            static_cast<uint64_t>(extSigX[index_word(3, 2)]) << 32 |
+            extSigX[index_word(3, 1)];
 
         if (!negateB) {
             sigZ += sigB;
 
             if (0 == (sigZ & UINT64_C(0x8000000000000000))) {
-                auto const sigZExtra_1 = (static_cast<uint32_t>(sigZ) << 31) | !!(0 != extSigX[indexWordLo(3)]);
+                auto const sigZExtra_1 = (static_cast<uint32_t>(sigZ) << 31) | !!(0 != extSigX[index_word_lo(3)]);
                 ++expA;
                 sigZ = UINT64_C(0x8000000000000000) | sigZ >> 1;
-                extSigX[indexWord(3, 0)] = sigZExtra_1;
+                extSigX[index_word(3, 0)] = sigZExtra_1;
             }
 
-            extSigX[indexWord(3, 2)] = sigZ >> 32;
-            extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigZ);
-            (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_roundingPrecision, zSPtr);
+            extSigX[index_word(3, 2)] = sigZ >> 32;
+            extSigX[index_word(3, 1)] = static_cast<uint32_t>(sigZ);
+            (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_rounding_precision, zSPtr);
             return;
         }
 
         sigZ -= sigB;
-        uint32_t sigZExtra = extSigX[indexWordLo(3)];
+        uint32_t sigZExtra = extSigX[index_word_lo(3)];
 
         if (0 != sigZExtra) {
             --sigZ;
@@ -141,16 +141,16 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
                 sigZ = sigZ << 1 | sigZExtra >> 31;
                 sigZExtra <<= 1;
             } else {
-                roundPackRoutinePtr = softfloat_normRoundPackMToExtF80M;
+                roundPackRoutinePtr = norm_round_pack_to_M_extF80;
             }
         }
 
         {
             uint32_t extSigX[3];
-            extSigX[indexWord(3, 0)] = sigZExtra;
-            extSigX[indexWord(3, 2)] = sigZ >> 32;
-            extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigZ);
-            (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_roundingPrecision, zSPtr);
+            extSigX[index_word(3, 0)] = sigZExtra;
+            extSigX[index_word(3, 2)] = sigZ >> 32;
+            extSigX[index_word(3, 1)] = static_cast<uint32_t>(sigZ);
+            (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_rounding_precision, zSPtr);
         }
 
         return;
@@ -168,13 +168,13 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
 
             if (0 == sigZ) {
                 softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-                zSPtr->signExp = packToExtF80UI64(softfloat_round_min == softfloat_roundingMode, 0);
+                zSPtr->signExp = pack_to_extF80_UI64(softfloat_round_min == softfloat_roundingMode, 0);
                 zSPtr->signif = 0;
                 return;
             }
         }
 
-        roundPackRoutinePtr = softfloat_normRoundPackMToExtF80M;
+        roundPackRoutinePtr = norm_round_pack_to_M_extF80;
     } else {
         sigZ += sigB;
 
@@ -183,16 +183,16 @@ softfloat_addExtF80M(extFloat80M const* aSPtr,
             ++expA;
             sigZ = UINT64_C(0x8000000000000000) | sigZ >> 1;
         } else if (0 == (sigZ & UINT64_C(0x8000000000000000))) {
-            roundPackRoutinePtr = softfloat_normRoundPackMToExtF80M;
+            roundPackRoutinePtr = norm_round_pack_to_M_extF80;
         }
     }
 
     {
         uint32_t extSigX[3];
-        extSigX[indexWord(3, 0)] = sigZExtra;
-        extSigX[indexWord(3, 2)] = sigZ >> 32;
-        extSigX[indexWord(3, 1)] = static_cast<uint32_t>(sigZ);
-        (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_roundingPrecision, zSPtr);
+        extSigX[index_word(3, 0)] = sigZExtra;
+        extSigX[index_word(3, 2)] = sigZ >> 32;
+        extSigX[index_word(3, 1)] = static_cast<uint32_t>(sigZ);
+        (*roundPackRoutinePtr)(signZ, expA, extSigX, extF80_rounding_precision, zSPtr);
     }
 }
 

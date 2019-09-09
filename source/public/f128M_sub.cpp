@@ -46,10 +46,10 @@ f128M_sub(float128_t const* const aPtr,
 
     auto const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);
     auto const bWPtr = reinterpret_cast<uint64_t const*>(bPtr);
-    uint64_t const uiA64 = aWPtr[indexWord(2, 1)];
-    uint64_t const uiA0 = aWPtr[indexWord(2, 0)];
-    uint64_t const uiB64 = bWPtr[indexWord(2, 1)];
-    uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
+    uint64_t const uiA64 = aWPtr[index_word(2, 1)];
+    uint64_t const uiA0 = aWPtr[index_word(2, 0)];
+    uint64_t const uiB64 = bWPtr[index_word(2, 1)];
+    uint64_t const uiB0 = bWPtr[index_word(2, 0)];
     bool const signA = is_sign(uiA64);
     bool const signB = is_sign(uiB64);
 
@@ -60,6 +60,6 @@ f128M_sub(float128_t const* const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    softfloat_addF128M(reinterpret_cast<uint32_t const *>(aPtr), reinterpret_cast<uint32_t const *>(bPtr), reinterpret_cast<uint32_t*>(zPtr), true);
+    add_M_F128(reinterpret_cast<uint32_t const *>(aPtr), reinterpret_cast<uint32_t const *>(bPtr), reinterpret_cast<uint32_t*>(zPtr), true);
 #endif
 }

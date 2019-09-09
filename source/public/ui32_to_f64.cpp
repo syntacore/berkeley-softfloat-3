@@ -43,7 +43,7 @@ ui32_to_f64(uint32_t const a)
 
     if (0 != a) {
         int8_t const shiftDist = count_leading_zeros(a) + 21;
-        return u_as_f(packToF64UI(0, 0x432 - shiftDist, static_cast<uint64_t>(a) << shiftDist));
+        return u_as_f(pack_to_F64_UI(0, 0x432 - shiftDist, static_cast<uint64_t>(a) << shiftDist));
     }
 
     return make_signed_zero<float64_t>();

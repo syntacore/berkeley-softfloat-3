@@ -429,9 +429,9 @@ four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
 inline commonNaN
-commonNaN_from_f128M(uint32_t const* aWPtr)
+commonNaN_from_M_f128(uint32_t const* aWPtr)
 {
-    if (0 == (aWPtr[indexWordHi(4)] & UINT64_C(0x0000800000000000))) {
+    if (0 == (aWPtr[index_word_hi(4)] & UINT64_C(0x0000800000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
@@ -448,7 +448,7 @@ value is a signaling NaN, the invalid exception is raised.
 @bug use extFloat80_t
 */
 inline void
-propagate_NaN_ExtF80M(extFloat80M const* const aSPtr,
+propagate_NaN_extF80M(extFloat80M const* const aSPtr,
                               extFloat80M const* const bSPtr,
                               extFloat80M* const zSPtr)
 {
@@ -470,10 +470,10 @@ inline void
 commonNaN_to_F128M(commonNaN const&,
                    uint32_t* const zWPtr)
 {
-    zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
-    zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
-    zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
-    zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
+    zWPtr[index_word(4, 3)] = defaultNaNF128UI96;
+    zWPtr[index_word(4, 2)] = defaultNaNF128UI64;
+    zWPtr[index_word(4, 1)] = defaultNaNF128UI32;
+    zWPtr[index_word(4, 0)] = defaultNaNF128UI0;
 }
 
 /**
@@ -493,10 +493,10 @@ propagate_NaN_F128M(uint32_t const* const aWPtr,
         softfloat_raiseFlags(softfloat_flag_invalid);
     }
 
-    zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
-    zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
-    zWPtr[indexWord(4, 1)] = defaultNaNF128UI32;
-    zWPtr[indexWord(4, 0)] = defaultNaNF128UI0;
+    zWPtr[index_word(4, 3)] = defaultNaNF128UI96;
+    zWPtr[index_word(4, 2)] = defaultNaNF128UI64;
+    zWPtr[index_word(4, 1)] = defaultNaNF128UI32;
+    zWPtr[index_word(4, 0)] = defaultNaNF128UI0;
 }
 
 }  // namespace riscv

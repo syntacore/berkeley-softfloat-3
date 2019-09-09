@@ -47,7 +47,7 @@ f32_to_f64(float32_t const a)
             return u_as_f(commonNaN_to_F64UI(commonNaN_from_f32UI(f_as_u(a))));
         }
 
-        return u_as_f(packToF64UI(sign, 0x7FF, 0));
+        return u_as_f(pack_to_F64_UI(sign, 0x7FF, 0));
     }
 
     int16_t const exp = get_exp(a);
@@ -55,12 +55,12 @@ f32_to_f64(float32_t const a)
 
     if (0 == exp) {
         if (is_zero(a)) {
-            return u_as_f(packToF64UI(sign, 0, 0));
+            return u_as_f(pack_to_F64_UI(sign, 0, 0));
         }
 
         exp16_sig32 const normExpSig(frac);
-        return u_as_f(packToF64UI(sign, normExpSig.exp - 1 + 0x380, static_cast<uint64_t>(normExpSig.sig) << 29));
+        return u_as_f(pack_to_F64_UI(sign, normExpSig.exp - 1 + 0x380, static_cast<uint64_t>(normExpSig.sig) << 29));
     }
 
-    return u_as_f(packToF64UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
+    return u_as_f(pack_to_F64_UI(sign, exp + 0x380, static_cast<uint64_t>(frac) << 29));
 }

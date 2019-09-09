@@ -48,7 +48,7 @@ extF80M_to_f32(const extFloat80_t* aPtr)
     extFloat80M const* aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 
     if (0x7FFF == exp) {
@@ -64,10 +64,10 @@ extF80M_to_f32(const extFloat80_t* aPtr)
             return make_signed_zero<float32_t>(sign);
         }
 
-        exp += softfloat_normExtF80SigM(&sig);
+        exp += norm_M_extF80Sig(&sig);
     }
 
-    uint32_t const sig32 = static_cast<uint32_t>(shortShiftRightJam64(sig, 33));
+    uint32_t const sig32 = static_cast<uint32_t>(short_shift_right_jam_64(sig, 33));
     exp -= 0x3F81;
 
     if (exp < -0x1000) {
@@ -75,6 +75,6 @@ extF80M_to_f32(const extFloat80_t* aPtr)
     }
 
     assert(INT16_MIN <= exp && exp <= INT16_MAX);
-    return roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
+    return round_pack_to_F32(sign, static_cast<int16_t>(exp), sig32);
 #endif
 }

@@ -62,6 +62,6 @@ extF80M_eq_signaling(extFloat80_t const* const aPtr,
 
     return
         0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000)) &&
-        0 == softfloat_compareNonnormExtF80M(aPtr, bPtr);
+        0 == compare_non_norm_M_extF80(aPtr, bPtr);
 #endif
 }

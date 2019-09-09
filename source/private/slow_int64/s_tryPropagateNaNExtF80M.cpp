@@ -41,16 +41,16 @@ namespace internals {
 namespace slow_int64 {
 
 bool
-softfloat_tryPropagateNaNExtF80M(extFloat80M const* const aSPtr,
-                                 extFloat80M const* const bSPtr,
-                                 extFloat80M* const zSPtr)
+try_propagate_NaN_M_extF80(extFloat80M const* const aSPtr,
+                           extFloat80M const* const bSPtr,
+                           extFloat80M* const zSPtr)
 {
     bool const result =
         is_NaN(*aSPtr) ||
         is_NaN(*bSPtr);
 
     if (result) {
-        propagate_NaN_ExtF80M(aSPtr, bSPtr, zSPtr);
+        propagate_NaN_extF80M(aSPtr, bSPtr, zSPtr);
     }
 
     return result;

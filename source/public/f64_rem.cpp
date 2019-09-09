@@ -113,7 +113,7 @@ f64_rem(float64_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = approxRecip32_1(static_cast<uint32_t>(sigB >> 21));
+        uint32_t const recip32 = approx_recip_32_1(static_cast<uint32_t>(sigB >> 21));
         /*
         Changing the shift of `rem' here requires also changing the initial
         subtraction from `expDiff'.
@@ -166,7 +166,7 @@ f64_rem(float64_t const a,
                 rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
             }
 
-            return normRoundPackToF64(signRem, expB, rem);
+            return norm_round_pack_to_F64(signRem, expB, rem);
         }
     }
 
@@ -190,7 +190,7 @@ f64_rem(float64_t const a,
         rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
     }
 
-    return normRoundPackToF64(signRem, expB, rem);
+    return norm_round_pack_to_F64(signRem, expB, rem);
 }
 
 #else
@@ -218,7 +218,7 @@ selectRem(bool const signA,
         rem = static_cast<uint64_t>(-static_cast<int64_t>(rem));
     }
 
-    return normRoundPackToF64(signRem, expB, rem);
+    return norm_round_pack_to_F64(signRem, expB, rem);
 }
 
 }  // namespace
@@ -295,7 +295,7 @@ f64_rem(float64_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = approxRecip32_1(static_cast<uint32_t>(sigB >> 21));
+        uint32_t const recip32 = approx_recip_32_1(static_cast<uint32_t>(sigB >> 21));
         /*
         Changing the shift of `rem' here requires also changing the initial
         subtraction from `expDiff'.

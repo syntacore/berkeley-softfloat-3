@@ -40,9 +40,9 @@ namespace softfloat {
 namespace internals {
 
 float16_t
-roundPackToF16(bool sign,
-               int16_t exp,
-               uint16_t sig)
+round_pack_to_F16(bool sign,
+                  int16_t exp,
+                  uint16_t sig)
 {
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     uint8_t const roundIncrement =
@@ -55,10 +55,10 @@ roundPackToF16(bool sign,
     if (0x1D <= static_cast<unsigned>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == detectTininess ||
+                softfloat_tininess_beforeRounding == detect_tininess ||
                 exp < -1 ||
                 sig + roundIncrement < 0x8000u;
-            sig = static_cast<uint16_t>(shiftRightJam32(sig, static_cast<uint16_t>(-exp)));
+            sig = static_cast<uint16_t>(shift_right_jam_32(sig, static_cast<uint16_t>(-exp)));
             exp = 0;
             roundBits = sig & 0xFu;
 
@@ -67,7 +67,7 @@ roundPackToF16(bool sign,
             }
         } else if (0x1D < exp || 0x8000 <= sig + roundIncrement) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
-            return u_as_f(static_cast<uint16_t>(packToF16UI(sign, 0x1F, 0u) - !roundIncrement));
+            return u_as_f(static_cast<uint16_t>(pack_to_F16_UI(sign, 0x1F, 0u) - !roundIncrement));
         }
     }
 
@@ -77,7 +77,7 @@ roundPackToF16(bool sign,
 
     sig = static_cast<uint16_t>((sig + roundIncrement) >> 4);
     sig &= ~static_cast<uint16_t>(!(roundBits ^ 8) & !!(softfloat_round_near_even == softfloat_roundingMode));
-    return u_as_f(packToF16UI(sign, static_cast<int8_t>(sig ? exp : 0), sig));
+    return u_as_f(pack_to_F16_UI(sign, static_cast<int8_t>(sig ? exp : 0), sig));
 }
 
 }  // namespace internals

@@ -43,7 +43,7 @@ ui32_to_f16(uint32_t a)
     int8_t const shiftDist = count_leading_zeros(a) - 21;
 
     if (0 <= shiftDist) {
-        return u_as_f(a ? packToF16UI(false, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : uint16_t(0));
+        return u_as_f(a ? pack_to_F16_UI(false, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : uint16_t(0));
     }
 
     int8_t const shiftDist1 = shiftDist + 4;
@@ -53,5 +53,5 @@ ui32_to_f16(uint32_t a)
             shiftDist1 < 0 ?
             a >> -shiftDist1 | !!(0 != (a << (shiftDist1 & 0x1Fu))) :
             a << shiftDist1);
-    return roundPackToF16(0, 0x1C - shiftDist1, sig);
+    return round_pack_to_F16(0, 0x1C - shiftDist1, sig);
 }

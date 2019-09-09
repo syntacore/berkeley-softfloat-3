@@ -51,7 +51,7 @@ f16_to_f128(float16_t const a)
             float128_t(
                 0 != frac ?
                 commonNaN_to_F128UI(commonNaN_from_f16UI(f_as_u(a))) :
-                uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
+                uint128{pack_to_F128_UI64(sign, 0x7FFF, 0), 0});
     }
 
     assert(0x1F != exp);
@@ -61,7 +61,7 @@ f16_to_f128(float16_t const a)
         return
             float128_t(
                 uint128(
-                    packToF128UI64(sign,
+                    pack_to_F128_UI64(sign,
                                    exp + 0x3FF0,
                                    static_cast<uint64_t>(frac) << 38),
                     0));
@@ -71,7 +71,7 @@ f16_to_f128(float16_t const a)
 
     if (0 == frac) {
         assert(0 == exp && 0 == frac);
-        return float128_t(uint128{packToF128UI64(sign, 0, 0), 0});
+        return float128_t(uint128{pack_to_F128_UI64(sign, 0, 0), 0});
     }
 
     assert(0 == exp && 0 != frac);
@@ -80,7 +80,7 @@ f16_to_f128(float16_t const a)
     return
         float128_t(
             uint128(
-                packToF128UI64(sign,
+                pack_to_F128_UI64(sign,
                                normExpSig.exp - 1 + 0x3FF0,
                                static_cast<uint64_t>(normExpSig.sig) << 38),
                 0));

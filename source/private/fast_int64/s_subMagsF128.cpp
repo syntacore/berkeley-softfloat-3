@@ -47,10 +47,10 @@ sub_magnitudes(uint64_t const uiA64,
                       uint64_t const uiB0,
                       bool const signZ)
 {
-    int32_t const expA = expF128UI64(uiA64);
-    int32_t const expB = expF128UI64(uiB64);
-    uint128 const sigA = shortShiftLeft128(uint128{fracF128UI64(uiA64), uiA0}, 4);
-    uint128 const sigB = shortShiftLeft128(uint128{fracF128UI64(uiB64), uiB0}, 4);
+    int32_t const expA = exp_F128_UI64(uiA64);
+    int32_t const expB = exp_F128_UI64(uiB64);
+    uint128 const sigA = short_shift_left_128(uint128{frac_F128_UI64(uiA64), uiA0}, 4);
+    uint128 const sigB = short_shift_left_128(uint128{frac_F128_UI64(uiB64), uiB0}, 4);
     int32_t const expDiff = expA - expB;
 
     if (!(0 < expDiff)) {
@@ -69,26 +69,26 @@ sub_magnitudes(uint64_t const uiA64,
 
             if (sigB.v64 < sigA.v64) {
                 uint128 const sigZ = sub(sigA, sigB);
-                return normRoundPackToF128(signZ, expZ - 5, sigZ.v64, sigZ.v0);
+                return norm_round_pack_to_F128(signZ, expZ - 5, sigZ.v64, sigZ.v0);
             }
 
             if (sigA.v64 < sigB.v64) {
                 uint128 const sigZ = sub(sigB, sigA);
-                return normRoundPackToF128(!signZ, expZ - 5, sigZ.v64, sigZ.v0);
+                return norm_round_pack_to_F128(!signZ, expZ - 5, sigZ.v64, sigZ.v0);
             }
 
             if (sigB.v0 < sigA.v0) {
                 uint128 const sigZ = sub(sigA, sigB);
-                return normRoundPackToF128(signZ, expZ - 5, sigZ.v64, sigZ.v0);
+                return norm_round_pack_to_F128(signZ, expZ - 5, sigZ.v64, sigZ.v0);
             }
 
             if (sigA.v0 < sigB.v0) {
                 uint128 const sigZ = sub(sigB, sigA);
-                return normRoundPackToF128(!signZ, expZ - 5, sigZ.v64, sigZ.v0);
+                return norm_round_pack_to_F128(!signZ, expZ - 5, sigZ.v64, sigZ.v0);
             }
 
             softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
-            return float128_t(uint128{packToF128UI64(softfloat_roundingMode == softfloat_round_min, 0, 0), 0});
+            return float128_t(uint128{pack_to_F128_UI64(softfloat_roundingMode == softfloat_round_min, 0, 0), 0});
         }
 
         if (0x7FFF == expB) {
@@ -96,25 +96,25 @@ sub_magnitudes(uint64_t const uiA64,
                 return float128_t(propagate_NaN(uiA64, uiA0, uiB64, uiB0));
             }
 
-            return float128_t(uint128{packToF128UI64(!signZ, 0x7FFF, 0), 0});
+            return float128_t(uint128{pack_to_F128_UI64(!signZ, 0x7FFF, 0), 0});
         }
 
         if (0 != expA) {
-            auto const sigA_1 = shiftRightJam128(sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0, static_cast<uint32_t>(-expDiff));
+            auto const sigA_1 = shift_right_jam_128(sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0, static_cast<uint32_t>(-expDiff));
             uint128 const sigZ = sub(uint128{sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0}, sigA_1);
-            return normRoundPackToF128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
+            return norm_round_pack_to_F128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
         }
 
         auto const expDiff_1 = expDiff + 1;
 
         if (0 == expDiff_1) {
             uint128 const sigZ = sub(uint128{sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0}, sigA);
-            return normRoundPackToF128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
+            return norm_round_pack_to_F128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
         }
 
-        auto const sigA_1 = shiftRightJam128(sigA, static_cast<uint32_t>(-expDiff_1));
+        auto const sigA_1 = shift_right_jam_128(sigA, static_cast<uint32_t>(-expDiff_1));
         uint128 const sigZ = sub(uint128{sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0}, sigA_1);
-        return normRoundPackToF128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
+        return norm_round_pack_to_F128(!signZ, expB - 5, sigZ.v64, sigZ.v0);
     }
 
     if (0x7FFF == expA) {
@@ -126,21 +126,21 @@ sub_magnitudes(uint64_t const uiA64,
     }
 
     if (0 != expB) {
-        auto const sigB_1 = shiftRightJam128(sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0, static_cast<uint32_t>(expDiff));
+        auto const sigB_1 = shift_right_jam_128(sigB.v64 | UINT64_C(0x0010000000000000), sigB.v0, static_cast<uint32_t>(expDiff));
         uint128 const sigZ = sub(uint128{sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0}, sigB_1);
-        return normRoundPackToF128(signZ, expA - 5, sigZ.v64, sigZ.v0);
+        return norm_round_pack_to_F128(signZ, expA - 5, sigZ.v64, sigZ.v0);
     }
 
     auto const expDiff_1 = expDiff - 1;
 
     if (0 == expDiff_1) {
         uint128 const sigZ = sub(uint128{sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0}, sigB);
-        return normRoundPackToF128(signZ, expA - 5, sigZ.v64, sigZ.v0);
+        return norm_round_pack_to_F128(signZ, expA - 5, sigZ.v64, sigZ.v0);
     }
 
-    auto const sigB_1 = shiftRightJam128(sigB, static_cast<uint32_t>(expDiff_1));
+    auto const sigB_1 = shift_right_jam_128(sigB, static_cast<uint32_t>(expDiff_1));
     uint128 const sigZ = sub(uint128{sigA.v64 | UINT64_C(0x0010000000000000), sigA.v0}, sigB_1);
-    return normRoundPackToF128(signZ, expA - 5, sigZ.v64, sigZ.v0);
+    return norm_round_pack_to_F128(signZ, expA - 5, sigZ.v64, sigZ.v0);
 }
 
 }  // namespace fast_int64

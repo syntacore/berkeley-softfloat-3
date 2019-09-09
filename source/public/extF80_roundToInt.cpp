@@ -48,8 +48,8 @@ extF80_roundToInt(extFloat80_t const a,
     using namespace softfloat::internals::fast_int64;
 
     uint16_t const uiA64 = a.signExp;
-    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(1, 0));
-    int32_t exp = expExtF80UI64(uiA64);
+    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & pack_to_extF80_UI64(1, 0));
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sigA = a.signif;
 
     if (0 == (sigA & UINT64_C(0x8000000000000000)) && 0x7FFF != exp) {
@@ -60,7 +60,7 @@ extF80_roundToInt(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigA);
         exp += normExpSig.exp;
         sigA = normExpSig.sig;
     }

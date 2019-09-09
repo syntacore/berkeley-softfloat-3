@@ -52,13 +52,13 @@ f128M_lt(const float128_t* aPtr,
     aWPtr = (const uint32_t*)aPtr;
     bWPtr = (const uint32_t*)bPtr;
 
-    if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
+    if (is_NaN_M_F128(aWPtr) || is_NaN_M_F128(bWPtr)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return false;
     }
 
-    uiA96 = aWPtr[indexWordHi(4)];
-    uiB96 = bWPtr[indexWordHi(4)];
+    uiA96 = aWPtr[index_word_hi(4)];
+    uiB96 = bWPtr[index_word_hi(4)];
     signA = is_sign(uiA96);
     signB = is_sign(uiB96);
 
@@ -71,22 +71,22 @@ f128M_lt(const float128_t* aPtr,
             return true;
         }
 
-        wordA = aWPtr[indexWord(4, 2)];
-        wordB = bWPtr[indexWord(4, 2)];
+        wordA = aWPtr[index_word(4, 2)];
+        wordB = bWPtr[index_word(4, 2)];
 
         if (wordA | wordB) {
             return true;
         }
 
-        wordA = aWPtr[indexWord(4, 1)];
-        wordB = bWPtr[indexWord(4, 1)];
+        wordA = aWPtr[index_word(4, 1)];
+        wordB = bWPtr[index_word(4, 1)];
 
         if (wordA | wordB) {
             return true;
         }
 
-        wordA = aWPtr[indexWord(4, 0)];
-        wordB = bWPtr[indexWord(4, 0)];
+        wordA = aWPtr[index_word(4, 0)];
+        wordB = bWPtr[index_word(4, 0)];
         return ((wordA | wordB) != 0);
     }
 
@@ -95,6 +95,6 @@ f128M_lt(const float128_t* aPtr,
         bWPtr = (const uint32_t*)aPtr;
     }
 
-    return (softfloat_compare128M(aWPtr, bWPtr) < 0);
+    return (compare_M_128(aWPtr, bWPtr) < 0);
 #endif
 }

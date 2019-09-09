@@ -41,15 +41,15 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_remStepMBy32(uint8_t size_words,
+rem_step_by_32_M(uint8_t size_words,
                        uint32_t const* remPtr,
                        uint8_t dist,
                        uint32_t const* bPtr,
                        uint32_t q,
                        uint32_t* zPtr)
 {
-    auto index = indexWordLo(size_words);
-    auto const lastIndex = indexWordHi(size_words);
+    auto index = index_word_lo(size_words);
+    auto const lastIndex = index_word_hi(size_words);
     uint64_t dwordProd = static_cast<uint64_t>(bPtr[index]) * q;
     uint32_t wordRem = remPtr[index];
     uint32_t wordShiftedRem = wordRem << dist;

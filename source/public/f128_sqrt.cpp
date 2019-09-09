@@ -43,8 +43,8 @@ f128_sqrt(float128_t const a)
 
     uint128 const uA{a};
     bool const signA = is_sign(uA.v64);
-    int32_t expA = expF128UI64(uA.v64);
-    uint128 sigA{fracF128UI64(uA.v64), uA.v0};
+    int32_t expA = exp_F128_UI64(uA.v64);
+    uint128 sigA{frac_F128_UI64(uA.v64), uA.v0};
 
     if (0x7FFF == expA) {
         if (0 != (sigA.v64 | sigA.v0)) {
@@ -77,7 +77,7 @@ f128_sqrt(float128_t const a)
             return a;
         }
 
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigA);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -91,15 +91,15 @@ f128_sqrt(float128_t const a)
     expA &= 1;
     sigA.v64 |= UINT64_C(0x0001000000000000);
     uint32_t const sig32A = static_cast<uint32_t>(sigA.v64 >> 17);
-    uint32_t const recipSqrt32 = approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    uint32_t const recipSqrt32 = approx_recip_sqrt_32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
     uint128 rem;
 
     if (expA) {
         sig32Z >>= 1;
-        rem = shortShiftLeft128(sigA, 12);
+        rem = short_shift_left_128(sigA, 12);
     } else {
-        rem = shortShiftLeft128(sigA, 13);
+        rem = short_shift_left_128(sigA, 13);
     }
 
     uint32_t qs[3];
@@ -111,18 +111,18 @@ f128_sqrt(float128_t const a)
     uint64_t x64 = static_cast<uint64_t>(sig32Z) << 32;
     uint64_t sig64Z = x64 + (static_cast<uint64_t>(q) << 3);
     x64 += sig64Z;
-    uint128 rem_1 = shortShiftLeft128(rem, 29);
-    uint128 const tmp = mul64ByShifted32To128(x64, q);
+    uint128 rem_1 = short_shift_left_128(rem, 29);
+    uint128 const tmp = mul_64_by_shifted_32_to_128(x64, q);
     uint128 rem_2 = sub(rem_1, tmp);
     uint32_t q_2 = (static_cast<uint32_t>(rem_2.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
-    uint128 const y_0 = shortShiftLeft128(rem_2, 29);
+    uint128 const y_0 = short_shift_left_128(rem_2, 29);
     sig64Z <<= 1;
 
     /* Repeating this loop is a rare occurrence.*/
     for (;;) {
-        uint128 const tmp_1 = shortShiftLeft128(uint128{0, sig64Z}, 32);
+        uint128 const tmp_1 = short_shift_left_128(uint128{0, sig64Z}, 32);
         uint128 const tmp_2 = add(tmp_1, uint128{0, static_cast<uint64_t>(q_2) << 6});
-        uint128 const tmp_3 = mul128By32(tmp_2, q_2);
+        uint128 const tmp_3 = mul_128_by_32(tmp_2, q_2);
         rem_2 = sub(y_0, tmp_3);
 
         if (0 == (rem_2.v64 & UINT64_C(0x8000000000000000))) {
@@ -136,19 +136,19 @@ f128_sqrt(float128_t const a)
 
     uint32_t q_1 = ((static_cast<uint32_t>(rem_2.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     uint64_t sigZExtra = static_cast<uint64_t>(static_cast<uint64_t>(q_1) << 59);
-    uint128 const term_1 = shortShiftLeft128(uint128{0, qs[1]}, 53);
+    uint128 const term_1 = short_shift_left_128(uint128{0, qs[1]}, 53);
     uint128 sigZ = add(uint128{static_cast<uint64_t>(qs[2]) << 18, (static_cast<uint64_t>(qs[0]) << 24) + (q_1 >> 5)}, term_1);
 
     if ((q_1 & 0xF) <= 2) {
         q_1 &= ~3;
         sigZExtra = static_cast<uint64_t>(static_cast<uint64_t>(q_1) << 59);
-        uint128 y = shortShiftLeft128(sigZ, 6);
+        uint128 y = short_shift_left_128(sigZ, 6);
         y.v0 |= sigZExtra >> 58;
         uint128 const term_2 = sub(y, uint128{0, q_1});
-        uint128 const y_1 = mul64ByShifted32To128(term_2.v0, q_1);
-        uint128 const term_3 = mul64ByShifted32To128(term_2.v64, q_1);
+        uint128 const y_1 = mul_64_by_shifted_32_to_128(term_2.v0, q_1);
+        uint128 const term_3 = mul_64_by_shifted_32_to_128(term_2.v64, q_1);
         uint128 const term_4 = add(term_3, uint128{0, y_1.v64});
-        uint128 const rem_3 = shortShiftLeft128(rem_2, 20);
+        uint128 const rem_3 = short_shift_left_128(rem_2, 20);
         uint128 const term_5 = sub(term_4, rem_3);
 
         /* The concatenation of `term' and `y_1.v0' is now the negative remainder
@@ -166,5 +166,5 @@ f128_sqrt(float128_t const a)
         }
     }
 
-    return roundPackToF128(false, expZ, sigZ.v64, sigZ.v0, sigZExtra);
+    return round_pack_to_F128(false, expZ, sigZ.v64, sigZ.v0, sigZExtra);
 }

@@ -62,7 +62,7 @@ f64_roundToInt(float64_t const a,
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        uint64_t const uiZ = uiA & packToF64UI(1, 0, 0);
+        uint64_t const uiZ = uiA & pack_to_F64_UI(1, 0, 0);
 
         switch (roundingMode) {
         case softfloat_round_near_even:
@@ -75,21 +75,21 @@ f64_roundToInt(float64_t const a,
 
         case softfloat_round_near_maxMag:
             if (exp == 0x3FE) {
-                return u_as_f(uiZ | packToF64UI(0, 0x3FF, 0));
+                return u_as_f(uiZ | pack_to_F64_UI(0, 0x3FF, 0));
             }
 
             break;
 
         case softfloat_round_min:
             if (0 != uiZ) {
-                return u_as_f(packToF64UI(1, 0x3FF, 0));
+                return u_as_f(pack_to_F64_UI(1, 0x3FF, 0));
             }
 
             break;
 
         case softfloat_round_max:
             if (0 == uiZ) {
-                return u_as_f(packToF64UI(0, 0x3FF, 0));
+                return u_as_f(pack_to_F64_UI(0, 0x3FF, 0));
             }
 
             break;

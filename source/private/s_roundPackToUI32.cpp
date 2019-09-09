@@ -41,10 +41,10 @@ namespace internals {
 
 template<>
 uint32_t
-roundPackTo<uint32_t>(bool const sign,
-                      uint64_t sig,
-                      softfloat_round_mode const roundingMode,
-                      bool const exact)
+round_pack_to<uint32_t>(bool const sign,
+                        uint64_t sig,
+                        softfloat_round_mode const roundingMode,
+                        bool const exact)
 {
     uint16_t const roundIncrement =
         softfloat_round_near_even == roundingMode || softfloat_round_near_maxMag == roundingMode ? 0x800u :
@@ -78,10 +78,10 @@ roundPackTo<uint32_t>(bool const sign,
 
 template
 uint32_t
-roundPackTo<uint32_t>(bool const sign,
-                      uint64_t sig,
-                      softfloat_round_mode const roundingMode,
-                      bool const exact);
+round_pack_to<uint32_t>(bool const sign,
+                        uint64_t sig,
+                        softfloat_round_mode const roundingMode,
+                        bool const exact);
 
 }  // namespace internals
 }  // namespace softfloat

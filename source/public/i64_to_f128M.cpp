@@ -48,8 +48,8 @@ i64_to_f128M(int64_t const a,
     uint32_t uiZ96 = 0;
     uint32_t uiZ64 = 0;
 
-    zWPtr[indexWord(4, 1)] = 0;
-    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[index_word(4, 1)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
 
     if (0 != a) {
         bool const sign = (a < 0);
@@ -60,21 +60,21 @@ i64_to_f128M(int64_t const a,
         uint8_t const shiftDist = count_leading_zeros(absA) + 17u;
 
         if (shiftDist < 32) {
-            uint32_t* const ptr = zWPtr + indexMultiwordHi(4, 3);
-            ptr[indexWord(3, 2)] = 0;
-            ptr[indexWord(3, 1)] = absA >> 32;
-            ptr[indexWord(3, 0)] = static_cast<uint32_t>(absA);
-            softfloat_shortShiftLeft96M(ptr, shiftDist, ptr);
-            ptr[indexWordHi(3)] = packToF128UI96(sign, 0x404Eu - shiftDist, ptr[indexWordHi(3)]);
+            uint32_t* const ptr = zWPtr + index_multiword_hi(4, 3);
+            ptr[index_word(3, 2)] = 0;
+            ptr[index_word(3, 1)] = absA >> 32;
+            ptr[index_word(3, 0)] = static_cast<uint32_t>(absA);
+            short_shift_left_M_96(ptr, shiftDist, ptr);
+            ptr[index_word_hi(3)] = pack_to_F128_UI96(sign, 0x404Eu - shiftDist, ptr[index_word_hi(3)]);
             return;
         }
 
         absA <<= shiftDist - 32;
-        uiZ96 = packToF128UI96(sign, 0x404Eu - shiftDist, absA >> 32);
+        uiZ96 = pack_to_F128_UI96(sign, 0x404Eu - shiftDist, absA >> 32);
         uiZ64 = static_cast<uint32_t>(absA);
     }
 
-    zWPtr[indexWord(4, 3)] = uiZ96;
-    zWPtr[indexWord(4, 2)] = uiZ64;
+    zWPtr[index_word(4, 3)] = uiZ96;
+    zWPtr[index_word(4, 2)] = uiZ64;
 #endif
 }

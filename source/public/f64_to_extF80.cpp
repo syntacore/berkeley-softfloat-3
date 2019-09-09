@@ -53,7 +53,7 @@ f64_to_extF80(float64_t const a)
             return uZ;
         } else {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, 0x7FFF);
+            uZ.signExp = pack_to_extF80_UI64(sign, 0x7FFF);
             uZ.signif = UINT64_C(0x8000000000000000);
             return uZ;
         }
@@ -61,7 +61,7 @@ f64_to_extF80(float64_t const a)
 
     if (is_zero(a)) {
         extFloat80_t uZ;
-        uZ.signExp = packToExtF80UI64(sign, 0);
+        uZ.signExp = pack_to_extF80_UI64(sign, 0);
         uZ.signif = 0;
         return uZ;
     }
@@ -73,7 +73,7 @@ f64_to_extF80(float64_t const a)
     }
 
     extFloat80_t uZ;
-    uZ.signExp = packToExtF80UI64(sign, exp + 0x3C00u);
+    uZ.signExp = pack_to_extF80_UI64(sign, exp + 0x3C00u);
     uZ.signif = (frac | UINT64_C(0x0010000000000000)) << 11;
     return uZ;
 }

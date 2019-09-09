@@ -41,12 +41,12 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_normRoundPackMToF128M(bool const sign,
-                                int32_t exp,
-                                uint32_t* const extSigPtr,
-                                uint32_t* const zWPtr)
+norm_round_pack_to_M_F128(bool const sign,
+                          int32_t exp,
+                          uint32_t* const extSigPtr,
+                          uint32_t* const zWPtr)
 {
-    auto ptr = extSigPtr + indexWordHi(5);
+    auto ptr = extSigPtr + index_word_hi(5);
     int16_t shiftDist = 0;
     uint32_t wordSig;
 
@@ -60,10 +60,10 @@ softfloat_normRoundPackMToF128M(bool const sign,
         shiftDist += 32;
 
         if (160 <= shiftDist) {
-            zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0, 0);
-            zWPtr[indexWord(4, 2)] = 0;
-            zWPtr[indexWord(4, 1)] = 0;
-            zWPtr[indexWord(4, 0)] = 0;
+            zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, 0, 0);
+            zWPtr[index_word(4, 2)] = 0;
+            zWPtr[index_word(4, 1)] = 0;
+            zWPtr[index_word(4, 0)] = 0;
             return;
         }
 
@@ -77,10 +77,10 @@ softfloat_normRoundPackMToF128M(bool const sign,
         /**
         @bug modify input
         */
-        softfloat_shiftLeft160M(extSigPtr, static_cast<uint32_t>(shiftDist_1), extSigPtr);
+        shift_left_M_160(extSigPtr, static_cast<uint32_t>(shiftDist_1), extSigPtr);
     }
 
-    softfloat_roundPackMToF128M(sign, exp, extSigPtr, zWPtr);
+    round_pack_to_M_F128(sign, exp, extSigPtr, zWPtr);
 }
 
 }  // namespace slow_int64

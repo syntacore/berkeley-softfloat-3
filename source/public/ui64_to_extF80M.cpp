@@ -50,7 +50,7 @@ ui64_to_extF80M(uint64_t a,
 
     if (0 != a) {
         auto const shiftDist = count_leading_zeros(a);
-        uiZ64 = packToExtF80UI64(false, static_cast<uint16_t>(UINT16_C(0x403E) - shiftDist));
+        uiZ64 = pack_to_extF80_UI64(false, static_cast<uint16_t>(UINT16_C(0x403E) - shiftDist));
         sigZ = a << shiftDist;
     }
 

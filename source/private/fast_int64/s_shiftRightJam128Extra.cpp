@@ -41,7 +41,7 @@ namespace internals {
 namespace fast_int64 {
 
 uint128_extra
-shiftRightJam128Extra(uint64_t a64,
+shift_right_jam_128Extra(uint64_t a64,
                       uint64_t a0,
                       uint64_t extra,
                       uint32_t dist)

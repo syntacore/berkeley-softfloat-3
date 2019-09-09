@@ -60,11 +60,11 @@ f64_mul(float64_t const a,
             return u_as_f(defaultNaNF64UI);
         }
 
-        return u_as_f(packToF64UI(signZ, 0x7FF, 0));
+        return u_as_f(pack_to_F64_UI(signZ, 0x7FF, 0));
     }
 
     if (is_zero(a) || is_zero(b)) {
-        return u_as_f(packToF64UI(signZ, 0, 0));
+        return u_as_f(pack_to_F64_UI(signZ, 0, 0));
     }
 
     int16_t expA = get_exp(a);
@@ -88,14 +88,14 @@ f64_mul(float64_t const a,
     int16_t const expZ = expA + expB - 0x3FF;
     auto const sigA_1 = (sigA | UINT64_C(0x0010000000000000)) << 10;
     auto const sigB_1 = (sigB | UINT64_C(0x0010000000000000)) << 11;
-    uint128 const sig128Z = mul64To128(sigA_1, sigB_1);
+    uint128 const sig128Z = mul_64_to_128(sigA_1, sigB_1);
     uint64_t const sigZ = sig128Z.v64 | !!(0 != sig128Z.v0);
 
     if (sigZ < UINT64_C(0x4000000000000000)) {
-        return roundPackToF64(signZ, expZ - 1, sigZ << 1);
+        return round_pack_to_F64(signZ, expZ - 1, sigZ << 1);
     }
 
-    return roundPackToF64(signZ, expZ, sigZ);
+    return round_pack_to_F64(signZ, expZ, sigZ);
 
 #else
     using namespace softfloat::internals::slow_int64;
@@ -143,11 +143,11 @@ f64_mul(float64_t const a,
     sigA = (sigA | UINT64_C(0x0010000000000000)) << 10;
     sigB = (sigB | UINT64_C(0x0010000000000000)) << 11;
     uint32_t sig128Z[4];
-    softfloat_mul64To128M(sigA, sigB, sig128Z);
+    mul_M_64_to_128(sigA, sigB, sig128Z);
     uint64_t sigZ =
-        static_cast<uint64_t>(sig128Z[indexWord(4, 3)]) << 32 | sig128Z[indexWord(4, 2)];
+        static_cast<uint64_t>(sig128Z[index_word(4, 3)]) << 32 | sig128Z[index_word(4, 2)];
 
-    if (sig128Z[indexWord(4, 1)] || sig128Z[indexWord(4, 0)]) {
+    if (sig128Z[index_word(4, 1)] || sig128Z[index_word(4, 0)]) {
         sigZ |= 1;
     }
 
@@ -156,7 +156,7 @@ f64_mul(float64_t const a,
         sigZ <<= 1;
     }
 
-    return roundPackToF64(signZ, expZ, sigZ);
+    return round_pack_to_F64(signZ, expZ, sigZ);
 
 #endif
 }

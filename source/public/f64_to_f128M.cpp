@@ -50,7 +50,7 @@ f64_to_f128M(float64_t a,
     int16_t exp = get_exp(a);
     uint64_t frac = get_frac(a);
 
-    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
 
     if (is_NaN(a)) {
         commonNaN_to_F128M(commonNaN_from_f64UI(f_as_u(a)), zWPtr);
@@ -58,16 +58,16 @@ f64_to_f128M(float64_t a,
     }
 
     if (is_inf(a)) {
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0x7FFF, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
         return;
     }
 
     if (is_zero(a)) {
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
         return;
     }
 
@@ -77,12 +77,12 @@ f64_to_f128M(float64_t a,
         frac = normExpSig.sig;
     }
 
-    zWPtr[indexWord(4, 1)] = static_cast<uint32_t>(frac) << 28;
+    zWPtr[index_word(4, 1)] = static_cast<uint32_t>(frac) << 28;
     frac >>= 4;
-    zWPtr[indexWordHi(4)] = packToF128UI96(sign, exp + 0x3C00u, frac >> 32);
+    zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, exp + 0x3C00u, frac >> 32);
     /**
     @todo Warning   C4242   '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
     */
-    zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(frac);
+    zWPtr[index_word(4, 2)] = static_cast<uint32_t>(frac);
 #endif
 }

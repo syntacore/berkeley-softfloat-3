@@ -45,18 +45,18 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
 #else
     using namespace softfloat::internals::slow_int64;
     uint16_t uiA64 = aPtr->signExp;
-    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & packToExtF80UI64(true, 0u));
-    int32_t expA = expExtF80UI64(uiA64);
+    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & pack_to_extF80_UI64(true, 0u));
+    int32_t expA = exp_extF80_UI64(uiA64);
     uint64_t rem64 = aPtr->signif;
 
     if (expA == 0x7FFF) {
         if (rem64 & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            propagate_NaN_ExtF80M(aPtr, 0, zPtr);
+            propagate_NaN_extF80M(aPtr, 0, zPtr);
             return;
         }
 
         if (signUI64) {
-            softfloat_invalidExtF80M(zPtr);
+            invalid_M_extF80(zPtr);
             return;
         }
 
@@ -77,20 +77,20 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
             return;
         }
 
-        expA += softfloat_normExtF80SigM(&rem64);
+        expA += norm_M_extF80Sig(&rem64);
     }
 
     if (signUI64) {
-        softfloat_invalidExtF80M(zPtr);
+        invalid_M_extF80(zPtr);
         return;
     }
 
     int32_t const expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
     expA &= 1;
     uint32_t rem[4];
-    softfloat_shortShiftLeft64To96M(rem64, static_cast<uint8_t>(30 - expA), &rem[indexMultiwordHi(4, 3)]);
+    short_shift_left_M_64_to_96(rem64, static_cast<uint8_t>(30 - expA), &rem[index_multiword_hi(4, 3)]);
     uint32_t const sig32A = rem64 >> 32;
-    uint32_t const recipSqrt32 = approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    uint32_t const recipSqrt32 = approx_recip_sqrt_32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     if (expA) {
@@ -98,56 +98,56 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
     }
 
     rem64 = 
-        (static_cast<uint64_t>(rem[indexWord(4, 3)]) << 32 | rem[indexWord(4, 2)]) - 
+        (static_cast<uint64_t>(rem[index_word(4, 3)]) << 32 | rem[index_word(4, 2)]) - 
         static_cast<uint64_t>(sig32Z) * sig32Z;
-    rem[indexWord(4, 3)] = rem64 >> 32;
-    rem[indexWord(4, 2)] = static_cast<uint32_t>(rem64);
+    rem[index_word(4, 3)] = rem64 >> 32;
+    rem[index_word(4, 2)] = static_cast<uint32_t>(rem64);
 
     uint32_t q = (static_cast<uint32_t>(rem64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32;
     uint64_t const sig64Z = (static_cast<uint64_t>(sig32Z) << 32) + (static_cast<uint64_t>(q) << 3);
     uint64_t x64 = (static_cast<uint64_t>(sig32Z) << 32) + sig64Z;
     uint32_t term[4];
-    term[indexWord(3, 2)] = 0;
-    term[indexWord(3, 1)] = x64 >> 32;
-    term[indexWord(3, 0)] = static_cast<uint32_t>(x64);
-    softfloat_remStep96MBy32(
-        &rem[indexMultiwordHi(4, 3)],
+    term[index_word(3, 2)] = 0;
+    term[index_word(3, 1)] = x64 >> 32;
+    term[index_word(3, 0)] = static_cast<uint32_t>(x64);
+    rem_step_by_32_M_96(
+        &rem[index_multiword_hi(4, 3)],
         29,
         term,
         q,
-        &rem[indexMultiwordHi(4, 3)]
+        &rem[index_multiword_hi(4, 3)]
     );
-    rem64 = static_cast<uint64_t>(rem[indexWord(4, 3)]) << 32 | rem[indexWord(4, 2)];
+    rem64 = static_cast<uint64_t>(rem[index_word(4, 3)]) << 32 | rem[index_word(4, 2)];
 
     q = ((static_cast<uint32_t>(rem64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     x64 = static_cast<uint64_t>(q) << 7;
     uint32_t extSigZ[3];
-    extSigZ[indexWord(3, 0)] = static_cast<uint32_t>(x64);
+    extSigZ[index_word(3, 0)] = static_cast<uint32_t>(x64);
     x64 = (sig64Z << 1) + (x64 >> 32);
-    extSigZ[indexWord(3, 2)] = x64 >> 32;
-    extSigZ[indexWord(3, 1)] = static_cast<uint32_t>(x64);
+    extSigZ[index_word(3, 2)] = x64 >> 32;
+    extSigZ[index_word(3, 1)] = static_cast<uint32_t>(x64);
 
     if ((q & 0xFFFFFF) <= 2) {
         q &= ~static_cast<uint32_t>(0xFFFF);
-        extSigZ[indexWordLo(3)] = q << 7;
+        extSigZ[index_word_lo(3)] = q << 7;
         x64 = sig64Z + (q >> 27);
-        term[indexWord(4, 3)] = 0;
-        term[indexWord(4, 2)] = x64 >> 32;
-        term[indexWord(4, 1)] = static_cast<uint32_t>(x64);
-        term[indexWord(4, 0)] = q << 5;
-        rem[indexWord(4, 0)] = 0;
-        softfloat_remStep128MBy32(rem, 28, term, q, rem);
-        q = rem[indexWordHi(4)];
+        term[index_word(4, 3)] = 0;
+        term[index_word(4, 2)] = x64 >> 32;
+        term[index_word(4, 1)] = static_cast<uint32_t>(x64);
+        term[index_word(4, 0)] = q << 5;
+        rem[index_word(4, 0)] = 0;
+        rem_step_by_32_M_128(rem, 28, term, q, rem);
+        q = rem[index_word_hi(4)];
 
         if (q & 0x80000000) {
-            softfloat_sub1X96M(extSigZ);
+            sub_1_M_X96(extSigZ);
         } else {
-            if (q || rem[indexWord(4, 1)] || rem[indexWord(4, 2)]) {
-                extSigZ[indexWordLo(3)] |= 1;
+            if (q || rem[index_word(4, 1)] || rem[index_word(4, 2)]) {
+                extSigZ[index_word_lo(3)] |= 1;
             }
         }
     }
 
-    softfloat_roundPackMToExtF80M(0, expZ, extSigZ, extF80_roundingPrecision, zPtr);
+    round_pack_to_M_extF80M(0, expZ, extSigZ, extF80_rounding_precision, zPtr);
 #endif
 }

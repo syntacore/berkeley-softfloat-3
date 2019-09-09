@@ -65,7 +65,7 @@ eq(uint128 const& a,
 }  // namespace
 
 float128_t
-roundPackToF128(bool const sign,
+round_pack_to_F128(bool const sign,
                 int32_t exp,
                 uint64_t sig64,
                 uint64_t sig0,
@@ -84,12 +84,12 @@ roundPackToF128(bool const sign,
     if (0x7FFD <= static_cast<uint32_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == detectTininess ||
+                softfloat_tininess_beforeRounding == detect_tininess ||
                 exp < -1 ||
                 !doIncrement ||
                 lt(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_MAX));
 
-            uint128_extra const sig128Extra = shiftRightJam128Extra(uint128_extra(uint128(sig64, sig0), sigExtra), static_cast<uint32_t>(-exp));
+            uint128_extra const sig128Extra = shift_right_jam_128Extra(uint128_extra(uint128(sig64, sig0), sigExtra), static_cast<uint32_t>(-exp));
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
@@ -121,10 +121,10 @@ roundPackToF128(bool const sign,
                 softfloat_round_near_maxMag == softfloat_roundingMode ||
                 (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode
             ) {
-                return float128_t(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
+                return float128_t(uint128{pack_to_F128_UI64(sign, 0x7FFF, 0), 0});
             }
 
-            return float128_t(uint128{packToF128UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
+            return float128_t(uint128{pack_to_F128_UI64(sign, 0x7FFE, UINT64_C(0x0000FFFFFFFFFFFF)), UINT64_MAX});
         }
     }
 
@@ -135,7 +135,7 @@ roundPackToF128(bool const sign,
     if (doIncrement) {
         uint128 const sig128 = add(uint128{sig64, sig0}, uint128{0, 1});
         return float128_t(uint128{
-            packToF128UI64(sign, exp, sig128.v64),
+            pack_to_F128_UI64(sign, exp, sig128.v64),
             sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven)});
     }
 
@@ -143,7 +143,7 @@ roundPackToF128(bool const sign,
         exp = 0;
     }
 
-    return float128_t(uint128{packToF128UI64(sign, exp, sig64), sig0});
+    return float128_t(uint128{pack_to_F128_UI64(sign, exp, sig64), sig0});
 }
 
 }  // namespace fast_int64

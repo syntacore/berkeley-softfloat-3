@@ -50,7 +50,7 @@ extF80_to_i32(extFloat80_t a,
 
     uint16_t const uiA64 = a.signExp;
     bool sign = is_sign(uiA64);
-    int32_t const exp = expExtF80UI64(uiA64);
+    int32_t const exp = exp_extF80_UI64(uiA64);
     uint64_t const sig = a.signif;
 
     if (!fromNaN_is_same_as_both_overflow && 0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
@@ -64,5 +64,5 @@ extF80_to_i32(extFloat80_t a,
 
     auto const shiftDist = 0x4032 - exp;
     uint32_t const shiftDist1 = shiftDist <= 0 ? 1u : static_cast<uint32_t>(shiftDist);
-    return roundPackTo<int32_t>(sign, shiftRightJam64(sig, shiftDist1), roundingMode, exact);
+    return round_pack_to<int32_t>(sign, shift_right_jam_64(sig, shiftDist1), roundingMode, exact);
 }

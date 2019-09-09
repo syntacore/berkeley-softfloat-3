@@ -42,7 +42,7 @@ namespace fast_int64 {
 
 template<>
 int64_t
-roundPackTo<int64_t>(bool const sign,
+round_pack_to<int64_t>(bool const sign,
                      uint64_t sig,
                      uint64_t const sigExtra,
                      softfloat_round_mode const roundingMode,
@@ -81,7 +81,7 @@ roundPackTo<int64_t>(bool const sign,
 
 template
 int64_t
-roundPackTo<int64_t>(bool,
+round_pack_to<int64_t>(bool,
                      uint64_t,
                      uint64_t,
                      softfloat_round_mode,

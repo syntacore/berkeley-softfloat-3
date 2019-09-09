@@ -50,14 +50,14 @@ f128M_mul(float128_t const* const aPtr,
     uint32_t const* const bWPtr = reinterpret_cast<const uint32_t*>(bPtr);
     uint32_t* const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
-    int32_t expA = expF128UI96(uiA96);
-    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
-    int32_t expB = expF128UI96(uiB96);
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
+    int32_t expA = exp_F128_UI96(uiA96);
+    uint32_t const uiB96 = bWPtr[index_word_hi(4)];
+    int32_t expB = exp_F128_UI96(uiB96);
     bool const signZ = is_sign(uiA96) != is_sign(uiB96);
 
     if (0x7FFF == expA || 0x7FFF == expB) {
-        if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
+        if (try_propagate_NaN_M_F128(aWPtr, bWPtr, zWPtr)) {
             return;
         }
 
@@ -65,36 +65,36 @@ f128M_mul(float128_t const* const aPtr,
             uint32_t const* ptr = 0 == expA ? aWPtr : bWPtr;
 
             if (
-                0 == fracF128UI96(ptr[indexWordHi(4)]) &&
-                0 == (ptr[indexWord(4, 2)] | ptr[indexWord(4, 1)] | ptr[indexWord(4, 0)])
+                0 == frac_F128_UI96(ptr[index_word_hi(4)]) &&
+                0 == (ptr[index_word(4, 2)] | ptr[index_word(4, 1)] | ptr[index_word(4, 0)])
             ) {
-                softfloat_invalidF128M(zWPtr);
+                invalid_M_F128(zWPtr);
                 return;
             }
         }
 
-        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0x7FFF, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0x7FFF, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     uint32_t sigA[4];
 
     if (0 != expA) {
-        sigA[indexWordHi(4)] = fracF128UI96(uiA96) | 0x00010000;
-        sigA[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
-        sigA[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
-        sigA[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
+        sigA[index_word_hi(4)] = frac_F128_UI96(uiA96) | 0x00010000;
+        sigA[index_word(4, 2)] = aWPtr[index_word(4, 2)];
+        sigA[index_word(4, 1)] = aWPtr[index_word(4, 1)];
+        sigA[index_word(4, 0)] = aWPtr[index_word(4, 0)];
     } else {
-        expA = softfloat_shiftNormSigF128M(aWPtr, 0, sigA);
+        expA = shift_norm_sig_M_F128(aWPtr, 0, sigA);
 
         if (expA == -128) {
-            zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
-            zWPtr[indexWord(4, 2)] = 0;
-            zWPtr[indexWord(4, 1)] = 0;
-            zWPtr[indexWord(4, 0)] = 0;
+            zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0, 0);
+            zWPtr[index_word(4, 2)] = 0;
+            zWPtr[index_word(4, 1)] = 0;
+            zWPtr[index_word(4, 0)] = 0;
             return;
         }
     }
@@ -102,39 +102,39 @@ f128M_mul(float128_t const* const aPtr,
     uint32_t sigB[4];
 
     if (0 != expB) {
-        sigB[indexWordHi(4)] = fracF128UI96(uiB96) | 0x00010000;
-        sigB[indexWord(4, 2)] = bWPtr[indexWord(4, 2)];
-        sigB[indexWord(4, 1)] = bWPtr[indexWord(4, 1)];
-        sigB[indexWord(4, 0)] = bWPtr[indexWord(4, 0)];
+        sigB[index_word_hi(4)] = frac_F128_UI96(uiB96) | 0x00010000;
+        sigB[index_word(4, 2)] = bWPtr[index_word(4, 2)];
+        sigB[index_word(4, 1)] = bWPtr[index_word(4, 1)];
+        sigB[index_word(4, 0)] = bWPtr[index_word(4, 0)];
     } else {
-        expB = softfloat_shiftNormSigF128M(bWPtr, 0, sigB);
+        expB = shift_norm_sig_M_F128(bWPtr, 0, sigB);
 
         if (expB == -128) {
-            zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
-            zWPtr[indexWord(4, 2)] = 0;
-            zWPtr[indexWord(4, 1)] = 0;
-            zWPtr[indexWord(4, 0)] = 0;
+            zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0, 0);
+            zWPtr[index_word(4, 2)] = 0;
+            zWPtr[index_word(4, 1)] = 0;
+            zWPtr[index_word(4, 0)] = 0;
             return;
         }
     }
 
     int32_t expZ = expA + expB - 0x4000;
     uint32_t sigProd[8];
-    softfloat_mul128MTo256M(sigA, sigB, sigProd);
+    mul_M_128_to_256(sigA, sigB, sigProd);
 
-    if (0 != sigProd[indexWord(8, 2)] || 0 != (sigProd[indexWord(8, 1)] | sigProd[indexWord(8, 0)])) {
-        sigProd[indexWord(8, 3)] |= 1;
+    if (0 != sigProd[index_word(8, 2)] || 0 != (sigProd[index_word(8, 1)] | sigProd[index_word(8, 0)])) {
+        sigProd[index_word(8, 3)] |= 1;
     }
 
-    uint32_t* const extSigZPtr = &sigProd[indexMultiwordHi(8, 5)];
+    uint32_t* const extSigZPtr = &sigProd[index_multiword_hi(8, 5)];
     uint8_t shiftDist = 16;
 
-    if (0 != (extSigZPtr[indexWordHi(5)] & 2)) {
+    if (0 != (extSigZPtr[index_word_hi(5)] & 2)) {
         ++expZ;
         shiftDist = 15;
     }
 
-    softfloat_shortShiftLeft160M(extSigZPtr, shiftDist, extSigZPtr);
-    softfloat_roundPackMToF128M(signZ, expZ, extSigZPtr, zWPtr);
+    short_shift_left_M_160(extSigZPtr, shiftDist, extSigZPtr);
+    round_pack_to_M_F128(signZ, expZ, extSigZPtr, zWPtr);
 #endif
 }

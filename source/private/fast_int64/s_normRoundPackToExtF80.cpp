@@ -41,7 +41,7 @@ namespace internals {
 namespace fast_int64 {
 
 extFloat80_t
-normRoundPackToExtF80(bool const sign,
+norm_round_pack_to_extF80(bool const sign,
                       int32_t exp,
                       uint64_t sig,
                       uint64_t sigExtra,
@@ -57,13 +57,13 @@ normRoundPackToExtF80(bool const sign,
     exp -= shiftDist;
 
     if (0 != shiftDist) {
-        uint128 const sig128 = shortShiftLeft128(uint128{sig, sigExtra}, shiftDist);
+        uint128 const sig128 = short_shift_left_128(uint128{sig, sigExtra}, shiftDist);
         sig = sig128.v64;
         sigExtra = sig128.v0;
     }
 
     return
-        roundPackToExtF80(sign, exp, sig, sigExtra, roundingPrecision);
+        round_pack_to_extF80(sign, exp, sig, sigExtra, roundingPrecision);
 }
 
 }  // namespace fast_int64

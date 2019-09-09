@@ -41,7 +41,7 @@ i64_to_f64(int64_t const a)
 {
     using namespace softfloat::internals;
     bool const sign = a < 0;
-    return 
-        0 == (a & INT64_MAX) ? u_as_f(sign ? packToF64UI(1, 0x43E, 0) : 0):
-        normRoundPackToF64(sign, 0x43C, static_cast<uint64_t>(sign ? -a : a));
+    return
+        0 == (a & INT64_MAX) ? u_as_f(sign ? pack_to_F64_UI(1, 0x43E, 0) : 0) :
+        norm_round_pack_to_F64(sign, 0x43C, static_cast<uint64_t>(sign ? -a : a));
 }

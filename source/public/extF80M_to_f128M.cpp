@@ -48,9 +48,9 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
     uint16_t const uiA64 = aPtr->signExp;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sig = aPtr->signif;
-    zWPtr[indexWord(4, 0)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
@@ -58,9 +58,9 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
             return;
         }
 
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x7FFF, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0x7FFF, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
         return;
     }
 
@@ -70,30 +70,30 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
 
     if (0 == (sig & UINT64_C(0x8000000000000000))) {
         if (0 == sig) {
-            zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0, 0);
-            zWPtr[indexWord(4, 2)] = 0;
-            zWPtr[indexWord(4, 1)] = 0;
+            zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0, 0);
+            zWPtr[index_word(4, 2)] = 0;
+            zWPtr[index_word(4, 1)] = 0;
             return;
         }
 
-        exp += softfloat_normExtF80SigM(&sig);
+        exp += norm_M_extF80Sig(&sig);
     }
 
-    zWPtr[indexWord(4, 1)] = static_cast<uint32_t>(sig) << 17;
+    zWPtr[index_word(4, 1)] = static_cast<uint32_t>(sig) << 17;
     sig >>= 15;
-    zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(sig);
+    zWPtr[index_word(4, 2)] = static_cast<uint32_t>(sig);
 
     if (exp < 0) {
-        zWPtr[indexWordHi(4)] = sig >> 32;
-        softfloat_shiftRight96M(
-            &zWPtr[indexMultiwordHi(4, 3)],
+        zWPtr[index_word_hi(4)] = sig >> 32;
+        shift_right_M_96(
+            &zWPtr[index_multiword_hi(4, 3)],
             static_cast<uint8_t>(-exp),
-            &zWPtr[indexMultiwordHi(4, 3)]);
+            &zWPtr[index_multiword_hi(4, 3)]);
         exp = 0;
-        sig = static_cast<uint64_t>(zWPtr[indexWordHi(4)]) << 32;
+        sig = static_cast<uint64_t>(zWPtr[index_word_hi(4)]) << 32;
     }
 
-    zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), sig >> 32);
+    zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, static_cast<unsigned>(exp), sig >> 32);
     return;
 #endif
 }

@@ -56,7 +56,7 @@ f32_to_i32_r_minMag(float32_t const a,
     bool const sign = is_sign(a);
 
     if (shiftDist <= 0) {
-        if (f_as_u(a) == packToF32UI(true, 0x9E, 0)) {
+        if (f_as_u(a) == pack_to_F32_UI(true, 0x9E, 0)) {
             return INT32_MIN;
         }
 

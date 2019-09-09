@@ -43,12 +43,12 @@ ui64_to_f16(uint64_t a)
     int8_t const shiftDist = count_leading_zeros(a) - 53;
 
     if (0 <= shiftDist) {
-        return u_as_f(a ? packToF16UI(0, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : uint16_t(0));
+        return u_as_f(a ? pack_to_F16_UI(0, static_cast<int8_t>(0x18 - shiftDist), static_cast<uint16_t>(a << shiftDist)) : uint16_t(0));
     }
 
     int8_t const shiftDist1 = shiftDist + 4;
     uint16_t const sig =
-        shiftDist1 < 0 ? static_cast<uint16_t>(shortShiftRightJam64(a, static_cast<uint8_t>(-shiftDist1))) :
+        shiftDist1 < 0 ? static_cast<uint16_t>(short_shift_right_jam_64(a, static_cast<uint8_t>(-shiftDist1))) :
         static_cast<uint16_t>(a << shiftDist1);
-    return roundPackToF16(0, 0x1C - shiftDist1, sig);
+    return round_pack_to_F16(0, 0x1C - shiftDist1, sig);
 }

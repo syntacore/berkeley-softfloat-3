@@ -44,7 +44,7 @@ extF80_to_f32(extFloat80_t a)
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t const sig = uiA0;
 
     if (exp == INT16_MAX) {
@@ -55,7 +55,7 @@ extF80_to_f32(extFloat80_t a)
         return make_signed_inf<float32_t>(sign);
     }
 
-    uint32_t const sig32 = static_cast<uint32_t>(shortShiftRightJam64(sig, 33));
+    uint32_t const sig32 = static_cast<uint32_t>(short_shift_right_jam_64(sig, 33));
 
     if (exp | sig32) {
         exp -= 0x3F81;
@@ -65,7 +65,7 @@ extF80_to_f32(extFloat80_t a)
         }
 
         assert(INT16_MIN <= exp && exp <= INT16_MAX);
-        return roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
+        return round_pack_to_F32(sign, static_cast<int16_t>(exp), sig32);
     }
 
     return make_signed_zero<float32_t>(sign);

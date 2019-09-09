@@ -54,7 +54,7 @@ extF80M_sub(extFloat80_t const *const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    softfloat_addExtF80M(aPtr, bPtr, zPtr, true);
+    add_M_extF80(aPtr, bPtr, zPtr, true);
 #endif
 }
 

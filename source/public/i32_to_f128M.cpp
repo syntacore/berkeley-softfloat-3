@@ -46,19 +46,20 @@ i32_to_f128M(int32_t a,
 #else
     using namespace softfloat::internals::slow_int64;
     uint32_t* const zWPtr = (uint32_t*)zPtr;
-    zWPtr[indexWord(4, 0)] = 0;
-    zWPtr[indexWord(4, 1)] = 0;
+    zWPtr[index_word(4, 0)] = 0;
+    zWPtr[index_word(4, 1)] = 0;
 
     if (0 == a) {
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 3)] = 0;
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 3)] = 0;
     } else {
         bool const sign = a < 0;
         uint32_t const absA = static_cast<uint32_t>(sign ? -a : a);
         int8_t const shiftDist = count_leading_zeros(absA) + 17;
         uint64_t const normAbsA = static_cast<uint64_t>(absA) << shiftDist;
-        zWPtr[indexWord(4, 2)] = static_cast<uint32_t>(normAbsA);
-        zWPtr[indexWord(4, 3)] = packToF128UI96(sign, 0x402Eu - shiftDist, normAbsA >> 32);
+        zWPtr[index_word(4, 2)] = static_cast<uint32_t>(normAbsA);
+        zWPtr[index_word(4, 3)] = pack_to_F128_UI96(sign, 0x402Eu - shiftDist, normAbsA >> 32);
     }
+
 #endif
 }

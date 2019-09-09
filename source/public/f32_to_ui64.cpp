@@ -60,11 +60,11 @@ f32_to_ui64(float32_t const a,
     uint64_t const sig64 = static_cast<uint64_t>(sig | (0 != exp ? 0x00800000 : 0)) << 40;
 
     if (0 != shiftDist) {
-        uint64_extra const sig64Extra = shiftRightJam64Extra(sig64, 0, static_cast<uint32_t>(shiftDist));
-        return roundPackTo<uint64_t>(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
+        uint64_extra const sig64Extra = shift_right_jam_64Extra(sig64, 0, static_cast<uint32_t>(shiftDist));
+        return round_pack_to<uint64_t>(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
     }
 
-    return roundPackTo<uint64_t>(sign, sig64, 0, roundingMode, exact);
+    return round_pack_to<uint64_t>(sign, sig64, 0, roundingMode, exact);
 
 #else
     using namespace softfloat::internals::slow_int64;
@@ -82,14 +82,14 @@ f32_to_ui64(float32_t const a,
     }
 
     uint32_t extSig[3];
-    extSig[indexWord(3, 2)] = (sig | (0 != exp ? 0x00800000 : 0)) << 8;
-    extSig[indexWord(3, 1)] = 0;
-    extSig[indexWord(3, 0)] = 0;
+    extSig[index_word(3, 2)] = (sig | (0 != exp ? 0x00800000 : 0)) << 8;
+    extSig[index_word(3, 1)] = 0;
+    extSig[index_word(3, 0)] = 0;
 
     if (shiftDist) {
-        softfloat_shiftRightJam96M(extSig, static_cast<uint8_t>(shiftDist), extSig);
+        shift_right_jam_M_96(extSig, static_cast<uint8_t>(shiftDist), extSig);
     }
 
-    return roundPackMTo<uint64_t>(sign, extSig, roundingMode, exact);
+    return round_pack_to_M<uint64_t>(sign, extSig, roundingMode, exact);
 #endif
 }

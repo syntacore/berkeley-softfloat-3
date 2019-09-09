@@ -43,8 +43,8 @@ f128_to_ui32_r_minMag(float128_t const a,
     using namespace softfloat::internals::fast_int64;
 
     uint128 const aa{a};
-    int32_t const exp = expF128UI64(aa.v64);
-    uint64_t sig64 = fracF128UI64(aa.v64) | (aa.v0 != 0);
+    int32_t const exp = exp_F128_UI64(aa.v64);
+    uint64_t sig64 = frac_F128_UI64(aa.v64) | (aa.v0 != 0);
     int32_t const shiftDist = 0x402F - exp;
 
     if (49 <= shiftDist) {

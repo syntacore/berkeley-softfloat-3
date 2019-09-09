@@ -48,7 +48,7 @@ f64_to_i64_r_minMag(float64_t const a,
 
     if (shiftDist <= 0) {
         if (shiftDist < -10) {
-            if (f_as_u(a) == packToF64UI(1, 0x43E, 0)) {
+            if (f_as_u(a) == pack_to_F64_UI(1, 0x43E, 0)) {
                 return INT64_MIN;
             }
 

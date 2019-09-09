@@ -48,7 +48,7 @@ i32_to_f16(int32_t a)
     int8_t const shiftDist = count_leading_zeros(absA) - 21;
 
     if (0 <= shiftDist) {
-        return u_as_f(a ? packToF16UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : uint16_t(0));
+        return u_as_f(a ? pack_to_F16_UI(sign, 0x18 - shiftDist, static_cast<uint16_t>(absA << shiftDist)) : uint16_t(0));
     }
 
     int8_t const shiftDist1 = shiftDist + 4;
@@ -56,5 +56,5 @@ i32_to_f16(int32_t a)
         static_cast<uint16_t>(
             shiftDist1 < 0 ? absA >> -shiftDist1 | !!(0 != (absA << (shiftDist1 & 0x1F))) :
             absA << shiftDist1);
-    return roundPackToF16(sign, 0x1C - shiftDist1, sig);
+    return round_pack_to_F16(sign, 0x1C - shiftDist1, sig);
 }

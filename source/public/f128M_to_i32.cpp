@@ -52,12 +52,12 @@ f128M_to_i32(float128_t const* const aPtr,
     static bool const fromNaN_same_as_any_overflow = fromNaN_same_as_pos_overflow || fromNaN_same_as_neg_overflow;
 
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     bool sign = is_sign(uiA96);
-    int32_t const exp = expF128UI96(uiA96);
-    uint64_t sig64 = static_cast<uint64_t>(fracF128UI96(uiA96)) << 32 | aWPtr[indexWord(4, 2)];
+    int32_t const exp = exp_F128_UI96(uiA96);
+    uint64_t sig64 = static_cast<uint64_t>(frac_F128_UI96(uiA96)) << 32 | aWPtr[index_word(4, 2)];
 
-    if (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
+    if (aWPtr[index_word(4, 1)] | aWPtr[index_word(4, 0)]) {
         sig64 |= 1;
     }
 
@@ -76,6 +76,6 @@ f128M_to_i32(float128_t const* const aPtr,
     }
 
     int32_t const shiftDist = 0x4023 - exp;
-    return roundPackTo<int32_t>(sign, 0 < shiftDist ? shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
+    return round_pack_to<int32_t>(sign, 0 < shiftDist ? shift_right_jam_64(sig64, static_cast<uint32_t>(shiftDist)) : sig64, roundingMode, exact);
 #endif
 }

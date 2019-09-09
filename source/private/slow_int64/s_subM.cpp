@@ -41,16 +41,16 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_subM(size_t const size_words,
+sub_M(size_t const size_words,
                uint32_t const* const aPtr,
                uint32_t const* const bPtr,
                uint32_t* const zPtr)
 {
 
-    auto const lastIndex = indexWordHi(size_words);
+    auto const lastIndex = index_word_hi(size_words);
     bool borrow = 0;
 
-    for (auto index = indexWordLo(size_words);; index += wordIncr) {
+    for (auto index = index_word_lo(size_words);; index += wordIncr) {
         uint32_t const wordA = aPtr[index];
         uint32_t const wordB = bPtr[index];
         zPtr[index] = wordA - wordB - !!borrow;

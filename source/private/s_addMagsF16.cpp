@@ -65,10 +65,10 @@ add_magnitudes(uint16_t const& uiA,
         uint16_t const sigZ = 0x0800u + sigA + sigB;
 
         if (0 == (sigZ & 1) && expZ < 0x1E) {
-            return u_as_f(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
+            return u_as_f(pack_to_F16_UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 1)));
         }
 
-        return roundPackToF16(signZ, expZ, static_cast<uint16_t>(sigZ << 3));
+        return round_pack_to_F16(signZ, expZ, static_cast<uint16_t>(sigZ << 3));
     }
 
     bool const signZ = is_sign(uiA);
@@ -84,7 +84,7 @@ add_magnitudes(uint16_t const& uiA,
         }
 
         if (expDiff <= -13) {
-            uint16_t uiZ = packToF16UI(signZ, expB, sigB);
+            uint16_t uiZ = pack_to_F16_UI(signZ, expB, sigB);
 
             if (0 != (expA | sigA)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
@@ -146,14 +146,14 @@ add_magnitudes(uint16_t const& uiA,
     uint16_t const sigZ = sig32Z >> 16;
 
     if (0 != (sig32Z & 0xFFFF)) {
-        return roundPackToF16(signZ, expZ, sigZ | 1u);
+        return round_pack_to_F16(signZ, expZ, sigZ | 1u);
     }
 
     if (0 == (sigZ & 0xF) && expZ < 0x1E) {
-        return u_as_f(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 4)));
+        return u_as_f(pack_to_F16_UI(signZ, expZ, static_cast<uint16_t>(sigZ >> 4)));
     }
 
-    return roundPackToF16(signZ, expZ, sigZ);
+    return round_pack_to_F16(signZ, expZ, sigZ);
 }
 
 }  // namespace internals

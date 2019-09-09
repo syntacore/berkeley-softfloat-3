@@ -41,35 +41,32 @@ namespace internals {
 namespace slow_int64 {
 
 int
-softfloat_shiftNormSigF128M(
-    const uint32_t* wPtr, uint8_t shiftDist, uint32_t* sigPtr)
+shift_norm_sig_M_F128(const uint32_t* wPtr,
+                     uint8_t shiftDist,
+                     uint32_t* sigPtr)
 {
-    uint32_t wordSig;
-    int32_t exp;
-    uint32_t leadingBit;
-
-    wordSig = wPtr[indexWordHi(4)];
-    exp = expF128UI96(wordSig);
+    uint32_t wordSig = wPtr[index_word_hi(4)];
+    int32_t exp = exp_F128_UI96(wordSig);
 
     if (exp) {
-        softfloat_shortShiftLeft128M(wPtr, shiftDist, sigPtr);
-        leadingBit = UINT32_C(0x00010000) << shiftDist;
-        sigPtr[indexWordHi(4)] =
-            (sigPtr[indexWordHi(4)] & (leadingBit - 1)) | leadingBit;
+        short_shift_left_M_128(wPtr, shiftDist, sigPtr);
+        uint32_t leadingBit = UINT32_C(0x00010000) << shiftDist;
+        sigPtr[index_word_hi(4)] =
+            (sigPtr[index_word_hi(4)] & (leadingBit - 1)) | leadingBit;
     } else {
         exp = 16;
         wordSig &= 0x7FFFFFFF;
 
         if (!wordSig) {
             exp = -16;
-            wordSig = wPtr[indexWord(4, 2)];
+            wordSig = wPtr[index_word(4, 2)];
 
             if (!wordSig) {
                 exp = -48;
-                wordSig = wPtr[indexWord(4, 1)];
+                wordSig = wPtr[index_word(4, 1)];
 
                 if (!wordSig) {
-                    wordSig = wPtr[indexWord(4, 0)];
+                    wordSig = wPtr[index_word(4, 0)];
 
                     if (!wordSig) {
                         return -128;
@@ -81,7 +78,7 @@ softfloat_shiftNormSigF128M(
         }
 
         exp -= count_leading_zeros(wordSig);
-        softfloat_shiftLeft128M(wPtr, static_cast<uint32_t>(1 - exp + shiftDist), sigPtr);
+        shift_left_M_128(wPtr, static_cast<uint32_t>(1 - exp + shiftDist), sigPtr);
     }
 
     return exp;

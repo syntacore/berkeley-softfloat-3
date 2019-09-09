@@ -45,21 +45,21 @@ f128_to_f16(float128_t const a)
     uint64_t const uiA64 = uA.v64;
     uint64_t const uiA0 = uA.v0;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expF128UI64(uiA64);
-    uint64_t const frac64 = fracF128UI64(uiA64) | (uiA0 != 0);
+    int32_t exp = exp_F128_UI64(uiA64);
+    uint64_t const frac64 = frac_F128_UI64(uiA64) | (uiA0 != 0);
 
     if (exp == 0x7FFF) {
         if (frac64) {
             return u_as_f(commonNaN_to_F16UI(commonNaN_from_f128UI(uiA64, uiA0)));
         }
 
-        return u_as_f(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0x1F, 0));
     }
 
-    uint16_t const frac16 = static_cast<uint16_t>(shortShiftRightJam64(frac64, 34));
+    uint16_t const frac16 = static_cast<uint16_t>(short_shift_right_jam_64(frac64, 34));
 
     if (!(exp | frac16)) {
-        return u_as_f(packToF16UI(sign, 0, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0, 0));
     }
 
     exp -= 0x3FF1;
@@ -71,5 +71,5 @@ f128_to_f16(float128_t const a)
     /**
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
-    return roundPackToF16(sign, static_cast<int16_t>(exp), frac16 | 0x4000u);
+    return round_pack_to_F16(sign, static_cast<int16_t>(exp), frac16 | 0x4000u);
 }

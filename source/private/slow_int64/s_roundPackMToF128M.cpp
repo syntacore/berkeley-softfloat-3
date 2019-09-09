@@ -47,7 +47,7 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_roundPackMToF128M(bool const sign,
+round_pack_to_M_F128(bool const sign,
                             int32_t exp,
                             uint32_t* const extSigPtr,
                             uint32_t* const zWPtr)
@@ -57,7 +57,7 @@ softfloat_roundPackMToF128M(bool const sign,
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
 
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
-    uint32_t sigExtra = extSigPtr[indexWordLo(5)];
+    uint32_t sigExtra = extSigPtr[index_word_lo(5)];
     bool doIncrement = (0x80000000 <= sigExtra);
 
     if (!roundNearEven && softfloat_round_near_maxMag != softfloat_roundingMode) {
@@ -69,17 +69,17 @@ softfloat_roundPackMToF128M(bool const sign,
     if (0x7FFD <= static_cast<uint32_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == detectTininess ||
+                softfloat_tininess_beforeRounding == detect_tininess ||
                 exp < -1 ||
                 !doIncrement ||
-                softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig) < 0;
+                compare_M_128(extSigPtr + index_multiword_hi(5, 4), maxSig) < 0;
 
             /**
             @bug modify input
             */
-            softfloat_shiftRightJam160M(extSigPtr, static_cast<uint8_t>(-exp), extSigPtr);
+            shift_right_jam_M_160(extSigPtr, static_cast<uint8_t>(-exp), extSigPtr);
             exp = 0;
-            sigExtra = extSigPtr[indexWordLo(5)];
+            sigExtra = extSigPtr[index_word_lo(5)];
 
             if (isTiny && sigExtra) {
                 softfloat_raiseFlags(softfloat_flag_underflow);
@@ -92,21 +92,21 @@ softfloat_roundPackMToF128M(bool const sign,
                     ((sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) &&
                     sigExtra;
             }
-        } else if (0x7FFD < exp || (0x7FFD == exp && doIncrement && 0 == softfloat_compare128M(extSigPtr + indexMultiwordHi(5, 4), maxSig))) {
+        } else if (0x7FFD < exp || (0x7FFD == exp && doIncrement && 0 == compare_M_128(extSigPtr + index_multiword_hi(5, 4), maxSig))) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
 
             if (roundNearEven || softfloat_round_near_maxMag == softfloat_roundingMode || (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode) {
-                zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x7FFF, 0);
-                zWPtr[indexWord(4, 2)] = 0;
-                zWPtr[indexWord(4, 1)] = 0;
-                zWPtr[indexWord(4, 0)] = 0;
+                zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, 0x7FFF, 0);
+                zWPtr[index_word(4, 2)] = 0;
+                zWPtr[index_word(4, 1)] = 0;
+                zWPtr[index_word(4, 0)] = 0;
                 return;
             }
 
-            zWPtr[indexWordHi(4)] = packToF128UI96(sign, 0x7FFE, 0x0000FFFF);
-            zWPtr[indexWord(4, 2)] = 0xFFFFFFFF;
-            zWPtr[indexWord(4, 1)] = 0xFFFFFFFF;
-            zWPtr[indexWord(4, 0)] = 0xFFFFFFFF;
+            zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, 0x7FFE, 0x0000FFFF);
+            zWPtr[index_word(4, 2)] = 0xFFFFFFFF;
+            zWPtr[index_word(4, 1)] = 0xFFFFFFFF;
+            zWPtr[index_word(4, 0)] = 0xFFFFFFFF;
             return;
         }
     }
@@ -115,7 +115,7 @@ softfloat_roundPackMToF128M(bool const sign,
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 
-    uint32_t uj = extSigPtr[indexWord(5, 1)];
+    uint32_t uj = extSigPtr[index_word(5, 1)];
 
     if (doIncrement) {
         uint32_t ui;
@@ -126,23 +126,23 @@ softfloat_roundPackMToF128M(bool const sign,
                 uj &= ~1;
             }
 
-            zWPtr[indexWord(4, 2)] = extSigPtr[indexWord(5, 3)];
-            zWPtr[indexWord(4, 1)] = extSigPtr[indexWord(5, 2)];
-            zWPtr[indexWord(4, 0)] = uj;
-            ui = extSigPtr[indexWordHi(5)];
+            zWPtr[index_word(4, 2)] = extSigPtr[index_word(5, 3)];
+            zWPtr[index_word(4, 1)] = extSigPtr[index_word(5, 2)];
+            zWPtr[index_word(4, 0)] = uj;
+            ui = extSigPtr[index_word_hi(5)];
         } else {
-            zWPtr[indexWord(4, 0)] = uj;
-            ui = extSigPtr[indexWord(5, 2)] + 1;
-            zWPtr[indexWord(4, 1)] = ui;
-            uj = extSigPtr[indexWord(5, 3)];
+            zWPtr[index_word(4, 0)] = uj;
+            ui = extSigPtr[index_word(5, 2)] + 1;
+            zWPtr[index_word(4, 1)] = ui;
+            uj = extSigPtr[index_word(5, 3)];
 
             if (ui) {
-                zWPtr[indexWord(4, 2)] = uj;
-                ui = extSigPtr[indexWordHi(5)];
+                zWPtr[index_word(4, 2)] = uj;
+                ui = extSigPtr[index_word_hi(5)];
             } else {
                 ++uj;
-                zWPtr[indexWord(4, 2)] = uj;
-                ui = extSigPtr[indexWordHi(5)];
+                zWPtr[index_word(4, 2)] = uj;
+                ui = extSigPtr[index_word_hi(5)];
 
                 if (!uj) {
                     ++ui;
@@ -150,23 +150,23 @@ softfloat_roundPackMToF128M(bool const sign,
             }
         }
 
-        zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), ui);
+        zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, static_cast<unsigned>(exp), ui);
     } else {
-        zWPtr[indexWord(4, 0)] = uj;
-        uint32_t ui = extSigPtr[indexWord(5, 2)];
-        zWPtr[indexWord(4, 1)] = ui;
+        zWPtr[index_word(4, 0)] = uj;
+        uint32_t ui = extSigPtr[index_word(5, 2)];
+        zWPtr[index_word(4, 1)] = ui;
         uj |= ui;
-        ui = extSigPtr[indexWord(5, 3)];
-        zWPtr[indexWord(4, 2)] = ui;
+        ui = extSigPtr[index_word(5, 3)];
+        zWPtr[index_word(4, 2)] = ui;
         uj |= ui;
-        ui = extSigPtr[indexWordHi(5)];
+        ui = extSigPtr[index_word_hi(5)];
         uj |= ui;
 
         if (0 == uj) {
             exp = 0;
         }
 
-        zWPtr[indexWordHi(4)] = packToF128UI96(sign, static_cast<unsigned>(exp), ui);
+        zWPtr[index_word_hi(4)] = pack_to_F128_UI96(sign, static_cast<unsigned>(exp), ui);
     }
 }
 

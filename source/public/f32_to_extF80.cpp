@@ -54,7 +54,7 @@ f32_to_extF80(float32_t const a)
             return uZ;
         } else {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, 0x7FFF);
+            uZ.signExp = pack_to_extF80_UI64(sign, 0x7FFF);
             uZ.signif = UINT64_C(0x8000000000000000);
             return uZ;
         }
@@ -62,7 +62,7 @@ f32_to_extF80(float32_t const a)
 
     if (is_zero(a)) {
         extFloat80_t uZ;
-        uZ.signExp = packToExtF80UI64(sign, 0);
+        uZ.signExp = pack_to_extF80_UI64(sign, 0);
         uZ.signif = 0;
         return uZ;
     }
@@ -75,7 +75,7 @@ f32_to_extF80(float32_t const a)
 
     {
         extFloat80_t uZ;
-        uZ.signExp = packToExtF80UI64(sign, exp + 0x3F80u);
+        uZ.signExp = pack_to_extF80_UI64(sign, exp + 0x3F80u);
         uZ.signif = static_cast<uint64_t>(frac | 0x00800000) << 40;
         return uZ;
     }

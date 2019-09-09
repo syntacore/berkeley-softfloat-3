@@ -49,7 +49,7 @@ ui32_to_f128(uint32_t const a)
     return
         float128_t(
             uint128(
-                packToF128UI64(false,
+                pack_to_F128_UI64(false,
                                0x402E - shiftDist,
                                static_cast<uint64_t>(a) << shiftDist),
                 0));

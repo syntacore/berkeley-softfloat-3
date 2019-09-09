@@ -44,7 +44,7 @@ extF80_to_f16(extFloat80_t a)
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t const sig = uiA0;
 
     if (exp == 0x7FFF) {
@@ -52,13 +52,13 @@ extF80_to_f16(extFloat80_t a)
             return u_as_f(commonNaN_to_F16UI(commonNaN_from_extF80UI(uiA64, uiA0)));
         }
 
-        return u_as_f(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0x1F, 0));
     }
 
-    uint16_t const sig16 = static_cast<uint16_t>(shortShiftRightJam64(sig, 49));
+    uint16_t const sig16 = static_cast<uint16_t>(short_shift_right_jam_64(sig, 49));
 
     if (!(exp | sig16)) {
-        return u_as_f(packToF16UI(sign, 0, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0, 0));
     }
 
     exp -= 0x3FF1;
@@ -70,5 +70,5 @@ extF80_to_f16(extFloat80_t a)
     /**
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
-    return roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
+    return round_pack_to_F16(sign, static_cast<int16_t>(exp), sig16);
 }

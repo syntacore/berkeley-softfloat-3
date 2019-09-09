@@ -62,7 +62,7 @@ make_result(uint16_t const sigA,
         sigZ |= (static_cast<uint32_t>(sigB) * sigZ != sig32A);
     }
 
-    return roundPackToF16(signZ, expZ, sigZ);
+    return round_pack_to_F16(signZ, expZ, sigZ);
 }
 
 #else
@@ -84,8 +84,8 @@ make_result(uint16_t sigA,
 
     int const index = sigB >> 6 & 0xF;
     uint16_t const r0 =
-        approxRecip_1k0s[index] -
-        ((static_cast<uint32_t>(approxRecip_1k1s[index]) * (sigB & 0x3F)) >> 10);
+        approx_recip_1k0s[index] -
+        ((static_cast<uint32_t>(approx_recip_1k1s[index]) * (sigB & 0x3F)) >> 10);
     uint16_t sigZ = (static_cast<uint32_t>(sigA) * r0) >> 16;
     uint16_t rem = (sigA << 10) - sigZ * sigB;
     sigZ += (rem * static_cast<uint32_t>(r0)) >> 26;
@@ -105,7 +105,7 @@ make_result(uint16_t sigA,
         }
     }
 
-    return roundPackToF16(signZ, expZ, sigZ);
+    return round_pack_to_F16(signZ, expZ, sigZ);
 }
 
 #endif
@@ -131,7 +131,7 @@ f16_div(float16_t const a,
 
     if (is_inf(a)) {
         if (is_finite(b)) {
-            return u_as_f(packToF16UI(signZ, 0x1F, 0));
+            return u_as_f(pack_to_F16_UI(signZ, 0x1F, 0));
         }
 
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -139,7 +139,7 @@ f16_div(float16_t const a,
     }
 
     if (is_inf(b)) {
-        return u_as_f(packToF16UI(signZ, 0, 0));
+        return u_as_f(pack_to_F16_UI(signZ, 0, 0));
     }
 
     if (is_zero(b)) {
@@ -149,11 +149,11 @@ f16_div(float16_t const a,
         }
 
         softfloat_raiseFlags(softfloat_flag_infinite);
-        return u_as_f(packToF16UI(signZ, 0x1F, 0));
+        return u_as_f(pack_to_F16_UI(signZ, 0x1F, 0));
     }
 
     if (is_zero(a)) {
-        return u_as_f(packToF16UI(signZ, 0, 0));
+        return u_as_f(pack_to_F16_UI(signZ, 0, 0));
     }
 
     if (0 == expB) {

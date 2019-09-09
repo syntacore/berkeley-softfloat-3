@@ -53,9 +53,9 @@ i64_to_f128(int64_t const a)
     int8_t const shiftDist = count_leading_zeros(absA) + 49;
 
     if (64 <= shiftDist) {
-        return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});
+        return static_cast<float128_t>(uint128{pack_to_F128_UI64(sign, 0x406E - shiftDist, absA << (shiftDist - 64)), 0});
     }
 
-    uint128 const zSig = shortShiftLeft128(uint128{0, absA}, static_cast<uint8_t>(shiftDist));
-    return static_cast<float128_t>(uint128{packToF128UI64(sign, 0x406E - shiftDist, zSig.v64), zSig.v0});
+    uint128 const zSig = short_shift_left_128(uint128{0, absA}, static_cast<uint8_t>(shiftDist));
+    return static_cast<float128_t>(uint128{pack_to_F128_UI64(sign, 0x406E - shiftDist, zSig.v64), zSig.v0});
 }

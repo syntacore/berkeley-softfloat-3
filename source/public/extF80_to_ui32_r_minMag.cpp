@@ -42,7 +42,7 @@ extF80_to_ui32_r_minMag(extFloat80_t const a,
 {
     using namespace softfloat::internals;
     uint16_t const uiA64 = a.signExp;
-    int32_t const exp = expExtF80UI64(uiA64);
+    int32_t const exp = exp_extF80_UI64(uiA64);
     uint64_t const sig = a.signif;
 
     int32_t const shiftDist = 0x403E - exp;

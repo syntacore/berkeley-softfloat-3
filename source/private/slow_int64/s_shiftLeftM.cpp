@@ -41,7 +41,7 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_shiftLeftM(size_t size_words,
+shift_left_M(size_t size_words,
                      uint32_t const* aPtr,
                      uint32_t dist,
                      uint32_t* zPtr)
@@ -50,21 +50,21 @@ softfloat_shiftLeftM(size_t size_words,
     uint32_t wordDist = dist >> 5;
 
     if (wordDist < size_words) {
-        aPtr += indexMultiwordLoBut(size_words, wordDist);
+        aPtr += index_multiword_lo_but(size_words, wordDist);
         uint8_t const innerDist = dist & 31;
 
         if (innerDist) {
-            softfloat_shortShiftLeftM(static_cast<uint8_t>(size_words - wordDist),
+            short_shift_left_M(static_cast<uint8_t>(size_words - wordDist),
                                       aPtr,
                                       innerDist,
-                                      zPtr + indexMultiwordHiBut(size_words, wordDist));
+                                      zPtr + index_multiword_hi_but(size_words, wordDist));
 
             if (0 == wordDist) {
                 return;
             }
         } else {
-            aPtr += indexWordHi(size_words - wordDist);
-            destPtr = zPtr + indexWordHi(size_words);
+            aPtr += index_word_hi(size_words - wordDist);
+            destPtr = zPtr + index_word_hi(size_words);
 
             for (size_t i = size_words - wordDist; i; --i) {
                 *destPtr = *aPtr;
@@ -73,7 +73,7 @@ softfloat_shiftLeftM(size_t size_words,
             }
         }
 
-        zPtr += indexMultiwordLo(size_words, wordDist);
+        zPtr += index_multiword_lo(size_words, wordDist);
     } else {
         wordDist = size_words;
     }

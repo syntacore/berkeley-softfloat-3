@@ -41,8 +41,8 @@ f128M_isSignalingNaN(float128_t const *aPtr)
 {
     using namespace softfloat::internals;
     auto const aWPtr = reinterpret_cast<uint32_t const*>(aPtr);
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     return
         UINT32_C(0x7FFF8000) == (uiA96 & UINT32_C(0x7FFF8000)) && 
-        (0 != (UINT32_C(0x00007FFF) & uiA96) || 0 != aWPtr[indexWord(4, 2)] || 0 != aWPtr[indexWord(4, 1)] || 0 != aWPtr[indexWord(4, 0)]);
+        (0 != (UINT32_C(0x00007FFF) & uiA96) || 0 != aWPtr[index_word(4, 2)] || 0 != aWPtr[index_word(4, 1)] || 0 != aWPtr[index_word(4, 0)]);
 }

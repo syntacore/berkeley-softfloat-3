@@ -52,13 +52,13 @@ f64_to_extF80M(float64_t a,
     }
 
     if (is_inf(a)) {
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
+        zSPtr->signExp = pack_to_extF80_UI64(sign, 0x7FFF);
         zSPtr->signif = UINT64_C(0x8000000000000000);
         return;
     }
 
     if (is_zero(a)) {
-        zSPtr->signExp = packToExtF80UI64(sign, 0);
+        zSPtr->signExp = pack_to_extF80_UI64(sign, 0);
         zSPtr->signif = 0;
         return;
     }
@@ -69,6 +69,6 @@ f64_to_extF80M(float64_t a,
         frac = normExpSig.sig;
     }
 
-    zSPtr->signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
+    zSPtr->signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp + 0x3C00));
     zSPtr->signif = UINT64_C(0x8000000000000000) | frac << 11;
 }

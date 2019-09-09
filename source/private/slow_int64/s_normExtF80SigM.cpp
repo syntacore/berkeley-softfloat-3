@@ -41,7 +41,7 @@ namespace internals {
 namespace slow_int64 {
 
 int
-softfloat_normExtF80SigM(uint64_t* const sigPtr)
+norm_M_extF80Sig(uint64_t* const sigPtr)
 {
     uint64_t const sig = *sigPtr;
     auto const shiftDist = count_leading_zeros(sig);

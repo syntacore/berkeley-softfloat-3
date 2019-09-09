@@ -50,11 +50,11 @@ f128_roundToInt(float128_t const a,
     uint128 uiZ;
 
     uint128 const uA{a};
-    int32_t exp = expF128UI64(uA.v64);
+    int32_t exp = exp_F128_UI64(uA.v64);
 
     if (0x402F <= exp) {
         if (0x406F <= exp) {
-            if (0x7FFF == exp && 0 != (fracF128UI64(uA.v64) | uA.v0)) {
+            if (0x7FFF == exp && 0 != (frac_F128_UI64(uA.v64) | uA.v0)) {
                 return float128_t(propagate_NaN(uA, uint128{0, 0}));
             }
 
@@ -99,7 +99,7 @@ f128_roundToInt(float128_t const a,
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            uiZ.v64 = uA.v64 & packToF128UI64(1, 0, 0);
+            uiZ.v64 = uA.v64 & pack_to_F128_UI64(1, 0, 0);
             uiZ.v0 = 0;
 
             /**
@@ -107,7 +107,7 @@ f128_roundToInt(float128_t const a,
             */
             switch (roundingMode) {
             case softfloat_round_near_even:
-                if (0 == (fracF128UI64(uA.v64) | uA.v0)) {
+                if (0 == (frac_F128_UI64(uA.v64) | uA.v0)) {
                     break;
                 }
 
@@ -115,21 +115,21 @@ f128_roundToInt(float128_t const a,
 
             case softfloat_round_near_maxMag:
                 if (0x3FFE == exp) {
-                    uiZ.v64 |= packToF128UI64(0, 0x3FFF, 0);
+                    uiZ.v64 |= pack_to_F128_UI64(0, 0x3FFF, 0);
                 }
 
                 break;
 
             case softfloat_round_min:
                 if (0 != uiZ.v64) {
-                    uiZ.v64 = packToF128UI64(1, 0x3FFF, 0);
+                    uiZ.v64 = pack_to_F128_UI64(1, 0x3FFF, 0);
                 }
 
                 break;
 
             case softfloat_round_max:
                 if (0 == uiZ.v64) {
-                    uiZ.v64 = packToF128UI64(0, 0x3FFF, 0);
+                    uiZ.v64 = pack_to_F128_UI64(0, 0x3FFF, 0);
                 }
 
                 break;

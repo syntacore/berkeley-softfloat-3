@@ -42,7 +42,7 @@ extF80_sqrt(extFloat80_t const a)
     using namespace softfloat::internals::fast_int64;
 
     bool const signA = is_sign(a.signExp);
-    int32_t expA = expExtF80UI64(a.signExp);
+    int32_t expA = exp_extF80_UI64(a.signExp);
     uint64_t sigA = a.signif;
 
     if (0x7FFF == expA) {
@@ -68,7 +68,7 @@ extF80_sqrt(extFloat80_t const a)
     if (signA) {
         if (0 == sigA) {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(signA, 0);
+            uZ.signExp = pack_to_extF80_UI64(signA, 0);
             uZ.signif = 0;
             return uZ;
         } else {
@@ -87,12 +87,12 @@ extF80_sqrt(extFloat80_t const a)
     if (0 == (UINT64_C(0x8000000000000000) & sigA)) {
         if (!sigA) {
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(signA, 0);
+            uZ.signExp = pack_to_extF80_UI64(signA, 0);
             uZ.signif = 0;
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -105,16 +105,16 @@ extF80_sqrt(extFloat80_t const a)
     int32_t const expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
     expA &= 1;
     uint32_t const sig32A = sigA >> 32;
-    uint32_t const recipSqrt32 = approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    uint32_t const recipSqrt32 = approx_recip_sqrt_32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     uint128 rem;
 
     if (0 != expA) {
         sig32Z >>= 1;
-        rem = shortShiftLeft128(uint128{0, sigA}, 61);
+        rem = short_shift_left_128(uint128{0, sigA}, 61);
     } else {
-        rem = shortShiftLeft128(uint128{0, sigA}, 62);
+        rem = short_shift_left_128(uint128{0, sigA}, 62);
     }
 
     rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
@@ -125,8 +125,8 @@ extF80_sqrt(extFloat80_t const a)
     /**
     @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
     */
-    uint128 term = mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
-    rem = shortShiftLeft128(rem, 29);
+    uint128 term = mul_64_by_shifted_32_to_128(x64, static_cast<uint32_t>(q));
+    rem = short_shift_left_128(rem, 29);
     rem = sub(rem, term);
 
     q = ((static_cast<uint32_t>(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
@@ -140,10 +140,10 @@ extF80_sqrt(extFloat80_t const a)
         /**
         @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
         */
-        term = mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
+        term = mul_64_by_shifted_32_to_128(x64 + (q >> 27), static_cast<uint32_t>(q));
         x64 = static_cast<uint32_t>(q << 5) * static_cast<uint64_t>(static_cast<uint32_t>(q));
         term = add(term, uint128{0, x64});
-        rem = shortShiftLeft128(rem, 28);
+        rem = short_shift_left_128(rem, 28);
         rem = sub(rem, term);
 
         if (0 != (UINT64_C(0x8000000000000000) & rem.v64)) {
@@ -157,6 +157,6 @@ extF80_sqrt(extFloat80_t const a)
         }
     }
 
-    return roundPackToExtF80(0, expZ, sigZ, sigZExtra, extF80_roundingPrecision);
+    return round_pack_to_extF80(0, expZ, sigZ, sigZExtra, extF80_rounding_precision);
 }
 

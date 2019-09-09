@@ -46,11 +46,11 @@ f128M_to_ui64(float128_t const* const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    uint32_t const *const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const* const aWPtr = reinterpret_cast<const uint32_t*>(aPtr);
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     bool const sign = is_sign(uiA96);
-    int32_t const exp = expF128UI96(uiA96);
-    uint32_t sig96 = fracF128UI96(uiA96);
+    int32_t const exp = exp_F128_UI96(uiA96);
+    uint32_t sig96 = frac_F128_UI96(uiA96);
 
     int32_t const shiftDist = 0x404F - exp;
 
@@ -60,7 +60,7 @@ f128M_to_ui64(float128_t const* const aPtr,
             0x7FFF == exp &&
             (
                 0 != sig96 ||
-                0 != (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])
+                0 != (aWPtr[index_word(4, 2)] | aWPtr[index_word(4, 1)] | aWPtr[index_word(4, 0)])
             ) ?
             ui64_fromNaN :
             sign ?
@@ -73,13 +73,13 @@ f128M_to_ui64(float128_t const* const aPtr,
     }
 
     uint32_t sig[4];
-    sig[indexWord(4, 3)] = sig96;
-    sig[indexWord(4, 2)] = aWPtr[indexWord(4, 2)];
-    sig[indexWord(4, 1)] = aWPtr[indexWord(4, 1)];
-    sig[indexWord(4, 0)] = aWPtr[indexWord(4, 0)];
-    softfloat_shiftRightJam128M(sig, static_cast<uint8_t>(shiftDist), sig);
+    sig[index_word(4, 3)] = sig96;
+    sig[index_word(4, 2)] = aWPtr[index_word(4, 2)];
+    sig[index_word(4, 1)] = aWPtr[index_word(4, 1)];
+    sig[index_word(4, 0)] = aWPtr[index_word(4, 0)];
+    shift_right_jam_M_128(sig, static_cast<uint8_t>(shiftDist), sig);
 
     return
-        roundPackMTo<uint64_t>(sign, sig + indexMultiwordLo(4, 3), roundingMode, exact);
+        round_pack_to_M<uint64_t>(sign, sig + index_multiword_lo(4, 3), roundingMode, exact);
 #endif
 }

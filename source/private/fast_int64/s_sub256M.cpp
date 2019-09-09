@@ -41,18 +41,18 @@ namespace internals {
 namespace fast_int64 {
 
 void
-sub256M(uint64_t const* const aPtr,
+sub_M_256(uint64_t const* const aPtr,
         uint64_t const* const bPtr,
         uint64_t* const zPtr)
 {
     bool borrow = false;
 
-    for (unsigned index = indexWordLo(4);;) {
+    for (unsigned index = index_word_lo(4);;) {
         uint64_t const wordA = aPtr[index];
         uint64_t const wordB = bPtr[index];
         zPtr[index] = wordA - wordB - !!borrow;
 
-        if (index == indexWordHi(4)) {
+        if (index == index_word_hi(4)) {
             break;
         }
 

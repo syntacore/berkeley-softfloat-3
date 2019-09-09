@@ -41,13 +41,13 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_negXM(uint8_t size_words,
+neg_M_X(uint8_t size_words,
                 uint32_t* zPtr)
 {
-    auto const lastIndex = indexWordHi(size_words);
+    auto const lastIndex = index_word_hi(size_words);
     bool carry = 1;
 
-    for (auto index = indexWordLo(size_words);;) {
+    for (auto index = index_word_lo(size_words);;) {
         uint32_t const word = ~zPtr[index] + !!(carry);
         zPtr[index] = word;
 

@@ -65,7 +65,7 @@ sub_magnitudes(uint16_t const& uiA,
         int16_t sigDiff = sigA - sigB;
 
         if (0 == sigDiff) {
-            return u_as_f(packToF16UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
+            return u_as_f(pack_to_F16_UI(softfloat_roundingMode == softfloat_round_min, 0, 0));
         }
 
         if (0 != expA) {
@@ -83,10 +83,10 @@ sub_magnitudes(uint16_t const& uiA,
         int8_t const expZ = expA - shiftDist;
 
         if (expZ < 0) {
-            return u_as_f(packToF16UI(signZ, 0, static_cast<uint16_t>(sigDiff << expA)));
+            return u_as_f(pack_to_F16_UI(signZ, 0, static_cast<uint16_t>(sigDiff << expA)));
         }
 
-        return u_as_f(packToF16UI(signZ, expZ, static_cast<uint16_t>(sigDiff << shiftDist)));
+        return u_as_f(pack_to_F16_UI(signZ, expZ, static_cast<uint16_t>(sigDiff << shiftDist)));
     }
 
     bool signZ = is_sign(uiA);
@@ -98,11 +98,11 @@ sub_magnitudes(uint16_t const& uiA,
         signZ = !signZ;
 
         if (expB == 0x1F) {
-            return u_as_f(sigB ? propagate_NaN(uiA, uiB) : packToF16UI(signZ, 0x1F, 0));
+            return u_as_f(sigB ? propagate_NaN(uiA, uiB) : pack_to_F16_UI(signZ, 0x1F, 0));
         }
 
         if (expDiff <= -13) {
-            uint16_t const uiZ_1 = packToF16UI(signZ, expB, sigB);
+            uint16_t const uiZ_1 = pack_to_F16_UI(signZ, expB, sigB);
 
             if (0 != (expA | sigA)) {
                 softfloat_raiseFlags(softfloat_flag_inexact);
@@ -154,14 +154,14 @@ sub_magnitudes(uint16_t const& uiA,
     uint16_t const sigZ = sig32Z_1 >> 16;
 
     if (0 != (sig32Z_1 & 0xFFFFu)) {
-        return roundPackToF16(signZ, expZ_1, sigZ | 1u);
+        return round_pack_to_F16(signZ, expZ_1, sigZ | 1u);
     }
 
     if (0 == (sigZ & 0xFu) && static_cast<unsigned>(expZ_1) < 0x1Eu) {
-        return u_as_f(packToF16UI(signZ, expZ_1, static_cast<uint16_t>(sigZ >> 4)));
+        return u_as_f(pack_to_F16_UI(signZ, expZ_1, static_cast<uint16_t>(sigZ >> 4)));
     }
 
-    return roundPackToF16(signZ, expZ_1, sigZ);
+    return round_pack_to_F16(signZ, expZ_1, sigZ);
 }
 
 }  // namespace internals

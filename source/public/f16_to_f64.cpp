@@ -49,12 +49,12 @@ f16_to_f64(float16_t a)
             return u_as_f(commonNaN_to_F64UI(commonNaN_from_f16UI(f_as_u(a))));
         }
 
-        return u_as_f(packToF64UI(sign, 0x7FF, 0));
+        return u_as_f(pack_to_F64_UI(sign, 0x7FF, 0));
     }
 
     if (0 == exp) {
         if (is_zero(a)) {
-            return u_as_f(packToF64UI(sign, 0, 0));
+            return u_as_f(pack_to_F64_UI(sign, 0, 0));
         }
 
         exp8_sig16 const normExpSig{frac};
@@ -62,5 +62,5 @@ f16_to_f64(float16_t a)
         frac = normExpSig.sig;
     }
 
-    return u_as_f(packToF64UI(sign, exp + 0x3F0, static_cast<uint64_t>(frac) << 42));
+    return u_as_f(pack_to_F64_UI(sign, exp + 0x3F0, static_cast<uint64_t>(frac) << 42));
 }

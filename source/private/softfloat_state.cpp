@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace softfloat {
 namespace internals {
-/*THREAD_LOCAL*/ softfloat_tininess detectTininess = softfloat::internals::init_detectTininess;
-/*THREAD_LOCAL*/ uint8_t extF80_roundingPrecision = 80;
+/*THREAD_LOCAL*/ softfloat_tininess detect_tininess = softfloat::internals::init_detectTininess;
+/*THREAD_LOCAL*/ uint8_t extF80_rounding_precision = 80;
 }  // namespace internals
 }  // namespace softfloat

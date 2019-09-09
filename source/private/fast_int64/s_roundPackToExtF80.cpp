@@ -41,11 +41,11 @@ namespace internals {
 namespace fast_int64 {
 
 extFloat80_t
-roundPackToExtF80(bool sign,
-                  int32_t exp,
-                  uint64_t sig,
-                  uint64_t sigExtra,
-                  uint8_t roundingPrecision)
+round_pack_to_extF80(bool sign,
+                     int32_t exp,
+                     uint64_t sig,
+                     uint64_t sigExtra,
+                     uint8_t roundingPrecision)
 {
     uint64_t roundIncrement;
     uint64_t roundMask;
@@ -74,10 +74,10 @@ roundPackToExtF80(bool sign,
         if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
             if (exp <= 0) {
                 bool isTiny =
-                    softfloat_tininess_beforeRounding == detectTininess ||
+                    softfloat_tininess_beforeRounding == detect_tininess ||
                     exp < 0 ||
                     sig <= static_cast<uint64_t>(sig + roundIncrement);
-                sig = shiftRightJam64(sig, 1u - exp);
+                sig = shift_right_jam_64(sig, 1u - exp);
                 auto const roundBits_1 = sig & roundMask;
 
                 if (isTiny && roundBits_1) {
@@ -98,7 +98,7 @@ roundPackToExtF80(bool sign,
 
                 sig &= ~roundMask;
                 extFloat80_t uZ;
-                uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+                uZ.signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
                 uZ.signif = sig;
                 return uZ;
             }
@@ -115,7 +115,7 @@ roundPackToExtF80(bool sign,
                 }
 
                 extFloat80_t uZ;
-                uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+                uZ.signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
                 uZ.signif = sig;
                 return uZ;
             }
@@ -145,7 +145,7 @@ roundPackToExtF80(bool sign,
         }
 
         extFloat80_t uZ;
-        uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        uZ.signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
         uZ.signif = sig;
         return uZ;
     }
@@ -158,11 +158,11 @@ roundPackToExtF80(bool sign,
     if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
         if (exp <= 0) {
             bool isTiny =
-                softfloat_tininess_beforeRounding == detectTininess ||
+                softfloat_tininess_beforeRounding == detect_tininess ||
                 exp < 0 ||
                 !doIncrement ||
                 sig < UINT64_C(0xFFFFFFFFFFFFFFFF);
-            uint64_extra const sig64Extra = shiftRightJam64Extra(sig, sigExtra, 1u - exp);
+            uint64_extra const sig64Extra = shift_right_jam_64Extra(sig, sigExtra, 1u - exp);
             sig = sig64Extra.v;
             sigExtra = sig64Extra.extra;
 
@@ -189,7 +189,7 @@ roundPackToExtF80(bool sign,
             }
 
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+            uZ.signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
             uZ.signif = sig;
             return uZ;
         }
@@ -203,13 +203,13 @@ roundPackToExtF80(bool sign,
                 (sign ? softfloat_round_min : softfloat_round_max) == softfloat_roundingMode
             ) {
                 extFloat80_t uZ;
-                uZ.signExp = packToExtF80UI64(sign, UINT16_C(0x7FFF));
+                uZ.signExp = pack_to_extF80_UI64(sign, UINT16_C(0x7FFF));
                 uZ.signif = UINT64_C(0x8000000000000000);
                 return uZ;
             }
 
             extFloat80_t uZ;
-            uZ.signExp = packToExtF80UI64(sign, UINT16_C(0x7FFE));
+            uZ.signExp = pack_to_extF80_UI64(sign, UINT16_C(0x7FFE));
             uZ.signif = ~UINT64_C(0);
             return uZ;
         }
@@ -234,7 +234,7 @@ roundPackToExtF80(bool sign,
 
     {
         extFloat80_t uZ;
-        uZ.signExp = packToExtF80UI64(sign, static_cast<uint16_t>(exp));
+        uZ.signExp = pack_to_extF80_UI64(sign, static_cast<uint16_t>(exp));
         uZ.signif = sig;
         return uZ;
     }

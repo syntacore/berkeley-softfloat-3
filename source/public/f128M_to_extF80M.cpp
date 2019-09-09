@@ -55,35 +55,35 @@ f128M_to_extF80M(const float128_t* aPtr,
     aWPtr = (const uint32_t*)aPtr;
     zSPtr = zPtr;
 
-    uiA96 = aWPtr[indexWordHi(4)];
+    uiA96 = aWPtr[index_word_hi(4)];
     sign = is_sign(uiA96);
-    exp = expF128UI96(uiA96);
+    exp = exp_F128_UI96(uiA96);
 
     if (exp == 0x7FFF) {
-        if (softfloat_isNaNF128M(aWPtr)) {
-            *zSPtr = extFloat80M(commonNaN_from_f128M(aWPtr));
+        if (is_NaN_M_F128(aWPtr)) {
+            *zSPtr = extFloat80M(commonNaN_from_M_f128(aWPtr));
             return;
         }
 
-        zSPtr->signExp = packToExtF80UI64(sign, 0x7FFF);
+        zSPtr->signExp = pack_to_extF80_UI64(sign, 0x7FFF);
         zSPtr->signif = UINT64_C(0x8000000000000000);
         return;
     }
 
-    exp = softfloat_shiftNormSigF128M(aWPtr, 15, sig);
+    exp = shift_norm_sig_M_F128(aWPtr, 15, sig);
 
     if (exp == -128) {
-        zSPtr->signExp = packToExtF80UI64(sign, 0);
+        zSPtr->signExp = pack_to_extF80_UI64(sign, 0);
         zSPtr->signif = 0;
         return;
     }
 
-    if (sig[indexWord(4, 0)]) {
-        sig[indexWord(4, 1)] |= 1;
+    if (sig[index_word(4, 0)]) {
+        sig[index_word(4, 1)] |= 1;
     }
 
-    softfloat_roundPackMToExtF80M(
-        sign, exp, &sig[indexMultiwordHi(4, 3)], 80, zSPtr);
+    round_pack_to_M_extF80M(
+        sign, exp, &sig[index_multiword_hi(4, 3)], 80, zSPtr);
 
 #endif
 }

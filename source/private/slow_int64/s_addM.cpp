@@ -41,16 +41,16 @@ namespace internals {
 namespace slow_int64 {
 
 void
-softfloat_addM(size_t size_words,
-               uint32_t const *const aPtr,
-               uint32_t const *const bPtr,
-               uint32_t* const zPtr)
+add_M(size_t size_words,
+      uint32_t const* const aPtr,
+      uint32_t const* const bPtr,
+      uint32_t* const zPtr)
 {
 
-    auto const lastIndex = indexWordHi(size_words);
+    auto const lastIndex = index_word_hi(size_words);
     bool carry = false;
 
-    for (auto index = indexWordLo(size_words);; index += wordIncr) {
+    for (auto index = index_word_lo(size_words);; index += wordIncr) {
         uint32_t const wordA = aPtr[index];
         uint32_t const wordZ = wordA + bPtr[index] + !!carry;
         zPtr[index] = wordZ;

@@ -48,13 +48,13 @@ f128M_mulAdd(float128_t const* const aPtr,
     uint64_t const* const aWPtr = reinterpret_cast<uint64_t const*>(aPtr);
     uint64_t const* const bWPtr = reinterpret_cast<uint64_t const*>(bPtr);
     uint64_t const* const cWPtr = reinterpret_cast<uint64_t const*>(cPtr);
-    uint64_t const uiA64 = aWPtr[indexWord(2, 1)];
-    uint64_t const uiA0 = aWPtr[indexWord(2, 0)];
-    uint64_t const uiB64 = bWPtr[indexWord(2, 1)];
-    uint64_t const uiB0 = bWPtr[indexWord(2, 0)];
-    uint64_t const uiC64 = cWPtr[indexWord(2, 1)];
-    uint64_t const uiC0 = cWPtr[indexWord(2, 0)];
-    *zPtr = mulAddF128(softfloat_mulAdd_madd,
+    uint64_t const uiA64 = aWPtr[index_word(2, 1)];
+    uint64_t const uiA0 = aWPtr[index_word(2, 0)];
+    uint64_t const uiB64 = bWPtr[index_word(2, 1)];
+    uint64_t const uiB0 = bWPtr[index_word(2, 0)];
+    uint64_t const uiC64 = cWPtr[index_word(2, 1)];
+    uint64_t const uiC0 = cWPtr[index_word(2, 0)];
+    *zPtr = mul_add_F128(softfloat_mulAdd_madd,
                                  uiA64, uiA0,
                                  uiB64, uiB0,
                                  uiC64, uiC0);
@@ -62,7 +62,7 @@ f128M_mulAdd(float128_t const* const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    softfloat_mulAddF128M(softfloat_mulAdd_madd,
+    mul_add_M_F128(softfloat_mulAdd_madd,
                           reinterpret_cast<const uint32_t*>(aPtr),
                           reinterpret_cast<const uint32_t*>(bPtr), 
                           reinterpret_cast<const uint32_t*>(cPtr),

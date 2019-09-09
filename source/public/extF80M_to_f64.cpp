@@ -48,7 +48,7 @@ extF80M_to_f64(extFloat80_t const* const aPtr)
     extFloat80M const* aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 
     if (0x7FFF == exp) {
@@ -56,18 +56,18 @@ extF80M_to_f64(extFloat80_t const* const aPtr)
             return u_as_f(commonNaN_to_F64UI(commonNaN{*aSPtr}));
         }
 
-        return u_as_f(packToF64UI(sign, 0x7FF, 0));
+        return u_as_f(pack_to_F64_UI(sign, 0x7FF, 0));
     }
 
     if (0 == (sig & UINT64_C(0x8000000000000000))) {
         if (0 == sig) {
-            return u_as_f(packToF64UI(sign, 0, 0));
+            return u_as_f(pack_to_F64_UI(sign, 0, 0));
         }
 
-        exp += softfloat_normExtF80SigM(&sig);
+        exp += norm_M_extF80Sig(&sig);
     }
 
-    sig = shortShiftRightJam64(sig, 1);
+    sig = short_shift_right_jam_64(sig, 1);
     exp -= 0x3C01;
 
     if (exp < -0x1000) {
@@ -77,6 +77,6 @@ extF80M_to_f64(extFloat80_t const* const aPtr)
     /**
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
-    return roundPackToF64(sign, static_cast<int16_t>(exp), sig);
+    return round_pack_to_F64(sign, static_cast<int16_t>(exp), sig);
 #endif
 }

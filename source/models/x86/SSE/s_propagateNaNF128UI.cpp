@@ -83,10 +83,10 @@ static inline void
 result_copy(uint32_t* const zWPtr,
             uint32_t const* const ptr)
 {
-    zWPtr[indexWordHi(4)] = ptr[indexWordHi(4)] | 0x00008000;
-    zWPtr[indexWord(4, 2)] = ptr[indexWord(4, 2)];
-    zWPtr[indexWord(4, 1)] = ptr[indexWord(4, 1)];
-    zWPtr[indexWord(4, 0)] = ptr[indexWord(4, 0)];
+    zWPtr[index_word_hi(4)] = ptr[index_word_hi(4)] | 0x00008000;
+    zWPtr[index_word(4, 2)] = ptr[index_word(4, 2)];
+    zWPtr[index_word(4, 1)] = ptr[index_word(4, 1)];
+    zWPtr[index_word(4, 0)] = ptr[index_word(4, 0)];
 }
 
 }  // namespace
@@ -116,7 +116,7 @@ propagate_NaN_F128M(uint32_t const* const aWPtr,
         }
     }
 
-    if (softfloat_isNaNF128M(aWPtr)) {
+    if (is_NaN_M_F128(aWPtr)) {
         result_copy(zWPtr, aWPtr);
     } else {
         result_copy(zWPtr, bWPtr);

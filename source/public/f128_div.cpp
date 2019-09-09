@@ -46,11 +46,11 @@ f128_div(float128_t const a,
     uint128 const bb{b};
 
     bool const signA = is_sign(aa.v64);
-    int32_t expA = expF128UI64(aa.v64);
-    uint128 sigA{fracF128UI64(aa.v64), aa.v0};
+    int32_t expA = exp_F128_UI64(aa.v64);
+    uint128 sigA{frac_F128_UI64(aa.v64), aa.v0};
     bool const signB = is_sign(bb.v64);
-    int32_t expB = expF128UI64(bb.v64);
-    uint128 sigB{fracF128UI64(bb.v64), bb.v0};
+    int32_t expB = exp_F128_UI64(bb.v64);
+    uint128 sigB{frac_F128_UI64(bb.v64), bb.v0};
 
     bool const signZ = signA != signB;
 
@@ -75,7 +75,7 @@ f128_div(float128_t const a,
         }
 
         // result inf
-        return float128_t(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
+        return float128_t(uint128{pack_to_F128_UI64(signZ, 0x7FFF, 0), 0});
     }
 
     // a is finite
@@ -89,7 +89,7 @@ f128_div(float128_t const a,
         }
 
         // b is inf, result is 0
-        return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
+        return float128_t(uint128{pack_to_F128_UI64(signZ, 0, 0), 0});
     }
 
     if (0 == expB) {
@@ -104,11 +104,11 @@ f128_div(float128_t const a,
 
             // finite / 0
             softfloat_raiseFlags(softfloat_flag_infinite);
-            return float128_t(uint128{packToF128UI64(signZ, 0x7FFF, 0), 0});
+            return float128_t(uint128{pack_to_F128_UI64(signZ, 0x7FFF, 0), 0});
         }
 
         // b is subnormal
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigB.v64, sigB.v0);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigB.v64, sigB.v0);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -117,11 +117,11 @@ f128_div(float128_t const a,
         // a is 0 or subnormal
         if (0 == (sigA.v64 | sigA.v0)) {
             // a is 0
-            return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
+            return float128_t(uint128{pack_to_F128_UI64(signZ, 0, 0), 0});
         }
 
         // a is subnormal
-        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigA.v64, sigA.v0);
+        exp32_sig128 const normExpSig = norm_subnormal_F128Sig(sigA.v64, sigA.v0);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -136,7 +136,7 @@ f128_div(float128_t const a,
         rem = add(sigA, sigA);
     }
 
-    uint32_t const recip32 = approxRecip32_1(static_cast<uint32_t>(sigB.v64 >> 17));
+    uint32_t const recip32 = approx_recip_32_1(static_cast<uint32_t>(sigB.v64 >> 17));
     int ix = 3;
 
     uint32_t q;
@@ -151,8 +151,8 @@ f128_div(float128_t const a,
             break;
         }
 
-        rem = shortShiftLeft128(rem, 29);
-        rem = sub(rem, mul128By32(sigB, q));
+        rem = short_shift_left_128(rem, 29);
+        rem = sub(rem, mul_128_by_32(sigB, q));
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
@@ -163,8 +163,8 @@ f128_div(float128_t const a,
     }
 
     if (((q + 1) & 7) < 2) {
-        rem = shortShiftLeft128(rem, 29);
-        uint128 const term = mul128By32(sigB, q);
+        rem = short_shift_left_128(rem, 29);
+        uint128 const term = mul_128_by_32(sigB, q);
         rem = sub(rem, term);
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
@@ -181,10 +181,10 @@ f128_div(float128_t const a,
     }
 
     uint64_t const sigZExtra = static_cast<uint64_t>(q) << 60;
-    uint128 const term = shortShiftLeft128(uint128{0, qs[1]}, 54);
+    uint128 const term = short_shift_left_128(uint128{0, qs[1]}, 54);
     uint128 const sigZ =
         add(
             uint128{static_cast<uint64_t>(qs[2]) << 19, (static_cast<uint64_t>(qs[0]) << 25) + (q >> 4)},
             term);
-    return roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
+    return round_pack_to_F128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
 }

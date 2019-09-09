@@ -47,7 +47,7 @@ extF80M_to_f16(const extFloat80_t* aPtr)
     extFloat80M const* const aSPtr = aPtr;
     uint16_t const uiA64 = aSPtr->signExp;
     bool const sign = is_sign(uiA64);
-    int32_t exp = expExtF80UI64(uiA64);
+    int32_t exp = exp_extF80_UI64(uiA64);
     uint64_t sig = aSPtr->signif;
 
     if (0x7FFF == exp) {
@@ -55,18 +55,18 @@ extF80M_to_f16(const extFloat80_t* aPtr)
             return u_as_f(commonNaN_to_F16UI(commonNaN{*aSPtr}));
         }
 
-        return u_as_f(packToF16UI(sign, 0x1F, 0));
+        return u_as_f(pack_to_F16_UI(sign, 0x1F, 0));
     }
 
     if (0 == (sig & INT64_MIN)) {
         if (0 == sig) {
-            return u_as_f(packToF16UI(sign, 0, 0));
+            return u_as_f(pack_to_F16_UI(sign, 0, 0));
         }
 
-        exp += softfloat_normExtF80SigM(&sig);
+        exp += norm_M_extF80Sig(&sig);
     }
 
-    uint16_t const sig16 = static_cast<uint16_t>(shortShiftRightJam64(sig, 49));
+    uint16_t const sig16 = static_cast<uint16_t>(short_shift_right_jam_64(sig, 49));
     exp -= 0x3FF1;
 
     if (exp < -0x40) {
@@ -76,6 +76,6 @@ extF80M_to_f16(const extFloat80_t* aPtr)
     /**
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
-    return roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
+    return round_pack_to_F16(sign, static_cast<int16_t>(exp), sig16);
 #endif
 }

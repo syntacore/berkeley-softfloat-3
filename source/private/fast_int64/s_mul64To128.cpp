@@ -42,7 +42,7 @@ namespace internals {
 namespace fast_int64 {
 
 uint128
-mul64To128(uint64_t a,
+mul_64_to_128(uint64_t a,
            uint64_t b)
 {
     uint32_t const a32 = a >> 32;

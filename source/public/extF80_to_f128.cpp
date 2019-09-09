@@ -47,15 +47,15 @@ extF80_to_f128(extFloat80_t a)
 
     uint16_t const uiA64 = a.signExp;
     uint64_t const uiA0 = a.signif;
-    uint16_t const exp = expExtF80UI64(uiA64);
+    uint16_t const exp = exp_extF80_UI64(uiA64);
     uint64_t const frac = uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF);
 
     if (0x7FFF == exp && 0 != frac) {
         uiZ = commonNaN_to_F128UI(commonNaN_from_extF80UI(uiA64, uiA0));
     } else {
         sign = is_sign(uiA64);
-        frac128 = shortShiftLeft128(uint128{0, frac}, 49);
-        uiZ.v64 = packToF128UI64(sign, exp, frac128.v64);
+        frac128 = short_shift_left_128(uint128{0, frac}, 49);
+        uiZ.v64 = pack_to_F128_UI64(sign, exp, frac128.v64);
         uiZ.v0 = frac128.v0;
     }
 

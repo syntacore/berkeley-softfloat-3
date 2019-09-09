@@ -50,81 +50,81 @@ f128M_div(float128_t const* const aPtr,
     auto const bWPtr = reinterpret_cast<uint32_t const*>(bPtr);
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
 
-    uint32_t const uiA96 = aWPtr[indexWordHi(4)];
+    uint32_t const uiA96 = aWPtr[index_word_hi(4)];
     bool const signA = is_sign(uiA96);
-    int32_t expA = expF128UI96(uiA96);
-    uint32_t const uiB96 = bWPtr[indexWordHi(4)];
+    int32_t expA = exp_F128_UI96(uiA96);
+    uint32_t const uiB96 = bWPtr[index_word_hi(4)];
     bool const signB = is_sign(uiB96);
-    int32_t expB = expF128UI96(uiB96);
+    int32_t expB = exp_F128_UI96(uiB96);
     bool const signZ = signA != signB;
 
     if (0x7FFF == expA || 0x7FFF == expB) {
-        if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
+        if (try_propagate_NaN_M_F128(aWPtr, bWPtr, zWPtr)) {
             return;
         }
 
         if (expA == 0x7FFF) {
             if (expB == 0x7FFF) {
-                softfloat_invalidF128M(zWPtr);
+                invalid_M_F128(zWPtr);
                 return;
             }
 
-            zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0x7FFF, 0);
-            zWPtr[indexWord(4, 2)] = 0;
-            zWPtr[indexWord(4, 1)] = 0;
-            zWPtr[indexWord(4, 0)] = 0;
+            zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0x7FFF, 0);
+            zWPtr[index_word(4, 2)] = 0;
+            zWPtr[index_word(4, 1)] = 0;
+            zWPtr[index_word(4, 0)] = 0;
             return;
         }
 
-        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     uint32_t y[5];
-    expA = softfloat_shiftNormSigF128M(aWPtr, 13, y);
+    expA = shift_norm_sig_M_F128(aWPtr, 13, y);
     uint32_t sigB[4];
-    expB = softfloat_shiftNormSigF128M(bWPtr, 13, sigB);
+    expB = shift_norm_sig_M_F128(bWPtr, 13, sigB);
 
     if (expA == -128) {
         if (expB == -128) {
-            softfloat_invalidF128M(zWPtr);
+            invalid_M_F128(zWPtr);
             return;
         }
 
-        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     if (expB == -128) {
         softfloat_raiseFlags(softfloat_flag_infinite);
-        zWPtr[indexWordHi(4)] = packToF128UI96(signZ, 0x7FFF, 0);
-        zWPtr[indexWord(4, 2)] = 0;
-        zWPtr[indexWord(4, 1)] = 0;
-        zWPtr[indexWord(4, 0)] = 0;
+        zWPtr[index_word_hi(4)] = pack_to_F128_UI96(signZ, 0x7FFF, 0);
+        zWPtr[index_word(4, 2)] = 0;
+        zWPtr[index_word(4, 1)] = 0;
+        zWPtr[index_word(4, 0)] = 0;
         return;
     }
 
     int32_t expZ = expA - expB + 0x3FFE;
 
-    if (softfloat_compare128M(y, sigB) < 0) {
+    if (compare_M_128(y, sigB) < 0) {
         --expZ;
-        softfloat_add128M(y, y, y);
+        add_M_128(y, y, y);
     }
 
-    uint32_t const recip32 = approxRecip32_1((static_cast<uint64_t>(sigB[indexWord(4, 3)]) << 32 | sigB[indexWord(4, 2)]) >> 30);
+    uint32_t const recip32 = approx_recip_32_1((static_cast<uint64_t>(sigB[index_word(4, 3)]) << 32 | sigB[index_word(4, 2)]) >> 30);
     int ix = 3;
     uint64_t q64;
     uint32_t qs[3];
     uint32_t q;
 
     for (;;) {
-        q64 = static_cast<uint64_t>(y[indexWordHi(4)]) * recip32;
+        q64 = static_cast<uint64_t>(y[index_word_hi(4)]) * recip32;
         q = (q64 + 0x80000000) >> 32;
         --ix;
 
@@ -132,42 +132,42 @@ f128M_div(float128_t const* const aPtr,
             break;
         }
 
-        softfloat_remStep128MBy32(y, 29, sigB, q, y);
+        rem_step_by_32_M_128(y, 29, sigB, q, y);
 
-        if (y[indexWordHi(4)] & 0x80000000) {
+        if (y[index_word_hi(4)] & 0x80000000) {
             --q;
-            softfloat_add128M(y, sigB, y);
+            add_M_128(y, sigB, y);
         }
 
         qs[ix] = q;
     }
 
     if (((q + 1) & 7) < 2) {
-        softfloat_remStep128MBy32(y, 29, sigB, q, y);
+        rem_step_by_32_M_128(y, 29, sigB, q, y);
 
-        if (y[indexWordHi(4)] & 0x80000000) {
+        if (y[index_word_hi(4)] & 0x80000000) {
             --q;
-            softfloat_add128M(y, sigB, y);
-        } else if (softfloat_compare128M(sigB, y) <= 0) {
+            add_M_128(y, sigB, y);
+        } else if (compare_M_128(sigB, y) <= 0) {
             ++q;
-            softfloat_sub128M(y, sigB, y);
+            sub_M_128(y, sigB, y);
         }
 
-        if (y[indexWordLo(4)] || y[indexWord(4, 1)] || (y[indexWord(4, 2)] | y[indexWord(4, 3)])) {
+        if (y[index_word_lo(4)] || y[index_word(4, 1)] || (y[index_word(4, 2)] | y[index_word(4, 3)])) {
             q |= 1;
         }
     }
 
     q64 = static_cast<uint64_t>(q) << 28;
-    y[indexWord(5, 0)] = static_cast<uint32_t>(q64);
+    y[index_word(5, 0)] = static_cast<uint32_t>(q64);
     q64 = (static_cast<uint64_t>(qs[0]) << 25) + (q64 >> 32);
-    y[indexWord(5, 1)] = static_cast<uint32_t>(q64);
+    y[index_word(5, 1)] = static_cast<uint32_t>(q64);
     q64 = (static_cast<uint64_t>(qs[1]) << 22) + (q64 >> 32);
-    y[indexWord(5, 2)] = static_cast<uint32_t>(q64);
+    y[index_word(5, 2)] = static_cast<uint32_t>(q64);
     q64 = (static_cast<uint64_t>(qs[2]) << 19) + (q64 >> 32);
-    y[indexWord(5, 3)] = static_cast<uint32_t>(q64);
-    y[indexWord(5, 4)] = q64 >> 32;
-    softfloat_roundPackMToF128M(signZ, expZ, y, zWPtr);
+    y[index_word(5, 3)] = static_cast<uint32_t>(q64);
+    y[index_word(5, 4)] = q64 >> 32;
+    round_pack_to_M_F128(signZ, expZ, y, zWPtr);
     return;
 #endif
 }
