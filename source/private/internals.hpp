@@ -301,37 +301,6 @@ norm_round_pack_to_F128(bool,
                         uint64_t);
 
 float128_t
-add_magnitudes(uint64_t,
-               uint64_t,
-               uint64_t,
-               uint64_t,
-               bool);
-
-inline
-float128_t
-add_magnitudes(uint128 const& a,
-               uint128 const& b,
-               bool const signZ)
-{
-    return add_magnitudes(a.v64, a.v0, b.v64, b.v0, signZ);
-}
-
-float128_t
-sub_magnitudes(uint64_t,
-               uint64_t,
-               uint64_t,
-               uint64_t,
-               bool);
-inline
-float128_t
-sub_magnitudes(uint128 const& a,
-               uint128 const& b,
-               bool const signZ)
-{
-    return sub_magnitudes(a.v64, a.v0, b.v64, b.v0, signZ);
-}
-
-float128_t
 mul_add_F128(Mul_add_operations const op,
              uint64_t const& uiA64,
              uint64_t const& uiA0,
@@ -462,11 +431,6 @@ norm_round_pack_to_M_F128(bool,
                           uint32_t*,
                           uint32_t*);
 
-void
-add_M_F128(uint32_t const*,
-           uint32_t const*,
-           uint32_t*,
-           bool);
 void
 mul_add_M_F128(Mul_add_operations,
                uint32_t const*,

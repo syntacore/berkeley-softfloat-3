@@ -8,7 +8,6 @@ target_sources(softfloat_private
 INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_addMagsExtF80.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_addMagsF128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mul128To256M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mul64To128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mulAddF128.cpp
@@ -23,7 +22,6 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_shiftRightJam128Extra.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_sub256M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_subMagsExtF80.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_subMagsF128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/internals.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/primitives/functions.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/primitives/types.hpp
@@ -40,7 +38,6 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addCarryM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addComplCarryM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addExtF80M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addF128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_compare128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_compare96M.cpp
