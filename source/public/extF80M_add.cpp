@@ -46,11 +46,11 @@ extF80M_add(extFloat80_t const *const aPtr,
 {
     using namespace softfloat::internals::fast_int64;
 
-    uint16_t const uiA64 = aPtr->signExp;
-    uint64_t const uiA0 = aPtr->signif;
+    auto const uiA64 = aPtr->signExp;
+    auto const uiA0 = aPtr->signif;
     bool const signA = is_sign(uiA64);
-    uint16_t const uiB64 = bPtr->signExp;
-    uint64_t const uiB0 = bPtr->signif;
+    auto const uiB64 = bPtr->signExp;
+    auto const uiB0 = bPtr->signif;
     bool const signB = is_sign(uiB64);
     *zPtr =
         signA == signB ? add_magnitudes(uiA64, uiA0, uiB64, uiB0, signA) :
