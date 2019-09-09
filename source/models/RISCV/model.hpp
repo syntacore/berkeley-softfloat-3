@@ -99,15 +99,16 @@ struct commonNaN
     commonNaN() = default;
 
     constexpr
-    commonNaN(bool a_sign,
-              uint64_t const& a_v64,
-              uint64_t const& a_v0)
+        commonNaN(bool a_sign,
+                  uint64_t const& a_v64,
+                  uint64_t const& a_v0)
         : sign(a_sign)
         , v64(a_v64)
         , v0(a_v0)
     {}
 
-    commonNaN(extFloat80_t const& a)
+    explicit
+        commonNaN(extFloat80_t const& a)
         : commonNaN{false, 0, 0}
     {
         if (0 == (a.signif & UINT64_C(0x4000000000000000))) {
@@ -115,7 +116,33 @@ struct commonNaN
         }
     }
 
-    explicit operator extFloat80M()const
+    explicit
+        commonNaN(uint16_t const& uiA)
+        :  commonNaN(false, 0u, 0u)
+    {
+        if (0 == (uiA & 0x0200)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+        }
+    }
+    explicit
+        commonNaN(uint32_t const& uiA)
+        : commonNaN{false, 0u, 0u}
+    {
+        if (0 == (uiA & 0x00400000)) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+        }
+    }
+    explicit
+        commonNaN(uint64_t const& uiA)
+        : commonNaN{false, 0, 0}
+    {
+        if (0 == (uiA & UINT64_C(0x0008000000000000))) {
+            softfloat_raiseFlags(softfloat_flag_invalid);
+        }
+    }
+
+    explicit
+        operator extFloat80M()const
     {
         extFloat80M z;
         z.signExp = defaultNaNExtF80UI64;
@@ -123,7 +150,8 @@ struct commonNaN
         return z;
     }
 
-    explicit operator uint128()const
+    explicit
+        operator uint128()const
     {
         return uint128{defaultNaNExtF80UI64, defaultNaNExtF80UI0};
     }
@@ -144,11 +172,7 @@ exception is raised.
 inline commonNaN
 commonNaN_from_f16UI(uint16_t const& uiA)
 {
-    if (0 == (uiA & 0x0200)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return commonNaN{false, 0u, 0u};
+    return commonNaN{uiA};
 }
 
 /**
@@ -230,11 +254,7 @@ exception is raised.
 inline commonNaN
 commonNaN_from_f32UI(uint32_t const& uiA)
 {
-    if (0 == (uiA & 0x00400000)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return commonNaN{false, 0u, 0u};
+    return commonNaN{uiA};
 }
 
 /**
@@ -256,11 +276,7 @@ exception is raised.
 inline commonNaN
 commonNaN_from_f64UI(uint64_t const& uiA)
 {
-    if (0 == (uiA & UINT64_C(0x0008000000000000))) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return commonNaN{false, 0, 0};
+    return commonNaN{uiA};
 }
 
 /**
@@ -291,7 +307,7 @@ exception is raised.
 */
 inline commonNaN
 commonNaN_from_extF80UI(uint64_t const&,
-                              uint64_t const& uiA0)
+                        uint64_t const& uiA0)
 {
     if (0 == (uiA0 & UINT64_C(0x4000000000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -336,7 +352,7 @@ is raised.
 */
 inline commonNaN
 commonNaN_from_f128UI(uint64_t const& uiA64,
-                            uint64_t const&)
+                      uint64_t const&)
 {
     if (0 == (uiA64 & UINT64_C(0x0000800000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -356,9 +372,9 @@ invalid exception is raised.
 */
 inline uint128
 propagate_NaN(uint16_t const& uiA64,
-                               uint64_t const& uiA0,
-                               uint16_t const& uiB64,
-                               uint64_t const& uiB0)
+              uint64_t const& uiA0,
+              uint16_t const& uiB64,
+              uint64_t const& uiB0)
 {
 
     if (is_sNaN(uiA64, uiA0) || is_sNaN(uiB64, uiB0)) {
@@ -449,8 +465,8 @@ value is a signaling NaN, the invalid exception is raised.
 */
 inline void
 propagate_NaN_extF80M(extFloat80M const* const aSPtr,
-                              extFloat80M const* const bSPtr,
-                              extFloat80M* const zSPtr)
+                      extFloat80M const* const bSPtr,
+                      extFloat80M* const zSPtr)
 {
     if (is_sNaN(*aSPtr) || (bSPtr && is_sNaN(*bSPtr))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -486,8 +502,8 @@ the platform's normal endian order to form a 128-bit floating-point value.
 */
 inline void
 propagate_NaN_F128M(uint32_t const* const aWPtr,
-                  uint32_t const* const bWPtr,
-                  uint32_t* const zWPtr)
+                    uint32_t const* const bWPtr,
+                    uint32_t* const zWPtr)
 {
     if (f128M_isSignalingNaN((const float128_t*)aWPtr) || (bWPtr && f128M_isSignalingNaN((const float128_t*)bWPtr))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
