@@ -50,7 +50,7 @@ f16_to_f128(float16_t const a)
         return
             float128_t(
                 0 != frac ?
-                softfloat_commonNaNToF128UI(softfloat_f16UIToCommonNaN(f_as_u(a))) :
+                commonNaN_to_F128UI(commonNaN_from_f16UI(f_as_u(a))) :
                 uint128{packToF128UI64(sign, 0x7FFF, 0), 0});
     }
 

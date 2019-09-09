@@ -61,7 +61,7 @@ f128M_to_extF80M(const float128_t* aPtr,
 
     if (exp == 0x7FFF) {
         if (softfloat_isNaNF128M(aWPtr)) {
-            *zSPtr = extFloat80M(softfloat_f128MToCommonNaN(aWPtr));
+            *zSPtr = extFloat80M(commonNaN_from_f128M(aWPtr));
             return;
         }
 

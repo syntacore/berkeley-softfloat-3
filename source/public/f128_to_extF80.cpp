@@ -53,7 +53,7 @@ f128_to_extF80(float128_t const a)
     uint64_t uiZ0;
     if (exp == 0x7FFF) {
         if (frac64 | frac0) {
-            uint128 const uiZ = uint128(softfloat_f128UIToCommonNaN(uiA64, uiA0));
+            uint128 const uiZ = uint128(commonNaN_from_f128UI(uiA64, uiA0));
             uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         } else {
@@ -77,13 +77,13 @@ f128_to_extF80(float128_t const a)
             return uZ;
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(frac64, frac0);
+        exp32_sig128 const normExpSig = normSubnormalF128Sig(frac64, frac0);
         exp = normExpSig.exp;
         frac64 = normExpSig.sig.v64;
         frac0 = normExpSig.sig.v0;
     }
 
     uint128 const sig128 =
-        softfloat_shortShiftLeft128(uint128{frac64 | UINT64_C(0x0001000000000000), frac0}, 15);
-    return softfloat_roundPackToExtF80(sign, exp, sig128.v64, sig128.v0, 80);
+        shortShiftLeft128(uint128{frac64 | UINT64_C(0x0001000000000000), frac0}, 15);
+    return roundPackToExtF80(sign, exp, sig128.v64, sig128.v0, 80);
 }

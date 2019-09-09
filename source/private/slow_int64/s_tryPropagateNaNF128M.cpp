@@ -47,7 +47,7 @@ softfloat_tryPropagateNaNF128M(const uint32_t* aWPtr,
 {
 
     if (softfloat_isNaNF128M(aWPtr) || softfloat_isNaNF128M(bWPtr)) {
-        softfloat_propagateNaNF128M(aWPtr, bWPtr, zWPtr);
+        propagate_NaN_F128M(aWPtr, bWPtr, zWPtr);
         return true;
     }
 

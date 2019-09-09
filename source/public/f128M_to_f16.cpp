@@ -54,7 +54,7 @@ f128M_to_f16(const float128_t* aPtr)
 
     if (exp == 0x7FFF) {
         if (frac32) {
-            return u_as_f(softfloat_commonNaNToF16UI(softfloat_f128MToCommonNaN(aWPtr)));
+            return u_as_f(commonNaN_to_F16UI(commonNaN_from_f128M(aWPtr)));
         }
 
         return u_as_f(packToF16UI(sign, 0x1F, 0));
@@ -72,6 +72,6 @@ f128M_to_f16(const float128_t* aPtr)
         exp = -0x40;
     }
 
-    return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
+    return roundPackToF16(sign, static_cast<int16_t>(exp), static_cast<uint16_t>(frac16 | 0x4000));
 #endif
 }

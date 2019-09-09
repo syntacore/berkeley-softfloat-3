@@ -124,7 +124,7 @@ f16_mulAdd(float16_t const a,
     }
 
     if (is_zero(c)) {
-        return softfloat_roundPackToF16(signProd,
+        return roundPackToF16(signProd,
                                         expProd - 1,
                                         static_cast<uint16_t>(sigProd >> 15 | !!(0 != (sigProd & 0x7FFF))));
     }
@@ -150,12 +150,12 @@ f16_mulAdd(float16_t const a,
             /**
             @todo Warning   C4244   '=': conversion from 'uint32_t' to 'uint16_t', possible loss of data
             */
-            sigZ = static_cast<uint16_t>(sigC_1 + softfloat_shiftRightJam32(sigProd, static_cast<uint16_t>(16 - expDiff)));
+            sigZ = static_cast<uint16_t>(sigC_1 + shiftRightJam32(sigProd, static_cast<uint16_t>(16 - expDiff)));
         } else {
             expZ = expProd;
             uint32_t const sig32Z =
                 sigProd +
-                softfloat_shiftRightJam32(static_cast<uint32_t>(sigC_1) << 16, static_cast<uint16_t>(expDiff));
+                shiftRightJam32(static_cast<uint32_t>(sigC_1) << 16, static_cast<uint16_t>(expDiff));
             sigZ = sig32Z >> 16 | !!(0 != (sig32Z & 0xFFFF));
         }
 
@@ -164,7 +164,7 @@ f16_mulAdd(float16_t const a,
             sigZ <<= 1;
         }
 
-        return softfloat_roundPackToF16(signProd, expZ, sigZ);
+        return roundPackToF16(signProd, expZ, sigZ);
     }
 
     uint32_t const sig32C = static_cast<uint32_t>(sigC_1) << 16;
@@ -175,7 +175,7 @@ f16_mulAdd(float16_t const a,
     if (expDiff < 0) {
         signZ = signC;
         expZ = expC;
-        sig32Z = sig32C - softfloat_shiftRightJam32(sigProd, static_cast<uint16_t>(-expDiff));
+        sig32Z = sig32C - shiftRightJam32(sigProd, static_cast<uint16_t>(-expDiff));
     } else if (0 == expDiff) {
         expZ = expProd;
         sig32Z = sigProd - sig32C;
@@ -190,7 +190,7 @@ f16_mulAdd(float16_t const a,
         }
     } else /*if (0 < expDiff)*/ {
         expZ = expProd;
-        sig32Z = sigProd - softfloat_shiftRightJam32(sig32C, static_cast<uint16_t>(expDiff));
+        sig32Z = sigProd - shiftRightJam32(sig32C, static_cast<uint16_t>(expDiff));
     }
 
     int8_t const shiftDist = count_leading_zeros(sig32Z) - 1;
@@ -200,5 +200,5 @@ f16_mulAdd(float16_t const a,
         sig32Z >> -shiftDist_1 | !!(0 != static_cast<uint32_t>(sig32Z << (shiftDist_1 & 31))) :
         sig32Z << shiftDist_1;
 
-    return softfloat_roundPackToF16(signZ, expZ - shiftDist, sigZ);
+    return roundPackToF16(signZ, expZ - shiftDist, sigZ);
 }

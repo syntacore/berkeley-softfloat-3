@@ -62,7 +62,7 @@ make_result(uint16_t const sigA,
         sigZ |= (static_cast<uint32_t>(sigB) * sigZ != sig32A);
     }
 
-    return softfloat_roundPackToF16(signZ, expZ, sigZ);
+    return roundPackToF16(signZ, expZ, sigZ);
 }
 
 #else
@@ -84,8 +84,8 @@ make_result(uint16_t sigA,
 
     int const index = sigB >> 6 & 0xF;
     uint16_t const r0 =
-        softfloat_approxRecip_1k0s[index] -
-        ((static_cast<uint32_t>(softfloat_approxRecip_1k1s[index]) * (sigB & 0x3F)) >> 10);
+        approxRecip_1k0s[index] -
+        ((static_cast<uint32_t>(approxRecip_1k1s[index]) * (sigB & 0x3F)) >> 10);
     uint16_t sigZ = (static_cast<uint32_t>(sigA) * r0) >> 16;
     uint16_t rem = (sigA << 10) - sigZ * sigB;
     sigZ += (rem * static_cast<uint32_t>(r0)) >> 26;
@@ -105,7 +105,7 @@ make_result(uint16_t sigA,
         }
     }
 
-    return softfloat_roundPackToF16(signZ, expZ, sigZ);
+    return roundPackToF16(signZ, expZ, sigZ);
 }
 
 #endif

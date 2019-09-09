@@ -45,7 +45,9 @@ namespace internals {
 @param[in] sig mantissa bits [30..0]
 */
 float32_t
-softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
+roundPackToF32(bool sign,
+               int16_t exp,
+               uint32_t sig)
 {
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     assert(softfloat_round_near_even <= softfloat_roundingMode && softfloat_roundingMode <= softfloat_round_near_maxMag);
@@ -57,10 +59,10 @@ softfloat_roundPackToF32(bool sign, int16_t exp, uint32_t sig)
     if (0xFD <= static_cast<uint16_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == softfloat_detectTininess ||
+                softfloat_tininess_beforeRounding == detectTininess ||
                 exp < -1 ||
                 sig + roundIncrement < 0x80000000;
-            sig = softfloat_shiftRightJam32(sig, static_cast<uint16_t>(-exp));
+            sig = shiftRightJam32(sig, static_cast<uint16_t>(-exp));
             exp = 0;
             roundBits = sig & ~(~UINT32_C(0) << 7);
             if (isTiny && 0 != roundBits) {

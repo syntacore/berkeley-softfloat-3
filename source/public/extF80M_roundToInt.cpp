@@ -117,7 +117,7 @@ extF80M_roundToInt(extFloat80_t const* const aPtr,
 
         if (INT16_MAX == exp) {
             if (0 != (sigA & INT64_MAX)) {
-                softfloat_propagateNaNExtF80M(aPtr, 0, zPtr);
+                propagate_NaN_ExtF80M(aPtr, 0, zPtr);
                 return;
             }
 

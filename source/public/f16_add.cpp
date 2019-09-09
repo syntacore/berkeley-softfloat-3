@@ -43,10 +43,10 @@ f16_add(float16_t a, float16_t b)
     uint16_t const uiA = f_as_u(a);
     uint16_t const uiB = f_as_u(b);
     /**
-    @todo Merge with f16_sub, make softfloat_subMagsF16 and softfloat_addMagsF16 local
+    @todo Merge with f16_sub, make sub_magnitudes and add_magnitudes local
     */
     return
         is_sign(static_cast<uint16_t>(uiA ^ uiB)) ?
-        softfloat_subMagsF16(uiA, uiB) :
-        softfloat_addMagsF16(uiA, uiB);
+        sub_magnitudes(uiA, uiB) :
+        add_magnitudes(uiA, uiB);
 }

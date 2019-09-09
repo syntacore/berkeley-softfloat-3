@@ -67,7 +67,7 @@ f128_to_i64(float128_t const a,
         sig64 |= UINT64_C(0x0001000000000000);
 
         if (shiftDist) {
-            uint128 const sig128 = softfloat_shortShiftLeft128(uint128{sig64, sig0}, static_cast<uint8_t>(-shiftDist));
+            uint128 const sig128 = shortShiftLeft128(uint128{sig64, sig0}, static_cast<uint8_t>(-shiftDist));
             return roundPackTo<int64_t>(sign, sig128.v64, sig128.v0, roundingMode, exact);
         }
 
@@ -78,7 +78,7 @@ f128_to_i64(float128_t const a,
         sig64 |= UINT64_C(0x0001000000000000);
     }
 
-    uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
+    uint64_extra const sigExtra = shiftRightJam64Extra(sig64, sig0, static_cast<uint32_t>(shiftDist));
     return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 }
 

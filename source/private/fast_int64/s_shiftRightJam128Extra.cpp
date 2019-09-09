@@ -41,10 +41,10 @@ namespace internals {
 namespace fast_int64 {
 
 uint128_extra
-softfloat_shiftRightJam128Extra(uint64_t a64,
-                                uint64_t a0,
-                                uint64_t extra,
-                                uint32_t dist)
+shiftRightJam128Extra(uint64_t a64,
+                      uint64_t a0,
+                      uint64_t extra,
+                      uint32_t dist)
 {
     uint128_extra z;
 

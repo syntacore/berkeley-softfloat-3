@@ -45,17 +45,17 @@ f64_to_f32(float64_t a)
     uint64_t const frac = get_frac(a);
 
     if (is_finite(a)) {
-        uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac, 22));
+        uint32_t const frac32 = static_cast<uint32_t>(shortShiftRightJam64(frac, 22));
 
         if (0 != (exp | frac32)) {
-            return softfloat_roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
+            return roundPackToF32(sign, exp - 0x381, frac32 | 0x40000000);
         }
 
         return make_signed_zero<float32_t>(sign);
     }
 
     if (is_NaN(a)) {
-        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f64UIToCommonNaN(f_as_u(a))));
+        return u_as_f(commonNaN_to_F32UI(commonNaN_from_f64UI(f_as_u(a))));
     }
 
     return make_signed_inf<float32_t>(sign);

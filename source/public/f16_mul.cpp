@@ -95,5 +95,5 @@ f16_mul(float16_t a,
         sigZ <<= 1;
     }
 
-    return softfloat_roundPackToF16(signZ, expZ, sigZ);
+    return roundPackToF16(signZ, expZ, sigZ);
 }

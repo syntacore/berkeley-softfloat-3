@@ -54,5 +54,5 @@ extF80_le_quiet(extFloat80_t const a,
     bool const signB = is_sign(b.signExp);
     return
         signA != signB ? signA || !(((a.signExp | b.signExp) & 0x7FFF) | a.signif | b.signif) : 
-        (a.signExp == b.signExp && a.signif == b.signif) || (signA != softfloat_lt128(a.signExp, a.signif, b.signExp, b.signif));
+        (a.signExp == b.signExp && a.signif == b.signif) || (signA != lt(a.signExp, a.signif, b.signExp, b.signif));
 }

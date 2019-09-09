@@ -73,7 +73,7 @@ addMags(uint32_t const uiA,
             return u_as_f(packToF32UI(signA, expA, sigZ >> 1));
         }
 
-        return softfloat_roundPackToF32(signA, expA, sigZ << 6);
+        return roundPackToF32(signA, expA, sigZ << 6);
     }
 
     /* fractional bits before shift are [22..0] and after shift are [28..6] */
@@ -91,13 +91,13 @@ addMags(uint32_t const uiA,
         /* magnitude b greater than magnitude a */
         expZ = expB;
         /* add hidden bit and shift */
-        sigA_scaled = softfloat_shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
+        sigA_scaled = shiftRightJam32(sigA_scaled + (expA ? hidden_bit_scaled : sigA_scaled), static_cast<uint16_t>(-expDiff));
         sigB_scaled += hidden_bit_scaled;
     } else {
         /* magnitude a greater than magnitude b */
         expZ = expA;
         /* add hidden bit and shift */
-        sigB_scaled = softfloat_shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
+        sigB_scaled = shiftRightJam32(sigB_scaled + (expB ? hidden_bit_scaled : sigB_scaled), static_cast<uint16_t>(expDiff));
         sigA_scaled += hidden_bit_scaled;
     }
 
@@ -107,10 +107,10 @@ addMags(uint32_t const uiA,
     /* mantissa bits are [30..0] with up to 2 digits before point */
     /* if high mantissa bit is 0, then shift left to adjust leading mantissa bit to position [30] */
     if (sigZ < 2 * hidden_bit_scaled) {
-        return softfloat_roundPackToF32(is_sign(uiA), expZ - 1, sigZ << 1);
+        return roundPackToF32(is_sign(uiA), expZ - 1, sigZ << 1);
     }
 
-    return softfloat_roundPackToF32(is_sign(uiA), expZ, sigZ);
+    return roundPackToF32(is_sign(uiA), expZ, sigZ);
 }
 
 static float32_t
@@ -164,7 +164,7 @@ subMags(uint32_t const uiA,
     if (expDiff < 0) {
         return
             max_exp != expB ?
-            softfloat_normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - softfloat_shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
+            normRoundPackToF32(!signZ, expB - 1, (sigB_1 | 0x40000000) - shiftRightJam32(sigA_1 + (expA ? 0x40000000 : sigA_1), static_cast<uint16_t>(-expDiff))) :
             0 == sigB_1 ?
             make_signed_inf<float32_t>(!signZ) :
             u_as_f(propagate_NaN(uiA, uiB));
@@ -173,9 +173,9 @@ subMags(uint32_t const uiA,
     return
         max_exp == expA ?
         u_as_f(0 != sigA_1 ? propagate_NaN(uiA, uiB) : uiA) :
-        softfloat_normRoundPackToF32(signZ,
+        normRoundPackToF32(signZ,
                                      expA - 1,
-                                     (sigA_1 | 0x40000000) - softfloat_shiftRightJam32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
+                                     (sigA_1 | 0x40000000) - shiftRightJam32(sigB_1 + (expB ? 0x40000000 : sigB_1), static_cast<uint16_t>(expDiff)));
 }
 
 }  // namespace

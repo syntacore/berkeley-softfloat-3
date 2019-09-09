@@ -52,7 +52,7 @@ f128_to_f32(float128_t const a)
         /**
         @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
         */
-        uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac64, 18));
+        uint32_t const frac32 = static_cast<uint32_t>(shortShiftRightJam64(frac64, 18));
 
         if (0 != (exp | frac32)) {
             exp -= 0x3F81;
@@ -62,14 +62,14 @@ f128_to_f32(float128_t const a)
             }
 
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
-            return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
+            return roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
         }
 
         return make_signed_zero<float32_t>(sign);
     }
 
     if (0 != frac64) {
-        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
+        return u_as_f(commonNaN_to_F32UI(commonNaN_from_f128UI(uiA64, uiA0)));
     }
 
     return make_signed_inf<float32_t>(sign);

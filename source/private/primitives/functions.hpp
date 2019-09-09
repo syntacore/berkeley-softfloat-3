@@ -49,8 +49,8 @@ into the least-significant bit of the shifted value by setting the least-
 significant bit to 1.  This shifted-and-jammed value is returned.
 */
 inline constexpr uint64_t
-softfloat_shortShiftRightJam64(uint64_t a,
-                               uint8_t dist)
+shortShiftRightJam64(uint64_t a,
+                     uint8_t dist)
 {
     return
         (a >> (dist >= 63 ? 63 : dist)) |
@@ -67,7 +67,8 @@ greater than 32, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
 inline uint32_t
-softfloat_shiftRightJam32(uint32_t a, uint16_t dist)
+shiftRightJam32(uint32_t a,
+                uint16_t dist)
 {
     auto const dist1 = dist >= 31 ? 31 : dist;
     auto const mask = ~(~UINT32_C(0) << dist1);
@@ -85,7 +86,7 @@ greater than 64, the result will be either 0 or 1, depending on whether `a'
 is zero or nonzero.
 */
 inline uint64_t
-softfloat_shiftRightJam64(uint64_t a,
+shiftRightJam64(uint64_t a,
                           uint32_t dist)
 {
     auto const dist1 = dist >= 63 ? 63 : dist;
@@ -99,7 +100,7 @@ A constant table that translates an 8-bit unsigned integer (the array index)
 into the number of leading 0 bits before the most-significant 1 of that
 integer.  For integer zero (index 0), the corresponding table element is 8.
 */
-extern const uint_least8_t softfloat_countLeadingZeros8[256];
+extern const uint_least8_t countLeadingZeros8[256];
 
 /**
 @returns the number of leading 0 bits before the most-significant 1 bit of `a'.  If `a' is zero, sizeof(Ty) * CHAR_BIT is returned.
@@ -107,7 +108,7 @@ extern const uint_least8_t softfloat_countLeadingZeros8[256];
 inline uint8_t
 count_leading_zeros(uint8_t a)
 {
-    return softfloat_countLeadingZeros8[a];
+    return countLeadingZeros8[a];
 }
 
 inline uint8_t
@@ -134,8 +135,8 @@ count_leading_zeros(uint64_t a)
         count_leading_zeros(uint32_t(a >> sizeof(uint32_t) * CHAR_BIT));
 }
 
-extern const uint16_t softfloat_approxRecip_1k0s[16];
-extern const uint16_t softfloat_approxRecip_1k1s[16];
+extern const uint16_t approxRecip_1k0s[16];
+extern const uint16_t approxRecip_1k1s[16];
 
 /**
 Returns an approximation to the reciprocal of the number represented by `a',
@@ -152,7 +153,7 @@ reciprocal 1/A, and it differs from the true reciprocal by at most 2.006 ulp
 #if (SOFTFLOAT_FAST_DIV64TO32)
 
 inline uint32_t
-softfloat_approxRecip32_1(uint32_t a)
+approxRecip32_1(uint32_t a)
 {
     return static_cast<uint32_t>(INT64_MAX / static_cast<uint32_t>(a));
 }
@@ -160,13 +161,13 @@ softfloat_approxRecip32_1(uint32_t a)
 #else
 
 inline uint32_t
-softfloat_approxRecip32_1(uint32_t a)
+approxRecip32_1(uint32_t a)
 {
     auto const index = a >> 27 & 0xF;
     uint16_t const eps = static_cast<uint16_t>(a >> 11);
     uint16_t const r0 =
-        softfloat_approxRecip_1k0s[index] -
-        ((softfloat_approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
+        approxRecip_1k0s[index] -
+        ((approxRecip_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
     uint32_t const sigma0 = ~static_cast<uint32_t>((r0 * static_cast<uint64_t>(a)) >> 7);
     uint32_t const r =
         (static_cast<uint32_t>(r0) << 16) +
@@ -177,8 +178,8 @@ softfloat_approxRecip32_1(uint32_t a)
 
 #endif
 
-extern const uint16_t softfloat_approxRecipSqrt_1k0s[16];
-extern const uint16_t softfloat_approxRecipSqrt_1k1s[16];
+extern const uint16_t approxRecipSqrt_1k0s[16];
+extern const uint16_t approxRecipSqrt_1k1s[16];
 
 /**
 Returns an approximation to the reciprocal of the square root of the number
@@ -199,7 +200,7 @@ returned is also always within the range 0.5 to 1; thus, the most-
 significant bit of the result is always set.
 */
 uint32_t
-softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
+approxRecipSqrt32_1(uint32_t oddExpA,
                               uint32_t a);
 
 namespace fast_int64 {
@@ -211,7 +212,7 @@ and `a0' is less than or equal to the 128-bit unsigned integer formed by
 concatenating `b64' and `b0'.
 */
 inline constexpr bool
-softfloat_le128(uint64_t const& a64,
+le(uint64_t const& a64,
                 uint64_t const& a0,
                 uint64_t const& b64,
                 uint64_t const& b0)
@@ -220,10 +221,10 @@ softfloat_le128(uint64_t const& a64,
 }
 
 inline constexpr bool
-softfloat_le128(uint128 const& a,
+le(uint128 const& a,
                 uint128 const& b)
 {
-    return softfloat_le128(a.v64, a.v0, b.v64, b.v64);
+    return le(a.v64, a.v0, b.v64, b.v64);
 }
 
 /**
@@ -232,7 +233,7 @@ and `a0' is less than the 128-bit unsigned integer formed by concatenating
 `b64' and `b0'.
 */
 inline constexpr bool
-softfloat_lt128(uint64_t const& a64,
+lt(uint64_t const& a64,
                 uint64_t const& a0,
                 uint64_t const& b64,
                 uint64_t const& b0)
@@ -243,17 +244,17 @@ softfloat_lt128(uint64_t const& a64,
 }
 
 inline constexpr bool
-softfloat_lt128(uint128 const& a,
+lt(uint128 const& a,
                 uint128 const& b)
 {
-    return softfloat_lt128(a.v64, a.v0, b.v64, b.v0);
+    return lt(a.v64, a.v0, b.v64, b.v0);
 }
 
 inline constexpr bool
-softfloat_lt128(extFloat80_t const& a,
-                extFloat80_t const& b)
+lt(extFloat80_t const& a,
+   extFloat80_t const& b)
 {
-    return softfloat_lt128(a.signExp, a.signif, b.signExp, b.signif);
+    return lt(a.signExp, a.signif, b.signExp, b.signif);
 }
 
 /**
@@ -261,8 +262,8 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' left by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-softfloat_shortShiftLeft128(uint128 const& a,
-                            uint8_t const dist)
+shortShiftLeft128(uint128 const& a,
+                  uint8_t const dist)
 {
     return uint128{a.v64 << dist | a.v0 >> (63u & -static_cast<int8_t>(dist)), a.v0 << dist};
 }
@@ -272,20 +273,20 @@ Shifts the 128 bits formed by concatenating `a64' and `a0' right by the
 number of bits given in `dist', which must be in the range 1 to 63.
 */
 inline constexpr uint128
-softfloat_shortShiftRight128(uint128 const& a,
-                             uint8_t const dist)
+shortShiftRight128(uint128 const& a,
+                   uint8_t const dist)
 {
     return uint128{a.v64 >> dist, a.v64 << (63 & -dist) | a.v0 >> dist};
 }
 
 /**
-This function is the same as `softfloat_shiftRightJam64Extra' (below),
+This function is the same as `shiftRightJam64Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
 inline uint64_extra
-softfloat_shortShiftRightJam64Extra(uint64_t const& a,
-                                    uint64_t const& extra,
-                                    uint8_t const dist)
+shortShiftRightJam64Extra(uint64_t const& a,
+                          uint64_t const& extra,
+                          uint8_t const dist)
 {
     return uint64_extra{a >> dist, a << (-static_cast<int8_t>(dist) & 63) | !!(0 != extra)};
 }
@@ -298,8 +299,8 @@ bit of the shifted value by setting the least-significant bit to 1.  This
 shifted-and-jammed value is returned.
 */
 inline uint128
-softfloat_shortShiftRightJam128(uint128 const& a,
-                                uint8_t const dist)
+shortShiftRightJam128(uint128 const& a,
+                      uint8_t const dist)
 {
     auto const negDist = 63 & -static_cast<int8_t>(dist);
     return uint128{
@@ -309,13 +310,13 @@ softfloat_shortShiftRightJam128(uint128 const& a,
 }
 
 /**
-This function is the same as `softfloat_shiftRightJam128Extra' (below),
+This function is the same as `shiftRightJam128Extra' (below),
 except that `dist' must be in the range 1 to 63.
 */
 inline uint128_extra
-softfloat_shortShiftRightJam128Extra(uint128 const& a,
-                                     uint64_t const& extra,
-                                     uint8_t const dist)
+shortShiftRightJam128Extra(uint128 const& a,
+                           uint64_t const& extra,
+                           uint8_t const dist)
 {
     auto const uNegDist = 63 & -static_cast<int8_t>(dist);
     uint128_extra z;
@@ -342,9 +343,9 @@ field of the result.  The fractional part of the shifted value is modified
 as described above and returned in the `extra' field of the result.)
 */
 inline uint64_extra
-softfloat_shiftRightJam64Extra(uint64_t a,
-                               uint64_t extra,
-                               uint32_t dist)
+shiftRightJam64Extra(uint64_t a,
+                     uint64_t extra,
+                     uint32_t dist)
 {
     uint64_extra z;
 
@@ -371,15 +372,15 @@ greater than 128, the result will be either 0 or 1, depending on whether the
 original 128 bits are all zeros.
 */
 uint128
-softfloat_shiftRightJam128(uint64_t a64,
-                           uint64_t a0,
-                           uint32_t dist);
+shiftRightJam128(uint64_t a64,
+                 uint64_t a0,
+                 uint32_t dist);
 
 inline uint128
-softfloat_shiftRightJam128(uint128 const& a,
-                           uint32_t const dist)
+shiftRightJam128(uint128 const& a,
+                 uint32_t const dist)
 {
-    return softfloat_shiftRightJam128(a.v64, a.v0, dist);
+    return shiftRightJam128(a.v64, a.v0, dist);
 }
 
 /**
@@ -400,24 +401,24 @@ is modified as described above and returned in the `extra' field of the
 result.)
 */
 uint128_extra
-softfloat_shiftRightJam128Extra(uint64_t a64,
+shiftRightJam128Extra(uint64_t a64,
                                 uint64_t a0,
                                 uint64_t extra,
                                 uint32_t dist);
 
 inline uint128_extra
-softfloat_shiftRightJam128Extra(uint128 const& a,
-                                uint64_t const& extra,
-                                uint32_t const& dist)
+shiftRightJam128Extra(uint128 const& a,
+                      uint64_t const& extra,
+                      uint32_t const& dist)
 {
-    return softfloat_shiftRightJam128Extra(a.v64, a.v0, extra, dist);
+    return shiftRightJam128Extra(a.v64, a.v0, extra, dist);
 }
 
 inline uint128_extra
-softfloat_shiftRightJam128Extra(uint128_extra const& a,
-                                uint32_t const& dist)
+shiftRightJam128Extra(uint128_extra const& a,
+                      uint32_t const& dist)
 {
-    return softfloat_shiftRightJam128Extra(a.v, a.extra, dist);
+    return shiftRightJam128Extra(a.v, a.extra, dist);
 }
 
 /**
@@ -426,7 +427,7 @@ Returns the sum of the 128-bit integer formed by concatenating `a64' and
 addition is modulo 2^128, so any carry out is lost.
 */
 inline constexpr uint128
-softfloat_add128(uint128 const& a,
+add(uint128 const& a,
                  uint128 const& b)
 {
     return uint128{a.v64 + b.v64 + !!(a.v0 + b.v0 < a.v0), a.v0 + b.v0};
@@ -440,9 +441,9 @@ an array of four 64-bit elements that concatenate in the platform's normal
 endian order to form a 256-bit integer.
 */
 inline void
-softfloat_add256M(uint64_t const* const aPtr,
-                  uint64_t const* const bPtr,
-                  uint64_t* const zPtr)
+add256M(uint64_t const* const aPtr,
+        uint64_t const* const bPtr,
+        uint64_t* const zPtr)
 {
     bool carry = false;
 
@@ -467,8 +468,8 @@ and `a0' and the 128-bit integer formed by concatenating `b64' and `b0'.
 The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 */
 inline constexpr uint128
-softfloat_sub128(uint128 const& a,
-                 uint128 const& b)
+sub(uint128 const& a,
+    uint128 const& b)
 {
     return uint128{a.v64 - b.v64 - !!(a.v0 < b.v0), a.v0 - b.v0};
 }
@@ -482,7 +483,7 @@ by `zPtr'.  Each of `aPtr', `bPtr', and `zPtr' points to an array of four
 form a 256-bit integer.
 */
 void
-softfloat_sub256M(uint64_t const* aPtr,
+sub256M(uint64_t const* aPtr,
                   uint64_t const* bPtr,
                   uint64_t* zPtr);
 
@@ -490,8 +491,8 @@ softfloat_sub256M(uint64_t const* aPtr,
 @return the 128-bit product of `a', `b', and 2^32.
 */
 inline uint128
-softfloat_mul64ByShifted32To128(uint64_t const& a,
-                                uint32_t const& b)
+mul64ByShifted32To128(uint64_t const& a,
+                      uint32_t const& b)
 {
     uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a)) * b;
     return
@@ -505,7 +506,7 @@ softfloat_mul64ByShifted32To128(uint64_t const& a,
 @returns the 128-bit product of `a' and `b'.
 */
 uint128
-softfloat_mul64To128(uint64_t a,
+mul64To128(uint64_t a,
                      uint64_t b);
 
 /**
@@ -514,9 +515,9 @@ softfloat_mul64To128(uint64_t a,
 bits are discarded.
 */
 inline uint128
-softfloat_mul128By32(uint64_t const& a64,
-                     uint64_t const& a0,
-                     uint32_t const& b)
+mul128By32(uint64_t const& a64,
+           uint64_t const& a0,
+           uint32_t const& b)
 {
     uint64_t const mid = static_cast<uint64_t>(static_cast<uint32_t>(a0 >> 32)) * b;
     uint64_t const v0 = a0 * b;
@@ -525,10 +526,10 @@ softfloat_mul128By32(uint64_t const& a64,
 }
 
 inline uint128
-softfloat_mul128By32(uint128 const& a,
-                     uint32_t const& b)
+mul128By32(uint128 const& a,
+           uint32_t const& b)
 {
-    return softfloat_mul128By32(a.v64, a.v0, b);
+    return mul128By32(a.v64, a.v0, b);
 }
 
 /**
@@ -539,19 +540,18 @@ Argument `zPtr' points to an array of four 64-bit elements that concatenate
 in the platform's normal endian order to form a 256-bit integer.
 */
 void
-softfloat_mul128To256M(uint64_t const& a64,
-                       uint64_t const& a0,
-                       uint64_t const& b64,
-                       uint64_t const& b0,
-                       uint64_t* zPtr);
+mul128To256M(uint64_t const& a64,
+             uint64_t const& a0,
+             uint64_t const& b64,
+             uint64_t const& b0,
+             uint64_t* zPtr);
 
-inline
-void
-softfloat_mul128To256M(uint128 const& a,
-                       uint128 const& b,
-                       uint64_t* const zPtr)
+inline void
+mul128To256M(uint128 const& a,
+             uint128 const& b,
+             uint64_t* const zPtr)
 {
-    softfloat_mul128To256M(a.v64, a.v0, b.v64, b.v0, zPtr);
+    mul128To256M(a.v64, a.v0, b.v64, b.v0, zPtr);
 }
 
 }  // namespace fast_int64
@@ -725,7 +725,7 @@ This function or macro is the same as `softfloat_shortShiftRightM' with
 `size_words' = 4 (N = 128).
 */
 inline void
-softfloat_shortShiftRight128M(uint32_t const* aPtr,
+shortShiftRight128M(uint32_t const* aPtr,
                               uint8_t dist,
                               uint32_t* zPtr)
 {

@@ -59,6 +59,6 @@ extF80_lt(extFloat80_t const a,
     return
         signA != signB ?
         signA && 0 != static_cast<largest_type>(((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) :
-        (uiA64 != uiB64 || uiA0 != uiB0) && softfloat_lt128(uiA64, uiA0, uiB64, uiB0) != signA;
+        (uiA64 != uiB64 || uiA0 != uiB0) && lt(uiA64, uiA0, uiB64, uiB0) != signA;
 }
 

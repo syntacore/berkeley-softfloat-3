@@ -60,7 +60,7 @@ extF80_roundToInt(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
         exp += normExpSig.exp;
         sigA = normExpSig.sig;
     }

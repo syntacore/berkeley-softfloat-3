@@ -76,7 +76,7 @@ f32_sqrt(float32_t a)
     int16_t const expZ = ((expA - 0x7F) >> 1) + 0x7E;
     expA &= 1;
     sigA = (sigA | 0x00800000) << 8;
-    uint32_t sigZ = (static_cast<uint64_t>(sigA) * softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sigA)) >> 32;
+    uint32_t sigZ = (static_cast<uint64_t>(sigA) * approxRecipSqrt32_1(static_cast<uint32_t>(expA), sigA)) >> 32;
 
     if (0 != expA) {
         sigZ >>= 1;
@@ -96,5 +96,5 @@ f32_sqrt(float32_t a)
         }
     }
 
-    return softfloat_roundPackToF32(0, expZ, sigZ);
+    return roundPackToF32(0, expZ, sigZ);
 }

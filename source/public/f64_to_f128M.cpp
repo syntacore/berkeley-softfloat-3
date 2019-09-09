@@ -53,7 +53,7 @@ f64_to_f128M(float64_t a,
     zWPtr[indexWord(4, 0)] = 0;
 
     if (is_NaN(a)) {
-        softfloat_commonNaNToF128M(softfloat_f64UIToCommonNaN(f_as_u(a)), zWPtr);
+        commonNaN_to_F128M(commonNaN_from_f64UI(f_as_u(a)), zWPtr);
         return;
     }
 

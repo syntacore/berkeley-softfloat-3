@@ -48,6 +48,6 @@ f128_add(float128_t const a,
     bool const signB = is_sign(bb.v64);
     return
         signA == signB ?
-        softfloat_addMagsF128(aa, bb, signA) :
-        softfloat_subMagsF128(aa, bb, signA);
+        add_magnitudes(aa, bb, signA) :
+        sub_magnitudes(aa, bb, signA);
 }

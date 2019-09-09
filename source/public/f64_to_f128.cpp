@@ -49,7 +49,7 @@ f64_to_f128(float64_t a)
 
     if (!is_finite(a)) {
         if (is_NaN(a)) {
-            return static_cast<float128_t>(softfloat_commonNaNToF128UI(softfloat_f64UIToCommonNaN(f_as_u(a))));
+            return static_cast<float128_t>(commonNaN_to_F128UI(commonNaN_from_f64UI(f_as_u(a))));
         } else {
             uiZ.v64 = packToF128UI64(sign, 0x7FFF, 0);
             uiZ.v0 = 0;
@@ -67,6 +67,6 @@ f64_to_f128(float64_t a)
         frac = normExpSig.sig;
     }
 
-    uint128 const frac128 = softfloat_shortShiftLeft128(uint128{0, frac}, 60);
+    uint128 const frac128 = shortShiftLeft128(uint128{0, frac}, 60);
     return static_cast<float128_t>(uint128{packToF128UI64(sign, exp + 0x3C00, frac128.v64),frac128.v0});
 }

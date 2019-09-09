@@ -50,7 +50,7 @@ f32_to_f128M(float32_t a,
     uint32_t frac = get_frac(a);
 
     if (is_NaN(a)) {
-        softfloat_commonNaNToF128M(softfloat_f32UIToCommonNaN(f_as_u(a)), zWPtr);
+        commonNaN_to_F128M(commonNaN_from_f32UI(f_as_u(a)), zWPtr);
         return;
     }
 

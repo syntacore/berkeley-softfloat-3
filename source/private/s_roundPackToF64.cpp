@@ -40,9 +40,9 @@ namespace softfloat {
 namespace internals {
 
 float64_t
-softfloat_roundPackToF64(bool sign,
-                         int16_t exp,
-                         uint64_t sig)
+roundPackToF64(bool sign,
+               int16_t exp,
+               uint64_t sig)
 {
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     uint16_t const roundIncrement =
@@ -54,10 +54,10 @@ softfloat_roundPackToF64(bool sign,
     if (0x7FDu <= static_cast<uint16_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == softfloat_detectTininess ||
+                softfloat_tininess_beforeRounding == detectTininess ||
                 exp < -1 ||
                 sig + roundIncrement < uint64_t(INT64_MIN);
-            sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(-exp));
+            sig = shiftRightJam64(sig, static_cast<uint32_t>(-exp));
             exp = 0;
             roundBits = sig & 0x3FF;
 

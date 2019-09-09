@@ -117,7 +117,7 @@ f128M_div(float128_t const* const aPtr,
         softfloat_add128M(y, y, y);
     }
 
-    uint32_t const recip32 = softfloat_approxRecip32_1((static_cast<uint64_t>(sigB[indexWord(4, 3)]) << 32 | sigB[indexWord(4, 2)]) >> 30);
+    uint32_t const recip32 = approxRecip32_1((static_cast<uint64_t>(sigB[indexWord(4, 3)]) << 32 | sigB[indexWord(4, 2)]) >> 30);
     int ix = 3;
     uint64_t q64;
     uint32_t qs[3];

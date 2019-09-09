@@ -92,7 +92,7 @@ extF80_sqrt(extFloat80_t const a)
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -105,16 +105,16 @@ extF80_sqrt(extFloat80_t const a)
     int32_t const expZ = ((expA - 0x3FFF) >> 1) + 0x3FFF;
     expA &= 1;
     uint32_t const sig32A = sigA >> 32;
-    uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    uint32_t const recipSqrt32 = approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     uint128 rem;
 
     if (0 != expA) {
         sig32Z >>= 1;
-        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 61);
+        rem = shortShiftLeft128(uint128{0, sigA}, 61);
     } else {
-        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 62);
+        rem = shortShiftLeft128(uint128{0, sigA}, 62);
     }
 
     rem.v64 -= static_cast<uint64_t>(sig32Z) * sig32Z;
@@ -125,9 +125,9 @@ extF80_sqrt(extFloat80_t const a)
     /**
     @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
     */
-    uint128 term = softfloat_mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
-    rem = softfloat_shortShiftLeft128(rem, 29);
-    rem = softfloat_sub128(rem, term);
+    uint128 term = mul64ByShifted32To128(x64, static_cast<uint32_t>(q));
+    rem = shortShiftLeft128(rem, 29);
+    rem = sub(rem, term);
 
     q = ((static_cast<uint32_t>(rem.v64 >> 2) * static_cast<uint64_t>(recipSqrt32)) >> 32) + 2;
     x64 = sigZ;
@@ -140,11 +140,11 @@ extF80_sqrt(extFloat80_t const a)
         /**
         @todo Warning   C4242   'function': conversion from 'int64_t' to 'int32_t', possible loss of data
         */
-        term = softfloat_mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
+        term = mul64ByShifted32To128(x64 + (q >> 27), static_cast<uint32_t>(q));
         x64 = static_cast<uint32_t>(q << 5) * static_cast<uint64_t>(static_cast<uint32_t>(q));
-        term = softfloat_add128(term, uint128{0, x64});
-        rem = softfloat_shortShiftLeft128(rem, 28);
-        rem = softfloat_sub128(rem, term);
+        term = add(term, uint128{0, x64});
+        rem = shortShiftLeft128(rem, 28);
+        rem = sub(rem, term);
 
         if (0 != (UINT64_C(0x8000000000000000) & rem.v64)) {
             if (0 == sigZExtra) {
@@ -157,6 +157,6 @@ extF80_sqrt(extFloat80_t const a)
         }
     }
 
-    return softfloat_roundPackToExtF80(0, expZ, sigZ, sigZExtra, extF80_roundingPrecision);
+    return roundPackToExtF80(0, expZ, sigZ, sigZExtra, extF80_roundingPrecision);
 }
 

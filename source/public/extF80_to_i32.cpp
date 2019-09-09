@@ -64,5 +64,5 @@ extF80_to_i32(extFloat80_t a,
 
     auto const shiftDist = 0x4032 - exp;
     uint32_t const shiftDist1 = shiftDist <= 0 ? 1u : static_cast<uint32_t>(shiftDist);
-    return roundPackTo<int32_t>(sign, softfloat_shiftRightJam64(sig, shiftDist1), roundingMode, exact);
+    return roundPackTo<int32_t>(sign, shiftRightJam64(sig, shiftDist1), roundingMode, exact);
 }

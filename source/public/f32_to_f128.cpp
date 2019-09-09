@@ -47,7 +47,7 @@ f32_to_f128(float32_t a)
 
     if (!is_finite(a)) {
         if (is_NaN(a)) {
-            return float128_t(softfloat_commonNaNToF128UI(softfloat_f32UIToCommonNaN(f_as_u(a))));
+            return float128_t(commonNaN_to_F128UI(commonNaN_from_f32UI(f_as_u(a))));
         }
 
         return float128_t(uint128{packToF128UI64(sign, 0x7FFF, 0), 0});

@@ -53,7 +53,7 @@ f128M_sqrt(float128_t const* const aPtr,
 
     if (0x7FFF == rawExpA) {
         if (fracF128UI96(uiA96) || 0 != (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) {
-            softfloat_propagateNaNF128M(aWPtr, 0, zWPtr);
+            propagate_NaN_F128M(aWPtr, 0, zWPtr);
             return;
         }
 
@@ -97,7 +97,7 @@ f128M_sqrt(float128_t const* const aPtr,
 
     if (expA) {
         if (!rawExpA) {
-            softfloat_shortShiftRight128M(rem, 1, rem);
+            shortShiftRight128M(rem, 1, rem);
             rem64 >>= 1;
         }
 
@@ -106,7 +106,7 @@ f128M_sqrt(float128_t const* const aPtr,
         sig32A = static_cast<uint32_t>(rem64 >> 30);
     }
 
-    uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    uint32_t const recipSqrt32 = approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     if (0 != expA) {

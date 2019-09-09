@@ -91,7 +91,7 @@ f128_mul(float128_t const a,
             return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigA);
+        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigA);
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -101,25 +101,25 @@ f128_mul(float128_t const a,
             return float128_t(uint128{packToF128UI64(signZ, 0, 0), 0});
         }
 
-        exp32_sig128 const normExpSig = softfloat_normSubnormalF128Sig(sigB);
+        exp32_sig128 const normExpSig = normSubnormalF128Sig(sigB);
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
 
     int32_t expZ = expA + expB - 0x4000;
     sigA.v64 |= UINT64_C(0x0001000000000000);
-    sigB = softfloat_shortShiftLeft128(sigB, 16);
+    sigB = shortShiftLeft128(sigB, 16);
     uint64_t sig256Z[4];
-    softfloat_mul128To256M(sigA, sigB, sig256Z);
+    mul128To256M(sigA, sigB, sig256Z);
     uint64_t sigZExtra = sig256Z[indexWord(4, 1)] | (sig256Z[indexWord(4, 0)] != 0);
-    uint128 sigZ = softfloat_add128(uint128{sig256Z[indexWord(4, 3)], sig256Z[indexWord(4, 2)]}, sigA);
+    uint128 sigZ = add(uint128{sig256Z[indexWord(4, 3)], sig256Z[indexWord(4, 2)]}, sigA);
 
     if (UINT64_C(0x0002000000000000) <= sigZ.v64) {
         ++expZ;
-        uint128_extra const sig128Extra = softfloat_shortShiftRightJam128Extra(sigZ, sigZExtra, 1);
+        uint128_extra const sig128Extra = shortShiftRightJam128Extra(sigZ, sigZExtra, 1);
         sigZ = sig128Extra.v;
         sigZExtra = sig128Extra.extra;
     }
 
-    return softfloat_roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
+    return roundPackToF128(signZ, expZ, sigZ.v64, sigZ.v0, sigZExtra);
 }

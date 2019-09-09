@@ -94,7 +94,7 @@ extF80_rem(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
+        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigB);
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -111,7 +111,7 @@ extF80_rem(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -130,8 +130,8 @@ extF80_rem(extFloat80_t const a,
         return uZ;
     }
 
-    uint128 rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 32);
-    uint128 shiftedSigB = softfloat_shortShiftLeft128(uint128{0, sigB}, 32);
+    uint128 rem = shortShiftLeft128(uint128{0, sigA}, 32);
+    uint128 shiftedSigB = shortShiftLeft128(uint128{0, sigB}, 32);
 
     uint128 altRem;
     uint32_t q;
@@ -139,17 +139,17 @@ extF80_rem(extFloat80_t const a,
     if (expDiff < 1) {
         if (0 != expDiff) {
             --expB;
-            shiftedSigB = softfloat_shortShiftLeft128(uint128{0, sigB}, 33);
+            shiftedSigB = shortShiftLeft128(uint128{0, sigB}, 33);
             q = 0;
         } else {
             q = 0u + !!(sigB <= sigA);
 
             if (0 != q) {
-                rem = softfloat_sub128(rem, shiftedSigB);
+                rem = sub(rem, shiftedSigB);
             }
         }
     } else {
-        uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32);
+        uint32_t const recip32 = approxRecip32_1(sigB >> 32);
         expDiff -= 30;
 
         uint64_t q64;
@@ -162,12 +162,12 @@ extF80_rem(extFloat80_t const a,
             }
 
             q = (q64 + 0x80000000) >> 32;
-            rem = softfloat_shortShiftLeft128(rem, 29);
-            uint128 term = softfloat_mul64ByShifted32To128(sigB, q);
-            rem = softfloat_sub128(rem, term);
+            rem = shortShiftLeft128(rem, 29);
+            uint128 term = mul64ByShifted32To128(sigB, q);
+            rem = sub(rem, term);
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
-                rem = softfloat_add128(rem, shiftedSigB);
+                rem = add(rem, shiftedSigB);
             }
 
             expDiff -= 29;
@@ -179,12 +179,12 @@ extF80_rem(extFloat80_t const a,
         /**
         @todo Warning   C4244   '=': conversion from 'int' to 'uint8_t', possible loss of data
         */
-        rem = softfloat_shortShiftLeft128(rem, uint8_t(expDiff + 30));
-        rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
+        rem = shortShiftLeft128(rem, uint8_t(expDiff + 30));
+        rem = sub(rem, mul64ByShifted32To128(sigB, q));
 
         if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
-            altRem = softfloat_add128(rem, shiftedSigB);
-            uint128 const meanRem = softfloat_add128(rem, altRem);
+            altRem = add(rem, shiftedSigB);
+            uint128 const meanRem = add(rem, altRem);
 
             if (0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) || (!(meanRem.v64 | meanRem.v0) && (q & 1))) {
                 rem = altRem;
@@ -194,20 +194,20 @@ extF80_rem(extFloat80_t const a,
 
             if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
                 signRem = !signRem;
-                rem = softfloat_sub128(uint128{0, 0}, rem);
+                rem = sub(uint128{0, 0}, rem);
             }
 
-            return softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
+            return normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
         }
     }
 
     do {
         altRem = rem;
         ++q;
-        rem = softfloat_sub128(rem, shiftedSigB);
+        rem = sub(rem, shiftedSigB);
     } while (0 == (rem.v64 & UINT64_C(0x8000000000000000)));
 
-    uint128 const meanRem = softfloat_add128(rem, altRem);
+    uint128 const meanRem = add(rem, altRem);
 
     if (
         0 != (meanRem.v64 & UINT64_C(0x8000000000000000)) ||
@@ -220,8 +220,8 @@ extF80_rem(extFloat80_t const a,
 
     if (0 != (rem.v64 & UINT64_C(0x8000000000000000))) {
         signRem = !signRem;
-        rem = softfloat_sub128(uint128{0, 0}, rem);
+        rem = sub(uint128{0, 0}, rem);
     }
 
-    return softfloat_normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
+    return normRoundPackToExtF80(signRem, expB + 32, rem.v64, rem.v0, 80);
 }

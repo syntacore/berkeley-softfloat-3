@@ -47,7 +47,7 @@ f32_to_extF80(float32_t const a)
 
     if (!is_finite(a)) {
         if (is_NaN(a)) {
-            uint128 const uiZ = uint128(softfloat_f32UIToCommonNaN(f_as_u(a)));
+            uint128 const uiZ = uint128(commonNaN_from_f32UI(f_as_u(a)));
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;

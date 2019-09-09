@@ -120,7 +120,7 @@ extF80M_div(extFloat80_t const* const aSPtr,
 
     uint32_t y[3];
     softfloat_shortShiftLeft64To96M(sigA, shiftDist, y);
-    uint32_t const recip32 = softfloat_approxRecip32_1(static_cast<uint32_t>(x64 >> 32));
+    uint32_t const recip32 = approxRecip32_1(static_cast<uint32_t>(x64 >> 32));
     uint32_t sigB[3];
     sigB[indexWord(3, 0)] = static_cast<uint32_t>(x64) << 30;
     x64 >>= 2;

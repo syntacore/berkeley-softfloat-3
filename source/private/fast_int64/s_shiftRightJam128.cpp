@@ -41,9 +41,9 @@ namespace internals {
 namespace fast_int64 {
 
 uint128
-softfloat_shiftRightJam128(uint64_t a64,
-                           uint64_t a0,
-                           uint32_t dist)
+shiftRightJam128(uint64_t a64,
+                 uint64_t a0,
+                 uint32_t dist)
 {
     if (dist < 64) {
         auto const u8NegDist = 63u & -static_cast<int32_t>(dist);

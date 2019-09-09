@@ -60,7 +60,7 @@ f32_to_ui64(float32_t const a,
     uint64_t const sig64 = static_cast<uint64_t>(sig | (0 != exp ? 0x00800000 : 0)) << 40;
 
     if (0 != shiftDist) {
-        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig64, 0, static_cast<uint32_t>(shiftDist));
+        uint64_extra const sig64Extra = shiftRightJam64Extra(sig64, 0, static_cast<uint32_t>(shiftDist));
         return roundPackTo<uint64_t>(sign, sig64Extra.v, sig64Extra.extra, roundingMode, exact);
     }
 

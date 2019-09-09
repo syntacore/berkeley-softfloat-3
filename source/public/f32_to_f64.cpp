@@ -44,7 +44,7 @@ f32_to_f64(float32_t const a)
 
     if (!is_finite(a)) {
         if (is_NaN(a)) {
-            return u_as_f(softfloat_commonNaNToF64UI(softfloat_f32UIToCommonNaN(f_as_u(a))));
+            return u_as_f(commonNaN_to_F64UI(commonNaN_from_f32UI(f_as_u(a))));
         }
 
         return u_as_f(packToF64UI(sign, 0x7FF, 0));

@@ -53,18 +53,18 @@ extF80_to_f64(extFloat80_t a)
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            return u_as_f(softfloat_commonNaNToF64UI(softfloat_extF80UIToCommonNaN(uiA64, uiA0)));
+            return u_as_f(commonNaN_to_F64UI(commonNaN_from_extF80UI(uiA64, uiA0)));
         }
 
         return u_as_f(packToF64UI(sign, 0x7FF, 0));
     }
 
-    sig = softfloat_shortShiftRightJam64(sig, 1);
+    sig = shortShiftRightJam64(sig, 1);
     exp -= 0x3C01;
 
     if (exp < -0x1000) {
         exp = -0x1000;
     }
 
-    return softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), sig);
+    return roundPackToF64(sign, static_cast<int16_t>(exp), sig);
 }

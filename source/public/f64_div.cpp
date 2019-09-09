@@ -106,7 +106,7 @@ f64_div(float64_t const a,
     }
 
     sigB <<= 11;
-    uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32) - 2;
+    uint32_t const recip32 = approxRecip32_1(sigB >> 32) - 2;
     uint32_t const sig32Z = (static_cast<uint32_t>(sigA >> 32) * static_cast<uint64_t>(recip32)) >> 32;
     uint32_t doubleTerm = sig32Z << 1;
     uint64_t rem =
@@ -132,5 +132,5 @@ f64_div(float64_t const a,
         }
     }
 
-    return softfloat_roundPackToF64(signZ, expZ, sigZ);
+    return roundPackToF64(signZ, expZ, sigZ);
 }

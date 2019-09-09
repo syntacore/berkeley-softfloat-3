@@ -47,29 +47,29 @@ and `a0' is equal to the 128-bit unsigned integer formed by concatenating
 `b64' and `b0'.
 */
 static inline constexpr bool
-softfloat_eq128(uint64_t const& a64,
-                uint64_t const& a0,
-                uint64_t const& b64,
-                uint64_t const& b0)
+eq(uint64_t const& a64,
+   uint64_t const& a0,
+   uint64_t const& b64,
+   uint64_t const& b0)
 {
     return a64 == b64 && a0 == b0;
 }
 
 static inline constexpr bool
-softfloat_eq128(uint128 const& a,
-                uint128 const& b)
+eq(uint128 const& a,
+   uint128 const& b)
 {
-    return softfloat_eq128(a.v64, a.v0, b.v64, b.v0);
+    return eq(a.v64, a.v0, b.v64, b.v0);
 }
 
 }  // namespace
 
 float128_t
-softfloat_roundPackToF128(bool const sign,
-                          int32_t exp,
-                          uint64_t sig64,
-                          uint64_t sig0,
-                          uint64_t sigExtra)
+roundPackToF128(bool const sign,
+                int32_t exp,
+                uint64_t sig64,
+                uint64_t sig0,
+                uint64_t sigExtra)
 {
     softfloat_round_mode const softfloat_roundingMode = softfloat_get_roundingMode();
     bool const roundNearEven = softfloat_round_near_even == softfloat_roundingMode;
@@ -84,12 +84,12 @@ softfloat_roundPackToF128(bool const sign,
     if (0x7FFD <= static_cast<uint32_t>(exp)) {
         if (exp < 0) {
             bool const isTiny =
-                softfloat_tininess_beforeRounding == softfloat_detectTininess ||
+                softfloat_tininess_beforeRounding == detectTininess ||
                 exp < -1 ||
                 !doIncrement ||
-                softfloat_lt128(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_MAX));
+                lt(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_MAX));
 
-            uint128_extra const sig128Extra = softfloat_shiftRightJam128Extra(uint128_extra(uint128(sig64, sig0), sigExtra), static_cast<uint32_t>(-exp));
+            uint128_extra const sig128Extra = shiftRightJam128Extra(uint128_extra(uint128(sig64, sig0), sigExtra), static_cast<uint32_t>(-exp));
             sig64 = sig128Extra.v.v64;
             sig0 = sig128Extra.v.v0;
             sigExtra = sig128Extra.extra;
@@ -111,7 +111,7 @@ softfloat_roundPackToF128(bool const sign,
             (
             0x7FFD == exp &&
             doIncrement &&
-            softfloat_eq128(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF)))
+            eq(uint128(sig64, sig0), uint128(UINT64_C(0x0001FFFFFFFFFFFF), UINT64_C(0xFFFFFFFFFFFFFFFF)))
             )
         ) {
             softfloat_raiseFlags(softfloat_flag_overflow | softfloat_flag_inexact);
@@ -133,7 +133,7 @@ softfloat_roundPackToF128(bool const sign,
     }
 
     if (doIncrement) {
-        uint128 const sig128 = softfloat_add128(uint128{sig64, sig0}, uint128{0, 1});
+        uint128 const sig128 = add(uint128{sig64, sig0}, uint128{0, 1});
         return float128_t(uint128{
             packToF128UI64(sign, exp, sig128.v64),
             sig128.v0 & ~static_cast<uint64_t>(!(sigExtra & INT64_MAX) & roundNearEven)});

@@ -126,7 +126,7 @@ Rounding precision for 80-bit extended double-precision floating-point.
 Valid values are 32, 64, and 80.
 */
 extern /*THREAD_LOCAL*/ uint8_t extF80_roundingPrecision;
-extern /*THREAD_LOCAL*/ softfloat_tininess softfloat_detectTininess;
+extern /*THREAD_LOCAL*/ softfloat_tininess detectTininess;
 
 template<typename Ty>
 inline constexpr auto
@@ -176,28 +176,28 @@ roundPackTo(bool,
             bool);
 
 float16_t
-softfloat_roundPackToF16(bool,
+roundPackToF16(bool,
                          int16_t,
                          uint16_t);
 float16_t
-softfloat_normRoundPackToF16(bool,
+normRoundPackToF16(bool,
                              int16_t,
                              uint16_t const&);
 
 float16_t
-softfloat_addMagsF16(uint16_t const&,
+add_magnitudes(uint16_t const&,
                      uint16_t const&);
 float16_t
-softfloat_subMagsF16(uint16_t const&,
+sub_magnitudes(uint16_t const&,
                      uint16_t const&);
 
 float32_t
-softfloat_roundPackToF32(bool,
+roundPackToF32(bool,
                          int16_t,
                          uint32_t);
 
 float64_t
-softfloat_roundPackToF64(bool,
+roundPackToF64(bool,
                          int16_t,
                          uint64_t);
 
@@ -258,100 +258,100 @@ roundPackTo<uint64_t>(bool const sign,
 
 inline
 exp32_sig64
-softfloat_normSubnormalExtF80Sig(uint64_t const& sig)
+normSubnormalExtF80Sig(uint64_t const& sig)
 {
     auto const shiftDist = count_leading_zeros(sig);
     return exp32_sig64{-shiftDist, sig << shiftDist};
 }
 
 extFloat80_t
-softfloat_roundPackToExtF80(bool,
+roundPackToExtF80(bool,
                             int32_t,
                             uint64_t,
                             uint64_t,
                             uint8_t);
 extFloat80_t
-softfloat_normRoundPackToExtF80(bool,
+normRoundPackToExtF80(bool,
                                 int32_t,
                                 uint64_t,
                                 uint64_t,
                                 uint8_t);
 
 extFloat80_t
-softfloat_addMagsExtF80(uint16_t,
-                        uint64_t,
-                        uint16_t,
-                        uint64_t,
-                        bool);
+add_magnitudes(uint16_t,
+               uint64_t,
+               uint16_t,
+               uint64_t,
+               bool);
 extFloat80_t
-softfloat_subMagsExtF80(uint16_t,
-                        uint64_t,
-                        uint16_t,
-                        uint64_t,
-                        bool);
+sub_magnitudes(uint16_t,
+               uint64_t,
+               uint16_t,
+               uint64_t,
+               bool);
 
 exp32_sig128
-softfloat_normSubnormalF128Sig(uint64_t,
+normSubnormalF128Sig(uint64_t,
                                uint64_t);
 
 inline
 exp32_sig128
-softfloat_normSubnormalF128Sig(uint128 const& a)
+normSubnormalF128Sig(uint128 const& a)
 {
-    return softfloat_normSubnormalF128Sig(a.v64, a.v0);
+    return normSubnormalF128Sig(a.v64, a.v0);
 }
 
 float128_t
-softfloat_roundPackToF128(bool,
+roundPackToF128(bool,
                           int32_t,
                           uint64_t,
                           uint64_t,
                           uint64_t);
 float128_t
-softfloat_normRoundPackToF128(bool,
+normRoundPackToF128(bool,
                               int32_t,
                               uint64_t,
                               uint64_t);
 
 float128_t
-softfloat_addMagsF128(uint64_t,
-                      uint64_t,
-                      uint64_t,
-                      uint64_t,
-                      bool);
+add_magnitudes(uint64_t,
+               uint64_t,
+               uint64_t,
+               uint64_t,
+               bool);
 
 inline
 float128_t
-softfloat_addMagsF128(uint128 const& a,
-                      uint128 const& b,
-                      bool const signZ)
+add_magnitudes(uint128 const& a,
+               uint128 const& b,
+               bool const signZ)
 {
-    return softfloat_addMagsF128(a.v64, a.v0, b.v64, b.v0, signZ);
+    return add_magnitudes(a.v64, a.v0, b.v64, b.v0, signZ);
 }
 
 float128_t
-softfloat_subMagsF128(uint64_t,
-                      uint64_t,
-                      uint64_t,
-                      uint64_t,
-                      bool);
+sub_magnitudes(uint64_t,
+               uint64_t,
+               uint64_t,
+               uint64_t,
+               bool);
 inline
 float128_t
-softfloat_subMagsF128(uint128 const& a,
-                      uint128 const& b,
-                      bool const signZ)
+sub_magnitudes(uint128 const& a,
+               uint128 const& b,
+               bool const signZ)
 {
-    return softfloat_subMagsF128(a.v64, a.v0, b.v64, b.v0, signZ);
+    return sub_magnitudes(a.v64, a.v0, b.v64, b.v0, signZ);
 }
 
 float128_t
-softfloat_mulAddF128(Mul_add_operations const op,
-                     uint64_t const& uiA64,
-                     uint64_t const& uiA0,
-                     uint64_t const& uiB64,
-                     uint64_t const& uiB0,
-                     uint64_t const& uiC64,
-                     uint64_t const& uiC0);
+mulAddF128(Mul_add_operations const op,
+           uint64_t const& uiA64,
+           uint64_t const& uiA0,
+           uint64_t const& uiB64,
+           uint64_t const& uiB0,
+           uint64_t const& uiC64,
+           uint64_t const& uiC0);
 
 inline constexpr int32_t
 expF128UI64(uint64_t const& a64)
@@ -799,7 +799,7 @@ Returns true when 32-bit unsigned integer `uiA' has the bit pattern of a
 32-bit floating-point signaling NaN.
 */
 inline float64_t
-softfloat_normRoundPackToF64(bool const sign,
+normRoundPackToF64(bool const sign,
                              int16_t const exp,
                              uint64_t const sig)
 {
@@ -810,13 +810,13 @@ softfloat_normRoundPackToF64(bool const sign,
         return u_as_f(packToF64UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 10)));
     }
 
-    return softfloat_roundPackToF64(sign, exp_1, sig << shiftDist);
+    return roundPackToF64(sign, exp_1, sig << shiftDist);
 }
 
 inline float32_t
-softfloat_normRoundPackToF32(bool const sign,
-                             int16_t const exp,
-                             uint32_t const sig)
+normRoundPackToF32(bool const sign,
+                   int16_t const exp,
+                   uint32_t const sig)
 {
     int8_t const shiftDist = count_leading_zeros(sig) - 1;
     int16_t const exp_1 = exp - shiftDist;
@@ -825,7 +825,7 @@ softfloat_normRoundPackToF32(bool const sign,
         return u_as_f(packToF32UI(sign, sig ? exp_1 : 0, sig << (shiftDist - 7)));
     }
 
-    return softfloat_roundPackToF32(sign, exp_1, sig << shiftDist);
+    return roundPackToF32(sign, exp_1, sig << shiftDist);
 }
 
 }  // namespace internals

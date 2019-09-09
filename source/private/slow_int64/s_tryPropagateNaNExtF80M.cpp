@@ -50,7 +50,7 @@ softfloat_tryPropagateNaNExtF80M(extFloat80M const* const aSPtr,
         is_NaN(*bSPtr);
 
     if (result) {
-        softfloat_propagateNaNExtF80M(aSPtr, bSPtr, zSPtr);
+        propagate_NaN_ExtF80M(aSPtr, bSPtr, zSPtr);
     }
 
     return result;

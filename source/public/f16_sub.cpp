@@ -45,6 +45,6 @@ f16_sub(float16_t a,
     uint16_t const uiB = f_as_u(b);
     return
         is_sign(static_cast<uint16_t>(uiA ^ uiB)) ?
-        softfloat_addMagsF16(uiA, uiB) :
-        softfloat_subMagsF16(uiA, uiB);
+        add_magnitudes(uiA, uiB) :
+        sub_magnitudes(uiA, uiB);
 }

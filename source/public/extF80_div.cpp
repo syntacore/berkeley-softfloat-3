@@ -115,7 +115,7 @@ extF80_div(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigB);
+        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigB);
         expB += normExpSig.exp;
         sigB = normExpSig.sig;
     }
@@ -132,7 +132,7 @@ extF80_div(extFloat80_t const a,
             return uZ;
         }
 
-        exp32_sig64 const normExpSig = softfloat_normSubnormalExtF80Sig(sigA);
+        exp32_sig64 const normExpSig = normSubnormalExtF80Sig(sigA);
         expA += normExpSig.exp;
         sigA = normExpSig.sig;
     }
@@ -143,12 +143,12 @@ extF80_div(extFloat80_t const a,
 
     if (sigA < sigB) {
         --expZ;
-        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 32);
+        rem = shortShiftLeft128(uint128{0, sigA}, 32);
     } else {
-        rem = softfloat_shortShiftLeft128(uint128{0, sigA}, 31);
+        rem = shortShiftLeft128(uint128{0, sigA}, 31);
     }
 
-    uint32_t const recip32 = softfloat_approxRecip32_1(sigB >> 32);
+    uint32_t const recip32 = approxRecip32_1(sigB >> 32);
     uint64_t sigZ = 0;
     uint32_t q;
 
@@ -161,28 +161,28 @@ extF80_div(extFloat80_t const a,
             break;
         }
 
-        rem = softfloat_shortShiftLeft128(rem, 29);
-        rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
+        rem = shortShiftLeft128(rem, 29);
+        rem = sub(rem, mul64ByShifted32To128(sigB, q));
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
-            rem = softfloat_add128(rem, uint128{sigB >> 32, sigB << 32});
+            rem = add(rem, uint128{sigB >> 32, sigB << 32});
         }
 
         sigZ = (sigZ << 29) + q;
     }
 
     if (((q + 1) & 0x3FFFFF) < 2) {
-        rem = softfloat_shortShiftLeft128(rem, 29);
-        rem = softfloat_sub128(rem, softfloat_mul64ByShifted32To128(sigB, q));
-        uint128 const term = softfloat_shortShiftLeft128(uint128{0, sigB}, 32);
+        rem = shortShiftLeft128(rem, 29);
+        rem = sub(rem, mul64ByShifted32To128(sigB, q));
+        uint128 const term = shortShiftLeft128(uint128{0, sigB}, 32);
 
         if (rem.v64 & UINT64_C(0x8000000000000000)) {
             --q;
-            rem = softfloat_add128(rem, term);
-        } else if (softfloat_le128(term, rem)) {
+            rem = add(rem, term);
+        } else if (le(term, rem)) {
             ++q;
-            rem = softfloat_sub128(rem, term);
+            rem = sub(rem, term);
         }
 
         if (rem.v64 | rem.v0) {
@@ -190,5 +190,5 @@ extF80_div(extFloat80_t const a,
         }
     }
 
-    return softfloat_roundPackToExtF80(signZ, expZ, (sigZ << 6) + (q >> 23), static_cast<uint64_t>(static_cast<uint64_t>(q) << 41), extF80_roundingPrecision);
+    return roundPackToExtF80(signZ, expZ, (sigZ << 6) + (q >> 23), static_cast<uint64_t>(static_cast<uint64_t>(q) << 41), extF80_roundingPrecision);
 }

@@ -60,7 +60,7 @@ f64_to_i64(float64_t const a,
         return roundPackTo<int64_t>(sign, sig << -shiftDist, 0, roundingMode, exact);
     }
 
-    uint64_extra const sigExtra = softfloat_shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
+    uint64_extra const sigExtra = shiftRightJam64Extra(sig, 0, static_cast<uint32_t>(shiftDist));
     return roundPackTo<int64_t>(sign, sigExtra.v, sigExtra.extra, roundingMode, exact);
 
 #else

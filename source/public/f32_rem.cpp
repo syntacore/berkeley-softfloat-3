@@ -111,7 +111,7 @@ f32_rem(float32_t const a,
             }
         }
     } else {
-        uint32_t const recip32 = softfloat_approxRecip32_1(sigB << 8);
+        uint32_t const recip32 = approxRecip32_1(sigB << 8);
         /*
          Changing the shift of `rem' here requires also changing the initial
          subtraction from `expDiff'.
@@ -156,8 +156,8 @@ f32_rem(float32_t const a,
     }
 
     if (0x80000000 <= rem) {
-        return softfloat_normRoundPackToF32(!signA, expB, static_cast<uint32_t>(-static_cast<int32_t>(rem)));
+        return normRoundPackToF32(!signA, expB, static_cast<uint32_t>(-static_cast<int32_t>(rem)));
     }
 
-    return softfloat_normRoundPackToF32(signA, expB, rem);
+    return normRoundPackToF32(signA, expB, rem);
 }

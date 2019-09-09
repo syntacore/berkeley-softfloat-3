@@ -54,8 +54,8 @@ f128M_sub(float128_t const* const aPtr,
     bool const signB = is_sign(uiB64);
 
     *zPtr = 
-        signA == signB ? softfloat_subMagsF128(uiA64, uiA0, uiB64, uiB0, signA):
-        softfloat_addMagsF128(uiA64, uiA0, uiB64, uiB0, signA);
+        signA == signB ? sub_magnitudes(uiA64, uiA0, uiB64, uiB0, signA):
+        add_magnitudes(uiA64, uiA0, uiB64, uiB0, signA);
 
 #else
     using namespace softfloat::internals::slow_int64;

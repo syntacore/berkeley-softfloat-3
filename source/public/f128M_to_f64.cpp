@@ -52,7 +52,7 @@ f128M_to_f64(const float128_t* aPtr)
 
     if (exp == 0x7FFF) {
         if (frac64 || aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]) {
-            return u_as_f(softfloat_commonNaNToF64UI(softfloat_f128MToCommonNaN(aWPtr)));
+            return u_as_f(commonNaN_to_F64UI(commonNaN_from_f128M(aWPtr)));
         }
 
         return u_as_f(packToF64UI(sign, 0x7FF, 0));
@@ -79,6 +79,6 @@ f128M_to_f64(const float128_t* aPtr)
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
     return
-        softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
+        roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
 #endif
 }

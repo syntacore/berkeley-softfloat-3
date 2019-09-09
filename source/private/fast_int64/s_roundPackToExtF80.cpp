@@ -41,11 +41,11 @@ namespace internals {
 namespace fast_int64 {
 
 extFloat80_t
-softfloat_roundPackToExtF80(bool sign,
-                            int32_t exp,
-                            uint64_t sig,
-                            uint64_t sigExtra,
-                            uint8_t roundingPrecision)
+roundPackToExtF80(bool sign,
+                  int32_t exp,
+                  uint64_t sig,
+                  uint64_t sigExtra,
+                  uint8_t roundingPrecision)
 {
     uint64_t roundIncrement;
     uint64_t roundMask;
@@ -74,10 +74,10 @@ softfloat_roundPackToExtF80(bool sign,
         if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
             if (exp <= 0) {
                 bool isTiny =
-                    softfloat_tininess_beforeRounding == softfloat_detectTininess ||
+                    softfloat_tininess_beforeRounding == detectTininess ||
                     exp < 0 ||
                     sig <= static_cast<uint64_t>(sig + roundIncrement);
-                sig = softfloat_shiftRightJam64(sig, 1u - exp);
+                sig = shiftRightJam64(sig, 1u - exp);
                 auto const roundBits_1 = sig & roundMask;
 
                 if (isTiny && roundBits_1) {
@@ -158,11 +158,11 @@ softfloat_roundPackToExtF80(bool sign,
     if (0x7FFD <= static_cast<uint32_t>(exp - 1)) {
         if (exp <= 0) {
             bool isTiny =
-                softfloat_tininess_beforeRounding == softfloat_detectTininess ||
+                softfloat_tininess_beforeRounding == detectTininess ||
                 exp < 0 ||
                 !doIncrement ||
                 sig < UINT64_C(0xFFFFFFFFFFFFFFFF);
-            uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig, sigExtra, 1u - exp);
+            uint64_extra const sig64Extra = shiftRightJam64Extra(sig, sigExtra, 1u - exp);
             sig = sig64Extra.v;
             sigExtra = sig64Extra.extra;
 

@@ -142,7 +142,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_f16UIToCommonNaN(uint16_t const& uiA)
+commonNaN_from_f16UI(uint16_t const& uiA)
 {
     if (0 == (uiA & 0x0200)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -156,7 +156,7 @@ Converts the common NaN pointed to by `aPtr' into a 16-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
 inline constexpr uint16_t
-softfloat_commonNaNToF16UI(commonNaN const&)
+commonNaN_to_F16UI(commonNaN const&)
 {
     return defaultNaNF16UI;
 }
@@ -228,7 +228,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_f32UIToCommonNaN(uint32_t const& uiA)
+commonNaN_from_f32UI(uint32_t const& uiA)
 {
     if (0 == (uiA & 0x00400000)) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -242,7 +242,7 @@ Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
 inline constexpr uint32_t
-softfloat_commonNaNToF32UI(commonNaN const&)
+commonNaN_to_F32UI(commonNaN const&)
 {
     return defaultNaNF32UI;
 }
@@ -254,7 +254,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_f64UIToCommonNaN(uint64_t const& uiA)
+commonNaN_from_f64UI(uint64_t const& uiA)
 {
     if (0 == (uiA & UINT64_C(0x0008000000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -268,7 +268,7 @@ Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
 inline constexpr uint64_t
-softfloat_commonNaNToF64UI(commonNaN const&)
+commonNaN_to_F64UI(commonNaN const&)
 {
     return defaultNaNF64UI;
 }
@@ -290,7 +290,7 @@ location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 exception is raised.
 */
 inline commonNaN
-softfloat_extF80UIToCommonNaN(uint64_t const&,
+commonNaN_from_extF80UI(uint64_t const&,
                               uint64_t const& uiA0)
 {
     if (0 == (uiA0 & UINT64_C(0x4000000000000000))) {
@@ -335,7 +335,7 @@ pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid exception
 is raised.
 */
 inline commonNaN
-softfloat_f128UIToCommonNaN(uint64_t const& uiA64,
+commonNaN_from_f128UI(uint64_t const& uiA64,
                             uint64_t const&)
 {
     if (0 == (uiA64 & UINT64_C(0x0000800000000000))) {
@@ -373,7 +373,7 @@ Converts the common NaN pointed to by `aPtr' into a 128-bit floating-point
 NaN, and returns the bit pattern of this value as an unsigned integer.
 */
 inline constexpr uint128
-softfloat_commonNaNToF128UI(commonNaN const&)
+commonNaN_to_F128UI(commonNaN const&)
 {
     return uint128{defaultNaNF128UI64, defaultNaNF128UI0};
 }
@@ -429,7 +429,7 @@ four 32-bit elements that concatenate in the platform's normal endian order
 to form a 128-bit floating-point value.
 */
 inline commonNaN
-softfloat_f128MToCommonNaN(uint32_t const* aWPtr)
+commonNaN_from_f128M(uint32_t const* aWPtr)
 {
     if (0 == (aWPtr[indexWordHi(4)] & UINT64_C(0x0000800000000000))) {
         softfloat_raiseFlags(softfloat_flag_invalid);
@@ -448,7 +448,7 @@ value is a signaling NaN, the invalid exception is raised.
 @bug use extFloat80_t
 */
 inline void
-softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
+propagate_NaN_ExtF80M(extFloat80M const* const aSPtr,
                               extFloat80M const* const bSPtr,
                               extFloat80M* const zSPtr)
 {
@@ -467,8 +467,8 @@ NaN, and stores this NaN at the location pointed to by `zWPtr'.  Argument
 platform's normal endian order to form a 128-bit floating-point value.
 */
 inline void
-softfloat_commonNaNToF128M(commonNaN const&,
-                           uint32_t* const zWPtr)
+commonNaN_to_F128M(commonNaN const&,
+                   uint32_t* const zWPtr)
 {
     zWPtr[indexWord(4, 3)] = defaultNaNF128UI96;
     zWPtr[indexWord(4, 2)] = defaultNaNF128UI64;
@@ -485,9 +485,9 @@ and `zWPtr' points to an array of four 32-bit elements that concatenate in
 the platform's normal endian order to form a 128-bit floating-point value.
 */
 inline void
-softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
-                            uint32_t const* const bWPtr,
-                            uint32_t* const zWPtr)
+propagate_NaN_F128M(uint32_t const* const aWPtr,
+                  uint32_t const* const bWPtr,
+                  uint32_t* const zWPtr)
 {
     if (f128M_isSignalingNaN((const float128_t*)aWPtr) || (bWPtr && f128M_isSignalingNaN((const float128_t*)bWPtr))) {
         softfloat_raiseFlags(softfloat_flag_invalid);

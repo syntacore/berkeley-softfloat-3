@@ -52,7 +52,7 @@ extF80M_to_f16(const extFloat80_t* aPtr)
 
     if (0x7FFF == exp) {
         if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            return u_as_f(softfloat_commonNaNToF16UI(commonNaN{*aSPtr}));
+            return u_as_f(commonNaN_to_F16UI(commonNaN{*aSPtr}));
         }
 
         return u_as_f(packToF16UI(sign, 0x1F, 0));
@@ -66,7 +66,7 @@ extF80M_to_f16(const extFloat80_t* aPtr)
         exp += softfloat_normExtF80SigM(&sig);
     }
 
-    uint16_t const sig16 = static_cast<uint16_t>(softfloat_shortShiftRightJam64(sig, 49));
+    uint16_t const sig16 = static_cast<uint16_t>(shortShiftRightJam64(sig, 49));
     exp -= 0x3FF1;
 
     if (exp < -0x40) {
@@ -76,6 +76,6 @@ extF80M_to_f16(const extFloat80_t* aPtr)
     /**
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
-    return softfloat_roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
+    return roundPackToF16(sign, static_cast<int16_t>(exp), sig16);
 #endif
 }

@@ -71,7 +71,7 @@ extF80M_to_ui32(extFloat80_t const* const aPtr,
                 ui32_fromPosOverflow;
         }
     } else {
-        sig = softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
+        sig = shiftRightJam64(sig, static_cast<uint32_t>(shiftDist));
     }
 
     return roundPackTo<uint32_t>(sign, sig, roundingMode, exact);

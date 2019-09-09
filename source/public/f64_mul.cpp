@@ -88,14 +88,14 @@ f64_mul(float64_t const a,
     int16_t const expZ = expA + expB - 0x3FF;
     auto const sigA_1 = (sigA | UINT64_C(0x0010000000000000)) << 10;
     auto const sigB_1 = (sigB | UINT64_C(0x0010000000000000)) << 11;
-    uint128 const sig128Z = softfloat_mul64To128(sigA_1, sigB_1);
+    uint128 const sig128Z = mul64To128(sigA_1, sigB_1);
     uint64_t const sigZ = sig128Z.v64 | !!(0 != sig128Z.v0);
 
     if (sigZ < UINT64_C(0x4000000000000000)) {
-        return softfloat_roundPackToF64(signZ, expZ - 1, sigZ << 1);
+        return roundPackToF64(signZ, expZ - 1, sigZ << 1);
     }
 
-    return softfloat_roundPackToF64(signZ, expZ, sigZ);
+    return roundPackToF64(signZ, expZ, sigZ);
 
 #else
     using namespace softfloat::internals::slow_int64;
@@ -156,7 +156,7 @@ f64_mul(float64_t const a,
         sigZ <<= 1;
     }
 
-    return softfloat_roundPackToF64(signZ, expZ, sigZ);
+    return roundPackToF64(signZ, expZ, sigZ);
 
 #endif
 }

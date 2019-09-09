@@ -40,14 +40,14 @@ namespace softfloat {
 namespace internals {
 
 uint32_t
-softfloat_approxRecipSqrt32_1(uint32_t oddExpA,
-                              uint32_t a)
+approxRecipSqrt32_1(uint32_t oddExpA,
+                    uint32_t a)
 {
     auto const index = (a >> 27 & 0xE) + oddExpA;
     uint16_t const eps = static_cast<uint16_t>(a >> 12);
     uint16_t const r0 =
-        softfloat_approxRecipSqrt_1k0s[index] -
-        ((softfloat_approxRecipSqrt_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
+        approxRecipSqrt_1k0s[index] -
+        ((approxRecipSqrt_1k1s[index] * static_cast<uint32_t>(eps)) >> 20);
     uint32_t ESqrR0 = (static_cast<uint32_t>(r0) * r0) << (!oddExpA ? 1 : 0);
     uint32_t const sigma0 = ~static_cast<uint32_t>((static_cast<uint32_t>(ESqrR0) * static_cast<uint64_t>(a)) >> 23);
     uint32_t r =

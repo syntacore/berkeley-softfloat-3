@@ -54,7 +54,7 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
 
     if (exp == 0x7FFF) {
         if (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            softfloat_commonNaNToF128M(commonNaN{*aPtr}, zWPtr);
+            commonNaN_to_F128M(commonNaN{*aPtr}, zWPtr);
             return;
         }
 

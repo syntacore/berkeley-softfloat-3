@@ -42,8 +42,8 @@ namespace internals {
 namespace fast_int64 {
 
 uint128
-softfloat_mul64To128(uint64_t a,
-                     uint64_t b)
+mul64To128(uint64_t a,
+           uint64_t b)
 {
     uint32_t const a32 = a >> 32;
     uint32_t const a0 = static_cast<uint32_t>(a);

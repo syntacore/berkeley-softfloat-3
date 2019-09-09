@@ -53,7 +53,7 @@ extF80M_to_f32(const extFloat80_t* aPtr)
 
     if (0x7FFF == exp) {
         if (0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            return u_as_f(softfloat_commonNaNToF32UI(commonNaN{*aSPtr}));
+            return u_as_f(commonNaN_to_F32UI(commonNaN{*aSPtr}));
         }
 
         return make_signed_inf<float32_t>(sign);
@@ -67,7 +67,7 @@ extF80M_to_f32(const extFloat80_t* aPtr)
         exp += softfloat_normExtF80SigM(&sig);
     }
 
-    uint32_t const sig32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(sig, 33));
+    uint32_t const sig32 = static_cast<uint32_t>(shortShiftRightJam64(sig, 33));
     exp -= 0x3F81;
 
     if (exp < -0x1000) {
@@ -75,6 +75,6 @@ extF80M_to_f32(const extFloat80_t* aPtr)
     }
 
     assert(INT16_MIN <= exp && exp <= INT16_MAX);
-    return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
+    return roundPackToF32(sign, static_cast<int16_t>(exp), sig32);
 #endif
 }

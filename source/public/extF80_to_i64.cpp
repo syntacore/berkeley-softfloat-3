@@ -61,7 +61,7 @@ extF80_to_i64(extFloat80_t const a,
 
         sigExtra = 0;
     } else {
-        uint64_extra const sig64Extra = softfloat_shiftRightJam64Extra(sig, 0u, static_cast<uint32_t>(shiftDist));
+        uint64_extra const sig64Extra = shiftRightJam64Extra(sig, 0u, static_cast<uint32_t>(shiftDist));
         sig = sig64Extra.v;
         sigExtra = sig64Extra.extra;
     }

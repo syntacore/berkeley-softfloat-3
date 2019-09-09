@@ -89,9 +89,9 @@ invalid exception is raised.
 */
 uint128
 propagate_NaN(uint16_t const uiA64,
-                               uint64_t const uiA0,
-                               uint16_t const uiB64,
-                               uint64_t const uiB0)
+              uint64_t const uiA0,
+              uint16_t const uiB64,
+              uint64_t const uiB0)
 {
     bool const isSigNaNA = is_sNaN(uiA64, uiA0);
     bool const isSigNaNB = is_sNaN(uiB64, uiB0);
@@ -140,9 +140,9 @@ value is a signaling NaN, the invalid exception is raised.
 @bug use extFloat80_t
 */
 void
-softfloat_propagateNaNExtF80M(extFloat80M const* const aSPtr,
-                              extFloat80M const* const bSPtr,
-                              extFloat80M* const zSPtr)
+propagate_NaN_ExtF80M(extFloat80M const* const aSPtr,
+                      extFloat80M const* const bSPtr,
+                      extFloat80M* const zSPtr)
 {
     if (!bSPtr) {
         if (extF80M_isSignalingNaN(aSPtr)) {

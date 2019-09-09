@@ -41,9 +41,9 @@ namespace internals {
 namespace fast_int64 {
 
 void
-softfloat_sub256M(uint64_t const* const aPtr,
-                  uint64_t const* const bPtr,
-                  uint64_t* const zPtr)
+sub256M(uint64_t const* const aPtr,
+        uint64_t const* const bPtr,
+        uint64_t* const zPtr)
 {
     bool borrow = false;
 

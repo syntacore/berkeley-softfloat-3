@@ -51,13 +51,13 @@ f128_to_f64(float128_t const a)
 
     if (exp == 0x7FFF) {
         if (frac64 | frac0) {
-            return u_as_f(softfloat_commonNaNToF64UI(softfloat_f128UIToCommonNaN(uiA64, uiA0)));
+            return u_as_f(commonNaN_to_F64UI(commonNaN_from_f128UI(uiA64, uiA0)));
         }
 
         return u_as_f(packToF64UI(sign, 0x7FF, 0));
     }
 
-    uint128 const frac128 = softfloat_shortShiftLeft128(uint128{frac64, frac0}, 14);
+    uint128 const frac128 = shortShiftLeft128(uint128{frac64, frac0}, 14);
     frac64 = frac128.v64 | (frac128.v0 != 0);
 
     if (!(exp | frac64)) {
@@ -74,6 +74,6 @@ f128_to_f64(float128_t const a)
     @todo Warning   C4242   'function': conversion from 'int32_t' to 'int16_t', possible loss of data
     */
     return
-        softfloat_roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
+        roundPackToF64(sign, static_cast<int16_t>(exp), frac64 | UINT64_C(0x4000000000000000));
 }
 

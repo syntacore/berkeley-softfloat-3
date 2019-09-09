@@ -53,7 +53,7 @@ f128M_to_f32(const float128_t* aPtr)
         (0 != (aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]));
 
     if (exp != INT16_MAX) {
-        uint32_t const frac32 = static_cast<uint32_t>(softfloat_shortShiftRightJam64(frac64, 18u));
+        uint32_t const frac32 = static_cast<uint32_t>(shortShiftRightJam64(frac64, 18u));
 
         if (exp | frac32) {
             exp -= 0x3F81;
@@ -63,14 +63,14 @@ f128M_to_f32(const float128_t* aPtr)
             }
 
             assert(INT16_MIN <= exp && exp <= INT16_MAX);
-            return softfloat_roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
+            return roundPackToF32(sign, static_cast<int16_t>(exp), frac32 | 0x40000000);
         }
 
         return make_signed_zero<float32_t>(sign);
     }
 
     if (frac64) {
-        return u_as_f(softfloat_commonNaNToF32UI(softfloat_f128MToCommonNaN(aWPtr)));
+        return u_as_f(commonNaN_to_F32UI(commonNaN_from_f128M(aWPtr)));
     }
 
     return make_signed_inf<float32_t>(sign);

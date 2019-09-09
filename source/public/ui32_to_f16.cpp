@@ -53,5 +53,5 @@ ui32_to_f16(uint32_t a)
             shiftDist1 < 0 ?
             a >> -shiftDist1 | !!(0 != (a << (shiftDist1 & 0x1Fu))) :
             a << shiftDist1);
-    return softfloat_roundPackToF16(0, 0x1C - shiftDist1, sig);
+    return roundPackToF16(0, 0x1C - shiftDist1, sig);
 }

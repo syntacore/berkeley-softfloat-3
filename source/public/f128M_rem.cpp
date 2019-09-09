@@ -138,7 +138,7 @@ f128M_rem(float128_t const* const aPtr,
         }
     } else {
         uint32_t const recip32 =
-            softfloat_approxRecip32_1((static_cast<uint64_t>(x[indexWord(4, 3)]) << 32 | x[indexWord(4, 2)]) >> 30);
+            approxRecip32_1((static_cast<uint64_t>(x[indexWord(4, 3)]) << 32 | x[indexWord(4, 2)]) >> 30);
         expDiff -= 30;
 
         uint64_t q64;

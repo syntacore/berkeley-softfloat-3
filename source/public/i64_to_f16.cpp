@@ -50,7 +50,7 @@ i64_to_f16(int64_t a)
 
     shiftDist += 4;
     uint16_t const sig =
-        shiftDist < 0 ? static_cast<uint16_t>(softfloat_shortShiftRightJam64(absA, static_cast<uint8_t>(-shiftDist))) :
+        shiftDist < 0 ? static_cast<uint16_t>(shortShiftRightJam64(absA, static_cast<uint8_t>(-shiftDist))) :
         static_cast<uint16_t>(absA << shiftDist);
-    return softfloat_roundPackToF16(sign, 0x1C - shiftDist, sig);
+    return roundPackToF16(sign, 0x1C - shiftDist, sig);
 }

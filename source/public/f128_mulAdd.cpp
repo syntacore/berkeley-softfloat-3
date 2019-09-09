@@ -46,7 +46,7 @@ f128_mulAdd(float128_t const a,
     uint128 const uA{a};
     uint128 const uB{b};
     uint128 const uC{c};
-    return softfloat_mulAddF128(softfloat_mulAdd_madd,
+    return mulAddF128(softfloat_mulAdd_madd,
                                 uA.v64, uA.v0,
                                 uB.v64, uB.v0,
                                 uC.v64, uC.v0);

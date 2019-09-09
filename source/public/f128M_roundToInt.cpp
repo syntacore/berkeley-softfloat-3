@@ -118,7 +118,7 @@ f128M_roundToInt(float128_t const* const aPtr,
 
     if (0x406F <= exp) {
         if (0x7FFF == exp && 0 != (fracF128UI96(ui96) || (aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)]))) {
-            softfloat_propagateNaNF128M(aWPtr, 0, zWPtr);
+            propagate_NaN_F128M(aWPtr, 0, zWPtr);
             return;
         }
 

@@ -56,5 +56,5 @@ i32_to_f16(int32_t a)
         static_cast<uint16_t>(
             shiftDist1 < 0 ? absA >> -shiftDist1 | !!(0 != (absA << (shiftDist1 & 0x1F))) :
             absA << shiftDist1);
-    return softfloat_roundPackToF16(sign, 0x1C - shiftDist1, sig);
+    return roundPackToF16(sign, 0x1C - shiftDist1, sig);
 }

@@ -61,20 +61,20 @@ softfloat_mulAddF128M(Mul_add_operations op,
 
     if (0x7FFF == expA || 0x7FFF == expB) {
         if (softfloat_tryPropagateNaNF128M(aWPtr, bWPtr, zWPtr)) {
-            softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+            propagate_NaN_F128M(zWPtr, cWPtr, zWPtr);
             return;
         }
 
         if (0 == (uiA96 << 1)) {
             if (!(aWPtr[indexWord(4, 2)] | aWPtr[indexWord(4, 1)] | aWPtr[indexWord(4, 0)])) {
                 softfloat_invalidF128M(zWPtr);
-                softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+                propagate_NaN_F128M(zWPtr, cWPtr, zWPtr);
                 return;
             }
         } else if (0 == (uiB96 << 1)) {
             if (0 == (bWPtr[indexWord(4, 2)] | bWPtr[indexWord(4, 1)] | bWPtr[indexWord(4, 0)])) {
                 softfloat_invalidF128M(zWPtr);
-                softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+                propagate_NaN_F128M(zWPtr, cWPtr, zWPtr);
                 return;
             }
         }
@@ -85,13 +85,13 @@ softfloat_mulAddF128M(Mul_add_operations op,
     if (0x7FFF == expC) {
         if (fracF128UI96(uiC96) || (cWPtr[indexWord(4, 2)] | cWPtr[indexWord(4, 1)] | cWPtr[indexWord(4, 0)])) {
             zWPtr[indexWordHi(4)] = 0;
-            softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+            propagate_NaN_F128M(zWPtr, cWPtr, zWPtr);
             return;
         }
 
         if (prodIsInfinite && (signProd != signC)) {
             softfloat_invalidF128M(zWPtr);
-            softfloat_propagateNaNF128M(zWPtr, cWPtr, zWPtr);
+            propagate_NaN_F128M(zWPtr, cWPtr, zWPtr);
             return;
         }
 

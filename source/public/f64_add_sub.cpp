@@ -61,7 +61,7 @@ addMags(uint64_t const uiA,
             return u_as_f(0 != (sigA | sigB) ? propagate_NaN(uiA, uiB) : uiA);
         }
 
-        return softfloat_roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
+        return roundPackToF64(signZ, expA, (UINT64_C(0x0020000000000000) + sigA + sigB) << 9);
     }
 
     int16_t expZ;
@@ -81,7 +81,7 @@ addMags(uint64_t const uiA,
             sigA <<= 1;
         }
 
-        sigA = softfloat_shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
+        sigA = shiftRightJam64(sigA, static_cast<uint32_t>(-expDiff));
     } else {
         if (0x7FF == expA) {
             return u_as_f(sigA ? propagate_NaN(uiA, uiB) : uiA);
@@ -95,7 +95,7 @@ addMags(uint64_t const uiA,
             sigB <<= 1;
         }
 
-        sigB = softfloat_shiftRightJam64(sigB, static_cast<uint32_t>(expDiff));
+        sigB = shiftRightJam64(sigB, static_cast<uint32_t>(expDiff));
     }
 
     uint64_t sigZ = UINT64_C(0x2000000000000000) + sigA + sigB;
@@ -105,7 +105,7 @@ addMags(uint64_t const uiA,
         sigZ <<= 1;
     }
 
-    return softfloat_roundPackToF64(signZ, expZ, sigZ);
+    return roundPackToF64(signZ, expZ, sigZ);
 }
 
 static float64_t
@@ -167,10 +167,10 @@ subMags(uint64_t const uiA,
         }
 
         return
-            softfloat_normRoundPackToF64(signZ,
+            normRoundPackToF64(signZ,
                                          expB - 1,
                                          (sigB_shifted | UINT64_C(0x4000000000000000)) -
-                                         softfloat_shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted),
+                                         shiftRightJam64(sigA_shifted + (expA ? UINT64_C(0x4000000000000000) : sigA_shifted),
                                                  static_cast<uint32_t>(-expDiff)));
     }
 
@@ -179,10 +179,10 @@ subMags(uint64_t const uiA,
     }
 
     return
-        softfloat_normRoundPackToF64(signZ,
+        normRoundPackToF64(signZ,
                                      expA - 1,
                                      (sigA_shifted | UINT64_C(0x4000000000000000)) -
-                                     softfloat_shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), static_cast<uint32_t>(expDiff)));
+                                     shiftRightJam64(sigB_shifted + (expB ? UINT64_C(0x4000000000000000) : sigB_shifted), static_cast<uint32_t>(expDiff)));
 }
 
 }  // namespace

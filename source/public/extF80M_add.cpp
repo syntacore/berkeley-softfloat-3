@@ -53,8 +53,8 @@ extF80M_add(extFloat80_t const *const aPtr,
     uint64_t const uiB0 = bPtr->signif;
     bool const signB = is_sign(uiB64);
     *zPtr =
-        signA == signB ? softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA) :
-        softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
+        signA == signB ? add_magnitudes(uiA64, uiA0, uiB64, uiB0, signA) :
+        sub_magnitudes(uiA64, uiA0, uiB64, uiB0, signA);
 }
 
 #else

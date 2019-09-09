@@ -40,8 +40,8 @@ namespace softfloat {
 namespace internals {
 
 float16_t
-softfloat_subMagsF16(uint16_t const& uiA,
-                     uint16_t const& uiB)
+sub_magnitudes(uint16_t const& uiA,
+               uint16_t const& uiB)
 {
     using namespace softfloat::internals;
 
@@ -154,14 +154,14 @@ softfloat_subMagsF16(uint16_t const& uiA,
     uint16_t const sigZ = sig32Z_1 >> 16;
 
     if (0 != (sig32Z_1 & 0xFFFFu)) {
-        return softfloat_roundPackToF16(signZ, expZ_1, sigZ | 1u);
+        return roundPackToF16(signZ, expZ_1, sigZ | 1u);
     }
 
     if (0 == (sigZ & 0xFu) && static_cast<unsigned>(expZ_1) < 0x1Eu) {
         return u_as_f(packToF16UI(signZ, expZ_1, static_cast<uint16_t>(sigZ >> 4)));
     }
 
-    return softfloat_roundPackToF16(signZ, expZ_1, sigZ);
+    return roundPackToF16(signZ, expZ_1, sigZ);
 }
 
 }  // namespace internals

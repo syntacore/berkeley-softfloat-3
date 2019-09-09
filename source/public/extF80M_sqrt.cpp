@@ -51,7 +51,7 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
 
     if (expA == 0x7FFF) {
         if (rem64 & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            softfloat_propagateNaNExtF80M(aPtr, 0, zPtr);
+            propagate_NaN_ExtF80M(aPtr, 0, zPtr);
             return;
         }
 
@@ -90,7 +90,7 @@ extF80M_sqrt(extFloat80_t const* const aPtr, extFloat80_t* const zPtr)
     uint32_t rem[4];
     softfloat_shortShiftLeft64To96M(rem64, static_cast<uint8_t>(30 - expA), &rem[indexMultiwordHi(4, 3)]);
     uint32_t const sig32A = rem64 >> 32;
-    uint32_t const recipSqrt32 = softfloat_approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
+    uint32_t const recipSqrt32 = approxRecipSqrt32_1(static_cast<uint32_t>(expA), sig32A);
     uint32_t sig32Z = (static_cast<uint64_t>(sig32A) * recipSqrt32) >> 32;
 
     if (expA) {

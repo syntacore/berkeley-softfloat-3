@@ -47,6 +47,6 @@ extF80_add(extFloat80_t a, extFloat80_t b)
     uint64_t const uiB0 = b.signif;
     bool const signB = is_sign(uiB64);
     return signA == signB ?
-           softfloat_addMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA) :
-           softfloat_subMagsExtF80(uiA64, uiA0, uiB64, uiB0, signA);
+           add_magnitudes(uiA64, uiA0, uiB64, uiB0, signA) :
+           sub_magnitudes(uiA64, uiA0, uiB64, uiB0, signA);
 }

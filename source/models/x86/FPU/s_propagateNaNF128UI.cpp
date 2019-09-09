@@ -131,7 +131,7 @@ and `zWPtr' points to an array of four 32-bit elements that concatenate in
 the platform's normal endian order to form a 128-bit floating-point value.
 */
 void
-softfloat_propagateNaNF128M(uint32_t const* const aWPtr,
+propagate_NaN_F128M(uint32_t const* const aWPtr,
                             uint32_t const* const bWPtr,
                             uint32_t* const zWPtr)
 {

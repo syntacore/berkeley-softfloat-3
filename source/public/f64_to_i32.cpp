@@ -65,5 +65,5 @@ f64_to_i32(float64_t const a,
     }
 
     int16_t const shiftDist = 0x427 - exp;
-    return roundPackTo<int32_t>(sign, 0 < shiftDist ? softfloat_shiftRightJam64(sig, static_cast<uint32_t>(shiftDist)) : sig, roundingMode, exact);
+    return roundPackTo<int32_t>(sign, 0 < shiftDist ? shiftRightJam64(sig, static_cast<uint32_t>(shiftDist)) : sig, roundingMode, exact);
 }

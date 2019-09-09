@@ -42,6 +42,6 @@ ui64_to_f64(uint64_t const a)
     using namespace softfloat::internals;
     return
         0 == a ? make_signed_zero<float64_t>() :
-        0 != (a & INT64_MIN) ? softfloat_roundPackToF64(0, 0x43D, softfloat_shortShiftRightJam64(a, 1)) :
-        softfloat_normRoundPackToF64(0, 0x43C, a);
+        0 != (a & INT64_MIN) ? roundPackToF64(0, 0x43D, shortShiftRightJam64(a, 1)) :
+        normRoundPackToF64(0, 0x43C, a);
 }

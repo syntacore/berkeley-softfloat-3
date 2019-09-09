@@ -51,7 +51,7 @@ f16_to_f128M(float16_t a,
 
     if (!is_finite(a)) {
         if (!is_NaN(a)) {
-            softfloat_commonNaNToF128M(softfloat_f16UIToCommonNaN(f_as_u(a)), zWPtr);
+            commonNaN_to_F128M(commonNaN_from_f16UI(f_as_u(a)), zWPtr);
             return;
         }
 

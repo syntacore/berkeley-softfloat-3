@@ -72,7 +72,7 @@ f128_to_i32(float128_t const a,
     int32_t const shiftDist = 0x4023 - exp;
 
     if (0 < shiftDist) {
-        sig64 = softfloat_shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
+        sig64 = shiftRightJam64(sig64, static_cast<uint32_t>(shiftDist));
     }
 
     return roundPackTo<int32_t>(sign, sig64, roundingMode, exact);
