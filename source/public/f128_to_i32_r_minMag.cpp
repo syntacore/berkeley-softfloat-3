@@ -48,7 +48,7 @@ f128_to_i32_r_minMag(float128_t const a,
     int32_t const shiftDist = 0x402F - exp;
 
     if (49 <= shiftDist) {
-        if (exact && (exp | sig64)) {
+        if (exact && 0 != (exp | sig64)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -68,8 +68,11 @@ f128_to_i32_r_minMag(float128_t const a,
 
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0x7FFF && sig64 ? i32_fromNaN :
-            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+            0x7FFF == exp && 0 != sig64 ?
+            i32_fromNaN :
+            sign ?
+            i32_fromNegOverflow :
+            i32_fromPosOverflow;
     }
 
     sig64 |= UINT64_C(0x0001000000000000);
@@ -80,6 +83,5 @@ f128_to_i32_r_minMag(float128_t const a,
     }
 
     return sign ? -absZ : absZ;
-
 }
 

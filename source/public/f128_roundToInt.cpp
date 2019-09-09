@@ -99,8 +99,7 @@ f128_roundToInt(float128_t const a,
                 softfloat_raiseFlags(softfloat_flag_inexact);
             }
 
-            uiZ.v64 = uA.v64 & pack_to_F128_UI64(1, 0, 0);
-            uiZ.v0 = 0;
+            uiZ = uint128{uA.v64 & pack_to_F128_UI64(1, 0, 0), 0};
 
             /**
             @bug  warning: enumeration value ‘softfloat_round_minMag’ not handled in switch
@@ -138,8 +137,7 @@ f128_roundToInt(float128_t const a,
             return static_cast<float128_t>(uiZ);
         }
 
-        uiZ.v64 = uA.v64;
-        uiZ.v0 = 0;
+        uiZ = uint128{uA.v64, 0};
         uint64_t const lastBitMask = static_cast<uint64_t>(1) << (0x402F - exp);
         uint64_t const roundBitsMask = lastBitMask - 1;
 

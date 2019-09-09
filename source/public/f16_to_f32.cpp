@@ -37,9 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float32_t
-f16_to_f32(float16_t a)
+f16_to_f32(float16_t const a)
 {
     using namespace softfloat::internals;
+
     bool const sign = is_sign(a);
     int8_t exp = get_exp(a);
     uint16_t frac = get_frac(a);

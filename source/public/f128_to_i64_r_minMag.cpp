@@ -43,19 +43,16 @@ f128_to_i64_r_minMag(float128_t const a,
     using namespace softfloat::internals::fast_int64;
 
     uint128 const uA{a};
-    uint64_t const uiA64 = uA.v64;
-    uint64_t const uiA0 = uA.v0;
-    bool const sign = is_sign(uiA64);
-    int32_t const exp = exp_F128_UI64(uiA64);
-    uint64_t sig64 = frac_F128_UI64(uiA64);
-    uint64_t const sig0 = uiA0;
+    bool const sign = is_sign(uA.v64);
+    int32_t const exp = exp_F128_UI64(uA.v64);
+    uint64_t sig64 = frac_F128_UI64(uA.v64);
 
     int32_t const shiftDist = 0x402F - exp;
 
     if (shiftDist < 0) {
         if (shiftDist < -14) {
-            if (UINT64_C(0xC03E000000000000) == uiA64 && (sig0 < UINT64_C(0x0002000000000000))) {
-                if (exact && sig0) {
+            if (UINT64_C(0xC03E000000000000) == uA.v64 && (uA.v0 < UINT64_C(0x0002000000000000))) {
+                if (exact && 0 != uA.v0) {
                     softfloat_raiseFlags(softfloat_flag_inexact);
                 }
 
@@ -64,7 +61,7 @@ f128_to_i64_r_minMag(float128_t const a,
 
             softfloat_raiseFlags(softfloat_flag_invalid);
             return
-                0x7FFF == exp && 0 != (sig64 | sig0) ?
+                0x7FFF == exp && 0 != (sig64 | uA.v0) ?
                 i64_fromNaN :
                 sign ?
                 i64_fromNegOverflow :
@@ -76,9 +73,9 @@ f128_to_i64_r_minMag(float128_t const a,
         @todo Warning   C4244   '=': conversion from 'int32_t' to 'int8_t', possible loss of data
         */
         auto const negShiftDist = -shiftDist;
-        int64_t const absZ = static_cast<int64_t>(sig64 << negShiftDist | sig0 >>(shiftDist & 63u));
+        int64_t const absZ = static_cast<int64_t>(sig64 << negShiftDist | uA.v0 >>(shiftDist & 63u));
 
-        if (exact && static_cast<uint64_t>(sig0 << negShiftDist)) {
+        if (exact && 0 != static_cast<uint64_t>(uA.v0 << negShiftDist)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -86,7 +83,7 @@ f128_to_i64_r_minMag(float128_t const a,
     }
 
     if (49 <= shiftDist) {
-        if (exact && (exp | sig64 | sig0)) {
+        if (exact && 0 != (exp | sig64 | uA.v0)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
@@ -96,7 +93,7 @@ f128_to_i64_r_minMag(float128_t const a,
     sig64 |= UINT64_C(0x0001000000000000);
     int64_t const absZ = static_cast<int64_t>(sig64 >> shiftDist);
 
-    if (exact && (0 != sig0 || static_cast<uint64_t>(absZ << shiftDist) != sig64)) {
+    if (exact && (0 != uA.v0 || static_cast<uint64_t>(absZ << shiftDist) != sig64)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

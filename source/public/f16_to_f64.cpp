@@ -37,15 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float64_t
-f16_to_f64(float16_t a)
+f16_to_f64(float16_t const a)
 {
     using namespace softfloat::internals;
+
     bool const sign = is_sign(a);
     int8_t exp = get_exp(a);
     uint16_t frac = get_frac(a);
 
-    if (exp == 0x1F) {
-        if (frac) {
+    if (0x1F == exp) {
+        if (0 != frac) {
             return u_as_f(commonNaN_to_F64UI(commonNaN_from_f16UI(f_as_u(a))));
         }
 

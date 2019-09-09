@@ -43,6 +43,7 @@ f16_to_ui32(float16_t const a,
             bool const exact)
 {
     using namespace softfloat::internals;
+
     bool const sign = is_sign(a);
     uint16_t const frac = get_frac(a);
 
@@ -50,7 +51,8 @@ f16_to_ui32(float16_t const a,
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             frac ? ui32_fromNaN :
-            sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+            sign ? ui32_fromNegOverflow :
+            ui32_fromPosOverflow;
     }
 
     uint32_t sig32 = frac;

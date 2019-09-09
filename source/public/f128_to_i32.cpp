@@ -44,15 +44,12 @@ f128_to_i32(float128_t const a,
     using namespace softfloat::internals::fast_int64;
 
     uint128 const uA{a};
-    uint64_t const uiA64 = uA.v64;
-    uint64_t const uiA0 = uA.v0;
-    bool sign = is_sign(uiA64);
-    int32_t const exp = exp_F128_UI64(uiA64);
-    uint64_t sig64 = frac_F128_UI64(uiA64);
-    uint64_t const sig0 = uiA0;
+    bool sign = is_sign(uA.v64);
+    int32_t const exp = exp_F128_UI64(uA.v64);
+    uint64_t sig64 = frac_F128_UI64(uA.v64);
 
     if (i32_fromNaN != i32_fromPosOverflow || i32_fromNaN != i32_fromNegOverflow) {
-        if ((exp == 0x7FFF) && (sig64 | sig0)) {
+        if (0x7FFF == exp && 0 != (sig64 | uA.v0)) {
             if (i32_fromNaN == i32_fromPosOverflow) {
                 sign = 0;
             } else if (i32_fromNaN == i32_fromNegOverflow) {
@@ -64,11 +61,11 @@ f128_to_i32(float128_t const a,
         }
     }
 
-    if (exp) {
+    if (0 != exp) {
         sig64 |= UINT64_C(0x0001000000000000);
     }
 
-    sig64 |= (sig0 != 0);
+    sig64 |= (uA.v0 != 0);
     int32_t const shiftDist = 0x4023 - exp;
 
     if (0 < shiftDist) {

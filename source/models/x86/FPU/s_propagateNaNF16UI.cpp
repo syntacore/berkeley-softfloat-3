@@ -49,15 +49,17 @@ the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 signaling NaN, the invalid exception is raised.
 */
 uint16_t
-propagate_NaN(uint16_t uiA, uint16_t uiB)
+propagate_NaN(uint16_t const uiA,
+              uint16_t const uiB)
 {
     bool const isSigNaNA = is_sNaN(uiA);
     bool const isSigNaNB = is_sNaN(uiB);
+
     /* Make NaNs non-signaling.*/
     uint16_t const uiNonsigA = uiA | 0x0200u;
     uint16_t const uiNonsigB = uiB | 0x0200u;
 
-    if (isSigNaNA | isSigNaNB) {
+    if (isSigNaNA || isSigNaNB) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         if (isSigNaNA) {
             if (!isSigNaNB) {

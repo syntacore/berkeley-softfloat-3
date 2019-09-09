@@ -80,8 +80,7 @@ propagate_NaN(uint64_t const uiA,
 template<typename Ty>
 inline auto
 propagate_NaN(Ty const& a,
-              Ty const& b)->
-    decltype(u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))))
+              Ty const& b)->decltype(u_as_f(propagate_NaN(f_as_u(a), f_as_u(b))))
 {
     return u_as_f(propagate_NaN(f_as_u(a), f_as_u(b)));
 }

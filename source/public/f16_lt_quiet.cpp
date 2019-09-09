@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 bool
-f16_lt_quiet(float16_t a, float16_t b)
+f16_lt_quiet(float16_t const a,
+             float16_t const b)
 {
     using namespace softfloat::internals;
 

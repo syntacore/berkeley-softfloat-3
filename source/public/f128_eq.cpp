@@ -44,6 +44,7 @@ f128_eq(float128_t const a,
 
     uint128 const aa{a};
     uint128 const bb{b};
+
     if (is_NaN(aa) || is_NaN(bb)) {
         if (is_sNaN(aa) || is_sNaN(bb)) {
             softfloat_raiseFlags(softfloat_flag_invalid);

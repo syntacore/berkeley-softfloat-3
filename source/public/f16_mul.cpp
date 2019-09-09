@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float16_t
-f16_mul(float16_t a,
-        float16_t b)
+f16_mul(float16_t const a,
+        float16_t const b)
 {
     using namespace softfloat::internals;
+
     bool const signA = is_sign(a);
     bool const signB = is_sign(b);
     bool const signZ = signA != signB;

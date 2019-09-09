@@ -37,11 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 int32_t
-f16_to_i32(float16_t a,
+f16_to_i32(float16_t const a,
            softfloat_round_mode const roundingMode,
            bool exact)
 {
     using namespace softfloat::internals;
+
     bool const sign = is_sign(a);
     int8_t const exp = get_exp(a);
     uint16_t const frac = get_frac(a);
@@ -50,7 +51,8 @@ f16_to_i32(float16_t a,
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             frac ? i32_fromNaN :
-            sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+            sign ? i32_fromNegOverflow :
+            i32_fromPosOverflow;
     }
 
     int32_t sig32 = frac;

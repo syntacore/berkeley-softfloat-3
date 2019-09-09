@@ -169,8 +169,8 @@ f32_div(float32_t const a,
 #else
 
 float32_t
-f32_div(float32_t a,
-        float32_t b)
+f32_div(float32_t const a,
+        float32_t const b)
 {
     using namespace softfloat::internals::slow_int64;
 

@@ -42,11 +42,9 @@ f128_to_f32(float128_t const a)
     using namespace softfloat::internals::fast_int64;
 
     uint128 const uA{a};
-    uint64_t const uiA64 = uA.v64;
-    uint64_t const uiA0 = uA.v0;
-    bool const sign = is_sign(uiA64);
-    int32_t exp = exp_F128_UI64(uiA64);
-    uint64_t const frac64 = frac_F128_UI64(uiA64) | (uiA0 != 0);
+    bool const sign = is_sign(uA.v64);
+    int32_t exp = exp_F128_UI64(uA.v64);
+    uint64_t const frac64 = frac_F128_UI64(uA.v64) | (uA.v0 != 0);
 
     if (INT16_MAX != exp) {
         /**
@@ -69,7 +67,7 @@ f128_to_f32(float128_t const a)
     }
 
     if (0 != frac64) {
-        return u_as_f(commonNaN_to_F32UI(commonNaN_from_f128UI(uiA64, uiA0)));
+        return u_as_f(commonNaN_to_F32UI(commonNaN_from_f128UI(uA.v64, uA.v0)));
     }
 
     return make_signed_inf<float32_t>(sign);

@@ -42,6 +42,7 @@ f16_to_i64(float16_t const a,
            bool const exact)
 {
     using namespace softfloat::internals;
+
     bool const sign = is_sign(a);
     int8_t const exp = get_exp(a);
     uint16_t const frac = get_frac(a);
@@ -50,7 +51,8 @@ f16_to_i64(float16_t const a,
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             is_NaN(a) ? i64_fromNaN :
-            sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+            sign ? i64_fromNegOverflow :
+            i64_fromPosOverflow;
     }
 
     int32_t sig32 = frac;

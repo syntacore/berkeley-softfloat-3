@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 uint32_t
-f16_to_ui32_r_minMag(float16_t a, bool exact)
+f16_to_ui32_r_minMag(float16_t const a,
+                     bool const exact)
 {
     using namespace softfloat::internals;
+
     int8_t const exp = get_exp(a);
 
     int8_t const shiftDist = exp - 0x0F;
@@ -66,7 +68,7 @@ f16_to_ui32_r_minMag(float16_t a, bool exact)
 
     uint32_t const alignedSig = static_cast<uint32_t>(frac | 0x0400) << shiftDist;
 
-    if (exact && (alignedSig & 0x3FF)) {
+    if (exact && 0 != (alignedSig & 0x3FF)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

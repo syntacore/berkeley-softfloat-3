@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 uint64_t
-f16_to_ui64_r_minMag(float16_t a, bool exact)
+f16_to_ui64_r_minMag(float16_t const a,
+                     bool const exact)
 {
     using namespace softfloat::internals;
+
     int8_t const exp = get_exp(a);
     uint16_t const frac = get_frac(a);
     int8_t const shiftDist = exp - 0x0F;
@@ -58,7 +60,8 @@ f16_to_ui64_r_minMag(float16_t a, bool exact)
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
             is_NaN(a)? ui64_fromNaN :
-            sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+            sign ? ui64_fromNegOverflow :
+            ui64_fromPosOverflow;
     }
 
     uint32_t const alignedSig = static_cast<uint32_t>(frac | 0x0400) << shiftDist;

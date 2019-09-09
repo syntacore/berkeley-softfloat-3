@@ -42,18 +42,17 @@ f128_to_extF80(float128_t const a)
     using namespace softfloat::internals::fast_int64;
 
     uint128 const uA{a};
-    uint64_t const uiA64 = uA.v64;
-    uint64_t const uiA0 = uA.v0;
-    bool const sign = is_sign(uiA64);
-    int32_t exp = exp_F128_UI64(uiA64);
-    uint64_t frac64 = frac_F128_UI64(uiA64);
-    uint64_t frac0 = uiA0;
+    bool const sign = is_sign(uA.v64);
+    int32_t exp = exp_F128_UI64(uA.v64);
+    uint64_t frac64 = frac_F128_UI64(uA.v64);
+    uint64_t frac0 = uA.v0;
 
-    uint16_t uiZ64;
-    uint64_t uiZ0;
-    if (exp == 0x7FFF) {
-        if (frac64 | frac0) {
-            uint128 const uiZ = uint128(commonNaN_from_f128UI(uiA64, uiA0));
+    if (0x7FFF == exp) {
+        uint16_t uiZ64;
+        uint64_t uiZ0;
+
+        if (0 != (frac64 | frac0)) {
+            uint128 const uiZ = uint128(commonNaN_from_f128UI(uA.v64, uA.v0));
             uiZ64 = static_cast<uint16_t>(uiZ.v64);
             uiZ0 = uiZ.v0;
         } else {
@@ -67,10 +66,10 @@ f128_to_extF80(float128_t const a)
         return uZ;
     }
 
-    if (!exp) {
-        if (!(frac64 | frac0)) {
-            uiZ64 = pack_to_extF80_UI64(sign, 0);
-            uiZ0 = 0;
+    if (0 == exp) {
+        if (0 == (frac64 | frac0)) {
+            uint16_t const uiZ64 = pack_to_extF80_UI64(sign, 0);
+            uint64_t const uiZ0 = 0;
             extFloat80_t uZ;
             uZ.signExp = uiZ64;
             uZ.signif = uiZ0;
