@@ -180,13 +180,6 @@ norm_round_pack_to_F16(bool,
                        int16_t,
                        uint16_t const&);
 
-float16_t
-add_magnitudes(uint16_t const&,
-               uint16_t const&);
-float16_t
-sub_magnitudes(uint16_t const&,
-               uint16_t const&);
-
 float32_t
 round_pack_to_F32(bool,
                   int16_t,

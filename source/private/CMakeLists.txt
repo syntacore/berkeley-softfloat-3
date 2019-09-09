@@ -7,26 +7,10 @@ target_link_libraries(softfloat_private INTERFACE softfloat_build)
 target_sources(softfloat_private
 INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
-	${CMAKE_CURRENT_SOURCE_DIR}/primitives/functions.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/primitives/types.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/internals.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_addMagsF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecip_1Ks.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecipSqrt_1Ks.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecipSqrt32_1.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros8.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF32.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF64.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToI32.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToUI32.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/s_subMagsF16.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/softfloat_state.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_addMagsExtF80.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_addMagsF128.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mul64To128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mul128To256M.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mul64To128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_mulAddF128.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_normRoundPackToExtF80.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_normRoundPackToF128.cpp
@@ -40,19 +24,32 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_sub256M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_subMagsExtF80.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/fast_int64/s_subMagsF128.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/internals.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/primitives/functions.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/primitives/types.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecipSqrt32_1.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecipSqrt_1Ks.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_approxRecip_1Ks.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_countLeadingZeros8.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_normRoundPackToF16.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF16.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF32.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToF64.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToI32.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/s_roundPackToUI32.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addCarryM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addComplCarryM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addExtF80M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addF128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_addM.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_compare96M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_compare128M.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_compare96M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_compareNonnormExtF80M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_invalidExtF80M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_invalidF128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_isNaNF128M.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_mul64To128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_mul128MTo256M.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_mul64To128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_mulAddF128M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_negXM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_normExtF80SigM.cpp
@@ -74,4 +71,5 @@ INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_subM.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_tryPropagateNaNExtF80M.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/slow_int64/s_tryPropagateNaNF128M.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/softfloat_state.cpp
 )
