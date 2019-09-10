@@ -42,11 +42,11 @@ extF80_mul(extFloat80_t const a,
 {
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(a.signExp);
-    int32_t const expA = exp_extF80_UI64(a.signExp);
+    bool const signA = is_sign(a);
+    int32_t const expA = get_exp(a);
     uint64_t sigA = a.signif;
-    bool const signB = is_sign(b.signExp);
-    int32_t const expB = exp_extF80_UI64(b.signExp);
+    bool const signB = is_sign(b);
+    int32_t const expB = get_exp(b);
     uint64_t sigB = b.signif;
     bool const signZ = signA != signB;
 

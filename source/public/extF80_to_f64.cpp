@@ -41,8 +41,8 @@ extF80_to_f64(extFloat80_t const a)
 {
     using namespace softfloat::internals::fast_int64;
 
-    bool const sign = is_sign(a.signExp);
-    int32_t exp = exp_extF80_UI64(a.signExp);
+    bool const sign = is_sign(a);
+    int32_t exp = get_exp(a);
 
     if (0 == (exp | a.signif)) {
         return make_signed_zero<float64_t>(sign);

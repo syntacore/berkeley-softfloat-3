@@ -42,19 +42,17 @@ extF80_div(extFloat80_t const a,
 {
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(a.signExp);
-    int32_t expA = exp_extF80_UI64(a.signExp);
+    bool const signA = is_sign(a);
+    int32_t expA = get_exp(a);
     uint64_t sigA = a.signif;
-    uint16_t const uiB64 = b.signExp;
-    uint64_t const uiB0 = b.signif;
-    bool const signB = is_sign(uiB64);
-    int32_t expB = exp_extF80_UI64(uiB64);
-    uint64_t sigB = uiB0;
+    bool const signB = is_sign(b);
+    int32_t expB = get_exp(b);
+    uint64_t sigB = b.signif;
     bool const signZ = signA != signB;
 
     if (0x7FFF == expA) {
         if (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, uiB64, uiB0);
+            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ_1.v64);
             uZ.signif = uiZ_1.v0;
@@ -65,7 +63,7 @@ extF80_div(extFloat80_t const a,
             uZ.signif = UINT64_C(0x8000000000000000);
             return uZ;
         } else if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, uiB64, uiB0);
+            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ_1.v64);
             uZ.signif = uiZ_1.v0;
@@ -81,7 +79,7 @@ extF80_div(extFloat80_t const a,
 
     if (0x7FFF == expB) {
         if (sigB & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, uiB64, uiB0);
+            auto const uiZ_1 = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ_1.v64);
             uZ.signif = uiZ_1.v0;

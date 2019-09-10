@@ -47,13 +47,11 @@ int
 compare_non_norm_M_extF80(extFloat80M const* const aSPtr,
                           extFloat80M const* const bSPtr)
 {
-    uint16_t const uiA64 = aSPtr->signExp;
-    uint16_t const uiB64 = bSPtr->signExp;
     uint64_t sigA = aSPtr->signif;
-    bool signB = is_sign(uiB64);
+    bool signB = is_sign(bSPtr->signExp);
     uint64_t sigB = bSPtr->signif;
 
-    if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
+    if (0 != ((aSPtr->signExp ^ bSPtr->signExp) & 0x8000)) {
         if (0 == (sigA | sigB)) {
             return 0;
         }
@@ -61,8 +59,8 @@ compare_non_norm_M_extF80(extFloat80M const* const aSPtr,
         return signB ? 1 : -1;
     }
 
-    int32_t expA = exp_extF80_UI64(uiA64);
-    int32_t expB = exp_extF80_UI64(uiB64);
+    int32_t expA = get_exp(*aSPtr);
+    int32_t expB = get_exp(*bSPtr);
 
     if (0x7FFF == expA) {
         if (0x7FFF == expB) {

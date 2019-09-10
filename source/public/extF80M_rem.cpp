@@ -46,9 +46,9 @@ extF80M_rem(extFloat80_t const* const aPtr,
     *zPtr = extF80_rem(*aPtr, *bPtr);
 #else
     using namespace softfloat::internals::slow_int64;
-    uint16_t const uiA64 = aPtr->signExp;
-    int32_t expA = exp_extF80_UI64(uiA64);
-    int32_t expB = exp_extF80_UI64(bPtr->signExp);
+
+    int32_t expA = get_exp(*aPtr);
+    int32_t expB = get_exp(*bPtr);
 
     if (0x7FFF == expA || 0x7FFF == expB) {
         if (try_propagate_NaN_M_extF80(aPtr, bPtr, zPtr)) {
@@ -84,7 +84,7 @@ extF80M_rem(extFloat80_t const* const aPtr,
         expB += norm_M_extF80Sig(&x64);
     }
 
-    bool signRem = is_sign(uiA64);
+    bool signRem = is_sign(*aPtr);
 
     if (0 == expA) {
         expA = 1;

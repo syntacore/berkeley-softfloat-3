@@ -117,6 +117,7 @@ f16_div(float16_t const a,
         float16_t const b)
 {
     using namespace softfloat::internals;
+
     bool const signA = is_sign(a);
     int8_t expA = get_exp(a);
     uint16_t sigA = get_frac(a);

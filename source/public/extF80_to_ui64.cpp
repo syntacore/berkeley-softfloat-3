@@ -43,9 +43,8 @@ extF80_to_ui64(extFloat80_t const a,
 {
     using namespace softfloat::internals::fast_int64;
 
-    uint16_t const uiA64 = a.signExp;
-    bool const sign = is_sign(uiA64);
-    int32_t const exp = exp_extF80_UI64(uiA64);
+    bool const sign = is_sign(a);
+    int32_t const exp = get_exp(a);
     uint64_t sig = a.signif;
     int32_t const shiftDist = 0x403E - exp;
 

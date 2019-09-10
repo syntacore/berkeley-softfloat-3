@@ -42,9 +42,9 @@ extF80_to_ui32(extFloat80_t const a,
                bool const exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = a.signExp;
-    bool sign = is_sign(uiA64);
-    int32_t const exp = exp_extF80_UI64(uiA64);
+
+    bool sign = is_sign(a);
+    int32_t const exp = get_exp(a);
     uint64_t sig = a.signif;
 
     if (ui32_fromNaN != ui32_fromPosOverflow || ui32_fromNaN != ui32_fromNegOverflow) {

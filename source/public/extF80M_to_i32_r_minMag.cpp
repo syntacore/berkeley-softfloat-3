@@ -67,11 +67,10 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
                         bool exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = aPtr->signExp;
-    int32_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = aPtr->signif;
 
-    if (0 == sig && 0x7FFF != exp) {
+    int32_t const exp = get_exp(*aPtr);
+
+    if (0 == aPtr->signif && 0x7FFF != exp) {
         return 0;
     }
 
@@ -85,40 +84,40 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    bool const sign = is_sign(uiA64);
+    bool const sign = is_sign(*aPtr);
     bool raiseInexact = false;
 
     uint32_t absZ;
 
     if (shiftDist < 0) {
-        if (sig >> 32 || (shiftDist <= -31)) {
-            return invalid(sign, exp, sig);
+        if (aPtr->signif >> 32 || (shiftDist <= -31)) {
+            return invalid(sign, exp, aPtr->signif);
         }
 
-        uint64_t const shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(sig)) << -shiftDist;
+        uint64_t const shiftedSig = static_cast<uint64_t>(static_cast<uint32_t>(aPtr->signif)) << -shiftDist;
 
         if (shiftedSig >> 32) {
-            return invalid(sign, exp, sig);
+            return invalid(sign, exp, aPtr->signif);
         }
 
         absZ = static_cast<uint32_t>(shiftedSig);
     } else {
-        uint64_t const shiftedSig = sig >> shiftDist;
+        uint64_t const shiftedSig = aPtr->signif >> shiftDist;
 
         if (0 != (shiftedSig >> 32)) {
-            return invalid(sign, exp, sig);
+            return invalid(sign, exp, aPtr->signif);
         }
 
         absZ = static_cast<uint32_t>(shiftedSig);
 
         if (exact && 0 != shiftDist) {
-            raiseInexact = static_cast<uint64_t>(absZ) << shiftDist != sig;
+            raiseInexact = static_cast<uint64_t>(absZ) << shiftDist != aPtr->signif;
         }
     }
 
     if (sign) {
         if (0x80000000 < absZ) {
-            return invalid(sign, exp, sig);
+            return invalid(sign, exp, aPtr->signif);
         }
 
         if (raiseInexact) {
@@ -129,7 +128,7 @@ extF80M_to_i32_r_minMag(extFloat80_t const* const aPtr,
     }
 
     if (0x80000000u <= absZ) {
-        return invalid(sign, exp, sig);
+        return invalid(sign, exp, aPtr->signif);
     }
 
     if (raiseInexact) {

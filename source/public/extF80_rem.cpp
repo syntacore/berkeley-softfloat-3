@@ -42,10 +42,10 @@ extF80_rem(extFloat80_t const a,
 {
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(a.signExp);
-    int32_t expA = exp_extF80_UI64(a.signExp);
+    bool const signA = is_sign(a);
+    int32_t expA = get_exp(a);
     uint64_t sigA = a.signif;
-    int32_t expB = exp_extF80_UI64(b.signExp);
+    int32_t expB = get_exp(b);
     uint64_t sigB = b.signif;
 
     if (0x7FFF == expA) {

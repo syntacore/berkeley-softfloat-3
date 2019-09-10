@@ -41,32 +41,31 @@ extF80_to_ui32_r_minMag(extFloat80_t const a,
                         bool exact)
 {
     using namespace softfloat::internals;
-    uint16_t const uiA64 = a.signExp;
-    int32_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = a.signif;
+
+    int32_t const exp = get_exp(a);
 
     int32_t const shiftDist = 0x403E - exp;
 
     if (64 <= shiftDist) {
-        if (exact && (exp | sig)) {
+        if (exact && 0 != (exp | a.signif)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
         return 0;
     }
 
-    bool const sign = is_sign(uiA64);
+    bool const sign = is_sign(a);
 
     if (sign || shiftDist < 32) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            0x7FFF == exp && 0 != (sig & INT64_MAX) ? ui32_fromNaN :
+            0x7FFF == exp && 0 != (a.signif & INT64_MAX) ? ui32_fromNaN :
             sign ? ui32_fromNegOverflow : ui32_fromPosOverflow;
     }
 
-    uint32_t const z = static_cast<uint32_t>(sig >> shiftDist);
+    uint32_t const z = static_cast<uint32_t>(a.signif >> shiftDist);
 
-    if (exact && (static_cast<uint64_t>(z) << shiftDist != sig)) {
+    if (exact && (static_cast<uint64_t>(z) << shiftDist != a.signif)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

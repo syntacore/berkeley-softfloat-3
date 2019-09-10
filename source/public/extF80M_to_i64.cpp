@@ -47,22 +47,20 @@ extF80M_to_i64(const extFloat80_t* const aPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    uint16_t const uiA64 = aPtr->signExp;
-    bool const sign = is_sign(uiA64);
-    int32_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = aPtr->signif;
+    bool const sign = is_sign(*aPtr);
+    int32_t const exp = get_exp(*aPtr);
     int32_t const shiftDist = 0x403E - exp;
 
     if (shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            INT16_MAX == exp && 0 != (sig & INT64_MAX) ? i64_fromNaN :
+            INT16_MAX == exp && 0 != (aPtr->signif & INT64_MAX) ? i64_fromNaN :
             sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
 
     uint32_t extSig[3];
-    extSig[index_word(3, 2)] = sig >> 32;
-    extSig[index_word(3, 1)] = static_cast<uint32_t>(sig);
+    extSig[index_word(3, 2)] = aPtr->signif >> 32;
+    extSig[index_word(3, 1)] = static_cast<uint32_t>(aPtr->signif);
     extSig[index_word(3, 0)] = 0;
 
     if (shiftDist) {

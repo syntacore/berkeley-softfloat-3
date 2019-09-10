@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 int32_t
-extF80_to_i32(extFloat80_t a,
+extF80_to_i32(extFloat80_t const a,
               softfloat_round_mode const roundingMode,
-              bool exact)
+              bool const exact)
 {
     using namespace softfloat::internals;
 
@@ -48,12 +48,10 @@ extF80_to_i32(extFloat80_t a,
     static bool const fromNaN_is_same_as_both_overflow = fromNaN_is_same_as_pos_overflow && fromNaN_is_same_as_neg_overflow;
     static bool const fromNaN_is_same_as_any_overflow = fromNaN_is_same_as_pos_overflow || fromNaN_is_same_as_neg_overflow;
 
-    uint16_t const uiA64 = a.signExp;
-    bool sign = is_sign(uiA64);
-    int32_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = a.signif;
+    bool sign = is_sign(a);
+    int32_t const exp = get_exp(a);
 
-    if (!fromNaN_is_same_as_both_overflow && 0x7FFF == exp && 0 != (sig & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+    if (!fromNaN_is_same_as_both_overflow && 0x7FFF == exp && 0 != (a.signif & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
         if (!fromNaN_is_same_as_any_overflow) {
             softfloat_raiseFlags(softfloat_flag_invalid);
             return i32_fromNaN;
@@ -64,5 +62,5 @@ extF80_to_i32(extFloat80_t a,
 
     auto const shiftDist = 0x4032 - exp;
     uint32_t const shiftDist1 = shiftDist <= 0 ? 1u : static_cast<uint32_t>(shiftDist);
-    return round_pack_to<int32_t>(sign, shift_right_jam_64(sig, shiftDist1), roundingMode, exact);
+    return round_pack_to<int32_t>(sign, shift_right_jam_64(a.signif, shiftDist1), roundingMode, exact);
 }

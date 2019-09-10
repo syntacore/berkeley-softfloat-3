@@ -46,11 +46,10 @@ extF80M_div(extFloat80_t const* const aSPtr,
     *zSPtr = extF80_div(*aSPtr, *bSPtr);
 #else
     using namespace softfloat::internals::slow_int64;
-    uint16_t const uiA64 = aSPtr->signExp;
-    int32_t expA = exp_extF80_UI64(uiA64);
-    uint16_t const uiB64 = bSPtr->signExp;
-    int32_t expB = exp_extF80_UI64(uiB64);
-    bool const signZ = is_sign(uiA64) != is_sign(uiB64);
+
+    int32_t expA = get_exp(*aSPtr);
+    int32_t expB = get_exp(*bSPtr);
+    bool const signZ = is_sign(*aSPtr) != is_sign(*bSPtr);
 
     if (expA == INT16_MAX || expB == INT16_MAX) {
         if (try_propagate_NaN_M_extF80(aSPtr, bSPtr, zSPtr)) {

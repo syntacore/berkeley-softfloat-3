@@ -47,18 +47,13 @@ extF80_lt(extFloat80_t const a,
         return false;
     }
 
-    auto const uiA64 = a.signExp;
-    auto const uiA0 = a.signif;
-    auto const uiB64 = b.signExp;
-    auto const uiB0 = b.signif;
-
-    bool const signA = is_sign(uiA64);
-    bool const signB = is_sign(uiB64);
-    typedef typename std::conditional<(sizeof uiA0 < sizeof uiA64), decltype(uiA64), decltype(uiA0)>::type largest_type;
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
+    typedef typename std::conditional<(sizeof a.signif < sizeof a.signExp), decltype(a.signExp), decltype(a.signif)>::type largest_type;
 
     return
         signA != signB ?
-        signA && 0 != static_cast<largest_type>(((uiA64 | uiB64) & 0x7FFF) | uiA0 | uiB0) :
-        (uiA64 != uiB64 || uiA0 != uiB0) && lt(uiA64, uiA0, uiB64, uiB0) != signA;
+        signA && 0 != static_cast<largest_type>(((a.signExp | b.signExp) & 0x7FFF) | a.signif | b.signif) :
+        (a.signExp != b.signExp || a.signif != b.signif) && lt(a.signExp, a.signif, b.signExp, b.signif) != signA;
 }
 

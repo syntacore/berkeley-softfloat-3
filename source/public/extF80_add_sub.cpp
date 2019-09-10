@@ -51,22 +51,20 @@ add_M_extF80(extFloat80M const* aSPtr,
     using namespace softfloat::internals::slow_int64;
     typedef void(*round_packer_ptr)(bool, int32_t, uint32_t*, uint8_t const&, extFloat80M*);
 
-    uint16_t const uiA64 = aSPtr->signExp;
-    int32_t expA = exp_extF80_UI64(uiA64);
-    uint16_t const uiB64 = bSPtr->signExp;
-    int32_t expB = exp_extF80_UI64(uiB64);
+    int32_t expA = get_exp(*aSPtr);
+    int32_t expB = get_exp(*bSPtr);
 
     if (0x7FFF == expA || 0x7FFF == expB) {
         if (try_propagate_NaN_M_extF80(aSPtr, bSPtr, zSPtr)) {
             return;
         }
 
-        uint16_t uiZ64 = uiA64;
+        uint16_t uiZ64 = aSPtr->signExp;
 
         if (0x7FFF == expB) {
-            uiZ64 = static_cast<uint16_t>(uiB64 ^ pack_to_extF80_UI64(negateB, 0));
+            uiZ64 = static_cast<uint16_t>(bSPtr->signExp ^ pack_to_extF80_UI64(negateB, 0));
 
-            if (0x7FFF == expA && uiZ64 != uiA64) {
+            if (0x7FFF == expA && uiZ64 != aSPtr->signExp) {
                 invalid_M_extF80(zSPtr);
                 return;
             }
@@ -77,8 +75,8 @@ add_M_extF80(extFloat80M const* aSPtr,
         return;
     }
 
-    bool signZ = is_sign(uiA64);
-    bool const signB = is_sign(uiB64) != negateB;
+    bool signZ = is_sign(*aSPtr);
+    bool const signB = is_sign(*bSPtr) != negateB;
     negateB = signZ != signB;
 
     if (expA < expB) {
@@ -442,8 +440,8 @@ extF80_add(extFloat80_t const a,
            extFloat80_t const b)
 {
     using namespace softfloat::internals::fast_int64;
-    bool const signA = is_sign(a.signExp);
-    bool const signB = is_sign(b.signExp);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
     return signA == signB ?
         add_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA) :
         sub_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA);
@@ -455,8 +453,8 @@ extF80_sub(extFloat80_t const a,
 {
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(a.signExp);
-    bool const signB = is_sign(b.signExp);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
     return
         signA == signB ?
         sub_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA) :
@@ -471,8 +469,8 @@ extF80M_add(extFloat80_t const *const aPtr,
 #if (SOFTFLOAT_FAST_INT64)
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(aPtr->signExp);
-    bool const signB = is_sign(bPtr->signExp);
+    bool const signA = is_sign(*aPtr);
+    bool const signB = is_sign(*bPtr);
     *zPtr =
         signA == signB ?
         add_magnitudes(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA) :
@@ -494,8 +492,8 @@ extF80M_sub(extFloat80_t const *const aPtr,
 
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(aPtr->signExp);
-    bool const signB = is_sign(bPtr->signExp);
+    bool const signA = is_sign(*aPtr);
+    bool const signB = is_sign(*bPtr);
     *zPtr =
         signA == signB ?
         sub_magnitudes(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA) :

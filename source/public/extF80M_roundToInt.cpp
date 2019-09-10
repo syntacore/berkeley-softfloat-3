@@ -51,9 +51,9 @@ extF80M_roundToInt(extFloat80_t const* const aPtr,
     *zPtr = extF80_roundToInt(*aPtr, roundingMode, exact);
 #else
     using namespace softfloat::internals::slow_int64;
-    uint16_t const uiA64 = aPtr->signExp;
-    uint16_t const signUI64 = static_cast<uint16_t>(uiA64 & pack_to_extF80_UI64(1, 0));
-    int32_t exp = exp_extF80_UI64(uiA64);
+
+    uint16_t const signUI64 = static_cast<uint16_t>(aPtr->signExp & pack_to_extF80_UI64(1, 0));
+    int32_t exp = get_exp(*aPtr);
     uint64_t sigA = aPtr->signif;
 
     if (0 == (sigA & INT64_MIN) && 0x7FFF != exp) {

@@ -46,9 +46,9 @@ extF80M_to_ui32(extFloat80_t const* const aPtr,
     return extF80_to_ui32(*aPtr, roundingMode, exact);
 #else
     using namespace softfloat::internals;
-    uint16_t const uiA64 = aPtr->signExp;
-    bool const sign = is_sign(uiA64);
-    int32_t const exp = exp_extF80_UI64(uiA64);
+
+    bool const sign = is_sign(*aPtr);
+    int32_t const exp = get_exp(*aPtr);
     uint64_t sig = aPtr->signif;
     int32_t const shiftDist = 0x4032 - exp;
 

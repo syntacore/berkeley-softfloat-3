@@ -46,8 +46,8 @@ extF80M_to_ui64(extFloat80_t const* const aSPtr,
 #else
     using namespace softfloat::internals::slow_int64;
 
-    bool const sign = is_sign(aSPtr->signExp);
-    int32_t const exp = exp_extF80_UI64(aSPtr->signExp);
+    bool const sign = is_sign(*aSPtr);
+    int32_t const exp = get_exp(*aSPtr);
     uint64_t const sig = aSPtr->signif;
     int32_t const shiftDist = 0x403E - exp;
 

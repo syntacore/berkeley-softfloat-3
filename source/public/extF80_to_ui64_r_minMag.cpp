@@ -42,31 +42,29 @@ extF80_to_ui64_r_minMag(extFloat80_t const a,
 {
     using namespace softfloat::internals;
 
-    uint16_t const uiA64 = a.signExp;
-    int32_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const sig = a.signif;
+    int32_t const exp = get_exp(a);
     int32_t const shiftDist = 0x403E - exp;
 
     if (64 <= shiftDist) {
-        if (exact && (exp | sig)) {
+        if (exact && (exp | a.signif)) {
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
         return 0;
     }
 
-    bool const sign = is_sign(uiA64);
+    bool const sign = is_sign(a);
 
     if (sign || shiftDist < 0) {
         softfloat_raiseFlags(softfloat_flag_invalid);
         return
-            exp == 0x7FFF && (sig & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? ui64_fromNaN :
+            exp == 0x7FFF && (a.signif & UINT64_C(0x7FFFFFFFFFFFFFFF)) ? ui64_fromNaN :
             sign ? ui64_fromNegOverflow : ui64_fromPosOverflow;
     }
 
-    uint64_t const z = sig >> shiftDist;
+    uint64_t const z = a.signif >> shiftDist;
 
-    if (exact && (z << shiftDist != sig)) {
+    if (exact && (z << shiftDist != a.signif)) {
         softfloat_raiseFlags(softfloat_flag_inexact);
     }
 

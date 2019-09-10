@@ -50,8 +50,8 @@ extF80_le_quiet(extFloat80_t const a,
         return false;
     }
 
-    bool const signA = is_sign(a.signExp);
-    bool const signB = is_sign(b.signExp);
+    bool const signA = is_sign(a);
+    bool const signB = is_sign(b);
     return
         signA != signB ? signA || !(((a.signExp | b.signExp) & 0x7FFF) | a.signif | b.signif) : 
         (a.signExp == b.signExp && a.signif == b.signif) || (signA != lt(a.signExp, a.signif, b.signExp, b.signif));

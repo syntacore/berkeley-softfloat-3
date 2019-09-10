@@ -489,6 +489,18 @@ exp_extF80_UI64(uint16_t const& a64)
     return static_cast<uint16_t>(0x7FFF & a64);
 }
 
+inline constexpr uint16_t
+get_exp(extFloat80_t const& a)
+{
+    return exp_extF80_UI64(a.signExp);
+}
+
+inline constexpr bool
+is_sign(extFloat80_t const& a)
+{
+    return is_sign(a.signExp);
+}
+
 template<typename Ty>
 inline constexpr auto
 get_frac(Ty const a)->decltype(get_frac(f_as_u(a)))

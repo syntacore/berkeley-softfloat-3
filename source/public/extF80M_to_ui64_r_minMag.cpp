@@ -46,7 +46,7 @@ extF80M_to_ui64_r_minMag(extFloat80_t const* const aPtr,
     using namespace softfloat::internals;
 
     extFloat80M const* const aSPtr = aPtr;
-    int32_t const exp = exp_extF80_UI64(aSPtr->signExp);
+    int32_t const exp = get_exp(*aPtr);
 
     if (0 == aSPtr->signif && 0x7FFF != exp) {
         return 0;
@@ -62,7 +62,7 @@ extF80M_to_ui64_r_minMag(extFloat80_t const* const aPtr,
         return 0;
     }
 
-    bool const sign = is_sign(aSPtr->signExp);
+    bool const sign = is_sign(*aSPtr);
 
     if (shiftDist < 0) {
         if (!sign && -63 < shiftDist) {

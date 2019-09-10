@@ -51,25 +51,21 @@ extF80M_lt(extFloat80_t const* const aPtr,
         return false;
     }
 
-    uint16_t const uiA64 = aPtr->signExp;
-    uint64_t const uiA0 = aPtr->signif;
-    uint16_t const uiB64 = bPtr->signExp;
-    uint64_t const uiB0 = bPtr->signif;
-    bool const signA = is_sign(uiA64);
+    bool const signA = is_sign(*aPtr);
 
-    if (0 != ((uiA64 ^ uiB64) & 0x8000)) {
+    if (0 != ((aPtr->signExp ^ bPtr->signExp) & 0x8000)) {
         /* Signs are different. */
-        return signA && 0 != (uiA0 | uiB0);
+        return signA && 0 != (aPtr->signif | bPtr->signif);
     }
 
-    if (0 == ((uiA0 & uiB0) & UINT64_C(0x8000000000000000))) {
+    if (0 == ((aPtr->signif & bPtr->signif) & UINT64_C(0x8000000000000000))) {
         return compare_non_norm_M_extF80(aPtr, bPtr) < 0;
     }
 
-    if (uiA64 == uiB64) {
-        return uiA0 == uiB0 || signA != (uiA0 < uiB0);
+    if (aPtr->signExp == bPtr->signExp) {
+        return aPtr->signif == bPtr->signif || signA != (aPtr->signif < bPtr->signif);
     }
 
-    return signA != (uiA64 < uiB64);
+    return signA != (aPtr->signExp < bPtr->signExp);
 #endif
 }

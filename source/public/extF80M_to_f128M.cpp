@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 void
-extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
+extF80M_to_f128M(extFloat80_t const* const aPtr,
+                 float128_t* const zPtr)
 {
 #if (SOFTFLOAT_FAST_INT64)
     *zPtr = extF80_to_f128(*aPtr);
@@ -46,9 +47,8 @@ extF80M_to_f128M(extFloat80_t const* const aPtr, float128_t* const zPtr)
     using namespace softfloat::internals::slow_int64;
 
     auto const zWPtr = reinterpret_cast<uint32_t*>(zPtr);
-    uint16_t const uiA64 = aPtr->signExp;
-    bool const sign = is_sign(uiA64);
-    int32_t exp = exp_extF80_UI64(uiA64);
+    bool const sign = is_sign(*aPtr);
+    int32_t exp = get_exp(*aPtr);
     uint64_t sig = aPtr->signif;
     zWPtr[index_word(4, 0)] = 0;
 

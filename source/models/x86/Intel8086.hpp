@@ -107,7 +107,7 @@ struct commonNaN
 
     explicit
         commonNaN(extFloat80M const& a)
-        : commonNaN{is_sign(a.signExp), a.signif << 1, 0}
+        : commonNaN{is_sign(a), a.signif << 1, 0}
     {
         if (extF80M_isSignalingNaN(&a)) {
             softfloat_raiseFlags(softfloat_flag_invalid);

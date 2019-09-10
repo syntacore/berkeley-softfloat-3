@@ -41,8 +41,8 @@ extF80_sqrt(extFloat80_t const a)
 {
     using namespace softfloat::internals::fast_int64;
 
-    bool const signA = is_sign(a.signExp);
-    int32_t expA = exp_extF80_UI64(a.signExp);
+    bool const signA = is_sign(a);
+    int32_t expA = get_exp(a);
     uint64_t sigA = a.signif;
 
     if (0x7FFF == expA) {

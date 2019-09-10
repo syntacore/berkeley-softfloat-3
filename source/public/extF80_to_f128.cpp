@@ -37,19 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "model.hpp"
 
 float128_t
-extF80_to_f128(extFloat80_t a)
+extF80_to_f128(extFloat80_t const a)
 {
     using namespace softfloat::internals::fast_int64;
 
-    uint16_t const uiA64 = a.signExp;
-    uint64_t const uiA0 = a.signif;
-    uint16_t const exp = exp_extF80_UI64(uiA64);
-    uint64_t const frac = uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF);
+    uint16_t const exp = get_exp(a);
+    uint64_t const frac = a.signif & UINT64_C(0x7FFFFFFFFFFFFFFF);
 
     if (0x7FFF == exp && 0 != frac) {
-        return float128_t(commonNaN_to_F128UI(commonNaN_from_extF80UI(uiA64, uiA0)));
+        return float128_t(commonNaN_to_F128UI(commonNaN_from_extF80UI(a.signExp, a.signif)));
     } else {
-        bool const sign = is_sign(uiA64);
+        bool const sign = is_sign(a);
         uint128 const frac128 = short_shift_left_128(uint128{0, frac}, 49);
         return float128_t(uint128(pack_to_F128_UI64(sign, exp, frac128.v64), frac128.v0));
     }
