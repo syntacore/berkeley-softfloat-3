@@ -195,35 +195,33 @@ add_M_extF80(extFloat80M const* aSPtr,
 #endif
 
 static extFloat80_t
-add_magnitudes(uint16_t const uiA64,
-               uint64_t const uiA0,
-               uint16_t const uiB64,
-               uint64_t const uiB0,
+add_magnitudes(extFloat80_t const& a,
+               extFloat80_t const& b,
                bool signZ)
 {
     using namespace softfloat::internals::fast_int64;
 
-    int32_t const expA = exp_extF80_UI64(uiA64);
-    int32_t const expB = exp_extF80_UI64(uiB64);
+    int32_t const expA = get_exp(a);
+    int32_t const expB = get_exp(b);
     int32_t expDiff = expA - expB;
 
     if (0 == expDiff) {
         if (0x7FFF == expA) {
             extFloat80_t uZ;
 
-            if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & (uiA0 | uiB0))) {
-                uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
+            if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & (a.signif | b.signif))) {
+                uint128 const uiZ = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
             } else {
-                uZ.signExp = uiA64;
-                uZ.signif = uiA0;
+                uZ.signExp = a.signExp;
+                uZ.signif = a.signif;
             }
 
             return uZ;
         }
 
-        auto const sigZ_1 = uiA0 + uiB0;
+        auto const sigZ_1 = a.signif + b.signif;
 
         if (0 == expA) {
             exp32_sig64 const normExpSig = norm_subnormal_extF80Sig(sigZ_1);
@@ -238,13 +236,13 @@ add_magnitudes(uint16_t const uiA64,
         if (0x7FFF == expB) {
             extFloat80_t uZ;
 
-            if (uiB0 & UINT64_C(0x7FFFFFFFFFFFFFFF)) {
-                uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
+            if (0 != (b.signif & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+                uint128 const uiZ = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
             } else {
                 uZ.signExp = pack_to_extF80_UI64(signZ, 0x7FFF);
-                uZ.signif = uiB0;
+                uZ.signif = b.signif;
             }
 
             return uZ;
@@ -256,7 +254,7 @@ add_magnitudes(uint16_t const uiA64,
             ++expDiff;
 
             if (0 == expDiff) {
-                auto const sigZ_1 = uiA0 + uiB0;
+                auto const sigZ_1 = a.signif + b.signif;
 
                 if (0 != (UINT64_C(0x8000000000000000) & sigZ_1)) {
                     return round_pack_to_extF80(signZ, expZ, sigZ_1, 0, extF80_rounding_precision);
@@ -267,8 +265,8 @@ add_magnitudes(uint16_t const uiA64,
             }
         }
 
-        uint64_extra const sig64Extra = shift_right_jam_64Extra(uiA0, 0, static_cast<uint32_t>(-expDiff));
-        auto const sigZ_1 = sig64Extra.v + uiB0;
+        uint64_extra const sig64Extra = shift_right_jam_64Extra(a.signif, 0, static_cast<uint32_t>(-expDiff));
+        auto const sigZ_1 = sig64Extra.v + b.signif;
 
         if (0 != (sigZ_1 & UINT64_C(0x8000000000000000))) {
             return round_pack_to_extF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_rounding_precision);
@@ -279,16 +277,16 @@ add_magnitudes(uint16_t const uiA64,
     }
 
     if (0x7FFF == expA) {
-        if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & uiA0)) {
-            uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
+        if (0 != (UINT64_C(0x7FFFFFFFFFFFFFFF) & a.signif)) {
+            uint128 const uiZ = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
             return uZ;
         } else {
             extFloat80_t uZ;
-            uZ.signExp = uiA64;
-            uZ.signif = uiA0;
+            uZ.signExp = a.signExp;
+            uZ.signif = a.signif;
             return uZ;
         }
     }
@@ -299,7 +297,7 @@ add_magnitudes(uint16_t const uiA64,
         --expDiff;
 
         if (0 == expDiff) {
-            auto const sigZ_1 = uiA0 + uiB0;
+            auto const sigZ_1 = a.signif + b.signif;
 
             if (0 != (UINT64_C(0x8000000000000000) & sigZ_1)) {
                 return round_pack_to_extF80(signZ, expZ, sigZ_1, 0, extF80_rounding_precision);
@@ -310,8 +308,8 @@ add_magnitudes(uint16_t const uiA64,
         }
     }
 
-    uint64_extra const sig64Extra = shift_right_jam_64Extra(uiB0, 0u, static_cast<uint32_t>(expDiff));
-    auto const sigZ_1 = uiA0 + sig64Extra.v;
+    uint64_extra const sig64Extra = shift_right_jam_64Extra(b.signif, 0u, static_cast<uint32_t>(expDiff));
+    auto const sigZ_1 = a.signif + sig64Extra.v;
 
     if (0 != (sigZ_1 & UINT64_C(0x8000000000000000))) {
         return round_pack_to_extF80(signZ, expZ, sigZ_1, sig64Extra.extra, extF80_rounding_precision);
@@ -322,22 +320,20 @@ add_magnitudes(uint16_t const uiA64,
 }
 
 static extFloat80_t
-sub_magnitudes(uint16_t const uiA64,
-               uint64_t const uiA0,
-               uint16_t const uiB64,
-               uint64_t const uiB0,
+sub_magnitudes(extFloat80_t const& a,
+               extFloat80_t const& b,
                bool const signZ)
 {
     using namespace softfloat::internals::fast_int64;
 
-    int32_t const expA = exp_extF80_UI64(uiA64);
-    int32_t const expB = exp_extF80_UI64(uiB64);
+    int32_t const expA = exp_extF80_UI64(a.signExp);
+    int32_t const expB = exp_extF80_UI64(b.signExp);
     int32_t expDiff = expA - expB;
 
     if (0 < expDiff) {
         if (0x7FFF == expA) {
-            if (0 != (uiA0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-                uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
+            if (0 != (a.signif & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+                uint128 const uiZ = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
                 extFloat80_t uZ;
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
@@ -345,8 +341,8 @@ sub_magnitudes(uint16_t const uiA64,
             }
 
             extFloat80_t uZ;
-            uZ.signExp = uiA64;
-            uZ.signif = uiA0;
+            uZ.signExp = a.signExp;
+            uZ.signif = a.signif;
             return uZ;
         }
 
@@ -354,22 +350,22 @@ sub_magnitudes(uint16_t const uiA64,
             --expDiff;
 
             if (0 == expDiff) {
-                uint128 const sig128_6 = sub(uint128{uiA0, 0}, uint128{uiB0, 0});
+                uint128 const sig128_6 = sub(uint128{a.signif, 0}, uint128{b.signif, 0});
                 return
                     norm_round_pack_to_extF80(signZ, expA, sig128_6.v64, sig128_6.v0, extF80_rounding_precision);
             }
         }
 
-        uint128 const sig128_2 = shift_right_jam_128(uiB0, 0, static_cast<uint32_t>(expDiff));
-        uint128 const sig128_1 = sub(uint128{uiA0, 0}, sig128_2);
+        uint128 const sig128_2 = shift_right_jam_128(b.signif, 0, static_cast<uint32_t>(expDiff));
+        uint128 const sig128_1 = sub(uint128{a.signif, 0}, sig128_2);
         return
             norm_round_pack_to_extF80(signZ, expA, sig128_1.v64, sig128_1.v0, extF80_rounding_precision);
     }
 
     if (expDiff < 0) {
         if (expB == 0x7FFF) {
-            if (0 != (uiB0 & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-                uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
+            if (0 != (b.signif & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+                uint128 const uiZ = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
                 extFloat80_t uZ;
                 uZ.signExp = static_cast<uint16_t>(uiZ.v64);
                 uZ.signif = uiZ.v0;
@@ -386,21 +382,21 @@ sub_magnitudes(uint16_t const uiA64,
             ++expDiff;
 
             if (0 == expDiff) {
-                uint128 const sig128_7 = sub(uint128{uiB0, 0}, uint128{uiA0, 0});
+                uint128 const sig128_7 = sub(uint128{b.signif, 0}, uint128{a.signif, 0});
                 return
                     norm_round_pack_to_extF80(!signZ, expB, sig128_7.v64, sig128_7.v0, extF80_rounding_precision);
             }
         }
 
-        uint128 const sig128_4 = shift_right_jam_128(uiA0, 0, static_cast<uint32_t>(-expDiff));
-        uint128 const sig128_3 = sub(uint128{uiB0, 0}, sig128_4);
+        uint128 const sig128_4 = shift_right_jam_128(a.signif, 0, static_cast<uint32_t>(-expDiff));
+        uint128 const sig128_3 = sub(uint128{b.signif, 0}, sig128_4);
         return
             norm_round_pack_to_extF80(!signZ, expB, sig128_3.v64, sig128_3.v0, extF80_rounding_precision);
     }
 
     if (0x7FFF == expA) {
-        if (0 != ((uiA0 | uiB0) & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
-            uint128 const uiZ = propagate_NaN(uiA64, uiA0, uiB64, uiB0);
+        if (0 != ((a.signif | b.signif) & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
+            uint128 const uiZ = propagate_NaN(a.signExp, a.signif, b.signExp, b.signif);
             extFloat80_t uZ;
             uZ.signExp = static_cast<uint16_t>(uiZ.v64);
             uZ.signif = uiZ.v0;
@@ -416,17 +412,17 @@ sub_magnitudes(uint16_t const uiA64,
 
     int32_t const expZ = 0 == expA ? 1 : expA;
 
-    if (uiA0 > uiB0) {
-        uint128 const sig128 = sub(uint128{uiA0, 0}, uint128{uiB0, 0});
+    if (a.signif > b.signif) {
+        uint128 const sig128 = sub(uint128{a.signif, 0}, uint128{b.signif, 0});
         return norm_round_pack_to_extF80(signZ, expZ, sig128.v64, sig128.v0, extF80_rounding_precision);
     }
 
-    if (uiA0 < uiB0) {
-        uint128 const sig128 = sub(uint128{uiB0, 0}, uint128{uiA0, 0});
+    if (a.signif < b.signif) {
+        uint128 const sig128 = sub(uint128{b.signif, 0}, uint128{a.signif, 0});
         return norm_round_pack_to_extF80(!signZ, expZ, sig128.v64, sig128.v0, extF80_rounding_precision);
     }
 
-    /* uiA0 == uiB0 */
+    /* a.signif == b.signif */
     extFloat80_t uZ;
     uZ.signExp = pack_to_extF80_UI64(softfloat_round_min == softfloat_get_roundingMode(), 0);
     uZ.signif = 0;
@@ -443,8 +439,8 @@ extF80_add(extFloat80_t const a,
     bool const signA = is_sign(a);
     bool const signB = is_sign(b);
     return signA == signB ?
-        add_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA) :
-        sub_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA);
+        add_magnitudes(a, b, signA) :
+        sub_magnitudes(a, b, signA);
 }
 
 extFloat80_t
@@ -457,8 +453,8 @@ extF80_sub(extFloat80_t const a,
     bool const signB = is_sign(b);
     return
         signA == signB ?
-        sub_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA) :
-        add_magnitudes(a.signExp, a.signif, b.signExp, b.signif, signA);
+        sub_magnitudes(a, b, signA) :
+        add_magnitudes(a, b, signA);
 }
 
 void
@@ -473,8 +469,8 @@ extF80M_add(extFloat80_t const *const aPtr,
     bool const signB = is_sign(*bPtr);
     *zPtr =
         signA == signB ?
-        add_magnitudes(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA) :
-        sub_magnitudes(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA);
+        add_magnitudes(*aPtr, *bPtr, signA) :
+        sub_magnitudes(*aPtr, *bPtr, signA);
 #else
 
     using namespace softfloat::internals::slow_int64;
@@ -496,8 +492,8 @@ extF80M_sub(extFloat80_t const *const aPtr,
     bool const signB = is_sign(*bPtr);
     *zPtr =
         signA == signB ?
-        sub_magnitudes(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA) :
-        add_magnitudes(aPtr->signExp, aPtr->signif, bPtr->signExp, bPtr->signif, signA);
+        sub_magnitudes(*aPtr, *bPtr, signA) :
+        add_magnitudes(*aPtr, *bPtr, signA);
 
 #else
 
