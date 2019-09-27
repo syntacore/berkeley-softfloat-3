@@ -114,15 +114,13 @@ extern "C" {
     float32_t ui64_to_f32(uint64_t);
 
     int32_t f32_to_i32(float32_t, softfloat_round_mode, bool);
-    int32_t f32_to_i32_r_minMag(float32_t, bool);
     uint32_t f32_to_ui32(float32_t, softfloat_round_mode, bool);
-
+    int32_t f32_to_i32_r_minMag(float32_t, bool);
     uint32_t f32_to_ui32_r_minMag(float32_t, bool);
 
     int64_t f32_to_i64(float32_t, softfloat_round_mode, bool);
-    int64_t f32_to_i64_r_minMag(float32_t, bool);
     uint64_t f32_to_ui64(float32_t, softfloat_round_mode, bool);
-
+    int64_t f32_to_i64_r_minMag(float32_t, bool);
     uint64_t f32_to_ui64_r_minMag(float32_t, bool);
 
     float16_t f32_to_f16(float32_t);
@@ -167,9 +165,8 @@ extern "C" {
     uint32_t f64_to_ui32_r_minMag(float64_t, bool);
 
     int64_t f64_to_i64(float64_t, softfloat_round_mode, bool);
-    int64_t f64_to_i64_r_minMag(float64_t, bool);
-
     uint64_t f64_to_ui64(float64_t, softfloat_round_mode, bool);
+    int64_t f64_to_i64_r_minMag(float64_t, bool);
     uint64_t f64_to_ui64_r_minMag(float64_t, bool);
 
     float16_t f64_to_f16(float64_t);
