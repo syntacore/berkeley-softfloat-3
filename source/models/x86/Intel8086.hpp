@@ -227,39 +227,6 @@ true.
 */
 
 /**
-Assuming the unsigned integer formed from concatenating `uiA64' and `uiA0'
-has the bit pattern of an 80-bit extended floating-point NaN, converts
-this NaN to the common NaN form, and stores the resulting common NaN at the
-location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
-exception is raised.
-*/
-inline commonNaN
-commonNaN_from_extF80UI(uint16_t const uiA64,
-                        uint64_t const uiA0)
-{
-    if (is_sNaN(uiA64, uiA0)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-    }
-
-    return commonNaN{0 != (uiA64 >> 15), uiA0 << 1, 0};
-}
-
-/**
-Interpreting the unsigned integer formed from concatenating `uiA64' and
-`uiA0' as an 80-bit extended floating-point value, and likewise interpreting
-the unsigned integer formed from concatenating `uiB64' and `uiB0' as another
-80-bit extended floating-point value, and assuming at least on of these
-floating-point values is a NaN, returns the bit pattern of the combined NaN
-result.  If either original floating-point value is a signaling NaN, the
-invalid exception is raised.
-*/
-uint128
-propagate_NaN(uint16_t uiA64,
-              uint64_t uiA0,
-              uint16_t uiB64,
-              uint64_t uiB0);
-
-/**
 The bit pattern for a default generated 128-bit floating-point NaN.
 */
 static uint64_t const defaultNaNF128UI64 = UINT64_C(0xFFFF800000000000);
@@ -284,6 +251,24 @@ inline constexpr bool
 is_sNaN(uint128 const& a)
 {
     return is_sNaN(a.v64, a.v0);
+}
+
+/**
+Assuming the unsigned integer formed from concatenating `uiA64' and `uiA0'
+has the bit pattern of an 80-bit extended floating-point NaN, converts
+this NaN to the common NaN form, and stores the resulting common NaN at the
+location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
+exception is raised.
+*/
+inline commonNaN
+commonNaN_from_extF80UI(uint16_t const uiA64,
+                        uint64_t const uiA0)
+{
+    if (is_sNaN(uiA64, uiA0)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+    }
+
+    return commonNaN{0 != (uiA64 >> 15), uiA0 << 1, 0};
 }
 
 /**
@@ -315,6 +300,21 @@ commonNaN_to_F128UI(commonNaN const& a)
     uint128 const uiZ = short_shift_right_128(uint128{a.v64, a.v0}, 16);
     return uint128{uiZ.v64 | static_cast<uint64_t>(!!a.sign) << 63 | UINT64_C(0x7FFF800000000000), uiZ.v0};
 }
+
+/**
+Interpreting the unsigned integer formed from concatenating `uiA64' and
+`uiA0' as an 80-bit extended floating-point value, and likewise interpreting
+the unsigned integer formed from concatenating `uiB64' and `uiB0' as another
+80-bit extended floating-point value, and assuming at least on of these
+floating-point values is a NaN, returns the bit pattern of the combined NaN
+result.  If either original floating-point value is a signaling NaN, the
+invalid exception is raised.
+*/
+uint128
+propagate_NaN(uint16_t uiA64,
+              uint64_t uiA0,
+              uint16_t uiB64,
+              uint64_t uiB0);
 
 /**
 Interpreting the unsigned integer formed from concatenating `uiA64' and
