@@ -56,7 +56,7 @@ make_result(uint32_t sigA, uint32_t sigB, int16_t expZ, bool const signZ)
         sig64A = static_cast<uint64_t>(sigA) << 30;
     }
 
-    uint32_t sigZ = sig64A / sigB;
+    uint32_t sigZ = static_cast<uint32_t>(sig64A / sigB);
 
     if (0 == (sigZ & 0x3F)) {
         sigZ |= !!(static_cast<uint64_t>(sigB) * sigZ != sig64A);
