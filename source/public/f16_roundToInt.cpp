@@ -88,6 +88,9 @@ f16_roundToInt(float16_t const a,
             }
 
             break;
+        
+        default:
+            break;
         }
 
         return u_as_f(uiZ);
