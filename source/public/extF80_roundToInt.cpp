@@ -1,4 +1,4 @@
-﻿
+
 /** @file
 
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
@@ -92,9 +92,6 @@ extF80_roundToInt(extFloat80_t const a,
             softfloat_raiseFlags(softfloat_flag_inexact);
         }
 
-        /**
-        @bug  warning: enumeration value ‘softfloat_round_minMag’ not handled in switch
-        */
         switch (roundingMode) {
         case softfloat_round_near_even:
             if (0 == (sigA & UINT64_C(0x7FFFFFFFFFFFFFFF))) {
@@ -131,6 +128,9 @@ extF80_roundToInt(extFloat80_t const a,
                 return uZ;
             }
 
+            break;
+
+        default:
             break;
         }
 
