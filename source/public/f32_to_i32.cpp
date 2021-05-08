@@ -48,17 +48,17 @@ f32_to_i32(float32_t const a,
         return i32_fromNaN;
     }
 
-    int16_t const exp = get_exp(a);
-    bool const sign = is_sign(a);
-
-    if (255 == exp) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    if (is_inf(a)) {
+        softfloat_raiseFlags(softfloat_flag_overflow);
+        return is_sign(a) ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
 
     if (is_zero(a)) {
         return 0;
     }
+
+    int16_t const exp = get_exp(a);
+    bool const sign = is_sign(a);
 
     uint64_t const sig64 = static_cast<uint64_t>(get_frac(a) | 0x00800000) << 32;
     int16_t const shiftDist = 0xAA - exp;

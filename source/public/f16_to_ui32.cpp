@@ -44,16 +44,22 @@ f16_to_ui32(float16_t const a,
 {
     using namespace softfloat::internals;
 
+    if (is_NaN(a)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return ui32_fromNaN;
+    }
+
+    if (is_inf(a)) {
+        softfloat_raiseFlags(softfloat_flag_overflow);
+        return is_sign(a) ? ui32_fromNegOverflow : ui32_fromPosOverflow;
+    }
+
+    if (is_zero(a)) {
+        return 0;
+    }
+
     bool const sign = is_sign(a);
     uint16_t const frac = get_frac(a);
-
-    if (!is_finite(a)) {
-        softfloat_raiseFlags(softfloat_flag_invalid);
-        return
-            frac ? ui32_fromNaN :
-            sign ? ui32_fromNegOverflow :
-            ui32_fromPosOverflow;
-    }
 
     uint32_t sig32 = frac;
     int8_t const exp = get_exp(a);

@@ -42,23 +42,24 @@ f64_to_i32(float64_t const a,
            bool const exact)
 {
     using namespace softfloat::internals;
-    static bool const fromNaN_is_same_as_pos_overflow = i32_fromNaN == i32_fromPosOverflow;
-    static bool const fromNaN_is_same_as_neg_overflow = i32_fromNaN == i32_fromNegOverflow;
-    static bool const fromNaN_is_same_as_both_overflow = fromNaN_is_same_as_pos_overflow && fromNaN_is_same_as_neg_overflow;
-    static bool const fromNaN_is_same_as_any_overflow = fromNaN_is_same_as_pos_overflow || fromNaN_is_same_as_neg_overflow;
-    bool sign = is_sign(a);
+
+    if (is_NaN(a)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return i32_fromNaN;
+    }
+
+    if (is_inf(a)) {
+        softfloat_raiseFlags(softfloat_flag_overflow);
+        return is_sign(a) ? i32_fromNegOverflow : i32_fromPosOverflow;
+    }
+
+    if (is_zero(a)) {
+        return 0;
+    }
+
+    bool const sign = is_sign(a);
     int16_t const exp = get_exp(a);
     uint64_t sig = get_frac(a);
-
-    // TODO: check and re-factor
-    if (!fromNaN_is_same_as_both_overflow && is_NaN(a)) {
-        if (!fromNaN_is_same_as_any_overflow) {
-            softfloat_raiseFlags(softfloat_flag_invalid);
-            return i32_fromNaN;
-        }
-
-        sign = fromNaN_is_same_as_neg_overflow;
-    }
 
     if (0 != exp) {
         sig |= UINT64_C(0x0010000000000000);

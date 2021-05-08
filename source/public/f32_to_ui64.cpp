@@ -41,6 +41,22 @@ f32_to_ui64(float32_t const a,
             softfloat_round_mode const roundingMode,
             bool const exact)
 {
+    using namespace softfloat::internals;
+
+    if (is_NaN(a)) {
+        softfloat_raiseFlags(softfloat_flag_invalid);
+        return ui64_fromNaN;
+    }
+
+    if (is_inf(a)) {
+        softfloat_raiseFlags(softfloat_flag_overflow);
+        return is_sign(a) ? ui64_fromNegOverflow : ui64_fromPosOverflow;
+    }
+
+    if (is_zero(a)) {
+        return 0;
+    }
+
 #if (SOFTFLOAT_FAST_INT64)
 
     using namespace softfloat::internals::fast_int64;
