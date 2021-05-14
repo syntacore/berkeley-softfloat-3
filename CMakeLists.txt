@@ -8,8 +8,7 @@ TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_library(softfloat_interface INTERFACE)
-target_sources(softfloat_interface
-INTERFACE
+set(COMMON_INCLUDE
 	${CMAKE_CURRENT_SOURCE_DIR}/include/softfloat/functions.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/softfloat/types.h
 )
@@ -18,7 +17,7 @@ target_compile_definitions(softfloat_interface INTERFACE $<$<BOOL:${IS_BIG_ENDIA
 
 add_subdirectory(source)
 
-add_library(softfloat-riscv EXCLUDE_FROM_ALL)
+add_library(softfloat-riscv EXCLUDE_FROM_ALL ${COMMON_INCLUDE})
 target_link_libraries(softfloat-riscv
 PUBLIC
 	softfloat_interface
@@ -28,7 +27,7 @@ PRIVATE
 )
 set_target_properties(softfloat-riscv PROPERTIES FOLDER "libs/softfloat")
 
-add_library(softfloat-x86-FPU EXCLUDE_FROM_ALL)
+add_library(softfloat-x86-FPU EXCLUDE_FROM_ALL ${COMMON_INCLUDE})
 target_link_libraries(softfloat-x86-FPU
 PUBLIC
 	softfloat_interface
@@ -38,7 +37,7 @@ PRIVATE
 )
 set_target_properties(softfloat-x86-FPU PROPERTIES FOLDER "libs/softfloat")
 
-add_library(softfloat-x86-SSE EXCLUDE_FROM_ALL)
+add_library(softfloat-x86-SSE EXCLUDE_FROM_ALL ${COMMON_INCLUDE})
 target_link_libraries(softfloat-x86-SSE
 PUBLIC
 	softfloat_interface
